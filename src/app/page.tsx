@@ -73,27 +73,50 @@ const FinalCTA = dynamic(
   () => import("@/components/marketing/FinalCTA").then((m) => m.FinalCTA),
   { loading: () => sectionFallback }
 );
+// R4-a: three new institutional marketing sections — split into their
+// own JS chunks so the initial bundle stays lean. Each follows the
+// same `sectionFallback` skeleton pattern as the other sections.
+const TrustSignals = dynamic(
+  () => import("@/components/marketing/TrustSignals").then((m) => m.TrustSignals),
+  { loading: () => sectionFallback }
+);
+const MetricsShowcase = dynamic(
+  () => import("@/components/marketing/MetricsShowcase").then((m) => m.MetricsShowcase),
+  { loading: () => sectionFallback }
+);
+const SecurityDeepDive = dynamic(
+  () => import("@/components/marketing/SecurityDeepDive").then((m) => m.SecurityDeepDive),
+  { loading: () => sectionFallback }
+);
 
 export default function Home() {
-  // Round 1 redesign — simplified home to a tight 6-section rhythm:
-  //   Hero → Ticker → Bento → FeaturePreview → CTA → FinalCTA.
-  // Removed: ProofBar, TrustedBy, PositioningStrip, FeatureRotator,
-  // StatsBand, BlogPreview. The remaining sections already cover social
-  // proof (Ticker trades), feature depth (Bento + FeaturePreview), and
-  // conversion (CTA + FinalCTA) without redundant bands stacking up.
+  // R4-a redesigned home — 9-section rhythm with the three new
+  // institutional sections interleaved between the existing ones:
+  //   Hero → TrustSignals → Ticker → Bento → MetricsShowcase →
+  //   FeaturePreview → SecurityDeepDive → HomeCTA → FinalCTA.
+  // TrustSignals (post-Hero) sets the credibility frame before the
+  // user sees anything else. MetricsShowcase (post-Bento) deepens
+  // the metrics story the Bento alludes to. SecurityDeepDive
+  // (post-FeaturePreview) closes the trust loop before conversion.
   return (
     <PageTransition>
       {/* Hero — also keeps id="top" inside <Hero> for the command palette's "Go to top". */}
       <div id="hero" className="scroll-mt-16">
         <HeroVideo />
       </div>
+      {/* R4-a — premium trust band right after the Hero (Stripe-style). */}
+      <TrustSignals />
       <Ticker />
       {/* Anchor target for in-page navigation to the feature preview. */}
       <div id="features-preview" className="scroll-mt-16">
         <Bento />
       </div>
+      {/* R4-a — institutional metrics deep-dive (live ratios + equity curve). */}
+      <MetricsShowcase />
       {/* Compact 3-card feature preview — bridges Bento and the CTA section. */}
       <FeaturePreview />
+      {/* R4-a — security & privacy deep-dive (3 cards + comparison table). */}
+      <SecurityDeepDive />
       {/* Anchor target for the navigation-card CTA section. */}
       <div id="cta" className="scroll-mt-16">
         <HomeCTASection />

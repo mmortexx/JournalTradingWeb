@@ -6,6 +6,9 @@ import { useLang } from "@/lib/i18n";
 import { DemoProvider, useDemo, type DemoPage } from "./DemoContext";
 import { WindowChrome } from "./WindowChrome";
 import { TopNav } from "./TopNav";
+import { StatusBar } from "./StatusBar";
+import { DemoCommandPalette } from "./DemoCommandPalette";
+import { DemoShortcutsHint } from "./DemoShortcutsHint";
 import { DashboardPage } from "./pages/DashboardPage";
 import { TradesPage } from "./pages/TradesPage";
 import { TradeDetailPage } from "./pages/TradeDetailPage";
@@ -26,6 +29,20 @@ export function AppDemo() {
 function AppDemoInner() {
   const { t, lang } = useLang();
   const { page, fullscreen, setFullscreen, setPage, goBack } = useDemo();
+
+  // Demo-scoped command palette + shortcuts-overlay open state. Lifted here
+  // so the capture-phase keydown listener (below) and the StatusBar's
+  // keyboard-icon button can both toggle them, and so the overlays render
+  // inside the demo window's positioning context.
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+
+  // Ref on the demo window's outer wrapper — used (a) as the positioning
+  // context for the absolute overlays and (b) to gate the Cmd+K / `?`
+  // capture-phase interceptor (only fires when the demo is hovered or
+  // focused-within, so the global CommandPalette / ShortcutsHelp keep
+  // working when the user isn't interacting with the demo).
+  const demoRootRef = useRef<HTMLDivElement>(null);
 
   // Label the scrollable panel with the active page name (used by role="tabpanel").
   const panelLabelKey =
@@ -82,6 +99,8 @@ function AppDemoInner() {
       // Defer to the command palette / shortcuts overlay when they're open.
       if (document.querySelector("[cmdk-root]")) return;
       if (document.body.dataset.shortcutsHelpOpen === "true") return;
+      if (document.body.dataset.demoPaletteOpen === "true") return;
+      if (document.body.dataset.demoShortcutsOpen === "true") return;
 
       if (e.key.toLowerCase() === "f") {
         e.preventDefault();
@@ -91,6 +110,70 @@ function AppDemoInner() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [fullscreen, setFullscreen]);
+
+  /* ----------------------------------------------------------------
+     Demo-scoped Cmd+K (palette) + `?` (shortcuts overlay) interceptor.
+     Capture-phase listener on `window` so it fires BEFORE the global
+     CommandPalette / ShortcutsHelp bubble-phase listeners — calling
+     `stopPropagation` prevents those global handlers from also firing,
+     so the demo gets its own palette / overlay instead of the site-wide
+     ones whenever the demo is "active" (hovered or focused-within).
+
+     The `:hover, :focus-within` gate on `demoRootRef` is what scopes
+     the interception: when the user isn't interacting with the demo,
+     the global Cmd+K / `?` keep working as before. Skipped while typing
+     in a form field, while any modifiers are held (so Cmd+Shift+K etc.
+     pass through), and while either demo overlay is already open
+     (their own Escape handlers own the close action).
+     ---------------------------------------------------------------- */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const root = demoRootRef.current;
+      if (!root) return;
+      // Only intercept when the demo is "active".
+      if (!root.matches(":hover, :focus-within")) return;
+      // Skip when typing in a form field.
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tag = target.tagName;
+        if (
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          tag === "SELECT" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+      }
+      // Cmd+K / Ctrl+K → open the demo command palette.
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        e.stopPropagation();
+        setPaletteOpen(true);
+        return;
+      }
+      // `?` (Shift+/) → open the demo shortcuts overlay. Skipped while
+      // the demo palette is open (let the palette's own Esc close it
+      // first) and while the global ShortcutsHelp is open.
+      if (
+        document.body.dataset.demoPaletteOpen === "true" ||
+        document.body.dataset.shortcutsHelpOpen === "true" ||
+        document.body.dataset.demoShortcutsOpen === "true"
+      ) {
+        return;
+      }
+      if (
+        e.key === "?" ||
+        (e.shiftKey && (e.key === "/" || e.code === "Slash"))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        setShortcutsOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey, true); // capture phase
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, []);
 
   /* ----------------------------------------------------------------
      Touch swipe — horizontal swipe on the demo content area advances
@@ -206,6 +289,7 @@ function AppDemoInner() {
               gradient). `overflow-hidden` clips every child (title bar, nav,
               content, status bar) to the 12px window radius. */}
       <div
+        ref={demoRootRef}
         className={`relative mx-auto transition-all duration-500 ${
           fullscreen
             ? "fixed inset-3 z-[100] rounded-xl"
@@ -249,89 +333,34 @@ function AppDemoInner() {
             </div>
           </div>
 
-          {/* Status bar — 28px tall, mirrors a real Windows 11 / WinUI 3 app
-              status bar (Bloomberg Terminal / Linear desktop convention):
-              left = connection indicator (green dot + "Conectado" +
-              "Local-first"), center = current view name, right = live clock +
-              keyboard hint + fullscreen + share + reset. `liquid-glass`
-              background with a `border-t border-white/10` hairline; the
-              bottom corners are rounded automatically by the parent
-              window's `overflow-hidden` + `rounded-xl`. All text uses
-              `text-tertiary` (gray-400 on dark) so the bar reads as quiet
-              chrome, not content. Numbers use `.tnum` for tabular alignment. */}
-          <div className="liquid-glass border-t border-white/10 flex items-center justify-between px-3 h-7 text-[11px] text-tertiary select-none">
-            {/* Left — connection status. The green dot has a soft accent halo
-                (`shadow-[0_0_6px_rgb(var(--pnl-pos)/0.6)]`) so it reads as a
-                live "connected" LED, not a flat speck. The demoSampleData
-                notice moves into the dot's `title` attribute so the ethical
-                clarity ("sample data, not real trading") is preserved
-                without crowding the bar. "Conectado" / "Connected" is
-                inline-bilingual since no STR key exists for it; "Local-first"
-                reuses the existing `localFirst` STR key. */}
-            <span className="flex items-center gap-1.5 min-w-0">
-              <span
-                className="w-1.5 h-1.5 rounded-full bg-pnl-pos shrink-0 shadow-[0_0_6px_rgb(var(--pnl-pos)/0.6)]"
-                title={t("demoSampleData")}
-                aria-label={t("demoSampleData")}
-              />
-              <span className="truncate text-secondary">
-                {lang === "es" ? "Conectado" : "Connected"}
-              </span>
-              <span aria-hidden="true" className="hidden sm:inline opacity-40">·</span>
-              <span className="hidden sm:inline truncate">{t("localFirst")}</span>
-              {/* Keyboard-shortcut hint — desktop only. Teases the 1–6
-                  digit shortcuts so power users discover them without
-                  opening the full ? help overlay. */}
-              <span
-                aria-hidden="true"
-                className="hidden lg:inline opacity-40 ml-0.5"
-              >
-                ·
-              </span>
-              <span
-                className="hidden lg:inline text-[10px] tnum"
-                title={t("navShortcuts")}
-              >
-                {t("demoKeyHint")}
-              </span>
-            </span>
-            {/* Center — current view name. Mirrors how WinUI 3 apps show the
-                active document/view in the status bar. Hidden on <sm so the
-                bar stays readable on narrow viewports; the active tab in
-                TopNav already conveys the current view to mobile users. */}
-            <span className="hidden md:inline text-tertiary truncate absolute left-1/2 -translate-x-1/2 pointer-events-none">
-              {t(panelLabelKey)}
-            </span>
-            {/* Right side — live clock + fullscreen + share + reset (Win11
-                status-bar ordering: primary view control first, then utility
-                actions). All three keep their existing behavior; only the
-                visual order was changed to match the Windows 11 convention. */}
-            <span className="flex items-center gap-3">
-              <LiveClock />
-              <button
-                onClick={() => setFullscreen(!fullscreen)}
-                aria-label={fullscreen ? t("demoCloseFull") : t("demoOpenFull")}
-                className="hover:text-primary transition-colors flex items-center gap-1"
-              >
-                {fullscreen ? (
-                  <>
-                    <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 6L2 2M10 6l4-4M6 10l-4 4M10 10l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-                    <span className="hidden sm:inline">{t("demoCloseFull")}</span>
-                  </>
-                ) : (
-                  <>
-                    <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    <span className="hidden sm:inline">{t("demoOpenFull")}</span>
-                  </>
-                )}
-              </button>
-              <ShareButton />
-              {/* Reset — desktop only. Snaps the demo back to the
-                  dashboard tab and shows a brief "✓ Reiniciado" / "✓ Reset"
-                  confirmation that auto-dismisses after 2 s. */}
-              <ResetButton />
-            </span>
-          </div>
+          {/* Status bar — extracted into its own `StatusBar` component
+              (Feature 1) so the new live mini-metrics ticker + keyboard
+              icon button (Feature 3 trigger) live next to the bar they
+              decorate. Mirrors a real Windows 11 / WinUI 3 status bar
+              (Bloomberg Terminal / Linear desktop convention): left =
+              connection LED + "Conectado" + "Local-first", center = live
+              mini-metrics ticker (cycles every 4 s), right = HH:MM:SS
+              clock + "data: 72 trades" + keyboard / fullscreen / share /
+              reset icon buttons. */}
+          <StatusBar onOpenShortcuts={() => setShortcutsOpen(true)} />
+
+          {/* In-demo command palette (Feature 2) — Cmd+K when the demo is
+              active. Rendered here so it sits inside the demo window's
+              positioning context (absolute inset-0 covers only the demo,
+              not the whole page). The capture-phase keydown listener above
+              opens it; the palette manages its own Esc / arrows / enter. */}
+          <DemoCommandPalette
+            open={paletteOpen}
+            onClose={() => setPaletteOpen(false)}
+          />
+
+          {/* In-demo keyboard-shortcuts overlay (Feature 3) — `?` when the
+              demo is active, or click the keyboard icon in the status bar.
+              Anchored bottom-right, just above the status bar. */}
+          <DemoShortcutsHint
+            open={shortcutsOpen}
+            onClose={() => setShortcutsOpen(false)}
+          />
 
           {/* Window top reflection — thin 1px white-to-transparent gradient
               at the very top of the window. Mimics the subtle highlight
@@ -348,176 +377,5 @@ function AppDemoInner() {
         </div>
       </div>
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* LiveClock (status bar)                                             */
-/* ------------------------------------------------------------------ */
-
-/**
- * LiveClock — a real-time HH:MM clock for the demo's status bar, mirroring
- * the live-clock convention in Bloomberg Terminal / TradingView desktop
- * apps. Updates every 30 s (a minute-resolution clock doesn't need a
- * 1-second tick — saves a re-render per second). Renders `--:--` until the
- * first client-side tick (initializing empty avoids an SSR/hydration
- * mismatch since the server can't know the user's local time). Tabular
- * numerals via `.tnum` so the digits don't shift width as minutes change.
- * Hidden on <sm to keep the status bar readable on narrow viewports.
- */
-function LiveClock() {
-  const [time, setTime] = useState<string>("");
-  useEffect(() => {
-    const update = () => {
-      const now = new Date();
-      const hh = String(now.getHours()).padStart(2, "0");
-      const mm = String(now.getMinutes()).padStart(2, "0");
-      setTime(`${hh}:${mm}`);
-    };
-    update();
-    const id = window.setInterval(update, 30_000);
-    return () => window.clearInterval(id);
-  }, []);
-  return (
-    <span className="hidden sm:inline tnum tabular-nums" aria-label={time || "Clock"}>
-      {time || "--:--"}
-    </span>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Share button (status bar)                                          */
-/* ------------------------------------------------------------------ */
-
-/**
- * ShareButton — uses the Web Share API when available, otherwise copies
- * the current page URL to the clipboard and shows a brief "✓ Copied"
- * confirmation. The confirmation auto-dismisses after 2 s. Lives in the
- * demo's status bar so it's reachable from any page in the demo.
- */
-function ShareButton() {
-  const { t } = useLang();
-  const [copied, setCopied] = useState(false);
-  // Track the "✓ Copied" reset timeout so we can clear it on unmount and
-  // avoid a late setState on a gone component.
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    return () => {
-      if (resetTimer.current !== null) window.clearTimeout(resetTimer.current);
-    };
-  }, []);
-
-  async function handleShare() {
-    if (typeof navigator === "undefined") return;
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    const shareData = { title: "Trading Journal — Demo", url };
-
-    // Prefer the native share sheet when the browser exposes it.
-    if (typeof navigator.share === "function") {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch {
-        // User dismissed the share sheet (AbortError) or the call failed —
-        // fall through to the clipboard path so the button still does
-        // something useful on desktop browsers without share support.
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
-      resetTimer.current = setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard API can be blocked by permissions; fail silently.
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleShare}
-      aria-label={t("demoShare")}
-      className="hover:text-primary transition-colors flex items-center gap-1"
-    >
-      <svg
-        width="11"
-        height="11"
-        viewBox="0 0 16 16"
-        fill="none"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="3.5" r="2" stroke="currentColor" strokeWidth="1.4" />
-        <circle cx="4" cy="8" r="2" stroke="currentColor" strokeWidth="1.4" />
-        <circle cx="12" cy="12.5" r="2" stroke="currentColor" strokeWidth="1.4" />
-        <path
-          d="M5.7 7.1l4.6-2.6M5.7 8.9l4.6 2.6"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className="hidden sm:inline">{copied ? t("demoShareCopied") : t("demoShare")}</span>
-    </button>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Reset button (status bar, desktop only)                            */
-/* ------------------------------------------------------------------ */
-
-/**
- * ResetButton — snaps the demo back to the dashboard tab and shows a brief
- * "✓ Reiniciado" / "✓ Reset" confirmation that auto-dismisses after 2 s,
- * mirroring the ShareButton's confirmation pattern. Desktop-only
- * (`hidden lg:inline`) since the status bar is already crowded on smaller
- * viewports.
- */
-function ResetButton() {
-  const { t } = useLang();
-  const { setPage } = useDemo();
-  const [done, setDone] = useState(false);
-  // Track the "✓ Done" reset timeout so we can clear it on unmount.
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    return () => {
-      if (resetTimer.current !== null) window.clearTimeout(resetTimer.current);
-    };
-  }, []);
-
-  const handleReset = () => {
-    setPage("dashboard");
-    setDone(true);
-    if (resetTimer.current !== null) clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setDone(false), 2000);
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleReset}
-      aria-label={t("demoReset")}
-      className="hidden lg:inline hover:text-primary transition-colors flex items-center gap-1"
-    >
-      <svg
-        width="11"
-        height="11"
-        viewBox="0 0 16 16"
-        fill="none"
-        aria-hidden="true"
-        className={done ? "" : "transition-transform duration-500"}
-        style={done ? undefined : { transformOrigin: "50% 50%" }}
-      >
-        <path
-          d="M13.5 8a5.5 5.5 0 11-1.7-3.95M13.5 2v3h-3"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <span>{done ? t("demoResetDone") : t("demoReset")}</span>
-    </button>
   );
 }

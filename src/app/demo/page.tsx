@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
-import { DemoShortcutsHint } from "@/components/demo/DemoShortcutsHint";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -114,8 +113,6 @@ export default function DemoPage() {
       <section className="section bg-black scroll-mt-16">
         <AppDemoClient />
       </section>
-      {/* Keyboard shortcuts hint — small card right below the demo */}
-      <DemoShortcutsHint />
       {/* Screenshot gallery — all 8 optimized webp images */}
       <DemoGallery />
       <StatsBand />

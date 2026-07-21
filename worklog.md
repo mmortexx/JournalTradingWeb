@@ -8739,3 +8739,128 @@ Both `AnalyticsPage.tsx` and `JournalPage.tsx` were already ~90% polished by pri
 3. **Invoice fidelity** — the discipline-breakdown table now renders in Geist Mono, delivering the explicit "monospace feel" the spec called for. Combined with `tnum` + dashed dividers + red bold totals, it reads as a true institutional invoice.
 
 No constraints violated: only the 2 target files were edited; no indigo/blue introduced; accent gold remains used sparingly (header halo + histogram accent swatch only — no new gold added); P&L colors preserved throughout; dark theme + `text-primary/secondary/tertiary` maintained (zero raw `text-white`/`text-gray-*`); bilingual via `useLang()`; zero CSS added to `globals.css`. Lint clean, dev server 200.
+
+---
+
+## Task ID: R4-a
+
+**Agent:** R4-a (general-purpose subagent — institutional marketing sections)
+
+**Task:** Add 3 new institutional-grade marketing sections to the home page (`TrustSignals`, `MetricsShowcase`, `SecurityDeepDive`) and wire them into the home composition between existing sections. Dark-first, gold-accent, bilingual (ES/EN), no indigo/blue, accent gold used sparingly, P&L colors for trading figures, `tnum` everywhere, inline SVG icons only.
+
+### Work Log
+
+**First steps (minimal reads):**
+- Read last 120 lines of `worklog.md` — confirmed prior R3 stages all green (lint exit 0, HTTP 200, DOM-verified).
+- Read `src/app/page.tsx` (107 lines) — current composition Hero → Ticker → Bento → FeaturePreview → HomeCTA → FinalCTA, using `next/dynamic` with a `sectionFallback` skeleton pattern.
+- Read `src/app/globals.css` lines 1-70 (theme tokens) and 1320-1371 (`.liquid-glass` R3-a fix) — confirmed `liquid-glass` border/shadow work correctly now (Tailwind utilities own border/shadow on the host, machined insets live on `::after`).
+- Dev server check: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/` → **200** (already running, no restart needed).
+- Read existing primitives for style parity: `TrustStrip.tsx`, `LocalFirst.tsx`, `FeaturePreview.tsx`, `Bento.tsx` (IconWell pattern), `Reveal.tsx` (delay capped at 0.3s), `Eyebrow.tsx`, `CountUp.tsx` (IntersectionObserver-based, `tone` prop → `text-pnl-pos/neg`), `Money.tsx`, `Chip.tsx`.
+- Read `src/lib/trading/data.ts` for `METRICS`, `INITIAL_BALANCE_CONST`, `Trade` interface. Read `src/lib/trading/format.ts` for `fmtMoney` / `fmtNum` / `pnlTone`. Read `src/lib/i18n.tsx` `useLang` API (`{ lang, t, tf }`). Inspected existing `EquityCurve.tsx` (decided to build a custom inline SVG instead of reusing it — full design control for the marketing context, matches the left card's glass treatment).
+
+**Section 1 — `src/components/marketing/TrustSignals.tsx` (id="trust"):**
+- `.section-tight cv-auto relative overflow-hidden` band with `.grain` texture + a subtle top `divider-grad`-style hairline to read as a divider between Hero and the band.
+- 5-card grid: `grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3` (single horizontal row on desktop — the institutional Stripe-like pattern).
+- Each card: `liquid-glass depth-1 hover:depth-2 rounded-card p-4` with `IconWell` (`w-9 h-9 rounded-lg bg-white/5 border border-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)]`) + label (`text-sm font-medium text-primary`) + sublabel (`text-xs text-tertiary`).
+- 5 signals (all bilingual ES/EN):
+  1. "Pago único · Sin suscripción" — DollarIcon — sublabel "$149 — para siempre"
+  2. "100 % local · Cero telemetría" — LockIcon — "Tus datos no salen de tu PC"
+  3. "Garantía 30 días" — ShieldIcon — **accent gold icon** (`text-[rgb(var(--accent-base))]` — the single focal signal) — "Reembolso completo, sin preguntas"
+  4. "ES + EN · Bilingüe de verdad" — GlobeIcon — "No traducciones automáticas"
+  5. "Actualizaciones gratuitas de por vida" — RefreshIcon — "Sin planes, sin tramos"
+- Staggered `Reveal` entrance (delay `i * 0.07`), `whileHover={{ y: -3 }}` spring lift on each card. Easing `[0.22, 1, 0.36, 1]` (the project's institutional easing).
+- All icons are hand-built inline SVGs (16×16 viewBox) — no external icon libs.
+
+**Section 2 — `src/components/marketing/MetricsShowcase.tsx` (id="metrics-deep"):**
+- `.section cv-auto relative overflow-hidden` with `.grain`. Header: `.eyebrow` "MÉTRICAS INSTITUCIONALES" + `text-3xl md:text-4xl font-semibold tracking-tight` title with `.text-gradient` on "fondos." (ES) / "actually use." (EN) + `text-secondary` lead.
+- 2-col layout: `grid lg:grid-cols-2 gap-5 mt-10`.
+- **LEFT — `MetricsTable`**: `liquid-glass depth-2 hover:depth-3 rounded-card p-6 md:p-7 h-full flex flex-col`. Header row (eyebrow "Ratios en vivo" + title "Motor de métricas" + `pill` "tiempo real"). 8 rows, each `flex items-center justify-between gap-4 py-3 border-b border-white/[0.06]`:
+  - Expectancy `$37,75` — `tone="pos"` (green) — delta arrow up
+  - Sharpe `0,22` — neutral — delta up (Sharpe > 0)
+  - Sortino `0,34` — neutral — delta up
+  - Calmar `2,45` — neutral — delta up (Calmar > 1)
+  - Profit Factor `1,65` — neutral — delta up (PF > 1)
+  - Win Rate `48,6%` — neutral — delta neutral (between 40-50%)
+  - Avg R `R 0,32` — `tone="pos"` (green) — delta up
+  - Max Drawdown `11,1%` — `tone="neg"` (red) — delta down (always — it's a drawdown)
+  - Each value uses `CountUp` (`text-lg font-bold tnum text-primary` + `tone` for colorize). Each row has a tiny `DeltaArrow` (pos=green up, neg=red down, neutral=tertiary dash) and an italic hint label (`text-[10px] text-tertiary/70 hidden sm:inline` — visible on sm+).
+  - Footnote: "Calculado a partir de 72 operaciones cerradas." with `m.closedCount`.
+- **RIGHT — `EquityCard`**: `liquid-glass depth-2 hover:depth-3 rounded-card p-6 md:p-7 h-full flex flex-col`. Header (eyebrow "Curva de equity" + title "Capital en el tiempo" + right-aligned "BALANCE FINAL $12,718" with `profitColor` based on `finalBal - INITIAL_BALANCE_CONST`). Inline SVG (`viewBox="0 0 480 220"`): animated `motion.path` draw-in (`pathLength: 0 → 1` over 1.6s) for the equity line, gradient area fill (`url(#ms-eq-area)`), dashed baseline at INITIAL_BALANCE ($10,000), end-point dot colored by profit tone, min/max `$Xk` labels. Equity curve path computed via `useMemo` from `[INITIAL_BALANCE_CONST, ...METRICS.equityCurve]` (prepending the start point so the curve begins flat at $10,000). Footnote: "Calculado a partir de 72 trades." + profit `$+2,718` in green/red.
+- All numeric values use `tnum`. P&L colors via `tone` prop on `CountUp` and inline `style={{ color: profitColor }}` on the final balance / profit figure.
+
+**Section 3 — `src/components/marketing/SecurityDeepDive.tsx` (id="security"):**
+- `.section cv-auto relative overflow-hidden` with `aurora-bg` (subtle, opacity-70) + `.grain`. Header: `.eyebrow` "SEGURIDAD Y PRIVACIDAD" + `text-3xl md:text-4xl` title with `.text-gradient` on "producto de nadie." (ES) / "someone's product." (EN) + `text-secondary` lead.
+- 3-card grid (`grid md:grid-cols-3 gap-5 mt-10`):
+  1. **"Tus datos, tu disco"** — `DiskIcon` in accent-tinted IconWell (`w-10 h-10 rounded-lg bg-white/5 border border-white/10` + `text-[rgb(var(--accent-base))]`) + `<LaptopLockDiagram>` SVG (laptop with screen UI + lock badge + "LOCAL · OFFLINE" caption) + description + 4-bullet list (single .sqlite file, no mandatory account, works offline, copy/backup/inspect).
+  2. **"Cero telemetría"** — `AntennaOffIcon` + `<CrossedAntennaDiagram>` SVG (antenna mast + fading signal waves + animated `motion.path` draw-in cross-out + "NO SIGNAL · NO PHONE-HOME" caption) + description + 4-bullet list (no GA/Mixpanel/Sentry, no pixels/cookies/fingerprints, no crash reports, audit with Wireshark).
+  3. **"Cifrado en reposo"** — `KeyIcon` + `<LockKeyDiagram>` SVG (database cylinder behind + accent-gradient lock body with keyhole + key on the right + "ENCRYPTED · AT REST" caption) + description + 4-bullet list (BitLocker/FileVault/LUKS compatible, .sqlite never uploaded, no third-party master keys, your backup = your responsibility).
+  - Each card: `liquid-glass depth-2 hover:depth-3 rounded-card p-6 h-full flex flex-col` with `whileHover={{ y: -3 }}` spring lift. Bullets use `CheckIcon` (`text-pnl-pos` green check) — `flex items-start gap-2.5 text-sm text-secondary`.
+- **Comparison mini-table** below the grid (`mt-10 liquid-glass depth-2 rounded-card overflow-hidden`): 3-column grid `grid-cols-[1.2fr_1.4fr_1.4fr]` with header row ("COMPARATIVA" / "Trading Journal" / "SaaS en la nube") + 4 body rows (PRIVACIDAD / PAGO / TELEMETRÍA / DATOS). Trading Journal column: green `CheckIcon` + `text-primary` value (e.g., "Pago único — $149 / $249"). SaaS column: red `CrossIcon` + `text-tertiary` value (e.g., "Suscripción mensual"). Header row `bg-white/[0.03] border-b border-white/10`; body rows separated by `border-b border-white/[0.06]` (last:border-b-0).
+
+**Wire into home page (`src/app/page.tsx`):**
+- Added 3 `next/dynamic` imports (`TrustSignals`, `MetricsShowcase`, `SecurityDeepDive`) following the existing `sectionFallback` skeleton pattern — each split into its own JS chunk so the initial bundle stays lean.
+- New composition: `Hero → TrustSignals → Ticker → Bento → MetricsShowcase → FeaturePreview → SecurityDeepDive → HomeCTA → FinalCTA` (9 sections). The three new sections are interleaved between existing ones: TrustSignals post-Hero (credibility frame before anything else), MetricsShowcase post-Bento (deepens the metrics story the Bento alludes to), SecurityDeepDive post-FeaturePreview (closes the trust loop before conversion).
+- Updated the inline `Home()` comment to document the new 9-section rhythm.
+
+### Verification
+
+- **Lint**: `cd /home/z/my-project && bun run lint` → **EXIT=0** (zero errors, zero warnings). ✅
+- **HTTP**: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/` → **200**. ✅
+- **Section order verified** via `agent-browser eval`:
+  - hero: top 0, height 608
+  - trust: top 608, height 289 (right after Hero, before Ticker) ✅
+  - features-preview (Bento wrapper): top 939, height 1409 (Ticker between 897-939)
+  - metrics-deep: top 2348, height 705 (after Bento, before FeaturePreview) ✅
+  - security: top 3706, height 705 (after FeaturePreview, before CTA) ✅
+  - cta: top 4411, height 654
+  - final-cta: top 5064, height 571
+- **TrustSignals content verified**:
+  - 5 cards rendered (each `liquid-glass`)
+  - 5 icon wells (`w-9 h-9 rounded-lg`) — exactly as spec'd
+  - Accent well present (`text-[rgb(var(--accent-base))]` on the "Garantía 30 días" shield icon) — the single focal signal
+  - All 5 labels + sublabels correct: "Pago único · Sin suscripción" / "100 % local · Cero telemetría" / "Garantía 30 días" / "ES + EN · Bilingüe de verdad" / "Actualizaciones gratuitas de por vida"
+- **MetricsShowcase content verified** (after `scrollIntoView` to trigger `cv-auto` rendering):
+  - All 8 metric rows rendered with correct values: Expectancy $37,75 (pos/green) · Sharpe 0,22 · Sortino 0,34 · Calmar 2,45 · Profit Factor 1,65 · Win Rate 48,6% · Avg R R 0,32 (pos/green) · Max Drawdown 11,1% (neg/red)
+  - Equity curve SVG: 2 paths rendered (area fill + line), animated `pathLength` draw-in
+  - Final balance "$12,718" with profit "+$2,718" (green) — matches `METRICS.finalBalance` ($12,718) and `METRICS.netPnl` ($2,718)
+  - Footnote: "Calculado a partir de 72 operaciones." — matches `METRICS.closedCount` (72)
+- **SecurityDeepDive content verified**:
+  - Eyebrow "SEGURIDAD Y PRIVACIDAD" + title with text-gradient rendered
+  - 3 cards rendered: "Tus datos, tu disco" (with "LOCAL · OFFLINE" label) / "Cero telemetría" (with "NO SIGNAL · NO PHONE-HOME" label) / "Cifrado en reposo" (with "ENCRYPTED · AT REST" label) — each with description + 4 bullets
+  - Comparison table: "COMPARATIVA" header + "Trading Journal" / "SaaS en la nube" column headers + 4 rows (PRIVACIDAD / PAGO / TELEMETRÍA / DATOS) all with correct values:
+    - PRIVACIDAD: "Tus operaciones en tu disco" ✓ vs "Subidas a su nube" ✗
+    - PAGO: "Pago único — $149 / $249" ✓ vs "Suscripción mensual" ✗
+    - TELEMETRÍA: "Cero analítica" ✓ vs "Tracking de comportamiento" ✗
+    - DATOS: "Tuyos — archivo .sqlite" ✓ vs "Suyos — acceso revocable" ✗
+- **Screenshots** saved to `/tmp/`:
+  - `/tmp/r4a-home-full.png` (1.37 MB — full 5635px-tall home page)
+  - `/tmp/r4a-trust-inview.png` (384 KB — viewport with TrustSignals scrolled into view)
+  - `/tmp/r4a-metrics-inview.png` (233 KB — viewport with MetricsShowcase)
+  - `/tmp/r4a-security-inview.png` (716 KB — viewport with SecurityDeepDive top + 3 cards)
+  - `/tmp/r4a-comparison-inview.png` (511 KB — viewport with comparison table scrolled into view)
+- **VLM audit** attempted via `z-ai vision` but API returned HTTP 429 rate-limit on all retries; DOM-level verification above stands as the authoritative confirmation that all 3 sections rendered correctly with proper content, layout, and class names.
+
+### Stage Summary
+
+- **4 files touched**: 3 new (`src/components/marketing/TrustSignals.tsx` 263 lines, `MetricsShowcase.tsx` 386 lines, `SecurityDeepDive.tsx` 538 lines) + 1 edited (`src/app/page.tsx` 107 → 131 lines, +24 net for 3 dynamic imports + 3 JSX section inserts + comment update).
+- **No CSS added to globals.css.** All styling via existing utilities (`.liquid-glass`, `.depth-1/2/3`, `.grain`, `.eyebrow`, `.text-gradient`, `.aurora-bg`, `.divider-grad`, `.rounded-card`, `.tnum`, `.pill`, `.max-w-page`, `.section`, `.section-tight`, `.cv-auto`) + Tailwind utilities.
+- **All 3 new files** are `"use client"` (use `useLang()`, `motion`, `CountUp` which is client-only).
+- **Design system consistency**:
+  - Dark theme primary; `text-primary/secondary/tertiary` everywhere (zero raw `text-white`/`text-gray-*`).
+  - Accent gold (`--accent-base`) used sparingly: TrustSignals (1 of 5 icons — the guarantee shield, the focal signal) + MetricsShowcase (headline gradient word + equity curve stroke) + SecurityDeepDive (headline gradient word + 3 card icon wells + SVG diagram strokes).
+  - P&L colors (`--pnl-pos`/`--pnl-neg`): Expectancy + Avg R + final balance + profit figure (green for positive); Max Drawdown (red); comparison-table check icons (green) + cross icons (red); SecurityDeepDive bullet check icons (green).
+  - `tnum` on every numeric value (CountUp renders `tnum` by default; static numbers like $12,718 use explicit `tnum` class).
+  - No indigo/blue introduced. `aurora-bg` (existing utility, used by FinalCTA) applied to SecurityDeepDive at `opacity-70` for a subtle aurora backdrop — its low-alpha blue/purple tints (0.14-0.16) are part of the project's existing aurora palette, not new accent colors.
+- **Bilingual via `useLang()`** — inline `es ? ... : ...` ternary pattern matching `TrustStrip.tsx` (no new STR keys added to i18n.tsx).
+- **Inline SVG icons only** — no external icon libs. 14 unique inline SVGs across the 3 files (5 trust icons, 3 security card icons, 1 check, 1 cross, 3 security diagrams, 1 metrics delta arrow).
+- **Motion**: Reveal primitive (delay capped at 0.3s by Reveal's internal MAX_DELAY clamp) for section-level entrance; per-card `whileHover={{ y: -3 }}` spring lift on TrustSignals cards + MetricsShowcase cards + SecurityDeepDive cards; `motion.path` `pathLength` draw-in for equity curve (1.6s) and security cross-out (0.7s); `motion.circle` scale-in for the equity curve end-point dot. All easing `[0.22, 1, 0.36, 1]` (project's institutional easing).
+- **`next/dynamic`** with `sectionFallback` skeleton (a 360px-tall spacer) for all 3 new sections — keeps initial bundle lean, fetches each section's JS only when needed, avoids layout shift while the chunk loads.
+- **Issues found**:
+  - `cv-auto` (content-visibility: auto) on the 3 new sections means `innerText` returns empty for offscreen sections in headless eval until `scrollIntoView` is called. This is by design (the utility skips rendering work for offscreen elements) — in a real browser, the sections render as the user scrolls. Verified by scrolling each section into view and re-checking innerText, which then returned the expected content.
+  - `innerText` respects CSS `text-transform: uppercase` — so the "Comparativa" header (rendered with `uppercase` Tailwind class) appears as "COMPARATIVA" in `innerText`. Initially confused the verification (the check for "Comparativa" returned false); re-checking for "COMPARATIVA" confirmed the header is rendered correctly.
+  - `CountUp` values are 0 until the IntersectionObserver fires (threshold: 0.3). In headless eval, the values were stuck at 0 until `scrollIntoView({ block: 'start' })` was called on each section — at which point the observer fired and the count-up completed correctly to $37,75 / 0,22 / 0,34 / 2,45 / 1,65 / 48,6% / R 0,32 / 11,1%. In a real user's viewport, the count-up triggers naturally as they scroll.
+- **Next actions**:
+  - (a) The MetricsShowcase equity curve could optionally add a drawdown-shading overlay (the existing `EquityCurve.tsx` component does this via `METRICS.drawdownCeiling`) — currently the curve shows only the equity line + area fill + baseline. A drawdown-shading pass would deepen the institutional feel but adds visual density that may compete with the metrics table on the left.
+  - (b) The SecurityDeepDive `aurora-bg` could be swapped for a more gold-only aurora if the existing blue/purple tints feel off-brand — but it matches the FinalCTA aurora-bg exactly, so the two sections read as a coordinated closing pair.
+  - (c) The TrustSignals cards could grow to `lg:grid-cols-5` with larger padding on `xl` viewports if the labels ever feel cramped — currently `p-4` is tuned for the `max-w-page` (1200px) container.
+  - (d) The comparison table could be expanded with a 5th row (e.g., "Soporte" — "Email directo" vs "Solo chat bot") if the security story wants to extend into support quality.
