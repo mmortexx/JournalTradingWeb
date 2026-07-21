@@ -113,10 +113,10 @@ export function RiskCalculator() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
-            <h3 className="font-medium tracking-[-0.01em] text-white text-xl md:text-2xl">
+            <h3 className="font-medium tracking-[-0.01em] text-primary text-xl md:text-2xl">
               {L.title}
             </h3>
-            <p className="mt-1 text-sm text-gray-300">{L.subtitle}</p>
+            <p className="mt-1 text-sm text-secondary">{L.subtitle}</p>
           </div>
           {isHighRisk && (
             <motion.div
@@ -134,7 +134,7 @@ export function RiskCalculator() {
 
         {/* Presets */}
         <div className="flex flex-wrap items-center gap-2 mb-6">
-          <span className="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-400 mr-1">
+          <span className="text-[11px] uppercase tracking-[0.12em] font-semibold text-tertiary mr-1">
             {es ? "Plantillas" : "Presets"}
           </span>
           {PRESETS.map((p) => {
@@ -150,9 +150,9 @@ export function RiskCalculator() {
                     ? p.tone === "warn"
                       ? "bg-pnl-warn/20 text-pnl-warn border border-pnl-warn/40"
                       : p.tone === "accent"
-                      ? "bg-white/10 text-white border border-white/25"
-                      : "bg-white/15 text-white border border-white/20"
-                    : "bg-white/5 text-gray-300 border border-white/8 hover:border-white/20 hover:text-white"
+                      ? "bg-white/10 text-primary border border-white/25"
+                      : "bg-white/15 text-primary border border-white/20"
+                    : "bg-white/5 text-secondary border border-white/8 hover:border-white/20 hover:text-primary"
                 }`}
               >
                 {es ? p.labelEs : p.labelEn}
@@ -173,14 +173,14 @@ export function RiskCalculator() {
               value={Number.isFinite(balance) ? balance : ""}
               onChange={(e) => setBalance(Number(e.target.value))}
               inputMode="decimal"
-              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-white"
+              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-primary"
             />
           </Field>
 
           {/* Risk per trade (slider) */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <label id="rc-risk-label" htmlFor="rc-risk" className="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-400">
+              <label id="rc-risk-label" htmlFor="rc-risk" className="text-[11px] uppercase tracking-[0.12em] font-semibold text-tertiary">
                 {L.riskPer}
               </label>
               <span
@@ -188,7 +188,7 @@ export function RiskCalculator() {
                 className={`tnum text-sm font-semibold px-2 py-0.5 rounded-md border ${
                   isHighRisk
                     ? "text-pnl-warn border-pnl-warn/30 bg-pnl-warn/10"
-                    : "text-white border-white/20 bg-white/5"
+                    : "text-primary border-white/20 bg-white/5"
                 }`}
               >
                 {fmtNum(riskPct, lang, 2)} %
@@ -206,7 +206,7 @@ export function RiskCalculator() {
                 className="[&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:border-white/20 [&_[data-slot=slider-thumb]]:shadow-[0_0_0_4px_rgb(255_255_255/0.18)]"
               />
             </div>
-            <div className="flex justify-between text-[10px] text-gray-400 tnum">
+            <div className="flex justify-between text-[10px] text-tertiary tnum">
               <span>0.25 %</span>
               <span>1 %</span>
               <span>3 %</span>
@@ -223,7 +223,7 @@ export function RiskCalculator() {
               value={Number.isFinite(entry) ? entry : ""}
               onChange={(e) => setEntry(Number(e.target.value))}
               inputMode="decimal"
-              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-white"
+              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-primary"
             />
           </Field>
 
@@ -237,7 +237,7 @@ export function RiskCalculator() {
               value={Number.isFinite(stop) ? stop : ""}
               onChange={(e) => setStop(Number(e.target.value))}
               inputMode="decimal"
-              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-white"
+              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-primary"
             />
           </Field>
 
@@ -252,17 +252,17 @@ export function RiskCalculator() {
               onChange={(e) => setTarget(e.target.value === "" ? "" : Number(e.target.value))}
               placeholder={es ? "Ej. 115.00" : "e.g. 115.00"}
               inputMode="decimal"
-              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-white placeholder:text-gray-400/60"
+              className="bg-white/5 border border-white/10 rounded-md h-10 px-3 text-sm tnum text-primary placeholder:text-tertiary/60"
             />
           </Field>
 
           {/* Spacer / per-unit reference */}
           <div className="hidden sm:flex flex-col justify-end gap-2 pb-1">
-            <span className="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-400">
+            <span className="text-[11px] uppercase tracking-[0.12em] font-semibold text-tertiary">
               {L.perUnit}
             </span>
             <div className="h-10 flex items-center px-3 rounded-md bg-white/[0.03] border border-white/8">
-              <span className="text-sm tnum text-gray-300">
+              <span className="text-sm tnum text-secondary">
                 {calc.valid ? fmtMoney(calc.perUnit, lang, { decimals: 4 }) : "—"}
               </span>
             </div>
@@ -288,12 +288,12 @@ export function RiskCalculator() {
               <AnimatedMoney
                 value={calc.positionSize}
                 format={(v) => fmtNum(v, lang, v >= 100 ? 0 : 2)}
-                className="tnum text-2xl font-semibold text-white"
+                className="tnum text-2xl font-semibold text-primary"
               />
             ) : (
-              <span className="tnum text-2xl font-semibold text-gray-400">—</span>
+              <span className="tnum text-2xl font-semibold text-tertiary">—</span>
             )}
-            <span className="ml-1 text-xs text-gray-400">{L.units}</span>
+            <span className="ml-1 text-xs text-tertiary">{L.units}</span>
           </OutputCard>
 
           <OutputCard label={L.rr} tone={calc.rr >= 2 ? "pos" : "neutral"}>
@@ -302,11 +302,11 @@ export function RiskCalculator() {
                 value={calc.rr}
                 format={(v) => `${fmtNum(v, lang, 2)} : 1`}
                 className={`tnum text-2xl font-semibold ${
-                  calc.rr >= 2 ? "text-pnl-pos" : calc.rr >= 1 ? "text-white" : "text-pnl-warn"
+                  calc.rr >= 2 ? "text-pnl-pos" : calc.rr >= 1 ? "text-primary" : "text-pnl-warn"
                 }`}
               />
             ) : (
-              <span className="text-sm text-gray-400 italic">{L.noTarget}</span>
+              <span className="text-sm text-tertiary italic">{L.noTarget}</span>
             )}
           </OutputCard>
 
@@ -318,7 +318,7 @@ export function RiskCalculator() {
                 className="tnum text-2xl font-semibold text-pnl-pos"
               />
             ) : (
-              <span className="text-sm text-gray-400 italic">{L.noTarget}</span>
+              <span className="text-sm text-tertiary italic">{L.noTarget}</span>
             )}
           </OutputCard>
         </div>
@@ -326,7 +326,7 @@ export function RiskCalculator() {
         {/* Risk ladder */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-400">
+            <span className="text-[11px] uppercase tracking-[0.12em] font-semibold text-tertiary">
               {es ? "Escalera riesgo / beneficio" : "Risk / reward ladder"}
             </span>
             {!calc.valid && (
@@ -366,7 +366,7 @@ export function RiskCalculator() {
               <div className="w-1/4" />
             </div>
           </div>
-          <div className="mt-2 flex justify-between text-[10px] text-gray-400 tnum">
+          <div className="mt-2 flex justify-between text-[10px] text-tertiary tnum">
             <span>0</span>
             <span>1R</span>
             <span>{calc.rr > 0 ? `${fmtNum(calc.rr, lang, 1)}R` : "—"}</span>
@@ -382,7 +382,7 @@ export function RiskCalculator() {
 function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={htmlFor} className="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-400">
+      <label htmlFor={htmlFor} className="text-[11px] uppercase tracking-[0.12em] font-semibold text-tertiary">
         {label}
       </label>
       {children}
@@ -415,7 +415,7 @@ function OutputCard({
         prominent ? "shadow-[0_0_0_1px_rgb(var(--accent-base)/0.05),0_8px_24px_-12px_rgb(0_0_0/0.5)]" : ""
       }`}
     >
-      <div className="text-[10px] uppercase tracking-[0.12em] font-semibold text-gray-400 mb-1.5 truncate">
+      <div className="text-[10px] uppercase tracking-[0.12em] font-semibold text-tertiary mb-1.5 truncate">
         {label}
       </div>
       <div className="flex items-baseline gap-1">{children}</div>

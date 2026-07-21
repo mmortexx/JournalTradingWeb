@@ -118,10 +118,10 @@ export function ShortcutsHelp() {
             {/* Header */}
             <div className="flex items-center justify-between gap-3 px-4 py-3 border-b ">
               <div className="min-w-0">
-                <h2 className="text-sm font-medium tracking-tight text-white">
+                <h2 className="text-sm font-medium tracking-tight text-primary">
                   {es ? "Atajos de teclado" : "Keyboard shortcuts"}
                 </h2>
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                <p className="text-[11px] text-tertiary mt-0.5">
                   {es
                     ? "Muévete más rápido por la app."
                     : "Move faster through the app."}
@@ -131,7 +131,7 @@ export function ShortcutsHelp() {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={es ? "Cerrar" : "Close"}
-                className="icon-btn shrink-0 w-8 h-8 rounded-md flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/8 transition-colors"
+                className="icon-btn shrink-0 w-8 h-8 rounded-md flex items-center justify-center text-tertiary hover:text-primary hover:bg-white/8 transition-colors"
               >
                 <svg
                   width="14"
@@ -157,7 +157,7 @@ export function ShortcutsHelp() {
                   key={i}
                   className="flex items-center justify-between gap-4 px-2 py-2 rounded-md hover:bg-white/[0.03] transition-colors"
                 >
-                  <span className="text-sm text-gray-300">{s.label}</span>
+                  <span className="text-sm text-secondary">{s.label}</span>
                   <span className="flex items-center gap-1 shrink-0">
                     {s.keys}
                   </span>
@@ -167,7 +167,7 @@ export function ShortcutsHelp() {
 
             {/* Footer hint */}
             <div
-              className="flex items-center justify-between gap-2 px-3 py-2 border-t  text-[11px] text-gray-400"
+              className="flex items-center justify-between gap-2 px-3 py-2 border-t  text-[11px] text-tertiary"
               aria-hidden="true"
             >
               <span className="flex items-center gap-1.5">
@@ -188,7 +188,7 @@ export function ShortcutsHelp() {
 /** Small inline keyboard key chip — mirrors the CommandPalette styling. */
 function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border  bg-white/[0.03] text-[11px] font-mono text-gray-300 tnum">
+    <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border  bg-white/[0.03] text-[11px] font-mono text-secondary tnum">
       {children}
     </kbd>
   );

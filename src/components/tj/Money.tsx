@@ -34,7 +34,7 @@ export function Money({
         ? "text-pnl-pos"
         : tone === "neg"
         ? "text-pnl-neg"
-        : "text-gray-300";
+        : "text-secondary";
     return <span className={`tnum ${cls} ${className}`}>{text}</span>;
   }
   return <span className={`tnum ${className}`}>{text}</span>;

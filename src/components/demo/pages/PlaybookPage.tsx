@@ -251,19 +251,19 @@ function NewSetupDialog({
   const es = lang === "es";
 
   const inputCls =
-    "w-full bg-white/5 border border-white/10 rounded-md h-9 px-3 text-sm text-white placeholder:text-gray-400 focus:border-white/20 focus:bg-white/8 transition-colors";
+    "w-full bg-white/5 border border-white/10 rounded-md h-9 px-3 text-sm text-primary placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors";
   const labelCls =
-    "block text-[11px] uppercase tracking-[0.15em] text-gray-400 mb-1.5";
+    "block text-[11px] uppercase tracking-[0.15em] text-tertiary mb-1.5";
 
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="liquid-glass border border-white/20 sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">
+          <DialogTitle className="text-base font-medium text-primary">
             {label}
           </DialogTitle>
-          <DialogDescription className="text-gray-400 text-sm">
+          <DialogDescription className="text-tertiary text-sm">
             {es
               ? "Define tu setup con nombre, descripción y reglas. Se guardará localmente."
               : "Define your setup with name, description and rules. Saved locally."}
@@ -322,7 +322,7 @@ function NewSetupDialog({
             <DialogClose asChild>
               <button
                 type="button"
-                className="h-9 px-4 rounded-md text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                className="h-9 px-4 rounded-md text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors"
               >
                 {es ? "Cancelar" : "Cancel"}
               </button>
@@ -420,25 +420,25 @@ function SetupCard({
                   <SetupGlyph name={name} className="w-5 h-5" />
                 </span>
                 <div className="min-w-0">
-                  <h3 className="text-lg font-medium text-white leading-tight truncate">
+                  <h3 className="text-lg font-medium text-primary leading-tight truncate">
                     {name}
                   </h3>
-                  <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
+                  <p className="text-xs text-tertiary mt-0.5 line-clamp-1">
                     {es ? meta.desc.es : meta.desc.en}
                   </p>
                 </div>
               </div>
               <div className="flex-shrink-0 text-right">
                 {metrics.closedCount === 0 ? (
-                  <span className="text-[11px] uppercase tracking-[0.08em] text-gray-400/70">
+                  <span className="text-[11px] uppercase tracking-[0.08em] text-tertiary/70">
                     {t("noTradesYet")}
                   </span>
                 ) : (
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-gray-400">
+                    <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
                       {t("sample")}
                     </span>
-                    <span className="tnum text-sm font-medium text-gray-300">
+                    <span className="tnum text-sm font-medium text-secondary">
                       {fmtInt(metrics.closedCount, lang)}
                     </span>
                   </div>
@@ -462,7 +462,7 @@ function SetupCard({
             {/* Live stats row */}
             <div className="grid grid-cols-3 gap-2">
               <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-gray-400">
+                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
                   {t("expectancy")}
                 </span>
                 <Money
@@ -473,7 +473,7 @@ function SetupCard({
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-gray-400">
+                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
                   {t("winRate")}
                 </span>
                 <CountUp
@@ -485,7 +485,7 @@ function SetupCard({
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-gray-400">
+                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
                   {t("pnlTotal")}
                 </span>
                 <Money
@@ -501,10 +501,10 @@ function SetupCard({
                 split on hover, then springs back on hover-end. */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-gray-400">
+                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
                   {es ? "Ganadoras / Perdedoras" : "Winners / Losers"}
                 </span>
-                <span className="tnum text-[11px] text-gray-400">
+                <span className="tnum text-[11px] text-tertiary">
                   <span className="text-pnl-pos">
                     {fmtInt(metrics.wins, lang)}
                   </span>
@@ -565,7 +565,7 @@ function SetupCard({
                   style={{ backgroundColor: colorCss }}
                   aria-hidden
                 />
-                <span className="text-[11px] uppercase tracking-[0.15em] text-gray-400 font-semibold">
+                <span className="text-[11px] uppercase tracking-[0.15em] text-tertiary font-semibold">
                   {t("rules")}
                 </span>
               </div>
@@ -573,7 +573,7 @@ function SetupCard({
                 {meta.rules.map((rule, i) => (
                   <li
                     key={i}
-                    className="flex items-start gap-2 text-xs text-gray-300 leading-snug"
+                    className="flex items-start gap-2 text-xs text-secondary leading-snug"
                   >
                     <span
                       className="mt-0.5 flex-shrink-0 w-3.5 h-3.5 rounded-sm border inline-flex items-center justify-center"
@@ -654,12 +654,12 @@ export function PlaybookPage() {
               <Eyebrow>{t("playbookEyebrow")}</Eyebrow>
             </Reveal>
             <Reveal delay={0.05}>
-              <h1 className="mt-2 text-3xl md:text-4xl font-medium tracking-tight text-white">
+              <h1 className="mt-2 text-3xl md:text-4xl font-medium tracking-tight text-primary">
                 {t("playbookTitle")}
               </h1>
             </Reveal>
             <Reveal delay={0.1}>
-              <p className="mt-2 text-sm text-gray-300 leading-relaxed">
+              <p className="mt-2 text-sm text-secondary leading-relaxed">
                 {t("playbookDesc")}
               </p>
             </Reveal>
@@ -699,11 +699,11 @@ export function PlaybookPage() {
                   }}
                   aria-hidden
                 />
-                <span className="text-xl font-medium text-white">
+                <span className="text-xl font-medium text-primary">
                   {best.name}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+              <div className="flex items-center gap-1.5 text-xs text-tertiary">
                 <span>{t("expectancy")}</span>
                 <Money
                   value={best.expectancy}
@@ -714,7 +714,7 @@ export function PlaybookPage() {
               </div>
             </>
           ) : (
-            <span className="text-sm text-gray-400">{t("noTradesYet")}</span>
+            <span className="text-sm text-tertiary">{t("noTradesYet")}</span>
           )}
         </SummaryStat>
 
@@ -725,20 +725,20 @@ export function PlaybookPage() {
           {mostTraded ? (
             <>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl font-medium text-white">
+                <span className="text-xl font-medium text-primary">
                   {mostTraded.name}
                 </span>
                 <CountUp
                   to={mostTraded.count}
-                  className="text-sm font-medium text-white"
+                  className="text-sm font-medium text-primary"
                 />
               </div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-tertiary">
                 {es ? "operaciones" : "trades"}
               </div>
             </>
           ) : (
-            <span className="text-sm text-gray-400">{t("noTradesYet")}</span>
+            <span className="text-sm text-tertiary">{t("noTradesYet")}</span>
           )}
         </SummaryStat>
 
@@ -749,14 +749,14 @@ export function PlaybookPage() {
           <div className="flex items-baseline gap-2">
             <CountUp
               to={totalSetups}
-              className="text-xl font-medium text-white"
+              className="text-xl font-medium text-primary"
             />
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-tertiary">
               {es ? "en tu playbook" : "in your playbook"}
             </span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-gray-400">
-            <Sparkles className="w-3 h-3 text-white" aria-hidden />
+          <div className="flex items-center gap-1.5 text-xs text-tertiary">
+            <Sparkles className="w-3 h-3 text-primary" aria-hidden />
             <span>{es ? "Vivos, con métricas en tiempo real" : "Live, with real-time metrics"}</span>
           </div>
         </SummaryStat>
@@ -782,7 +782,7 @@ export function PlaybookPage() {
               trigger={
                 <button
                   type="button"
-                  className="w-full h-full min-h-[260px] rounded-card border-2 border-dashed border-white/20 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.06] transition-colors flex flex-col items-center justify-center gap-3 text-white group"
+                  className="w-full h-full min-h-[260px] rounded-card border-2 border-dashed border-white/20 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.06] transition-colors flex flex-col items-center justify-center gap-3 text-primary group"
                   aria-label={t("newSetup")}
                 >
                   <span className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 border border-white/20 group-hover:scale-110 transition-transform">
@@ -791,7 +791,7 @@ export function PlaybookPage() {
                   <span className="text-sm font-semibold">
                     {t("newSetup")}
                   </span>
-                  <span className="text-xs text-gray-400 px-6 text-center max-w-[220px]">
+                  <span className="text-xs text-tertiary px-6 text-center max-w-[220px]">
                     {es
                       ? "Define tu propio setup con reglas y métricas en vivo."
                       : "Define your own setup with rules and live metrics."}

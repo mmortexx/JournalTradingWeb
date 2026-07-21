@@ -220,11 +220,11 @@ function SettingSection({
       <section>
         <div className="flex items-baseline gap-3 mb-4">
           {eyebrow && (
-            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
               {eyebrow}
             </span>
           )}
-          <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-gray-400">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-tertiary">
             {title}
           </h2>
           <div className="flex-1 divider-grad" />
@@ -359,10 +359,10 @@ export function SettingsPage() {
         <header className="relative overflow-hidden rounded-card">
           <div className="relative py-2">
             <Eyebrow>{t("settingsEyebrow")}</Eyebrow>
-            <h1 className="mt-3 text-3xl md:text-4xl font-medium tracking-[-0.03em] text-white">
+            <h1 className="mt-3 text-3xl md:text-4xl font-medium tracking-[-0.03em] text-primary">
               {t("settingsTitle")}
             </h1>
-            <p className="mt-2 text-sm text-gray-300 max-w-xl leading-relaxed">
+            <p className="mt-2 text-sm text-secondary max-w-xl leading-relaxed">
               {es
                 ? "Personaliza la apariencia, el idioma y los datos del diario. Todo se guarda en tu equipo."
                 : "Customize the journal's appearance, language and data. Everything is saved on your machine."}
@@ -418,8 +418,8 @@ export function SettingsPage() {
                   <span
                     className={`shrink-0 grid place-items-center w-9 h-9 rounded-full text-[11px] font-bold tracking-wider tnum border border-solid ${
                       active
-                        ? "border-white/40 text-white bg-white/15"
-                        : "border-white/20 text-white bg-white/5"
+                        ? "border-white/40 text-primary bg-white/15"
+                        : "border-white/20 text-primary bg-white/5"
                     }`}
                     aria-hidden="true"
                   >
@@ -427,7 +427,7 @@ export function SettingsPage() {
                   </span>
                   <span
                     className={`text-base font-semibold ${
-                      active ? "text-white" : "text-white"
+                      active ? "text-primary" : "text-primary"
                     }`}
                     style={
                       active
@@ -492,12 +492,12 @@ export function SettingsPage() {
                 <span className="relative z-10 h-full flex items-center justify-center gap-2.5">
                   <Icon
                     className={`w-[18px] h-[18px] ${
-                      active ? "text-white" : "text-white"
+                      active ? "text-primary" : "text-primary"
                     }`}
                   />
                   <span
                     className={`text-sm font-semibold ${
-                      active ? "text-white" : "text-white"
+                      active ? "text-primary" : "text-primary"
                     }`}
                     style={
                       active
@@ -546,7 +546,7 @@ export function SettingsPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-pnl-pos transition-colors duration-[400ms]" />
               {es ? "Vista previa en vivo" : "Live preview"}
             </span>
-            <span className="pill bg-white/8 text-white tnum transition-colors duration-[400ms]">
+            <span className="pill bg-white/8 text-primary tnum transition-colors duration-[400ms]">
               {palette}
             </span>
           </div>
@@ -559,7 +559,7 @@ export function SettingsPage() {
             {/* Left column: P&L + featured KPI tile (pos/neg sample) */}
             <div className="flex-1 flex flex-col gap-4 min-w-0">
               <div>
-                <div className="text-[11px] uppercase tracking-[0.15em] text-gray-400 mb-1.5 transition-colors duration-[400ms]">
+                <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary mb-1.5 transition-colors duration-[400ms]">
                   {t("pnlTotal")}
                 </div>
                 <motion.div
@@ -571,7 +571,7 @@ export function SettingsPage() {
                 >
                   +$2,847.50
                 </motion.div>
-                <div className="mt-2 flex items-center gap-2 text-xs text-gray-400 tnum transition-colors duration-[400ms]">
+                <div className="mt-2 flex items-center gap-2 text-xs text-tertiary tnum transition-colors duration-[400ms]">
                   <span className="text-pnl-pos transition-colors duration-[400ms]">
                     {es ? "Hoy · 4 operaciones" : "Today · 4 trades"}
                   </span>
@@ -585,12 +585,12 @@ export function SettingsPage() {
 
               {/* Sample KPI tile — best vs. worst trade, showing pos/neg coloring. */}
               <div className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2.5 transition-colors duration-[400ms]">
-                <div className="text-[10px] uppercase tracking-[0.15em] text-gray-400 mb-1 transition-colors duration-[400ms]">
+                <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1 transition-colors duration-[400ms]">
                   {es ? "Operaciones de hoy" : "Today's trades"}
                 </div>
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span className="flex items-baseline gap-1.5">
-                    <span className="text-[10px] text-gray-400 tnum transition-colors duration-[400ms]">
+                    <span className="text-[10px] text-tertiary tnum transition-colors duration-[400ms]">
                       {es ? "Mejor" : "Best"}
                     </span>
                     <span className="text-base font-medium text-pnl-pos tnum transition-colors duration-[400ms]">
@@ -599,7 +599,7 @@ export function SettingsPage() {
                   </span>
                   <span className="opacity-30" aria-hidden="true">·</span>
                   <span className="flex items-baseline gap-1.5">
-                    <span className="text-[10px] text-gray-400 tnum transition-colors duration-[400ms]">
+                    <span className="text-[10px] text-tertiary tnum transition-colors duration-[400ms]">
                       {es ? "Peor" : "Worst"}
                     </span>
                     <span className="text-base font-medium text-pnl-neg tnum transition-colors duration-[400ms]">
@@ -612,7 +612,7 @@ export function SettingsPage() {
 
             {/* Right column: mini equity curve recoloring with the palette */}
             <div className="flex flex-col items-start sm:items-end gap-1.5">
-              <div className="text-[11px] uppercase tracking-[0.15em] text-gray-400 transition-colors duration-[400ms]">
+              <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary transition-colors duration-[400ms]">
                 {es ? "Curva" : "Equity"}
               </div>
               <MiniSparkline />
@@ -624,10 +624,10 @@ export function SettingsPage() {
             {[
               { label: t("winRate"), value: "68.3%", tone: "text-pnl-pos" },
               { label: t("expectancy"), value: "+$318", tone: "text-pnl-pos" },
-              { label: t("profitFactor"), value: "2.41", tone: "text-white" },
+              { label: t("profitFactor"), value: "2.41", tone: "text-primary" },
             ].map((kpi) => (
               <div key={kpi.label}>
-                <div className="text-[10px] uppercase tracking-[0.15em] text-gray-400 mb-1 transition-colors duration-[400ms]">
+                <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1 transition-colors duration-[400ms]">
                   {kpi.label}
                 </div>
                 <div className={`text-base font-medium tnum transition-colors duration-[400ms] ${kpi.tone}`}>
@@ -691,7 +691,7 @@ export function SettingsPage() {
                     text to assistive tech), hence aria-hidden. */}
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold whitespace-nowrap z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
+                  className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-primary text-[11px] font-semibold whitespace-nowrap z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
                   style={{ backgroundColor: p.dark }}
                 >
                   {t(p.labelKey)}
@@ -743,7 +743,7 @@ export function SettingsPage() {
                         }}
                         className="absolute inset-0 flex items-center justify-center"
                       >
-                        <CheckIcon className="w-6 h-6 text-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]" />
+                        <CheckIcon className="w-6 h-6 text-primary drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]" />
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -752,7 +752,7 @@ export function SettingsPage() {
                 {/* Label */}
                 <span
                   className={`text-xs font-medium tracking-wide transition-colors ${
-                    active ? "text-white" : "text-gray-300 group-hover:text-white"
+                    active ? "text-primary" : "text-secondary group-hover:text-primary"
                   }`}
                 >
                   {t(p.labelKey)}
@@ -771,12 +771,12 @@ export function SettingsPage() {
       >
         <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex-1">
-            <p className="text-sm text-gray-300 leading-relaxed">
+            <p className="text-sm text-secondary leading-relaxed">
               {es
                 ? "El diario se carga con 60 operaciones de muestra deterministas en 12 instrumentos y 3 meses. Recarga los datos cuando quieras reiniciar el estado."
                 : "The journal ships with 60 deterministic sample trades across 12 instruments and 3 months. Reload the data whenever you want to reset."}
             </p>
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-gray-400 tnum">
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-tertiary tnum">
               <span className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-pnl-pos" />
                 {es ? "60 operaciones" : "60 trades"}
@@ -798,7 +798,7 @@ export function SettingsPage() {
               whileHover={{ scale: sampleState === "idle" ? 1.02 : 1 }}
               whileTap={{ scale: sampleState === "idle" ? 0.97 : 1, transition: { type: "spring", stiffness: 400, damping: 25 } }}
               aria-label={t("loadSample")}
-              className="relative shrink-0 h-11 px-5 rounded-card border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium text-white overflow-hidden min-w-[200px] transition-colors disabled:cursor-default"
+              className="relative shrink-0 h-11 px-5 rounded-card border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium text-primary overflow-hidden min-w-[200px] transition-colors disabled:cursor-default"
             >
               <AnimatePresence mode="wait" initial={false}>
                 {sampleState === "idle" && (
@@ -810,7 +810,7 @@ export function SettingsPage() {
                     transition={{ duration: 0.2 }}
                     className="absolute inset-0 flex items-center justify-center gap-2"
                   >
-                    <RefreshIcon className="w-4 h-4 text-white" />
+                    <RefreshIcon className="w-4 h-4 text-primary" />
                     {t("loadSample")}
                   </motion.span>
                 )}
@@ -821,7 +821,7 @@ export function SettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute inset-0 flex items-center justify-center gap-2 text-gray-400"
+                    className="absolute inset-0 flex items-center justify-center gap-2 text-tertiary"
                   >
                     <motion.span
                       className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white"
@@ -857,7 +857,7 @@ export function SettingsPage() {
               whileHover={{ scale: downloadState === "idle" ? 1.02 : 1 }}
               whileTap={{ scale: downloadState === "idle" ? 0.97 : 1, transition: { type: "spring", stiffness: 400, damping: 25 } }}
               aria-label={t("downloadData")}
-              className="relative shrink-0 h-11 px-5 rounded-card border border-white/25 border-solid bg-white/5 hover:bg-white/8 text-sm font-medium text-white overflow-hidden min-w-[200px] transition-colors disabled:cursor-default"
+              className="relative shrink-0 h-11 px-5 rounded-card border border-white/25 border-solid bg-white/5 hover:bg-white/8 text-sm font-medium text-primary overflow-hidden min-w-[200px] transition-colors disabled:cursor-default"
             >
               <AnimatePresence mode="wait" initial={false}>
                 {downloadState === "idle" && (
@@ -869,7 +869,7 @@ export function SettingsPage() {
                     transition={{ duration: 0.2 }}
                     className="absolute inset-0 flex items-center justify-center gap-2"
                   >
-                    <DownloadIcon className="w-4 h-4 text-white" />
+                    <DownloadIcon className="w-4 h-4 text-primary" />
                     {t("downloadData")}
                   </motion.span>
                 )}
@@ -900,13 +900,13 @@ export function SettingsPage() {
       >
         <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 md:p-6">
           <div className="flex items-start gap-3 mb-4">
-            <div className="shrink-0 mt-0.5 w-9 h-9 rounded-card grid place-items-center bg-white/8 text-white">
+            <div className="shrink-0 mt-0.5 w-9 h-9 rounded-card grid place-items-center bg-white/8 text-primary">
               <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
                 <path d="M12 11v5M12 7.5v.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               </svg>
             </div>
-            <p className="text-sm text-gray-300 leading-relaxed pt-1">
+            <p className="text-sm text-secondary leading-relaxed pt-1">
               {t("aboutHelp")}
             </p>
           </div>
@@ -935,10 +935,10 @@ export function SettingsPage() {
                 key={item.label}
                 className="bg-white/[0.04] border border-white/10 rounded-md p-3"
               >
-                <div className="text-[10px] uppercase tracking-[0.15em] text-gray-400 mb-1">
+                <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
                   {item.label}
                 </div>
-                <div className="text-sm font-medium text-white tnum">
+                <div className="text-sm font-medium text-primary tnum">
                   {item.value}
                 </div>
               </div>
@@ -949,9 +949,9 @@ export function SettingsPage() {
 
           {/* Made-with + social */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <p className="flex items-center gap-1.5 text-xs text-gray-400">
+            <p className="flex items-center gap-1.5 text-xs text-tertiary">
               {es ? "Hecho con" : "Made with"}
-              <HeartIcon className="w-3.5 h-3.5 text-white" />
+              <HeartIcon className="w-3.5 h-3.5 text-primary" />
               {es
                 ? "para el trader manual serio."
                 : "for the serious manual trader."}
@@ -982,7 +982,7 @@ export function SettingsPage() {
                   aria-label={label}
                   whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 400, damping: 25 } }}
                   whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                  className="w-9 h-9 rounded-card grid place-items-center border border-white/10 bg-white/5 hover:bg-white/8 hover:border-white/25 hover:text-white text-gray-300 transition-colors duration-200"
+                  className="w-9 h-9 rounded-card grid place-items-center border border-white/10 bg-white/5 hover:bg-white/8 hover:border-white/25 hover:text-primary text-secondary transition-colors duration-200"
                 >
                   <Icon className="w-[18px] h-[18px]" />
                 </motion.a>
@@ -991,10 +991,10 @@ export function SettingsPage() {
           </div>
 
           {/* Tiny license + copyright */}
-          <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-400 tnum">
+          <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-tertiary tnum">
             <span>© 2024 Trading Journal. {t("rights")}</span>
             <span className="flex items-center gap-2">
-              <span className="pill bg-white/5 text-gray-400">
+              <span className="pill bg-white/5 text-tertiary">
                 {es ? "Licencia personal" : "Personal license"}
               </span>
               <span className="flex items-center gap-1.5">

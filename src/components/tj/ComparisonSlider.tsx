@@ -183,7 +183,7 @@ export function ComparisonSlider() {
             {es ? "Arrastra y compara" : "Drag and compare"}
           </Eyebrow>
           <h2
-            className="mt-5 t-h2 text-white"
+            className="mt-5 t-h2 text-primary"
           >
             {es ? (
               <>
@@ -195,7 +195,7 @@ export function ComparisonSlider() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-gray-300 leading-relaxed">
+          <p className="mt-4 text-secondary leading-relaxed">
             {es
               ? "Arrastra la barra central para revelar más del antes o del después. La transformación no es magia: es disciplina medida."
               : "Drag the center bar to reveal more of the before or the after. The transformation isn't magic: it's measured discipline."}
@@ -224,12 +224,12 @@ export function ComparisonSlider() {
               />
               {/* Header chip top-right */}
               <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/20">
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-white">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-primary">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
-                <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-white">
+                <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary">
                   {es ? "Después" : "After"}
                 </span>
               </div>
@@ -248,7 +248,7 @@ export function ComparisonSlider() {
                         <path d="M2 6.5l2.5 2.5L10 3.5" stroke="rgb(var(--pnl-pos))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </span>
-                    <span className="text-[14px] text-white font-medium">{line}</span>
+                    <span className="text-[14px] text-primary font-medium">{line}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -300,7 +300,7 @@ export function ComparisonSlider() {
                         <path d="M3 3l6 6M9 3l-6 6" stroke="rgb(var(--pnl-neg))" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     </span>
-                    <span className="text-[14px] text-gray-300/85">{line}</span>
+                    <span className="text-[14px] text-secondary/85">{line}</span>
                   </li>
                 ))}
               </ul>
@@ -327,7 +327,7 @@ export function ComparisonSlider() {
               />
               {/* Circular grip with double arrows */}
               <span
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-white border border-white/30 shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)]"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-white/30 shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)]"
                 aria-hidden="true"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -344,7 +344,7 @@ export function ComparisonSlider() {
 
             {/* Edge hint — top-center line showing this is interactive */}
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-              <span className="text-[10px] uppercase tracking-[0.18em] text-gray-400/70 font-semibold">
+              <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary/70 font-semibold">
                 {es ? "Arrastra →" : "Drag →"}
               </span>
             </div>
@@ -352,7 +352,7 @@ export function ComparisonSlider() {
         </Reveal>
 
         <Reveal delay={0.18}>
-          <p className="mt-6 text-xs text-gray-400 text-center max-w-2xl mx-auto">
+          <p className="mt-6 text-xs text-tertiary text-center max-w-2xl mx-auto">
             {es
               ? "El mismo trader, dos resultados. La diferencia no es talento: es mirarte con honestidad."
               : "The same trader, two outcomes. The difference isn't talent: it's looking at yourself honestly."}

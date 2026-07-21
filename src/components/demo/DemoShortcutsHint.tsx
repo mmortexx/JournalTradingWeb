@@ -31,7 +31,7 @@ const shortcuts: Shortcut[] = [
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
     <kbd
-      className="inline-flex items-center justify-center min-w-[1.75rem] h-7 px-2 rounded-md liquid-glass border border-white/10 text-[12px] font-medium text-gray-300 font-sans shadow-[0_1px_0_rgb(var(--tint)/0.5)]"
+      className="inline-flex items-center justify-center min-w-[1.75rem] h-7 px-2 rounded-md liquid-glass border border-white/10 text-[12px] font-medium text-secondary font-sans shadow-[0_1px_0_rgb(var(--tint)/0.5)]"
     >
       {children}
     </kbd>
@@ -70,16 +70,16 @@ export function DemoShortcutsHint() {
           >
             <div className="flex items-center gap-3 md:min-w-[200px]">
               <span
-                className="w-9 h-9 rounded-md flex items-center justify-center bg-white/8 text-white shrink-0"
+                className="w-9 h-9 rounded-md flex items-center justify-center bg-white/8 text-primary shrink-0"
                 aria-hidden="true"
               >
                 <KeyboardIcon />
               </span>
               <div>
-                <h3 className="text-sm md:text-base font-medium text-white leading-tight">
+                <h3 className="text-sm md:text-base font-medium text-primary leading-tight">
                   {es ? "Atajos de teclado" : "Keyboard shortcuts"}
                 </h3>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-tertiary">
                   {es ? "Funcionan sobre la demo" : "Work while on the demo"}
                 </p>
               </div>
@@ -90,7 +90,7 @@ export function DemoShortcutsHint() {
                   <span className="flex items-center gap-1">
                     {s.keys.map((k, j) =>
                       k === "–" ? (
-                        <span key={j} className="text-gray-400 text-xs mx-0.5">
+                        <span key={j} className="text-tertiary text-xs mx-0.5">
                           –
                         </span>
                       ) : (
@@ -98,7 +98,7 @@ export function DemoShortcutsHint() {
                       )
                     )}
                   </span>
-                  <span className="text-xs md:text-sm text-gray-300">
+                  <span className="text-xs md:text-sm text-secondary">
                     {es ? s.labelEs : s.labelEn}
                   </span>
                 </li>

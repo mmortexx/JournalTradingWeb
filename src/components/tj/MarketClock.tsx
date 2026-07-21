@@ -244,10 +244,10 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
         <div className="relative z-10 flex items-center gap-3 overflow-x-auto custom-scroll min-w-0">
           {/* UTC time anchor */}
           <div className="flex items-center gap-2 pr-3 border-r  shrink-0">
-            <span className="text-[10px] uppercase tracking-[0.12em] text-gray-400">
+            <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
               {labels.utc}
             </span>
-            <span className="text-sm font-semibold tnum text-white">
+            <span className="text-sm font-semibold tnum text-primary">
               {utcTime}
             </span>
           </div>
@@ -268,12 +268,12 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
                 <div className="flex flex-col min-w-0 leading-tight">
                   <span
                     className={`text-[11px] font-semibold ${
-                      isOpen ? "text-white" : "text-gray-400"
+                      isOpen ? "text-primary" : "text-tertiary"
                     }`}
                   >
                     {es ? s.nameEs : s.nameEn}
                   </span>
-                  <span className="text-[10px] tnum text-gray-300">
+                  <span className="text-[10px] tnum text-secondary">
                     {fmtTime(now, s.tz, lang)}
                   </span>
                 </div>
@@ -290,7 +290,7 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
               className={`pill text-[10px] tnum ${
                 openCount > 0
                   ? "bg-pnl-pos/10 text-pnl-pos border border-pnl-pos/25"
-                  : "bg-white/5 text-gray-400 border border-white/10"
+                  : "bg-white/5 text-tertiary border border-white/10"
               }`}
             >
               {labels.sessionsOpen}
@@ -314,18 +314,18 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
         {/* Header row */}
         <div className="flex items-start justify-between mb-4 gap-3">
           <div className="min-w-0">
-            <div className="text-[11px] uppercase tracking-[0.12em] text-gray-400">
+            <div className="text-[11px] uppercase tracking-[0.12em] text-tertiary">
               {labels.sessions}
             </div>
-            <div className="mt-1 text-sm text-gray-300 truncate">
+            <div className="mt-1 text-sm text-secondary truncate">
               {openCount > 0 ? labels.openNow(openCount) : labels.noneOpen}
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="text-[10px] uppercase tracking-[0.12em] text-gray-400">
+            <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
               {labels.utcLabel}
             </div>
-            <div className="text-xl font-bold tnum text-white leading-tight">
+            <div className="text-xl font-bold tnum text-primary leading-tight">
               {utcTime}
             </div>
           </div>
@@ -347,7 +347,7 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
                   <StatusDot isOpen={isOpen} />
                   <span
                     className={`text-sm font-semibold truncate ${
-                      isOpen ? "text-white" : "text-white"
+                      isOpen ? "text-primary" : "text-primary"
                     }`}
                   >
                     {es ? s.nameEs : s.nameEn}
@@ -355,7 +355,7 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
                 </div>
                 <span
                   className={`text-[10px] uppercase tracking-wider shrink-0 ${
-                    isOpen ? "text-pnl-pos" : "text-gray-400"
+                    isOpen ? "text-pnl-pos" : "text-tertiary"
                   }`}
                 >
                   {isOpen ? labels.open : labels.closed}
@@ -363,10 +363,10 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
               </div>
 
               <div className="flex items-baseline justify-between gap-2 mb-2.5">
-                <span className="text-[10px] uppercase tracking-[0.1em] text-gray-400">
+                <span className="text-[10px] uppercase tracking-[0.1em] text-tertiary">
                   {es ? s.localLabelEs : s.localLabelEn}
                 </span>
-                <span className="text-base font-semibold tnum text-white">
+                <span className="text-base font-semibold tnum text-primary">
                   {fmtTime(now, s.tz, lang)}
                 </span>
               </div>

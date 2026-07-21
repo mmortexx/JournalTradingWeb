@@ -211,7 +211,7 @@ export function GlossaryModal({
         {trigger ?? (
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-white hover:text-white-hover hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-hover hover:underline"
           >
             <BookOpen className="size-4" aria-hidden="true" />
             {es ? "Glosario" : "Glossary"}
@@ -226,14 +226,14 @@ export function GlossaryModal({
             <Eyebrow>{es ? "Glosario congelado" : "Frozen glossary"}</Eyebrow>
           </div>
           <DialogTitle
-            className="mt-3 font-semibold tracking-[-0.01em] text-white"
+            className="mt-3 font-semibold tracking-[-0.01em] text-primary"
             style={{ fontSize: "1.5rem" }}
           >
             {es
               ? "Términos de trading, sin traducir"
               : "Trading terms, untranslated"}
           </DialogTitle>
-          <p className="text-sm text-gray-300 leading-relaxed">
+          <p className="text-sm text-secondary leading-relaxed">
             {es
               ? "Los términos se mantienen en inglés aunque la app esté en español: es la lengua franca de los mercados. Solo la definición cambia de idioma."
               : "Terms stay in English even when the app is in Spanish: it is the lingua franca of the markets. Only the definition changes language."}
@@ -244,7 +244,7 @@ export function GlossaryModal({
         <div className="px-6 pb-3">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-tertiary pointer-events-none"
               aria-hidden="true"
             />
             <Input
@@ -288,23 +288,23 @@ export function GlossaryModal({
                   setActiveCat(e.target.value as GlossaryCategory | "all")
                 }
                 aria-label={es ? "Filtrar por categoría" : "Filter by category"}
-                className="appearance-none bg-white/5 border border-white/10 rounded-md h-9 pl-3 pr-8 text-sm text-gray-300 outline-none transition-colors hover:border-white/25 focus-visible:border-white/30 cursor-pointer"
+                className="appearance-none bg-white/5 border border-white/10 rounded-md h-9 pl-3 pr-8 text-sm text-secondary outline-none transition-colors hover:border-white/25 focus-visible:border-white/30 cursor-pointer"
               >
                 {GLOSSARY_CATEGORIES.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-background text-white">
+                  <option key={c.id} value={c.id} className="bg-background text-primary">
                     {es ? c.es : c.en}
                   </option>
                 ))}
               </select>
               <ChevronDown
-                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-4 text-gray-400"
+                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-4 text-tertiary"
                 aria-hidden="true"
               />
             </div>
           </div>
 
           {/* Live count of matching terms */}
-          <p className="mt-2.5 text-xs text-gray-400 tnum">
+          <p className="mt-2.5 text-xs text-tertiary tnum">
             {filtered.length === 0
               ? es
                 ? "0 términos"
@@ -328,7 +328,7 @@ export function GlossaryModal({
           {/* Recently viewed — last 3 expanded terms, persisted in localStorage */}
           {recentTerms.length > 0 && (
             <div className="mb-4">
-              <div className="flex items-center gap-1.5 mb-2 text-[11px] uppercase tracking-[0.12em] text-gray-400 font-semibold">
+              <div className="flex items-center gap-1.5 mb-2 text-[11px] uppercase tracking-[0.12em] text-tertiary font-semibold">
                 <Clock className="size-3" aria-hidden="true" />
                 {es ? "Vistos recientemente" : "Recently viewed"}
               </div>
@@ -369,7 +369,7 @@ export function GlossaryModal({
 
           {filtered.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-tertiary">
                 {es
                   ? "Sin resultados para tu búsqueda."
                   : "No results for your search."}
@@ -408,14 +408,14 @@ export function GlossaryModal({
                         {/* Expansion chevron — rotates when expanded */}
                         <ChevronDown
                           className={[
-                            "size-3.5 text-gray-400 shrink-0 transition-transform duration-200",
+                            "size-3.5 text-tertiary shrink-0 transition-transform duration-200",
                             isExpanded ? "rotate-180" : "",
                           ].join(" ")}
                           aria-hidden="true"
                         />
                         {/* Term name — always English, accent, bold (frozen glossary) */}
                         <h3
-                          className="text-base font-semibold text-white tracking-tight truncate"
+                          className="text-base font-semibold text-primary tracking-tight truncate"
                           lang="en"
                         >
                           {g.term}
@@ -429,7 +429,7 @@ export function GlossaryModal({
                     <p
                       className={[
                         "mt-2 text-sm leading-relaxed",
-                        isExpanded ? "text-gray-300" : "text-gray-400 truncate",
+                        isExpanded ? "text-secondary" : "text-tertiary truncate",
                       ].join(" ")}
                     >
                       {es ? g.es : g.en}
@@ -441,7 +441,7 @@ export function GlossaryModal({
           )}
 
           {/* Keyboard hint footer */}
-          <p className="mt-4 text-[11px] text-gray-400 text-center">
+          <p className="mt-4 text-[11px] text-tertiary text-center">
             {es
               ? "Usa ↑ ↓ para navegar y Enter para expandir."
               : "Use ↑ ↓ to navigate and Enter to expand."}

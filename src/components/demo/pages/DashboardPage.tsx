@@ -80,9 +80,9 @@ const ASSET_DOT: Record<string, string> = {
 };
 
 const inputCls =
-  "w-full bg-white/5 border border-white/10 rounded-md h-9 px-3 text-sm text-white tnum placeholder:text-gray-400 focus:border-white/20 focus:bg-white/8 transition-colors appearance-none";
+  "w-full bg-white/5 border border-white/10 rounded-md h-9 px-3 text-sm text-primary tnum placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors appearance-none";
 const labelCls =
-  "block text-[11px] uppercase tracking-[0.15em] text-gray-400 mb-1.5";
+  "block text-[11px] uppercase tracking-[0.15em] text-tertiary mb-1.5";
 
 /**
  * Dashboard / "Resumen" page of the native Trading Journal app,
@@ -254,7 +254,7 @@ export function DashboardPage() {
           <Eyebrow>{t("captureEyebrow")}</Eyebrow>
         </Reveal>
         <Reveal delay={0.04}>
-          <h1 className="mt-2 font-medium tracking-[-0.02em] text-white text-2xl md:text-[28px] leading-tight">
+          <h1 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-[28px] leading-tight">
             {t("captureHeadline")}
           </h1>
         </Reveal>
@@ -287,8 +287,8 @@ export function DashboardPage() {
                           onClick={() => setDirection(d)}
                           className={`relative px-4 h-8 rounded text-sm font-medium transition-colors ${
                             active
-                              ? "text-white"
-                              : "text-gray-400 hover:text-gray-300"
+                              ? "text-primary"
+                              : "text-tertiary hover:text-secondary"
                           }`}
                         >
                           {active && (
@@ -353,12 +353,12 @@ export function DashboardPage() {
                     initial={{ opacity: 0.55, y: 3 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                    className="text-3xl md:text-4xl font-bold tnum text-white leading-none"
+                    className="text-3xl md:text-4xl font-bold tnum text-primary leading-none"
                   >
                     <Money value={riskUsd} />
                   </motion.div>
                   <div className="mt-1.5 md:flex md:justify-end">
-                    <span className="pill bg-white/5 text-gray-400 border border-white/10">
+                    <span className="pill bg-white/5 text-tertiary border border-white/10">
                       {t(calcMethod)}
                     </span>
                   </div>
@@ -507,7 +507,7 @@ export function DashboardPage() {
                     >
                       {fmtNum(realizedR, lang, 2)}R
                     </span>
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+                    <span className="text-[10px] text-tertiary uppercase tracking-wider">
                       {es ? "realizado" : "realized"}
                     </span>
                   </div>
@@ -528,8 +528,8 @@ export function DashboardPage() {
                         aria-pressed={active}
                         className={`relative px-3 h-7 rounded text-xs font-medium transition-colors ${
                           active
-                            ? "text-white"
-                            : "text-gray-400 hover:text-gray-300"
+                            ? "text-primary"
+                            : "text-tertiary hover:text-secondary"
                         }`}
                       >
                         {active && (
@@ -559,7 +559,7 @@ export function DashboardPage() {
                   <button
                     type="button"
                     aria-label={t("dropScreens")}
-                    className="w-full border border-dashed border-white/10 rounded-md p-4 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-gray-300 hover:border-white/25 hover:bg-white/5 transition-colors min-h-[96px] cursor-pointer group"
+                    className="w-full border border-dashed border-white/10 rounded-md p-4 flex flex-col items-center justify-center gap-2 text-tertiary hover:text-secondary hover:border-white/25 hover:bg-white/5 transition-colors min-h-[96px] cursor-pointer group"
                   >
                     <svg
                       width="22"
@@ -593,7 +593,7 @@ export function DashboardPage() {
                     onChange={(e) => setNote(e.target.value)}
                     placeholder={t("notePlaceholder")}
                     rows={3}
-                    className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-gray-400 focus:border-white/20 focus:bg-white/8 transition-colors resize-none min-h-[96px] flex-1"
+                    className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-primary placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors resize-none min-h-[96px] flex-1"
                     aria-label={t("notePlaceholder")}
                   />
                 </div>
@@ -627,7 +627,7 @@ export function DashboardPage() {
                   type="button"
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                  className="h-9 px-4 rounded-md bg-white/5 border border-white/10 text-gray-300 font-medium text-sm flex items-center gap-2 hover:bg-white/8 hover:text-white transition-colors"
+                  className="h-9 px-4 rounded-md bg-white/5 border border-white/10 text-secondary font-medium text-sm flex items-center gap-2 hover:bg-white/8 hover:text-primary transition-colors"
                 >
                   <svg
                     width="14"
@@ -1050,7 +1050,7 @@ function DeltaTone({
 function ChevronDown() {
   return (
     <span
-      className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400"
+      className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-tertiary"
       aria-hidden="true"
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none">

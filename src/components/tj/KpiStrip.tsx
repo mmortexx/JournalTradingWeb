@@ -21,11 +21,11 @@ export function KpiStrip({ items, className = "" }: KpiStripProps) {
           transition={{ delay: i * 0.06, duration: 0.5 }}
           className="flex flex-col min-w-[110px]"
         >
-          <span className="text-[10px] uppercase tracking-[0.15em] text-gray-400">
+          <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
             {kpi.label}
           </span>
           <span
-            className={`font-semibold tnum text-white mt-1 ${
+            className={`font-semibold tnum text-primary mt-1 ${
               kpi.tone === "pos"
                 ? "text-pnl-pos"
                 : kpi.tone === "neg"

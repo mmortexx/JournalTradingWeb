@@ -49,7 +49,7 @@ export function DemoReadyToBuy() {
               <span className="w-6 h-px bg-white opacity-60" />
             </span>
             <h2
-              className="font-medium tracking-[-0.02em] leading-[1.05] text-white text-balance"
+              className="font-medium tracking-[-0.02em] leading-[1.05] text-primary text-balance"
               style={{ fontSize: "clamp(1.9rem, 4vw, 2.7rem)" }}
             >
               {es ? (
@@ -62,7 +62,7 @@ export function DemoReadyToBuy() {
                 </>
               )}
             </h2>
-            <p className="mt-4 text-base md:text-lg text-gray-300 leading-relaxed max-w-xl mx-auto">
+            <p className="mt-4 text-base md:text-lg text-secondary leading-relaxed max-w-xl mx-auto">
               {es
                 ? "Llévatelo a tu máquina. Pago único, sin suscripción, con garantía de 30 días."
                 : "Take it to your machine. One-time payment, no subscription, with a 30-day guarantee."}
@@ -105,15 +105,15 @@ export function DemoReadyToBuy() {
                 <MagneticButton
                   href={asset("/features")}
                   strength={0.15}
-                  className="liquid-glass border border-white/20 text-white inline-flex items-center gap-2 px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-black transition-all"
+                  className="liquid-glass border border-white/20 text-primary inline-flex items-center gap-2 px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-black transition-all"
                 >
                   {es ? "Explora características" : "Explore features"}
                 </MagneticButton>
               </motion.div>
             </div>
-            <p className="mt-5 text-xs text-gray-400">
+            <p className="mt-5 text-xs text-tertiary">
               {es ? "desde " : "from "}
-              <span className="tnum text-gray-300 font-medium">$149</span>
+              <span className="tnum text-secondary font-medium">$149</span>
               {" · "}
               {es ? "pago único · sin suscripción" : "one-time · no subscription"}
             </p>

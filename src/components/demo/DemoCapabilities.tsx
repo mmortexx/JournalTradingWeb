@@ -166,7 +166,7 @@ export function DemoCapabilities() {
             <span className="w-6 h-px bg-white opacity-60" />
           </span>
           <h2
-            className="mt-4 font-medium tracking-[-0.02em] leading-tight text-white"
+            className="mt-4 font-medium tracking-[-0.02em] leading-tight text-primary"
             style={{ fontSize: "clamp(1.6rem, 3.2vw, 2.4rem)" }}
           >
             {es ? (
@@ -190,16 +190,16 @@ export function DemoCapabilities() {
                 className="liquid-glass depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-4 h-full flex flex-col gap-3 hover:border-white/30"
               >
                 <span
-                  className="w-9 h-9 rounded-md flex items-center justify-center bg-white/8 text-white"
+                  className="w-9 h-9 rounded-md flex items-center justify-center bg-white/8 text-primary"
                   aria-hidden="true"
                 >
                   {c.icon}
                 </span>
                 <div>
-                  <h3 className="text-sm md:text-base font-medium text-white leading-tight">
+                  <h3 className="text-sm md:text-base font-medium text-primary leading-tight">
                     {es ? c.titleEs : c.titleEn}
                   </h3>
-                  <p className="mt-1 text-xs md:text-sm text-gray-300 leading-relaxed">
+                  <p className="mt-1 text-xs md:text-sm text-secondary leading-relaxed">
                     {es ? c.descEs : c.descEn}
                   </p>
                 </div>

@@ -150,7 +150,7 @@ export function CommandPalette() {
 
   // Override cmdk's default selected-state styling with our accent.
   const itemClass =
-    "data-[selected=true]:bg-white/5 data-[selected=true]:text-white";
+    "data-[selected=true]:bg-white/5 data-[selected=true]:text-primary";
 
   return (
     <AnimatePresence>
@@ -217,8 +217,8 @@ export function CommandPalette() {
                         onSelect={() => navigate(p.path)}
                       >
                         <NavIcon />
-                        <span className="text-white">{label}</span>
-                        <CommandShortcut className="tnum text-gray-400">
+                        <span className="text-primary">{label}</span>
+                        <CommandShortcut className="tnum text-tertiary">
                           {p.path}
                         </CommandShortcut>
                       </CommandItem>
@@ -240,10 +240,10 @@ export function CommandPalette() {
                     onSelect={() => run(toggleTheme)}
                   >
                     <ThemeIcon />
-                    <span className="text-white">
+                    <span className="text-primary">
                       {es ? "Cambiar tema" : "Toggle theme"}
                     </span>
-                    <CommandShortcut className="text-gray-400">
+                    <CommandShortcut className="text-tertiary">
                       {theme === "dark"
                         ? es
                           ? "Oscuro"
@@ -263,10 +263,10 @@ export function CommandPalette() {
                     onSelect={() => run(toggleLang)}
                   >
                     <LangIcon />
-                    <span className="text-white">
+                    <span className="text-primary">
                       {es ? "Cambiar idioma" : "Toggle language"}
                     </span>
-                    <CommandShortcut className="tnum text-gray-400">
+                    <CommandShortcut className="tnum text-tertiary">
                       ES / EN
                     </CommandShortcut>
                   </CommandItem>
@@ -291,9 +291,9 @@ export function CommandPalette() {
                         <PaletteSwatch
                           color={theme === "dark" ? p.dark : p.light}
                         />
-                        <span className="text-white">{label}</span>
+                        <span className="text-primary">{label}</span>
                         {isCurrent && (
-                          <CommandShortcut className="text-white">
+                          <CommandShortcut className="text-primary">
                             ✓
                           </CommandShortcut>
                         )}
@@ -312,10 +312,10 @@ export function CommandPalette() {
                     onSelect={() => navigate("/pricing")}
                   >
                     <CartIcon />
-                    <span className="text-white">
+                    <span className="text-primary">
                       {es ? "Comprar Pro" : "Buy Pro"}
                     </span>
-                    <CommandShortcut className="tnum text-gray-400">
+                    <CommandShortcut className="tnum text-tertiary">
                       /pricing
                     </CommandShortcut>
                   </CommandItem>
@@ -325,7 +325,7 @@ export function CommandPalette() {
 
             {/* Footer keyboard hint */}
             <div
-              className="flex items-center justify-between gap-2 px-3 py-2 border-t  text-[11px] text-gray-400"
+              className="flex items-center justify-between gap-2 px-3 py-2 border-t  text-[11px] text-tertiary"
               aria-hidden="true"
             >
               <span className="flex items-center gap-1.5">
@@ -368,7 +368,7 @@ function NavIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      className="text-gray-400 shrink-0"
+      className="text-tertiary shrink-0"
       aria-hidden="true"
     >
       <path
@@ -389,7 +389,7 @@ function ThemeIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      className="text-gray-400 shrink-0"
+      className="text-tertiary shrink-0"
       aria-hidden="true"
     >
       <path
@@ -409,7 +409,7 @@ function LangIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      className="text-gray-400 shrink-0"
+      className="text-tertiary shrink-0"
       aria-hidden="true"
     >
       <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" />
@@ -430,7 +430,7 @@ function CartIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      className="text-gray-400 shrink-0"
+      className="text-tertiary shrink-0"
       aria-hidden="true"
     >
       <path
@@ -458,7 +458,7 @@ function PaletteSwatch({ color }: { color: string }) {
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded border  bg-white/[0.03] text-[10px] font-mono text-gray-300 tnum">
+    <kbd className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded border  bg-white/[0.03] text-[10px] font-mono text-secondary tnum">
       {children}
     </kbd>
   );

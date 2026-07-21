@@ -45,7 +45,7 @@ export function BackToTop() {
           type="button"
           onClick={scrollToTop}
           aria-label={es ? "Volver arriba" : "Back to top"}
-          className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-white transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgb(var(--accent-base)/0.40)] active:scale-95"
+          className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-primary transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgb(var(--accent-base)/0.40)] active:scale-95"
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.7 }}

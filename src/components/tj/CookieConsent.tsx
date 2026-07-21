@@ -105,7 +105,7 @@ export function CookieConsent() {
         >
           <div className="flex items-start gap-3">
             <CookieIcon />
-            <p className="text-[13px] leading-relaxed text-gray-300 flex-1">
+            <p className="text-[13px] leading-relaxed text-secondary flex-1">
               {es
                 ? "Usamos cookies técnicas para recordar tus preferencias. Sin tracking, sin publicidad."
                 : "We use technical cookies to remember your preferences. No tracking, no ads."}
@@ -116,7 +116,7 @@ export function CookieConsent() {
             <Link
               href="/faq"
               onClick={dismiss}
-              className="text-[12px] font-medium text-gray-400 hover:text-white transition-colors underline-offset-4 hover:underline"
+              className="text-[12px] font-medium text-tertiary hover:text-primary transition-colors underline-offset-4 hover:underline"
             >
               {es ? "Más info" : "Learn more"}
             </Link>
@@ -139,7 +139,7 @@ export function CookieConsent() {
 function CookieIcon() {
   return (
     <span
-      className="shrink-0 mt-0.5 inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/5 text-white"
+      className="shrink-0 mt-0.5 inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/5 text-primary"
       aria-hidden="true"
     >
       <svg
