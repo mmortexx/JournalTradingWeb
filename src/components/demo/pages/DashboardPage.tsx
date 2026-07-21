@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import {
@@ -246,18 +246,52 @@ export function DashboardPage() {
         : "Computed"
       : t(calcMethod);
 
+  // ----- live "last updated" clock — signals real-time app -----
+  const [now, setNow] = useState<string>("");
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      setNow(
+        d.toLocaleTimeString(es ? "es-ES" : "en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+      );
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [es]);
+
   return (
     <div className="p-5 md:p-6 space-y-5 relative">
       {/* ============ 1. CAPTURE COMPOSER ============ */}
       <section className="relative">
-        <Reveal delay={0}>
-          <Eyebrow>{t("captureEyebrow")}</Eyebrow>
-        </Reveal>
-        <Reveal delay={0.04}>
-          <h1 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-[28px] leading-tight">
-            {t("captureHeadline")}
-          </h1>
-        </Reveal>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <Reveal delay={0}>
+              <Eyebrow>{t("captureEyebrow")}</Eyebrow>
+            </Reveal>
+            <Reveal delay={0.04}>
+              <h1 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-[28px] leading-tight">
+                {t("captureHeadline")}
+              </h1>
+            </Reveal>
+          </div>
+          {/* Live timestamp — signals "real-time app" like a Bloomberg terminal */}
+          <div className="hidden sm:flex items-center gap-2 text-[11px] text-tertiary tnum shrink-0 pt-1">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inset-0 rounded-full bg-pnl-pos/60 animate-ping" />
+              <span className="relative rounded-full h-1.5 w-1.5 bg-pnl-pos" />
+            </span>
+            <span className="uppercase tracking-[0.12em]">
+              {es ? "Actualizado" : "Updated"}
+            </span>
+            <span className="text-secondary font-medium">{now}</span>
+          </div>
+        </div>
 
         <Reveal delay={0.08}>
           <motion.div
@@ -1001,10 +1035,15 @@ function KpiTile({
   return (
     <motion.div
       whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-      className="liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 rounded-card p-4 flex flex-col gap-1.5 h-full"
+      className="liquid-glass depth-1 hover:depth-2 hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.10)] transition-shadow duration-300 rounded-card p-4 flex flex-col gap-1.5 h-full relative"
     >
-      <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary truncate">
-        {label}
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] text-tertiary truncate">
+        {/* Live pulse dot — signals "real-time data" */}
+        <span className="relative flex h-1 w-1 shrink-0" aria-hidden="true">
+          <span className="absolute inset-0 rounded-full bg-pnl-pos/50 animate-ping" style={{ animationDuration: "2s" }} />
+          <span className="relative rounded-full h-1 w-1 bg-pnl-pos" />
+        </span>
+        <span className="truncate">{label}</span>
       </div>
       <div className="min-w-0 tnum">{children}</div>
       {delta && <div className="mt-auto pt-1 text-[10px] tnum">{delta}</div>}
