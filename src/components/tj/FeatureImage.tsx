@@ -1,0 +1,74 @@
+"use client";
+
+import Image from "next/image";
+import { motion } from "framer-motion";
+
+interface FeatureImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  /** Overlay gradient opacity (0-1). */
+  overlay?: number;
+  /** Priority loading (for above-the-fold images). */
+  priority?: boolean;
+  /** Animation delay for reveal. */
+  delay?: number;
+  /**
+   * `sizes` attribute forwarded to next/image. Defaults to a sensible
+   * 1/2/3-column responsive hint. Pass a more specific value when the
+   * image lives in a different grid (e.g. a 4-up gallery should pass
+   * `(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw`).
+   */
+  sizes?: string;
+}
+
+/**
+ * Feature image with glass overlay and reveal animation.
+ * Uses next/image with unoptimized for static export compatibility.
+ * The overlay ensures images blend with the dark glass theme.
+ */
+export function FeatureImage({
+  src,
+  alt,
+  className = "",
+  overlay = 0.4,
+  priority = false,
+  delay = 0,
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+}: FeatureImageProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 1.05 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={`overflow-hidden rounded-card ${className}`}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        priority={priority}
+        unoptimized
+        className="object-cover"
+        sizes={sizes}
+      />
+      {/* Gradient overlay to blend with the dark theme */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `linear-gradient(180deg, rgb(var(--tint) / ${overlay * 0.3}) 0%, rgb(var(--tint) / ${overlay * 0.6}) 60%, rgb(var(--tint) / ${overlay * 0.9}) 100%)`,
+        }}
+        aria-hidden="true"
+      />
+      {/* Accent tint at top */}
+      <div
+        className="absolute inset-0 pointer-events-none mix-blend-overlay"
+        style={{
+          background: `radial-gradient(60% 40% at 80% 0%, rgb(var(--accent-base) / 0.15), transparent 70%)`,
+        }}
+        aria-hidden="true"
+      />
+    </motion.div>
+  );
+}

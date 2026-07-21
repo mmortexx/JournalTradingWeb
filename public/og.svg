@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Trading Journal — Tu operativa, medida.">
+  <title>Trading Journal</title>
+  <desc>Trading Journal brand card: dark graphite canvas, gold accent equity curve trending up, wordmark and Spanish tagline.</desc>
+
+  <defs>
+    <!-- Canvas: deep graphite with a faint warm corner glow -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#121418"/>
+      <stop offset="1" stop-color="#101216"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.12" r="0.65">
+      <stop offset="0" stop-color="#C7A76B" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#C7A76B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.05" cy="1" r="0.6">
+      <stop offset="0" stop-color="#5CC1B0" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#5CC1B0" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Equity curve stroke: warm gold gradient -->
+    <linearGradient id="curveStroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C7A76B" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#D6BC85"/>
+      <stop offset="1" stop-color="#F0DCAA"/>
+    </linearGradient>
+
+    <!-- Equity curve fill: gold fading down to transparent -->
+    <linearGradient id="curveFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C7A76B" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#C7A76B" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Brand mark stroke -->
+    <linearGradient id="markStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D6BC85"/>
+      <stop offset="1" stop-color="#C7A76B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background layers -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <!-- Faint horizontal baselines behind the curve (chart grid feel) -->
+  <g stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1">
+    <line x1="640" y1="240" x2="1160" y2="240"/>
+    <line x1="640" y1="320" x2="1160" y2="320"/>
+    <line x1="640" y1="400" x2="1160" y2="400"/>
+    <line x1="640" y1="460" x2="1160" y2="460"/>
+  </g>
+
+  <!-- Brand mark (top-left): rounded square + stylized "Z" -->
+  <g transform="translate(80,76)">
+    <rect x="0" y="0" width="48" height="48" rx="10" fill="none" stroke="#C7A76B" stroke-opacity="0.45" stroke-width="1.5"/>
+    <path d="M14,16 L34,16 L14,32 L34,32" fill="none" stroke="url(#markStroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Brand wordmark next to mark -->
+  <text x="146" y="108" font-family="'Segoe UI Variable','Segoe UI',Helvetica,Arial,sans-serif" font-size="22" font-weight="600" fill="#F0F0F5" letter-spacing="0.2">Trading Journal</text>
+
+  <!-- Equity curve (right half): area fill + stroke + end node -->
+  <g>
+    <path d="M640,440 C700,435 740,420 780,400 C820,380 852,412 900,360 C940,318 972,344 1020,288 C1060,244 1100,236 1140,212 L1140,460 L640,460 Z" fill="url(#curveFill)"/>
+    <path d="M640,440 C700,435 740,420 780,400 C820,380 852,412 900,360 C940,318 972,344 1020,288 C1060,244 1100,236 1140,212" fill="none" stroke="url(#curveStroke)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Soft halo + node at the curve's leading edge -->
+    <circle cx="1140" cy="212" r="14" fill="#C7A76B" fill-opacity="0.18"/>
+    <circle cx="1140" cy="212" r="6" fill="#F0DCAA"/>
+    <circle cx="1140" cy="212" r="2.5" fill="#121418"/>
+  </g>
+
+  <!-- Eyebrow label -->
+  <text x="80" y="316" font-family="'Segoe UI Variable','Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="600" fill="#6E737D" letter-spacing="4">LOCAL · PRIVADO · TUYO</text>
+
+  <!-- Main wordmark -->
+  <text x="80" y="402" font-family="'Segoe UI Variable','Segoe UI',Helvetica,Arial,sans-serif" font-size="78" font-weight="700" fill="#F0F0F5" letter-spacing="-2.5">Trading Journal</text>
+
+  <!-- Tagline -->
+  <text x="80" y="450" font-family="'Segoe UI Variable','Segoe UI',Helvetica,Arial,sans-serif" font-size="30" font-weight="400" fill="#A0A5AF" letter-spacing="0.3">Tu operativa, medida.</text>
+
+  <!-- Bottom hairline + URL -->
+  <rect x="80" y="546" width="1040" height="1" fill="#FFFFFF" fill-opacity="0.08"/>
+  <text x="80" y="578" font-family="'Segoe UI Variable','Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="500" fill="#5E636D" letter-spacing="0.4">tradingjournal.app</text>
+  <text x="1120" y="578" text-anchor="end" font-family="'Segoe UI Variable','Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="500" fill="#5E636D" letter-spacing="0.4">Diario de trading · local-first</text>
+</svg>

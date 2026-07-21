@@ -1,0 +1,1371 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   TRADING JOURNAL — DESIGN SYSTEM
+   Faithful to the native WinUI app: Resources/Colors.xaml,
+   Typography.xaml, Palettes/*.xaml, TintedAcrylicBackdrop.cs.
+   3-level translucent material (canvas < chrome < glass cards)
+   on top of an acrylic backdrop. 5 accent palettes. Dark default.
+   ============================================================ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* Tailwind v4 reads `--font-sans` here to resolve the `font-sans` utility
+     (and any element that opts into it). Putting Inter first makes the
+     utility resolve to Inter everywhere, with the system Geist Sans as
+     a high-quality fallback if the Inter webfont hasn't loaded yet.
+     Matches the body { font-family } cascade in @layer base below. */
+  --font-sans: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* ---- Trading Journal brand tokens mapped to Tailwind ----
+     NOTE: `--color-tj-accent*` mappings removed (R1-a) — they auto-
+     generated ~108 unused `*-tj-accent` Tailwind utilities. Components
+     now use `rgb(var(--accent-base))` directly in arbitrary Tailwind
+     values or in inline styles, so the raw `--accent-base` /
+     `--accent-hover` / `--accent-pressed` / `--accent-soft` channel-
+     triplet custom properties (defined in :root below) are what
+     actually drive accent rendering across the site. */
+  --color-pnl-pos: rgb(var(--pnl-pos));
+  --color-pnl-neg: rgb(var(--pnl-neg));
+  --color-pnl-warn: rgb(var(--pnl-warn));
+  --color-signal-green: rgb(var(--sig-green));
+  --color-signal-amber: rgb(var(--sig-amber));
+  --color-signal-red: rgb(var(--sig-red));
+  --color-divider: rgb(var(--divider));
+}
+
+/* ===== Default: Oro (gold) — DARK theme ===== */
+:root {
+  --radius: 0.625rem;
+
+  /* Accent — gold (#C7A76B), matching the user-uploaded golden/esmeralda
+     luxury imagery (dark backdrop, gold pathway hero). Default now points
+     at the "oro" palette (data-palette="oro"), so these :root values are
+     the SSR-safe fallback that already mirrors oro so the first paint is
+     gold even before the palette selector applies. */
+  --accent-base: 199 167 107; /* #C7A76B — gold */
+  --accent-hover: 214 188 133; /* #D6BC85 */
+  --accent-pressed: 176 144 90; /* #B0905A */
+  --accent-soft: 199 167 107;
+
+  /* P&L — slightly brighter green (Emerald-400 / #34D399) and slightly
+     deeper red (Red-600 / #EF4444) so positive/negative figures read
+     at a glance on both dark glass (translucent wash knocks real
+     contrast down a notch) and the bright light-theme glass. Same
+     hue family as before so existing visual associations hold. */
+  --pnl-pos: 52 211 153; /* #34D399 */
+  --pnl-neg: 239 68 68; /* #EF4444 */
+  --pnl-warn: 224 147 43; /* #E0932B */
+
+  --sig-green: 52 211 153;
+  --sig-amber: 224 147 43;
+  --sig-red: 229 103 90;
+
+  /* 3-level material — palette tint at escalating opacity.
+     Refined (R1-a) to a richer, more institutional near-black
+     (≈ #0E0F12, "Bloomberg terminal" depth) — one step darker than
+     the prior #121418 so the dark canvas reads as deeper and more
+     confident. The cool blue-gray cast is preserved so the brand
+     still reads as "serious fintech" rather than neutral charcoal;
+     the slightly darker floor also lets accent + P&L colors pop
+     with a touch more chroma separation. */
+  --tint: 14 15 18; /* #0E0F12 — Bloomberg terminal depth */
+  --canvas: 14 15 18;
+  --chrome: 14 15 18;
+  --card: 14 15 18;
+  --canvas-op: 0.12;
+  --chrome-op: 0.8;
+  --card-op: 0.55;
+
+  /* Text — pure white / Tailwind gray scale tuned to match the video-hero
+     aesthetic (#FFFFFF headings, gray-300 secondary, gray-400 tertiary).
+     Replaces the previous cooler neutrals (#F0F0F5 / #A0A5AF / #6E737D)
+     so all sections read coherently against the dark video hero and the
+     dark glass surfaces elsewhere. Contrast margins stay comfortably
+     within WCAG 2.1 AA (primary ≈ 19.3:1, secondary ≈ 12.6:1, tertiary
+     ≈ 8.6:1 on the #121418 backdrop) — tertiary was lifted one step
+     (gray-400 vs the prior gray-500) to keep it legible through the
+     liquid-glass layers. */
+  --txt-primary: 255 255 255; /* #FFFFFF — ≈ 19.3:1 */
+  --txt-secondary: 209 213 219; /* #D1D5DB (gray-300) — ≈ 12.6:1 */
+  --txt-tertiary: 156 163 175; /* #9CA3AF (gray-400) — ≈ 8.6:1 */
+  --divider: 255 255 255;
+
+  /* shadcn compatibility layer (mapped to TJ tokens) */
+  --background: oklch(0.16 0.008 250);
+  --foreground: oklch(0.96 0.008 80);
+  --card: oklch(0.2 0.008 250);
+  --card-foreground: oklch(0.96 0.008 80);
+  --popover: oklch(0.2 0.008 250);
+  --popover-foreground: oklch(0.96 0.008 80);
+  --primary: oklch(0.72 0.02 250);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.26 0.008 250);
+  --secondary-foreground: oklch(0.96 0.008 80);
+  --muted: oklch(0.24 0.008 250);
+  --muted-foreground: oklch(0.7 0.008 250);
+  --accent: oklch(0.72 0.02 250);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.62 0.22 25);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: rgb(var(--accent-base));
+  --chart-1: rgb(var(--pnl-pos));
+  --chart-2: rgb(var(--pnl-neg));
+  --chart-3: rgb(var(--pnl-warn));
+  --chart-4: rgb(var(--accent-base));
+  --chart-5: rgb(var(--sig-green));
+  --sidebar: oklch(0.2 0.008 250);
+  --sidebar-foreground: oklch(0.96 0.008 80);
+  --sidebar-primary: rgb(var(--accent-base));
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.26 0.008 250);
+  --sidebar-accent-foreground: oklch(0.96 0.008 80);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: rgb(var(--accent-base));
+}
+
+/* ===== Light theme ===== */
+:root[data-theme="light"] {
+  --pnl-pos: 52 211 153;
+  --pnl-neg: 239 68 68;
+  --pnl-warn: 224 147 43;
+
+  --sig-green: 52 211 153;
+  --sig-amber: 224 147 43;
+  --sig-red: 229 103 90;
+
+  /* Cool, very light blue-gray (Figma-style #F8FAFC) replaces the
+     warm #EEF2F7 so the light theme reads as bright & airy rather
+     than tinted. Same cool cast as the new dark keeps the brand
+     coherent across the theme toggle. */
+  --tint: 248 250 252; /* #F8FAFC */
+  --canvas: 248 250 252;
+  --chrome: 248 250 252;
+  --card: 248 250 252;
+  --canvas-op: 0.07;
+  --chrome-op: 0.8;
+  --card-op: 0.60;
+
+  /* Text on the new bright cool backdrop (≈ #F8FAFC, L≈0.97). Cool
+     neutrals (#14161C / #50555F / #787D87) replace the warm
+     browns (#1B1A18 / #5A564E / #6E685E) so the light theme reads
+     as institutional gray rather than sepia; contrast margins stay
+     at the same WCAG 2.1 AA levels (primary ≈ 18:1, secondary ≈ 9:1,
+     tertiary ≈ 5.4:1). */
+  --txt-primary: 20 22 28; /* #14161C — ≈ 18:1 */
+  --txt-secondary: 80 85 95; /* #50555F — ≈ 9:1 */
+  --txt-tertiary: 120 125 135; /* #787D87 — ≈ 5.4:1 */
+  --divider: 0 0 0;
+
+  --background: oklch(0.97 0.006 250);
+  --foreground: oklch(0.2 0.008 80);
+  --card: oklch(0.99 0.004 250);
+  --card-foreground: oklch(0.2 0.008 80);
+  --popover: oklch(0.99 0.004 250);
+  --popover-foreground: oklch(0.2 0.008 80);
+  --primary: oklch(0.5 0.02 250);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.93 0.006 250);
+  --secondary-foreground: oklch(0.2 0.008 80);
+  --muted: oklch(0.94 0.006 250);
+  --muted-foreground: oklch(0.45 0.008 80);
+  --accent: oklch(0.5 0.02 250);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.24 27);
+  --border: oklch(0 0 0 / 10%);
+  --input: oklch(0 0 0 / 12%);
+  --ring: rgb(var(--accent-base));
+}
+
+/* ===== Accent per palette ===== */
+:root[data-palette="oro"] {
+  --accent-base: 199 167 107; --accent-hover: 214 188 133; --accent-pressed: 176 144 90; --accent-soft: 199 167 107;
+  --tint: 32 30 27;
+}
+:root[data-theme="light"][data-palette="oro"] {
+  --accent-base: 138 108 53; --accent-hover: 113 88 31; --accent-pressed: 92 71 24;
+  --tint: 247 244 238;
+}
+:root[data-palette="esmeralda"] {
+  --accent-base: 92 193 176; --accent-hover: 110 206 191; --accent-pressed: 78 165 150; --accent-soft: 92 193 176;
+  --tint: 27 32 31;
+}
+:root[data-theme="light"][data-palette="esmeralda"] {
+  --accent-base: 45 118 106; --accent-hover: 36 95 86; --accent-pressed: 28 75 68;
+  --tint: 238 247 246;
+}
+:root[data-palette="onix"] {
+  --accent-base: 130 145 175; --accent-hover: 145 160 190; --accent-pressed: 110 125 155; --accent-soft: 130 145 175;
+  --tint: 18 20 24;
+}
+:root[data-theme="light"][data-palette="onix"] {
+  --accent-base: 69 80 94; --accent-hover: 55 64 75; --accent-pressed: 44 51 60;
+  --tint: 248 250 252;
+}
+:root[data-palette="aurora"] {
+  --accent-base: 156 104 182; --accent-hover: 172 120 196; --accent-pressed: 132 88 154; --accent-soft: 156 104 182;
+  --tint: 30 27 33;
+}
+:root[data-theme="light"][data-palette="aurora"] {
+  --accent-base: 91 53 110; --accent-hover: 73 42 88; --accent-pressed: 58 33 70;
+  --tint: 244 238 247;
+}
+:root[data-palette="seda"] {
+  --accent-base: 109 148 176; --accent-hover: 125 162 188; --accent-pressed: 92 126 150; --accent-soft: 109 148 176;
+  --tint: 27 31 35;
+}
+:root[data-theme="light"][data-palette="seda"] {
+  --accent-base: 57 86 106; --accent-hover: 46 69 85; --accent-pressed: 36 54 67;
+  --tint: 238 243 247;
+}
+
+/* Keep shadcn `.dark` variant in sync with data-theme dark */
+.dark { color-scheme: dark; }
+:root:not([data-theme="light"]) { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    border-color: rgb(var(--divider) / 0.1);
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    color: rgb(var(--txt-primary));
+    font-family: var(--font-inter), var(--font-geist-sans), "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    font-feature-settings: "tnum" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    text-rendering: optimizeLegibility;
+    /* Horizontal overflow guard — clamps any incidental overflow caused
+       by absolutely-positioned decorative orbs, wide tables, or long
+       unbroken strings before it can introduce a horizontal scrollbar
+       on narrow viewports (320px class). Vertical scroll is untouched. */
+    overflow-x: hidden;
+    /* Slight negative tracking on body text — pulls characters
+       ~0.16px closer at 1rem, tightening the ragged default sans
+       spacing into the more deliberate, controlled rhythm of
+       financial publications (FT, Bloomberg, Stripe). Subtle
+       enough that headings/labels still override via their own
+       letter-spacing rules above. */
+    letter-spacing: -0.01em;
+    /* Near-black canvas (≈ #0B0C0E, "Bloomberg terminal" depth) — a
+       whisper cooler than pure #000 so the void reads as a richer
+       institutional dark with a barely-perceptible blue-gray cast,
+       rather than a flat synthetic black. The hero section's video
+       background has no overlay, so the rest of the site reads as a
+       continuation: deep near-black void with liquid-glass cards
+       floating on top. Fixed so the backdrop stays anchored while
+       content scrolls, reinforcing the "stage" metaphor. */
+    background: #0B0C0E;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  /* Tabular figures + slashed zeros for financial typography.
+     `"zero" 1` enables the slashed-zero glyph (0 → 0̸) so numeric
+     columns visually distinguish 0 from O — a small but important
+     detail in financial/trading contexts where every digit matters. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "zero" 1;
+  }
+
+  /* ============================================================
+     TYPE SCALE — strict 1.25 ratio (major third).
+     A single, rigorous scale drives every heading so the visual
+     hierarchy reads as one system instead of ad-hoc per-section
+     sizes. `clamp()` keeps each step fluid across breakpoints
+     without bespoke responsive variants. Tight letter-spacing on
+     large display type, looser on small captions/labels.
+     Drop `.t-*` on any element to opt into the scale; the class
+     never sets color so it composes cleanly with text-primary /
+     text-secondary / text-tertiary utilities.
+     ============================================================ */
+  /* TYPE SCALE — PROFESSIONAL TUNING
+     Weights pulled lighter (500 for display/h1/h2/h3) to read as
+     more premium / editorial — heavy 600/700 headings read as
+     "demo". Letter-spacing tightened on large display type for
+     that financial-publication feel. Line-heights nudged for more
+     breathing room. Body shrunk to 1rem (was 1.0625rem) — smaller
+     is more professional, matches the typographic rhythm of
+     publications like FT / Bloomberg. h4 stays 600 — it is used
+     for small section labels where a heavier anchor is needed. */
+  .t-display {
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: 1.0;
+    letter-spacing: -0.035em;
+    font-weight: 500;
+  }
+  .t-h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+  }
+  .t-h2 {
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+  }
+  .t-h3 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+  }
+  .t-h4 {
+    font-size: 1.125rem;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    font-weight: 600;
+  }
+  .t-body {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .t-body-sm {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .t-caption {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  .t-label {
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Balanced text wrapping for every heading — prevents orphan
+     words on the last line and produces more even line breaks in
+     large display type. The `.text-balance` utility remains for
+     explicit opt-in on non-heading elements (paragraphs, etc.). */
+  h1, h2, h3 { text-wrap: balance; }
+
+  /* Standardized baseline transition for interactive + material
+     surfaces. Buttons / links use the spec's `all 0.2s` cadence so
+     every press / hover across the site shares the same tactile
+     feel; .pill gets the same. .glass is overridden below with a
+     richer 0.3s transition that also covers box-shadow + transform
+     so the depth-N hover deepening always eases smoothly. Tailwind
+     utilities (`transition-colors`, `transition-all`, `transition-shadow`)
+     still override per-element when they need different timing. */
+  a,
+  button,
+  .pill {
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ============================================================
+     GLOBAL FORM CONTROL POLISH — Apple-style translucent inputs.
+     A faint white wash (0.04) reads as etched glass on the acrylic
+     backdrop; the hairline divider border (0.1) keeps the field edge
+     crisp without competing with the label above it. The 8px radius
+     mirrors .glass cards for visual continuity across surfaces.
+
+     :focus lifts the wash slightly (0.06), brightens the border to a
+     half-strength accent tint, and lays a soft 3px accent halo behind
+     the field — the same Apple focus affordance the focus-visible ring
+     uses elsewhere, but tuned to feel "part of the field" rather than
+     wrapped around it. Tailwind utilities (bg-white/5, border, etc.)
+     still override per-element when applied.
+     ============================================================ */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="password"],
+  textarea,
+  select {
+    background-color: rgb(255 255 255 / 0.04);
+    border: 1px solid rgb(var(--divider) / 0.1);
+    border-radius: 8px;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: rgb(var(--accent-base) / 0.5);
+    background-color: rgb(255 255 255 / 0.06);
+    box-shadow: 0 0 0 3px rgb(var(--accent-base) / 0.12);
+    outline: none;
+  }
+  :root[data-theme="light"] input[type="text"],
+  :root[data-theme="light"] input[type="email"],
+  :root[data-theme="light"] input[type="number"],
+  :root[data-theme="light"] input[type="search"],
+  :root[data-theme="light"] input[type="tel"],
+  :root[data-theme="light"] input[type="url"],
+  :root[data-theme="light"] input[type="password"],
+  :root[data-theme="light"] textarea,
+  :root[data-theme="light"] select {
+    background-color: rgb(255 255 255 / 0.6);
+    border-color: rgb(var(--divider) / 0.18);
+  }
+  :root[data-theme="light"] input:focus,
+  :root[data-theme="light"] textarea:focus,
+  :root[data-theme="light"] select:focus {
+    background-color: rgb(255 255 255 / 0.85);
+  }
+}
+
+@layer components {
+  /* GLASS CARD — translucent so the acrylic backdrop shows through, blurred + saturated.
+     Apple-style "liquid glass": strong saturation (180%, macOS Big Sur level),
+     a vertical specular gradient on the rim that brightens at the top, an inner
+     highlight + base shadow for material depth, and a soft elevation shadow that
+     floats the card off the acrylic backdrop. The accent-tinted 1px border stays
+     subtle so the rim gradient — not the border — carries the edge; 0.35 opacity
+     (bumped from 0.30 for visibility on lower-saturation palettes like ónix /
+     seda where the accent itself reads close to neutral gray on the dark tint). */
+  .glass {
+    background-color: rgb(var(--card) / var(--card-op));
+    /* Subtle vertical gradient overlay (2% white at the top fading to
+       transparent at 50%) — gives the card a hair of depth beyond the
+       flat fill, like a soft top-light highlight. Tiny enough to read
+       as material weight, not a visible gradient. Sits under the
+       ::before refraction border so it never competes with the rim. */
+    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 50%);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid rgb(var(--accent-base) / 0.35);
+    border-radius: 8px;
+    position: relative;
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.08),
+      0 4px 16px -4px rgb(0 0 0 / 0.2);
+    /* GPU hint for the transform transition below + the Framer Motion
+       `whileHover` lift that pairs with .depth-N. Browsers can promote
+       the card to its own compositor layer up-front so the hover lift
+       never triggers a main-thread repaint — critical for the buttery
+       60fps feel at the now-reduced 16px blur radius (heavier blurs
+       are the usual culprit for scroll/hover jank, so keeping the
+       layer promoted preempts any residual repaint cost). Scoped to
+       .glass only (not global) so unrelated elements don't pay the
+       compositor-layer memory tax. */
+    will-change: transform;
+    /* Premium hover transition — covers every property that changes on
+       hover (background tint, border accent, shadow deepening, transform
+       lift) so the motion is always buttery. The cubic-bezier is the
+       same "soft settle" curve used by ScrollReveal + Framer Motion
+       spring transitions across the site. Tailwind utilities like
+       `transition-shadow` / `transition-colors` still override
+       per-element when they need different timing — but the defaults
+       here mean a bare `class="glass depth-2"` already animates
+       smoothly without per-element opt-in. */
+    transition:
+      background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.12) 0%, rgb(255 255 255 / 0.03) 50%, rgb(0 0 0 / 0.08) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  /* Subtle film-grain texture layered onto every glass card. Sits above
+     the glass fill but below the ::before refraction border, so the
+     grain reads as part of the material itself rather than a sticker.
+     Opacity is intentionally tiny (0.015) — at normal viewing distance
+     it reads as soft depth rather than noise. mix-blend-mode: overlay
+     lets the grain darken shadows and lift highlights without shifting
+     the accent hue. Same SVG fractalNoise as the body grain (which is
+     fixed to the viewport); here it tiles per-card so each surface has
+     its own micro-texture. */
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+  }
+  :root[data-theme="light"] .glass::before {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.5) 40%, rgb(0 0 0 / 0.06) 100%);
+  }
+  :root[data-theme="light"] .glass {
+    /* Bright + airy override: explicit 0.65 background opacity (vs the
+       0.60 --card-op variable) keeps light glass feeling solid without
+       going slab-heavy; the softer 0.25 accent border (down from 0.40)
+       lets the rim read as a luminous hairline rather than a hard rule —
+       what makes Apple's light glass feel weightless even at low blur. */
+    background-color: rgb(var(--card) / 0.65);
+    border-color: rgb(var(--accent-base) / 0.25);
+    /* Light theme: brighter specular highlight + softer elevation so the
+       card reads as light glass on a light backdrop rather than a heavy slab. */
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.5),
+      inset 0 -1px 0 0 rgb(0 0 0 / 0.04),
+      0 8px 32px -8px rgb(0 0 0 / 0.15);
+  }
+
+  /* GLASS-THIN — whisper-thin material for overlays that should hover
+     above content without blocking it (tooltips, dropdown menus,
+     popovers, command palettes — used by MiniCalendar / EquityCurve /
+     Heatmap / Histogram chart tooltips). Apply alongside .glass; the
+     compound selector (.glass.glass-thin = 0,2,0) beats .glass (0,1,0)
+     and the light-theme override raises specificity to clear
+     :root[data-theme="light"] .glass (0,3,0). Lower opacity + lighter
+     blur keeps the underlying content legible through the surface. */
+  .glass.glass-thin {
+    --card-op: 0.40;
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.06),
+      inset 0 -1px 0 0 rgb(0 0 0 / 0.04),
+      0 4px 16px -4px rgb(0 0 0 / 0.25);
+  }
+  .glass.glass-thin::before {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.16) 0%, rgb(255 255 255 / 0.04) 40%, rgb(0 0 0 / 0.10) 100%);
+  }
+  :root[data-theme="light"] .glass.glass-thin {
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.4),
+      inset 0 -1px 0 0 rgb(0 0 0 / 0.03),
+      0 4px 16px -4px rgb(0 0 0 / 0.12);
+  }
+  :root[data-theme="light"] .glass.glass-thin::before {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.85) 0%, rgb(255 255 255 / 0.35) 45%, rgb(0 0 0 / 0.05) 100%);
+  }
+
+  /* GRADIENT BORDER — accent-tinted 135deg gradient ring that overrides
+     the neutral .glass::before refraction border on cards that need
+     extra emphasis (the Bento hero "Disciplina" card, the Pro pricing
+     card). Uses the same 1px-padding + composite-mask technique as
+     .glass::before so the ring hugs the inherited border-radius and
+     never bleeds into the card interior. Declared AFTER the .glass
+     rules so its equal specificity (0,1,1) wins in dark theme; the
+     light-theme override below raises specificity just enough to
+     beat :root[data-theme="light"] .glass::before (0,3,1) so the
+     accent gradient survives in both themes. */
+  .gradient-border {
+    position: relative;
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgb(var(--accent-base) / 0.4), transparent 50%, rgb(var(--accent-base) / 0.2));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  :root[data-theme="light"] .gradient-border::before {
+    background: linear-gradient(135deg, rgb(var(--accent-base) / 0.55), transparent 50%, rgb(var(--accent-base) / 0.3));
+  }
+
+  /* DEPTH SCALE + BTN-APPLE are defined below as Tailwind v4 `@utility`
+     tokens and standard classes in the utilities layer so they support
+     `hover:depth-N` variants and win over conflicting utility classes
+     (`transition-colors`, `transition-all`) without per-element hacks. */
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: rgb(var(--txt-tertiary));
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+}
+
+/* ============================================================
+   DEPTH-1 / DEPTH-2 / DEPTH-3 — Apple-style translucent
+   elevation shadows. Apply alongside `.glass` (or any translucent
+   surface) to give cards the perceived "floating layer" feel of
+   macOS / iOS material design.
+
+   Three escalating levels map to common UX roles:
+     depth-1  KPI tiles, chips, compact stat cells  (subtle rest)
+     depth-2  content cards, tables, chart panels   (clear lift)
+     depth-3  hero bands, featured CTAs, composers   (floating focal)
+
+   Each level pairs a tight contact shadow (small offset, sharp
+   falloff — the "key light") with a softer ambient shadow (large
+   blur, low alpha — the "fill"). At depth-3 we add an accent-tinted
+   glow so the focal card reads as glowing rather than just shadowed.
+
+   Light-theme shadows use stronger black alphas because lighter
+   backdrops absorb less ambient light; otherwise the elevation
+   disappears. The accent glow scales up in light theme too so it
+   stays visible against the brighter canvas.
+
+   Defined via `@utility` (Tailwind v4) so `hover:depth-N`,
+   `md:depth-N`, `group-hover:depth-N` etc. work as variants —
+   used across the demo + chart surfaces for the "deepen on hover"
+   effect (e.g. a `depth-1` card that becomes `depth-2` on hover).
+   ============================================================ */
+@utility depth-1 {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.20),
+    0 2px 6px rgb(0 0 0 / 0.16);
+}
+@utility depth-2 {
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.22),
+    0 8px 18px rgb(0 0 0 / 0.22);
+}
+@utility depth-3 {
+  box-shadow:
+    0 4px 10px rgb(0 0 0 / 0.26),
+    0 18px 40px rgb(0 0 0 / 0.30),
+    0 0 28px rgb(var(--accent-base) / 0.10);
+}
+@utility depth-4 {
+  box-shadow:
+    0 6px 14px rgb(0 0 0 / 0.30),
+    0 24px 56px rgb(0 0 0 / 0.36),
+    0 0 36px rgb(var(--accent-base) / 0.16),
+    0 0 0 1px rgb(var(--accent-base) / 0.10);
+}
+:root[data-theme="light"] .depth-1 {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    0 2px 6px rgb(0 0 0 / 0.08);
+}
+:root[data-theme="light"] .depth-2 {
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.08),
+    0 8px 18px rgb(0 0 0 / 0.10);
+}
+:root[data-theme="light"] .depth-3 {
+  box-shadow:
+    0 4px 10px rgb(0 0 0 / 0.12),
+    0 18px 40px rgb(0 0 0 / 0.14),
+    0 0 32px rgb(var(--accent-base) / 0.14);
+}
+:root[data-theme="light"] .depth-4 {
+  box-shadow:
+    0 6px 14px rgb(0 0 0 / 0.16),
+    0 24px 56px rgb(0 0 0 / 0.20),
+    0 0 40px rgb(var(--accent-base) / 0.20),
+    0 0 0 1px rgb(var(--accent-base) / 0.14);
+}
+
+/* ============================================================
+   DEPTH HOVER DEEPENING — each level lifts to the NEXT level's
+   shadow on hover. Defined in plain CSS (outside any @layer) so
+   they win cascade precedence over Tailwind utility transitions
+   (`transition-colors`, `transition-all`) that would otherwise
+   prevent the box-shadow swap from animating. The base `.depth-N`
+   also carries the box-shadow + transform transition so the
+   deepening is always buttery even on cards that forgot to add
+   an explicit `transition-*` utility class.
+
+   Pair with Framer Motion `whileHover={{ y: -4 }}` on the
+   component — the JS spring handles the transform lift, this CSS
+   handles the shadow swap. They share the same cubic-bezier so
+   the two motions stay in sync. Honored by the global
+   prefers-reduced-motion rule above.
+   ============================================================ */
+.depth-1,
+.depth-2,
+.depth-3,
+.depth-4 {
+  transition:
+    color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.depth-1:hover {
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.22),
+    0 8px 18px rgb(0 0 0 / 0.22);
+}
+.depth-2:hover {
+  box-shadow:
+    0 4px 10px rgb(0 0 0 / 0.26),
+    0 18px 40px rgb(0 0 0 / 0.30),
+    0 0 28px rgb(var(--accent-base) / 0.10);
+}
+.depth-3:hover {
+  box-shadow:
+    0 6px 14px rgb(0 0 0 / 0.30),
+    0 24px 56px rgb(0 0 0 / 0.36),
+    0 0 36px rgb(var(--accent-base) / 0.16),
+    0 0 0 1px rgb(var(--accent-base) / 0.10);
+}
+.depth-4:hover {
+  box-shadow:
+    0 8px 18px rgb(0 0 0 / 0.34),
+    0 30px 72px rgb(0 0 0 / 0.42),
+    0 0 48px rgb(var(--accent-base) / 0.22),
+    0 0 0 1px rgb(var(--accent-base) / 0.18);
+}
+:root[data-theme="light"] .depth-1:hover {
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.08),
+    0 8px 18px rgb(0 0 0 / 0.10);
+}
+:root[data-theme="light"] .depth-2:hover {
+  box-shadow:
+    0 4px 10px rgb(0 0 0 / 0.12),
+    0 18px 40px rgb(0 0 0 / 0.14),
+    0 0 32px rgb(var(--accent-base) / 0.14);
+}
+:root[data-theme="light"] .depth-3:hover {
+  box-shadow:
+    0 6px 14px rgb(0 0 0 / 0.16),
+    0 24px 56px rgb(0 0 0 / 0.20),
+    0 0 40px rgb(var(--accent-base) / 0.20),
+    0 0 0 1px rgb(var(--accent-base) / 0.14);
+}
+:root[data-theme="light"] .depth-4:hover {
+  box-shadow:
+    0 8px 18px rgb(0 0 0 / 0.20),
+    0 30px 72px rgb(0 0 0 / 0.26),
+    0 0 48px rgb(var(--accent-base) / 0.26),
+    0 0 0 1px rgb(var(--accent-base) / 0.22);
+}
+
+@layer utilities {
+  .text-primary { color: rgb(var(--txt-primary)); }
+  .text-secondary { color: rgb(var(--txt-secondary)); }
+  .text-tertiary { color: rgb(var(--txt-tertiary)); }
+
+  .bg-tint { background-color: rgb(var(--tint)); }
+
+  .text-gradient {
+    background: linear-gradient(120deg, rgb(var(--accent-base)) 0%, rgb(var(--accent-hover)) 50%, rgb(var(--accent-base)) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .section {
+    padding-top: clamp(4rem, 8vw, 7rem);
+    padding-bottom: clamp(4rem, 8vw, 7rem);
+  }
+  .section-tight {
+    padding-top: clamp(3rem, 6vw, 5rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .divider-grad {
+    height: 1px;
+    /* Neutral hairline — uses --divider (white-on-dark, black-on-light) at a
+       low 12% opacity so the separator reads as a subtle floating rule
+       rather than a flat line. The gradient fades to transparent at both
+       edges so the hairline floats rather than terminating in a hard edge.
+       Switched from accent-tinted to neutral for a quieter, more
+       professional rhythm across long marketing pages. */
+    background: linear-gradient(90deg, transparent, rgb(var(--divider) / 0.12) 20%, rgb(var(--divider) / 0.12) 80%, transparent);
+  }
+
+  .aurora-bg {
+    background:
+      radial-gradient(60% 50% at 15% 10%, rgb(var(--accent-base) / 0.22), transparent 70%),
+      radial-gradient(55% 45% at 85% 15%, rgb(62 124 177 / 0.16), transparent 70%),
+      radial-gradient(50% 50% at 50% 100%, rgb(125 107 176 / 0.14), transparent 70%);
+  }
+
+  .max-w-page { max-width: 1200px; }
+  .max-w-form { max-width: 1100px; }
+  .rounded-card { border-radius: 8px; }
+  .rounded-pill { border-radius: 12px; }
+
+  /* Optional scroll-snap helpers — NOT applied globally. Apply `.snap-container`
+     on the scroll parent and `.snap-section` on each child to opt in. Uses
+     `proximity` so users retain free scroll control between sections. */
+  .snap-container { scroll-snap-type: y proximity; }
+  .snap-section { scroll-snap-align: start; scroll-snap-stop: normal; }
+
+  /* Balanced text wrapping for headings — avoids orphan words on the last
+     line and produces more even line breaks in large display type. */
+  .text-balance { text-wrap: balance; }
+
+  /* ============================================================
+     Safe-area padding — iOS notch / home-indicator insets. Pair with
+     `viewport-fit=cover` (see the `viewport` export in layout.tsx);
+     without that, env(safe-area-inset-*) resolves to 0 and these
+     utilities are inert. Apply `.safe-top` to elements that touch the
+     top of the viewport (sticky navbars, fullscreen drawers) and
+     `.safe-bottom` to elements pinned to the bottom (footers,
+     cookie banners, sticky CTAs) so their content never sits under
+     a home indicator.
+     ============================================================ */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* ============================================================
+     content-visibility: auto — skip rendering work for offscreen
+     sections. The browser skips layout / paint for any element
+     not currently visible, dramatically cutting the cost of long
+     marketing pages with many heavy animated sections. The
+     `contain-intrinsic-size` hint reserves space so the scrollbar
+     doesn't jump as the user scrolls.
+
+     `auto 500px` = a 500px-tall placeholder is assumed until the
+     element actually renders; tune per section if needed by
+     overriding contain-intrinsic-size locally.
+
+     Apply `.cv-auto` to below-the-fold <section>s only — never to
+     above-the-fold content (Hero, Navbar) where it would block
+     first paint.
+     ============================================================ */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+
+  /* DEPTH tokens are defined above as Tailwind v4 `@utility` declarations
+     (so `hover:depth-N`, `md:depth-N` etc. variants work) plus plain CSS
+     `:hover` deepen rules outside any layer (so they win cascade
+     precedence over conflicting `transition-colors` / `transition-all`
+     utilities). No duplicate definitions here. */
+}
+
+/* Thin, theme-aware scrollbar — subtle at rest, accent-tinted on hover.
+   Firefox via `scrollbar-color` on <html>; WebKit via ::-webkit-scrollbar*.
+   The hover state lifts to an accent tint so the user can spot the
+   affordance when actively scrolling long marketing pages without the
+   default browser chrome competing with content at rest. The 2px
+   transparent border + background-clip: content-box keeps the thumb
+   visually centered in the track with breathing room on either side. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--divider) / 0.2) transparent;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--divider) / 0.18);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--accent-base) / 0.45);
+  background-clip: content-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Film grain for depth — preserved at near-imperceptible opacity (0.01)
+   so the pure-black void still reads as a "material" with the faintest
+   tooth rather than a flat synthetic fill. mix-blend-mode: overlay lets
+   the grain lift highlights on the rare non-black surfaces (glass cards,
+   images) without shifting the accent hue. On the void itself it is
+   effectively invisible — kept only to maintain the material language
+   established by the glass-card ::after grain. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.01;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-theme="light"] body::before { opacity: 0.02; }
+
+/* ============================================================
+   .GRAIN — opt-in richer film-grain texture for surfaces that want
+   the "expensive printed" feel (hero bands, full-bleed feature
+   panels, premium card surfaces). Adds a 3%-opacity SVG
+   fractalNoise overlay via ::after so the texture can be toggled
+   per-element without affecting the global body::before grain
+   (which stays at ~1% for the void). Use sparingly — the texture is
+   GPU-composited so applying it to dozens of cards simultaneously
+   can cost frame budget on low-end devices. mix-blend-mode: overlay
+   lets the grain lift highlights and deepen shadows without
+   shifting the accent hue. Note: applying .grain to a .glass card
+   intentionally overrides that card's lighter .glass::after grain
+   (1.5%) with this richer 3% version — that's the opt-in behavior.
+   ============================================================ */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  z-index: 0;
+}
+:root[data-theme="light"] .grain::after { opacity: 0.025; }
+@media (prefers-reduced-motion: reduce) {
+  /* Grain is static texture, but honor the user's motion preference by
+     dropping the opacity one notch so the surface is calmer. */
+  .grain::after { opacity: 0.02; }
+}
+
+/* Crisp, institutional-grade keyboard focus affordance — a 2px ring in
+   the accent color at 60% opacity, with a tight 2px offset so the ring
+   sits close to the focused element. The 60% opacity reads as a
+   deliberate, controlled indicator (Bloomberg / Stripe accessibility
+   pattern) rather than a hard 100%-opacity outline that can feel
+   aggressive on dense data UIs. The 4px box-shadow halo at 18%
+   extends the affordance for low-vision users without competing with
+   the ring itself. */
+*:focus-visible {
+  outline: 2px solid rgb(var(--accent-base) / 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px rgb(var(--accent-base) / 0.18);
+}
+
+/* Explicit focus-visible ring on all interactive elements — guarantees
+   a visible, consistent keyboard focus affordance across native controls,
+   ARIA widgets and any element pulled into the tab order via tabindex.
+   The 2px outline-offset matches the *:focus-visible base rule so the
+   accent halo sits a consistent distance from every focused element
+   whether it's a native control, a styled <a>/<button>, or an ARIA
+   widget pulled into the tab order via tabindex. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid rgb(var(--accent-base) / 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default outline only when not keyboard-focused */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::selection {
+  background: rgb(var(--accent-base) / 0.3);
+  color: rgb(var(--txt-primary));
+}
+
+/* Custom scrollbar for demo panels */
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--divider) / 0.2) transparent;
+}
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgb(var(--divider) / 0.18);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--divider) / 0.3);
+  background-clip: content-box;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================================
+   PAGE-ENTER — subtle fade + slide-up that re-runs on every
+   navigation. Driven by app/template.tsx (which Next.js App
+   Router re-mounts on each route change, unlike layout.tsx).
+   The cubic-bezier is the same "soft settle" curve used by the
+   ScrollReveal / Framer Motion transitions across the site so
+   the page entrance feels consistent with in-page reveals.
+   Honored by the global prefers-reduced-motion rule above; the
+   explicit override below is belt-and-suspenders so the page
+   never animates for users who asked for reduced motion.
+   ============================================================ */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: page-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+}
+
+/* ============================================================
+   LINK-UNDERLINE — subtle 1px accent underline that sweeps in
+   from the left on hover. Apply to inline text links that don't
+   already carry their own hover affordance (Footer columns, FAQ
+   support link, section descriptions). The transform-origin: left
+   pairs with the cubic-bezier "soft settle" curve used site-wide
+   so the sweep matches the Reveal / motion timing budget.
+   ============================================================ */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: rgb(var(--accent-base));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-underline::after { transition: none; }
+}
+
+/* ============================================================
+   ICON-BTN — premium icon-only button affordance. Scales the
+   inner SVG 1.1× on hover with a soft-settle curve, mirroring
+   the Framer Motion `whileHover={{ scale: 1.1 }}` spec without
+   the per-instance wrapper cost. Apply to <button>/<a> elements
+   whose only content is an icon (Navbar theme/lang toggles,
+   mobile menu, Footer socials, BackToTop, etc.). The selector
+   targets both direct SVG children and the lucide-react wrapper
+   (<svg class="lucide ...">) so every icon variant is covered.
+   ============================================================ */
+.icon-btn > svg,
+.icon-btn svg,
+a.icon-btn > svg,
+button.icon-btn > svg {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: 50% 50%;
+}
+.icon-btn:hover > svg,
+.icon-btn:hover svg,
+a.icon-btn:hover > svg,
+button.icon-btn:hover > svg,
+.icon-btn:focus-visible > svg,
+.icon-btn:focus-visible svg {
+  transform: scale(1.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .icon-btn > svg,
+  .icon-btn svg,
+  a.icon-btn > svg,
+  button.icon-btn > svg { transition: none; transform: none; }
+}
+
+/* ============================================================
+   PRINT STYLES
+   Strip the dark theme, glass chrome, background animations and
+   floating overlays so the marketing content prints cleanly as
+   black text on white paper. Triggered by the browser's native
+   print dialog (Ctrl/Cmd+P).
+   ============================================================ */
+@media print {
+  /* 1. Force a clean paper baseline — override the dark theme baked
+        into <html data-theme="dark"> and the SVG-noise overlay on
+        body::before. */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  body::before {
+    display: none !important;
+  }
+  :root[data-theme="dark"] body,
+  :root[data-theme="light"] body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* 2. Hide top-level chrome and floating overlays.
+        - `body > div > header` → the Navbar (scoped to the page
+          wrapper so we don't also hide <header>s nested inside
+          marketing sections like Hero).
+        - `body > div > footer` → the Footer (same scoping; Story
+          uses a <footer> inside a card and must stay visible).
+        - `.fixed` → catches every fixed-position overlay in one
+          shot: Navbar header, CookieConsent, BackToTop,
+          ReadingProgress, CommandPalette modal, ThemeTransition
+          reveal, CursorGlow halo, and the Sonner toaster.
+        - `[role="dialog"]`, `[role="alertdialog"]` and
+          `[data-radix-popper-content-wrapper]` → defensive cover
+          for any future modal/popover/dropdown that ships without
+          `.fixed` (Radix portals default to position:absolute). All
+          current overlays use `.fixed` so these are belt-and-
+          suspenders for Cmd+P pressed while a modal is open.
+        - `canvas` → hides MarketBackground, ParticleField and
+          SlowMoChart (all three render a <canvas>).
+        - `.tj-no-print` → explicit opt-out hook for future use. */
+  body > div > header,
+  body > div > footer,
+  .fixed,
+  [role="dialog"],
+  [role="alertdialog"],
+  [data-radix-popper-content-wrapper],
+  canvas,
+  .tj-no-print {
+    display: none !important;
+  }
+
+  /* 3. Let main content flow without overflow clipping (several
+        sections use overflow:hidden for decorative effects) and
+        reset their background. */
+  main,
+  section,
+  article,
+  header,
+  footer {
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* 4. Strip glass surfaces, shadows and borders so cards read as
+        plain text blocks on white. Also neutralize the decorative
+        ::before / ::after pseudo-elements that carry the gradient
+        refraction border, film-grain texture, accent gradient ring,
+        .grain overlay and animated link underline — these are NOT
+        matched by the `*` universal rule below (pseudo-elements
+        need their own selector) and would otherwise print their
+        backgrounds if the user enables "Background graphics" in
+        the print dialog. */
+  .glass {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .glass::before,
+  .glass::after,
+  .gradient-border::before,
+  .link-underline::after,
+  .grain::after {
+    display: none !important;
+  }
+  /* Decorative full-bleed background gradients (aurora wash behind
+     the hero, accent hairline dividers) collapse to plain white
+     so the underlying content reads cleanly on paper. */
+  .aurora-bg,
+  .divider-grad {
+    background: #ffffff !important;
+  }
+
+  /* 5. Universal reset: solid black text on transparent bg, no
+        shadows or borders. Forces P&L colors (which would print
+        poorly) to legible black. Extended to `*::before` /
+        `*::after` so any decorative pseudo-element not enumerated
+        in step 4 is also neutralized (defence-in-depth — covers
+        future additions). `print-color-adjust: economy` is the
+        browser default but is declared explicitly here so the
+        rule survives any future `print-color-adjust: exact` on a
+        themed component, ensuring decorative backgrounds stay
+        stripped even if the user toggles "Background graphics" on. */
+  *,
+  *::before,
+  *::after {
+    color: #000000 !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    print-color-adjust: economy !important;
+    -webkit-print-color-adjust: economy !important;
+  }
+
+  /* 6. Gradient-filled text (`.text-gradient`) relies on
+        background-clip: text which doesn't print — force solid
+        black so headings stay readable. */
+  .text-gradient,
+  .text-gradient * {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+
+  /* 7. Page breaks: keep each top-level section together so it
+        doesn't get sliced across two pages, and never orphan a
+        heading at the bottom of a page.
+
+        IMPORTANT — the selector targets `main > section` AND
+        `main > .page-enter > section`: every route is wrapped by
+        `template.tsx` in `<div class="page-enter">`, so the
+        actual DOM is `main > .page-enter > section`. The original
+        `main > section` selector matched nothing — `break-inside:
+        avoid` was silently a no-op. Both selectors are listed so
+        the rule still works if template.tsx is later removed. */
+  main > section,
+  main > .page-enter > section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* 8. Reset the page wrapper backgrounds one more time so the
+        dark theme baked into `.min-h-screen` / `.flex-1` doesn't
+        bleed through. */
+  .min-h-screen,
+  .flex-1 {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* 9. Reset the <html> dark-class background that the no-FOUC
+        script applies before paint. */
+  html.dark,
+  html[class*="dark"] {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
+
+/* ============================================================
+   LIQUID GLASS — premium glassmorphism for navbar and cards.
+   R3-a root-cause fix: previously set border:none + own box-shadow,
+   which silently overrode ALL Tailwind border-* / shadow-* utilities
+   on .liquid-glass elements (the demo window had zero drop-shadow).
+   Now: no border / no box-shadow on the host — Tailwind utilities own
+   them. The machined inset highlights live on a ::after pseudo so they
+   survive even when a component sets its own outer shadow utility.
+   ============================================================ */
+.liquid-glass {
+  background: rgba(0, 0, 0, 0.4);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  position: relative;
+}
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 20%,
+    rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.1) 80%, rgba(255,255,255,0.3) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 -1px 0 rgb(0 0 0 / 0.08);
+}
+:root[data-theme="light"] .liquid-glass {
+  background: rgba(255, 255, 255, 0.7);
+}
+:root[data-theme="light"] .liquid-glass::after {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.6),
+    inset 0 -1px 0 rgb(0 0 0 / 0.06);
+}
