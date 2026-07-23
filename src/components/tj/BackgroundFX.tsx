@@ -23,6 +23,12 @@ import { useEffect, useRef, useState } from "react";
  *    fibra media (~90/rev) y fibra fina (~160/rev), avectadas
  *    radialmente y onduladas por fbm de baja frecuencia — el iris
  *    "respira" como una anémona, nunca se congela.
+ *  - Relieve 3D de las fibras: sin geometría real — se deriva la
+ *    pendiente cruzada-a-fibra (fiberHeight muestreada en dos ángulos
+ *    vecinos) y se sombrea como si cada filamento sobresaliera del
+ *    plano del iris, un lado al sol y el otro en sombra. La luz usada
+ *    es el mismo rumbo fijo que el catch-light de la pupila, para que
+ *    toda la escena lea con una sola fuente de luz coherente.
  *  - Pupila: disco casi negro con borde suave y ligeramente irregular
  *    (ninguna pupila real es un círculo perfecto), latido lento, brasa
  *    roja tenue en el centro y un catch-light corneal de dos manchas
@@ -153,23 +159,55 @@ float anoise(float a01, float K, float rad, vec2 off) {
   return mix(n1, n2, a01);
 }
 
+/* "Altura" de la fibra en un punto angular arbitrario — reproduce solo
+   el término que le da volumen a strand (clump + fibra fina), sin el
+   resto de la mezcla de color. Sirve para derivar la pendiente
+   cruzada-a-fibra (ver relieve 3D más abajo) muestreando este mismo
+   campo en dos ángulos vecinos. */
+float fiberHeight(float a01s, float rw, float rr) {
+  float clump = anoise(a01s, 14.0, rw * 2.2 - uTime * 0.035, vec2(11.3, 47.9));
+  clump = 0.26 + 1.05 * pow(clump, 1.35);
+  float f1 = anoise(a01s, 110.0, rr, vec2(0.0, 5.0));
+  float f2 = anoise(a01s, 190.0, rr * 1.9 + 7.0, vec2(41.0, 23.0));
+  return pow(f1 * 0.58 + f2 * 0.42, 3.0) * 2.35 * clump;
+}
+
 void main() {
   vec2 frag = gl_FragCoord.xy;
   vec2 res = uRes;
   float minDim = min(res.x, res.y);
 
-  /* Radio del anillo exterior = unidad del sistema. Centro con
-     "mirada" sutil hacia el puntero. */
+  /* Radio del anillo exterior = unidad del sistema. El ojo está ANCLADO
+     (no se desliza); la mirada la produce el seguimiento de más abajo. */
   float R = 0.415 * minDim;
-  vec2 center = res * vec2(0.5, uEyeY) + uLook * R * 0.035;
-  vec2 p = (frag - center) / R;
+  vec2 center = res * vec2(0.5, uEyeY);
+  vec2 p0 = (frag - center) / R;
+  float r0 = length(p0);
+
+  /* Luz de escena ÚNICA (arriba-izquierda, hacia el observador). NO
+     ilumina el iris en bloque — eso creaba una "bola" esférica oscura
+     que apagaba medio ojo. El iris conserva su look plano y limpio
+     (rojo→verde radial); esta luz solo alimenta el RELIEVE fibra-a-fibra
+     de más abajo y el catch-light, que es donde la profundidad se ve
+     bonita sin ensuciar el conjunto. */
+  vec3 L3 = normalize(vec3(-0.40, 0.60, 0.69));
+
+  /* ---- Seguimiento de mirada (la pupila observa al puntero) ----
+     Desplazamos el MUESTREO del iris hacia uLook: mucho en el centro
+     (donde vive la pupila), nada en el borde (limbo anclado) — la pupila
+     negra "mira" a donde va el ratón. Es solo un desplazamiento de
+     coordenadas: no oscurece ni deforma el ojo, no hay cúpula ni sombra
+     global. uLook ya trae micro-sacadas y fijación de scroll sumadas. */
+  float follow = smoothstep(1.15, 0.0, r0);
+  vec2 gaze = uLook * 0.16;
+  vec2 p = p0 - gaze * follow;
   float r = length(p);
   float ang = atan(p.y, p.x);
 
-  /* Sin rotación: un ojo real no gira su iris — solo mira (uLook, ya
-     aplicado arriba al desplazar center) y respira (el wob de más
-     abajo ondula las fibras in-situ sin barrer el ángulo en bloque). */
+  /* Sin rotación del iris sobre su propio eje (un iris real no gira):
+     solo mira (seguimiento de arriba) y respira (el wob de más abajo). */
   float a01 = fract(ang / TAU + 1.0);
+  vec2 pnUnit = p / max(r, 1e-4);
 
   /* Pupila: latido + dilatación sutil por scroll + apertura inicial +
      reenfoque al parpadear (se comprime un pelo con el párpado). */
@@ -221,6 +259,29 @@ void main() {
     /* Afilar: de campo de ruido a filamentos densos y crujientes. */
     float strand = pow(fine, 3.0) * 2.35 * clump;
 
+    /* ---- Relieve 3D de las fibras ----
+       Sin geometría real: se finge bulto muestreando la "altura" de la
+       fibra (fiberHeight) en dos ángulos vecinos y usando la pendiente
+       cruzada-a-fibra como si fuera la normal de una cresta en relieve.
+       La luz es el MISMO rumbo fijo que ya usa el catch-light de la
+       pupila (glintDir, más abajo) — así toda la escena lee como
+       iluminada por una sola fuente, no dos efectos con luces distintas.
+       El resultado: cada fibra tiene un lado "al sol" y un lado en
+       sombra, como si de verdad sobresaliera del plano del iris. */
+    const float dAng = 0.0015;
+    float hL = fiberHeight(fract(a01w - dAng + 1.0), rw, rr);
+    float hR = fiberHeight(fract(a01w + dAng + 1.0), rw, rr);
+    float fiberSlope = (hR - hL) / (2.0 * dAng);
+    vec2 tangentDir = vec2(-sin(ang), cos(ang));
+    /* Luz de escena (L3) proyectada al plano. El realce es más fuerte
+       cerca de la pupila (donde las fibras están densas y el volumen se
+       aprecia) y se suaviza hacia las puntas para no ensuciar el borde
+       emplumado. */
+    float lightAlongTangent = dot(normalize(L3.xy), tangentDir);
+    float reliefFalloff = mix(1.0, 0.35, smoothstep(rp * 1.1, tip * 0.9, rw));
+    float relief = clamp(fiberSlope * lightAlongTangent * 1.1, -1.0, 1.0);
+    float reliefShade = 1.0 + relief * 0.9 * reliefFalloff;
+
     /* Collarette: el anillo de contracción de un iris real — la
        frontera irregular entre la zona pupilar y la ciliar (~1.55·rp)
        donde las fibras se apelmazan y brillan un punto más. El ancho
@@ -248,7 +309,11 @@ void main() {
     float jit = anoise(a01w, 55.0, rw * 3.0, vec2(77.7, 19.1));
     fiberCol = mix(fiberCol, mix(RED_DEEP, GREEN_DEEP, tcol), jit * 0.38);
 
-    col += fiberCol * irisL * 2.05;
+    /* Difuso del iris con el RELIEVE 3D fibra-a-fibra: cada filamento
+       tiene un lado al sol y otro en sombra (reliefShade), así las líneas
+       alrededor de la pupila leen con volumen — sin tocar el look plano
+       y limpio del conjunto. */
+    col += fiberCol * irisL * 2.05 * reliefShade;
 
     /* Aro de raíces incandescente pegado a la pupila. */
     float rim = exp(-pow((rw - rp * 1.07) / 0.05, 2.0));
@@ -555,10 +620,11 @@ export function BackgroundFX() {
     let intro = reduce ? 1 : 0;
     let theme = document.documentElement.dataset.theme === "light" ? 1 : 0;
 
-    /* Parpadeo: primer blink a los ~3 s (tras el intro); después cada
-       4,5–9 s con doble parpadeo ocasional. */
+    /* Parpadeo: primer blink a los ~6 s (tras el intro); después
+       espaciado (7–15 s) y con doble parpadeo muy poco frecuente — un
+       ojo tranquilo que observa, no un tic nervioso. */
     let blinkStart = t0 - 9999;
-    let nextBlink = t0 + 3000;
+    let nextBlink = t0 + 6000;
     const hash01 = (x: number) => {
       const s = Math.sin(x * 0.001) * 43758.5453;
       return s - Math.floor(s);
@@ -706,21 +772,23 @@ export function BackgroundFX() {
       const end = smoothstep01((scrollS - 0.78) / 0.2);
       const exposure = (1.0 - 0.24 * mid + 0.24 * end) * 1.14;
 
-      /* Parpadeo: cierre 110 ms (acelerando) + apertura 190 ms (suave).
-         Al disparar se decide si habrá doble parpadeo (~1 de cada 4). */
+      /* Parpadeo: cierre 130 ms (acelerando) + apertura 240 ms (suave) —
+         un pelín más lento y líquido que antes. Doble parpadeo raro
+         (~1 de cada 12) y separación larga (7–15 s): el ojo observa con
+         calma, no parpadea de seguido. */
       let open = 1;
       if (!reduce) {
         if (now >= nextBlink) {
           blinkStart = now;
           const h = hash01(now);
-          nextBlink = now + (h < 0.25 ? 340 : 4500 + h * 4500);
+          nextBlink = now + (h < 0.08 ? 420 : 7000 + h * 8000);
         }
         const bt = now - blinkStart;
-        if (bt < 110) {
-          const k = bt / 110;
+        if (bt < 130) {
+          const k = bt / 130;
           open = 1 - k * k;
-        } else if (bt < 300) {
-          const k = (bt - 110) / 190;
+        } else if (bt < 370) {
+          const k = (bt - 130) / 240;
           open = 1 - Math.pow(1 - k, 3); /* easeOutCubic 0 → 1 */
         }
       }

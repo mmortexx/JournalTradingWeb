@@ -217,7 +217,7 @@ export function Navbar() {
         key={href}
         href={href}
         aria-current={active ? "page" : undefined}
-        className="rounded-full px-[15px] py-[9px] text-sm transition-colors duration-200"
+        className="relative rounded-full px-[15px] py-[9px] text-sm transition-colors duration-200"
         style={{
           color: active ? "var(--ink)" : "var(--ink-2)",
           background: active
@@ -237,6 +237,16 @@ export function Navbar() {
         }}
       >
         {label}
+        {/* Indicador de página activa — barra de acento bajo la píldora,
+            mismo lenguaje que el subrayado de pestaña activa del demo
+            (TopNav) y de SectionNav. */}
+        {active && (
+          <span
+            aria-hidden
+            className="absolute inset-x-3 -bottom-[3px] h-[2px] rounded-full"
+            style={{ background: "rgb(var(--accent-base))" }}
+          />
+        )}
       </Link>
     );
   };
@@ -274,6 +284,14 @@ export function Navbar() {
             {t("appName")}
           </span>
         </Link>
+
+        {/* Separador — estructura visual entre marca y navegación, mismo
+            lenguaje hairline que el resto del sitio (--divider). */}
+        <div
+          aria-hidden
+          className="hidden h-6 w-px shrink-0 md:block"
+          style={{ background: "rgb(var(--divider) / 0.15)" }}
+        />
 
         {/* Enlaces desktop: Producto (megamenú) · Demo · Precios */}
         <div className="hidden items-center gap-0.5 md:flex">
@@ -380,6 +398,14 @@ export function Navbar() {
           {pillLink("/pricing", es ? "Precios" : "Pricing")}
         </div>
 
+        {/* Separador — cierra el grupo de navegación antes del clúster de
+            utilidades (reloj/tema/idioma/CTA), mismo lenguaje hairline. */}
+        <div
+          aria-hidden
+          className="hidden h-6 w-px shrink-0 md:block"
+          style={{ background: "rgb(var(--divider) / 0.15)" }}
+        />
+
         {/* Clúster derecho: reloj UTC · tema · idioma · CTA · hamburguesa */}
         <div className="flex flex-none items-center gap-2">
           <UtcClock />
@@ -440,7 +466,7 @@ export function Navbar() {
           >
             <Link
               href="/pricing"
-              className="inline-flex flex-none items-center gap-[7px] whitespace-nowrap rounded-full text-sm font-semibold transition-[transform,filter] duration-200"
+              className="tj-cta-sheen inline-flex flex-none items-center gap-[7px] whitespace-nowrap rounded-full text-sm font-semibold transition-[transform,filter] duration-200"
               style={{
                 height: 40,
                 padding: "0 20px",
@@ -569,7 +595,7 @@ export function Navbar() {
                   <Link
                     href="/pricing"
                     onClick={() => setMobileOpen(false)}
-                    className="group flex items-center justify-center gap-1.5 h-11 w-full rounded-full text-sm font-semibold transition-all duration-200"
+                    className="tj-cta-sheen group flex items-center justify-center gap-1.5 h-11 w-full rounded-full text-sm font-semibold transition-all duration-200"
                     style={{
                       background: "rgb(var(--accent-base))",
                       color: "#06130d",
@@ -596,7 +622,7 @@ export function Navbar() {
  * UtcClock — "UTC HH:MM:SS" en vivo con punto de mercado verde con
  * glow, como en la píldora del HTML. Renderiza "--:--:--" en servidor
  * y primer paint; el intervalo arranca en un efecto (cero mismatch de
- * hidratación). Oculto por debajo de `lg` para no saturar la píldora.
+ * hidratación). Oculto por debajo de `md` para no saturar la píldora.
  */
 function UtcClock() {
   const [time, setTime] = useState("--:--:--");
@@ -615,7 +641,7 @@ function UtcClock() {
   }, []);
   return (
     <span
-      className="mr-0.5 hidden items-center gap-1.5 border-r pr-2 lg:inline-flex"
+      className="mr-0.5 hidden items-center gap-1.5 border-r pr-2 md:inline-flex"
       style={{ borderColor: "rgb(var(--divider) / 0.13)" }}
     >
       <span
@@ -626,6 +652,7 @@ function UtcClock() {
           height: 5,
           background: "rgb(var(--pnl-pos, 62 207 142))",
           boxShadow: "0 0 8px rgb(var(--pnl-pos, 62 207 142))",
+          animation: "tj-glow 2.4s ease-in-out infinite",
         }}
       />
       <span
