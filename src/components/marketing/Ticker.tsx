@@ -127,7 +127,7 @@ export function Ticker() {
     <div
       role="marquee"
       aria-label="Market ticker"
-      className="relative border-y border-white/10 py-3 liquid-glass overflow-hidden select-none"
+      className="relative border-y border-[rgb(var(--divider)/0.10)] py-3 liquid-glass overflow-hidden select-none"
     >
       {/* Left edge gradient fade — black-tinted so items ease out into the
           liquid-glass band's translucent dark surface instead of clipping

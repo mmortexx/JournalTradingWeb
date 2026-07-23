@@ -131,7 +131,7 @@ export function ShortcutsHelp() {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={es ? "Cerrar" : "Close"}
-                className="icon-btn shrink-0 w-8 h-8 rounded-md flex items-center justify-center text-tertiary hover:text-primary hover:bg-white/8 transition-colors"
+                className="icon-btn shrink-0 w-8 h-8 rounded-md flex items-center justify-center text-tertiary hover:text-primary hover:bg-[rgb(var(--divider)/0.08)] transition-colors"
               >
                 <svg
                   width="14"
@@ -155,7 +155,7 @@ export function ShortcutsHelp() {
               {shortcuts.map((s, i) => (
                 <li
                   key={i}
-                  className="flex items-center justify-between gap-4 px-2 py-2 rounded-md hover:bg-white/[0.03] transition-colors"
+                  className="flex items-center justify-between gap-4 px-2 py-2 rounded-md hover:bg-[rgb(var(--divider)/0.03)] transition-colors"
                 >
                   <span className="text-sm text-secondary">{s.label}</span>
                   <span className="flex items-center gap-1 shrink-0">
@@ -188,7 +188,7 @@ export function ShortcutsHelp() {
 /** Small inline keyboard key chip — mirrors the CommandPalette styling. */
 function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border  bg-white/[0.03] text-[11px] font-mono text-secondary tnum">
+    <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border  bg-[rgb(var(--divider)/0.03)] text-[11px] font-mono text-secondary tnum">
       {children}
     </kbd>
   );

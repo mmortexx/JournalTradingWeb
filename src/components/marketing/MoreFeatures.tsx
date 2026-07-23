@@ -111,11 +111,11 @@ export function MoreFeatures() {
             >
               <motion.article
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                className="group liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-white/20 hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
+                className="group liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--divider)/0.20)] hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
               >
                   {/* Icon */}
                   <div
-                    className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] flex items-center justify-center text-primary mb-4 transition-colors group-hover:bg-white/8 group-hover:border-white/20"
+                    className="w-10 h-10 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-primary mb-4 transition-colors group-hover:bg-[rgb(var(--divider)/0.08)] group-hover:border-[rgb(var(--divider)/0.20)]"
                   >
                     {f.icon}
                   </div>

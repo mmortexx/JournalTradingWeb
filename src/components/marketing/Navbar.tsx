@@ -8,13 +8,15 @@ import { useLang } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 
 /**
- * Navbar — píldora flotante del HTML de referencia.
+ * Navbar — barra edge-to-edge con material translúcido acrylic premium.
  *
  * Composición (desktop):
- *  - Píldora centrada de 60 px, max-w 1140, `rounded-full`, borde
- *    hairline y material de vidrio (blur 20 + saturate 1.5) con inset
- *    highlight. Al hacer scroll >10 px el vidrio se vuelve más opaco
- *    (70 % → 88 % de surface) y la sombra se hace más profunda.
+ *  - Barra que ocupa TODO el ancho de la web (edge-to-edge, no píldora
+ *    flotante). Material acrylic de alta calidad: blur 24 + saturate 1.8,
+ *    fondo `--surface` al 80 % (oscuro) / 88 % (claro) que sube a 92 % /
+ *    96 % al hacer scroll >10 px, borde inferior hairline, inset
+ *    highlight superior y sombra profunda al scroll. El contenido
+ *    interior se alinea a `max-w-page mx-auto`.
  *  - Marca: cuadrado de vidrio con el trío de velas + wordmark serif.
  *  - "Producto" abre un MEGAMENÚ desplegable de 520 px con 4 entradas
  *    (Características / Métricas / Disciplina / Seguridad), cada una
@@ -23,7 +25,12 @@ import { useTheme } from "@/lib/theme";
  *  - Demo y Precios como enlaces píldora.
  *  - Clúster derecho: reloj UTC en vivo con punto de sesión, toggle de
  *    tema (círculo 38 px), toggle de idioma y CTA "Comprar" en píldora
- *    accent con flecha.
+ *    accent con sheen.
+ *
+ * El material se diseñó para leerse sobre el ojo WebGL del fondo en
+ * AMBOS temas: en oscuro el `--surface` (#141618) aporta el scrim; en
+ * claro el `--surface` (#fbfaf7) aporta la base blanca translúcida que
+ * aísla el cromatismo del iris sin competir con él.
  *
  * El drawer móvil (focus-trap, scroll-lock, Escape, cierre por ruta)
  * se conserva íntegro del navbar anterior — es maquinaria a11y probada.
@@ -150,8 +157,8 @@ export function Navbar() {
       href: "/features",
       labelEs: "Características",
       labelEn: "Features",
-      descEs: "Calendario, playbooks, diario",
-      descEn: "Calendar, playbooks, journal",
+      descEs: "Vista general del producto",
+      descEn: "Product overview",
       icon: (
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
           <rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" />
@@ -162,7 +169,7 @@ export function Navbar() {
       ),
     },
     {
-      href: "/features#metricas",
+      href: "/features/metricas",
       labelEs: "Métricas",
       labelEn: "Metrics",
       descEs: "Sharpe, profit factor, expectancy",
@@ -174,7 +181,7 @@ export function Navbar() {
       ),
     },
     {
-      href: "/features#guardian",
+      href: "/features/disciplina",
       labelEs: "Disciplina",
       labelEn: "Discipline",
       descEs: "El Guardián frena antes del error",
@@ -186,7 +193,7 @@ export function Navbar() {
       ),
     },
     {
-      href: "/features#local",
+      href: "/features/seguridad",
       labelEs: "Seguridad",
       labelEn: "Security",
       descEs: "Local-first, sin nube ni cuentas",
@@ -252,23 +259,26 @@ export function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-5 pt-3.5">
+    <header className="fixed top-0 inset-x-0 z-50">
       <nav
-        className="flex w-full max-w-[1140px] items-center justify-between gap-4 rounded-full border pl-[18px] pr-[10px]"
+        className="flex w-full items-center justify-between gap-4 border-b px-5 md:px-8"
         style={{
           height: 60,
-          borderColor: "rgb(var(--divider) / 0.13)",
+          borderColor: "rgb(var(--divider) / 0.1)",
           background: scrolled
-            ? "color-mix(in srgb, var(--surface) 97%, transparent)"
-            : "color-mix(in srgb, var(--surface) 92%, transparent)",
-          backdropFilter: "blur(20px) saturate(1.5)",
-          WebkitBackdropFilter: "blur(20px) saturate(1.5)",
+            ? "color-mix(in srgb, var(--surface) 92%, transparent)"
+            : "color-mix(in srgb, var(--surface) 80%, transparent)",
+          backdropFilter: "blur(24px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(24px) saturate(1.8)",
           boxShadow: scrolled
-            ? "inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 14px 40px -16px rgb(0 0 0 / 0.62)"
-            : "inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 10px 30px -14px rgb(0 0 0 / 0.5)",
-          transition: "background 0.3s ease, box-shadow 0.3s ease",
+            ? "inset 0 1px 0 rgb(var(--divider) / 0.16), 0 14px 40px -16px rgb(0 0 0 / 0.55)"
+            : "inset 0 1px 0 rgb(var(--divider) / 0.14), 0 6px 20px -12px rgb(0 0 0 / 0.4)",
+          transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
         }}
       >
+        {/* Inner container — constrains content to the page max width
+            while the material bar itself spans edge-to-edge. */}
+        <div className="flex w-full max-w-page mx-auto items-center justify-between gap-4">
         {/* Marca */}
         <Link
           href="/"
@@ -506,6 +516,9 @@ export function Navbar() {
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
             )}
           </button>
+        </div>
+        {/* Cierre del inner container (max-w-page) — el material de la
+            barra sigue spaneando edge-to-edge por fuera. */}
         </div>
       </nav>
 

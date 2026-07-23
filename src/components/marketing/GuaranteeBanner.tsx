@@ -53,7 +53,7 @@ export function GuaranteeBanner() {
               {/* Shield + headline */}
               <div className="flex items-center gap-4 md:gap-5 md:flex-1">
                 <span
-                  className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-lg bg-white/5 border border-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] text-primary"
+                  className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary"
                   aria-hidden="true"
                 >
                   <ShieldIcon />
@@ -86,7 +86,7 @@ export function GuaranteeBanner() {
 
               {/* Stat chip — 30 días / 30 days, tnum */}
               <div className="md:flex-none md:text-right">
-                <div className="inline-flex items-baseline gap-1.5 pill bg-white/5 border border-white/10 !px-3 !py-1.5">
+                <div className="inline-flex items-baseline gap-1.5 pill bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] !px-3 !py-1.5">
                   <span className="text-2xl font-bold tnum text-primary leading-none">30</span>
                   <span className="text-xs uppercase tracking-[0.12em] text-tertiary font-semibold">
                     {es ? "días" : "days"}

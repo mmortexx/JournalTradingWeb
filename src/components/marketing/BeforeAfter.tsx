@@ -186,7 +186,7 @@ export function BeforeAfter() {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
               whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="relative flex-1 rounded-card liquid-glass depth-3 overflow-hidden border border-white/25 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="relative flex-1 rounded-card liquid-glass depth-3 overflow-hidden border border-[rgb(var(--divider)/0.25)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{
                 boxShadow:
                   "0 0 0 1px rgb(var(--accent-base) / 0.20), 0 14px 44px -8px rgb(var(--accent-base) / 0.35)",

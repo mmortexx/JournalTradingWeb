@@ -123,7 +123,7 @@ export function Values() {
                 {/* Accent edge — grows on hover */}
                 <span
                   aria-hidden="true"
-                  className="absolute left-0 top-6 bottom-6 w-px bg-white/30 origin-center transition-transform duration-300 group-hover:scale-y-125 group-hover:bg-white/60"
+                  className="absolute left-0 top-6 bottom-6 w-px bg-[rgb(var(--divider)/0.30)] origin-center transition-transform duration-300 group-hover:scale-y-125 group-hover:bg-[rgb(var(--divider)/0.60)]"
                 />
                 {/* Soft corner glow on hover */}
                 <div

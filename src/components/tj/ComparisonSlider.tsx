@@ -213,6 +213,18 @@ export function ComparisonSlider() {
           >
             {/* ─────────────── AFTER (base layer, full width) ─────────────── */}
             <div className="absolute inset-0">
+              {/* OPAQUE green-tinted surface — mirrors the Before layer's
+                  red-tinted surface so both sides read "full" and clearly
+                  distinct in BOTH themes. Without this, in light theme the
+                  After side looked blank/white next to the solid Before. */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, rgb(var(--pnl-pos))), color-mix(in srgb, var(--surface) 84%, rgb(var(--pnl-pos))))",
+                }}
+              />
               {/* Accent wash — same as the After card in BeforeAfter */}
               <div
                 aria-hidden="true"
@@ -223,8 +235,8 @@ export function ComparisonSlider() {
                 }}
               />
               {/* Header chip top-right */}
-              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/20">
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-primary">
+              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.20)]">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-pos/15 text-pnl-pos">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -323,16 +335,16 @@ export function ComparisonSlider() {
               onPointerDown={startDrag}
               onKeyDown={onKeyDown}
               style={{ left: handleLeft, touchAction: "none" }}
-              className="absolute top-0 bottom-0 z-30 -translate-x-1/2 w-1 cursor-ew-resize bg-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className="absolute top-0 bottom-0 z-30 -translate-x-1/2 w-1 cursor-ew-resize bg-[rgb(var(--divider)/0.60)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.60)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
               {/* Soft glow along the line */}
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 -left-1 -right-1 blur-[3px] bg-white/30"
+                className="absolute inset-y-0 -left-1 -right-1 blur-[3px] bg-[rgb(var(--divider)/0.30)]"
               />
               {/* Circular grip with double arrows */}
               <span
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-white/30 shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)]"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-[rgb(var(--divider)/0.30)] shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)]"
                 aria-hidden="true"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

@@ -160,7 +160,7 @@ export function TestimonialsWall() {
                     </svg>
                   ))}
                 </div>
-                <span className="pill bg-white/5 text-tertiary border border-white/10 flex items-center gap-1 text-[10px]">
+                <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] flex items-center gap-1 text-[10px]">
                   <svg
                     width="9"
                     height="9"

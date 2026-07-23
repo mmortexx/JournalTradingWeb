@@ -150,7 +150,7 @@ export function CommandPalette() {
 
   // Override cmdk's default selected-state styling with our accent.
   const itemClass =
-    "data-[selected=true]:bg-white/5 data-[selected=true]:text-primary";
+    "data-[selected=true]:bg-[rgb(var(--divider)/0.05)] data-[selected=true]:text-primary";
 
   return (
     <AnimatePresence>
@@ -454,7 +454,7 @@ function PaletteSwatch({ color }: { color: string }) {
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded border  bg-white/[0.03] text-[10px] font-mono text-secondary tnum">
+    <kbd className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded border  bg-[rgb(var(--divider)/0.03)] text-[10px] font-mono text-secondary tnum">
       {children}
     </kbd>
   );

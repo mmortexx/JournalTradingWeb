@@ -91,7 +91,7 @@ export function TechSpecs() {
         {/* Header */}
         <Reveal className="max-w-2xl">
           <Eyebrow>{es ? "Técnico" : "Technical"}</Eyebrow>
-          <h2 className="mt-5 t-h2 text-white">
+          <h2 className="mt-5 t-h2 text-primary">
             {es ? (
               <>
                 Construido <span className="text-gradient">para durar.</span>
@@ -102,7 +102,7 @@ export function TechSpecs() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-lg text-gray-300 leading-relaxed">
+          <p className="mt-4 text-lg text-secondary leading-relaxed">
             {es
               ? "Sin dependencias externas, sin procesos en segundo plano, sin telemetría. Una vez instalado, es tuyo."
               : "No external dependencies, no background processes, no telemetry. Once installed, it's yours."}
@@ -136,10 +136,10 @@ export function TechSpecs() {
                     }}
                     className={cellClasses}
                   >
-                    <dt className="text-gray-400 text-[11px] uppercase tracking-[0.14em] font-semibold">
+                    <dt className="text-tertiary text-[11px] uppercase tracking-[0.14em] font-semibold">
                       {es ? r.labelEs : r.labelEn}
                     </dt>
-                    <dd className="text-white text-sm font-medium leading-snug tnum">
+                    <dd className="text-primary text-sm font-medium leading-snug tnum">
                       {es ? r.valueEs : r.valueEn}
                     </dd>
                   </motion.dl>
@@ -151,7 +151,7 @@ export function TechSpecs() {
 
         {/* Footnote */}
         <Reveal delay={0.2} className="mt-6">
-          <p className="text-xs text-gray-400 leading-relaxed">
+          <p className="text-xs text-tertiary leading-relaxed">
             {es
               ? "Sin requisitos de conexión. Funciona en tu equipo aunque mañana cierren internet."
               : "No connection requirements. Runs on your machine even if the internet shuts down tomorrow."}

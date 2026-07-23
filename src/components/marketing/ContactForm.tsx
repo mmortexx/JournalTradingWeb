@@ -172,7 +172,7 @@ export function ContactForm() {
                           onChange={(e) => setName(e.target.value)}
                           placeholder={es ? "Tu nombre" : "Your name"}
                           aria-label={es ? "Nombre" : "Name"}
-                          className="w-full bg-white/5 border border-white/10 rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-white/25 focus-visible:border-white/30"
+                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)]"
                         />
                       </Field>
                       <Field label={es ? "Email" : "Email"} htmlFor="cf-email">
@@ -185,7 +185,7 @@ export function ContactForm() {
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Email" : "Email"}
-                          className="w-full bg-white/5 border border-white/10 rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-white/25 focus-visible:border-white/30"
+                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)]"
                         />
                       </Field>
                       <Field label={es ? "Mensaje" : "Message"} htmlFor="cf-msg">
@@ -196,7 +196,7 @@ export function ContactForm() {
                           placeholder={es ? "¿En qué podemos ayudarte?" : "How can we help?"}
                           aria-label={es ? "Mensaje" : "Message"}
                           rows={4}
-                          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2.5 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-white/25 focus-visible:border-white/30 resize-y min-h-[112px]"
+                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md px-3 py-2.5 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)] resize-y min-h-[112px]"
                         />
                       </Field>
 

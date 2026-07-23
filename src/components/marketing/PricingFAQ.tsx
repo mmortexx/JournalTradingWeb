@@ -164,9 +164,9 @@ export function PricingFAQ() {
                   delay: 0.18 + i * 0.08,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="pill bg-white/5 text-secondary border border-white/10 tnum"
+                className="pill bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.10)] tnum"
               >
-                <span className="size-1.5 rounded-full bg-white" aria-hidden="true" />
+                <span className="size-1.5 rounded-full bg-[rgb(var(--divider))]" aria-hidden="true" />
                 {label}
               </motion.span>
             ))}
@@ -188,7 +188,7 @@ export function PricingFAQ() {
                 <AccordionItem
                   key={item.q}
                   value={`item-${i}`}
-                  className="border-white/10 last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-white/25 data-[state=open]:bg-white/[0.04] data-[state=open]:shadow-[0_0_28px_-6px_rgb(var(--accent-base)_/_0.18)]"
+                  className="border-[rgb(var(--divider)/0.10)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--divider)/0.25)] data-[state=open]:bg-[rgb(var(--divider)/0.04)] data-[state=open]:shadow-[0_0_28px_-6px_rgb(var(--accent-base)_/_0.18)]"
                 >
                   <AccordionTrigger className="text-left text-sm font-medium text-primary hover:text-primary hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180">
                     {item.q}

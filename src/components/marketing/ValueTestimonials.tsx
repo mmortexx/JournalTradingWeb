@@ -102,7 +102,7 @@ export function ValueTestimonials() {
             <Eyebrow>{es ? "Valor por dinero" : "Value for money"}</Eyebrow>
           </div>
           <h2
-            className="mt-5 t-h2 text-white"
+            className="mt-5 t-h2 text-primary"
           >
             {es ? (
               <>
@@ -114,7 +114,7 @@ export function ValueTestimonials() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-base text-gray-300 leading-relaxed">
+          <p className="mt-4 text-base text-secondary leading-relaxed">
             {es
               ? "No es barato porque sea cutre. Es barato porque no hay servidor que mantener ni accionistas a los que pagar."
               : "It isn't cheap because it's shoddy. It's cheap because there's no server to maintain and no shareholders to pay."}
@@ -149,7 +149,7 @@ export function ValueTestimonials() {
 
               {/* Value chip — the headline stat the trader attributes to the app. */}
               <div className="relative flex items-center justify-between gap-2">
-                <span className="pill bg-white/5 text-white border border-white/20 !text-[11px] uppercase tracking-[0.1em] tnum">
+                <span className="pill bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !text-[11px] uppercase tracking-[0.1em] tnum">
                   {es ? t.chipEs : t.chipEn}
                 </span>
                 <span
@@ -182,10 +182,10 @@ export function ValueTestimonials() {
               </div>
 
               {/* Quote — compact, slightly smaller than the main SocialProof. */}
-              <blockquote className="relative text-[13.5px] text-gray-300 leading-relaxed flex-1">
-                <span className="text-white mr-1 text-base">“</span>
+              <blockquote className="relative text-[13.5px] text-secondary leading-relaxed flex-1">
+                <span className="text-primary mr-1 text-base">“</span>
                 {es ? t.quoteEs : t.quoteEn}
-                <span className="text-white ml-1 text-base">”</span>
+                <span className="text-primary ml-1 text-base">”</span>
               </blockquote>
 
               {/* Author */}
@@ -197,10 +197,10 @@ export function ValueTestimonials() {
                   {t.initials}
                 </span>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[13px] font-medium text-white truncate">
+                  <span className="text-[13px] font-medium text-primary truncate">
                     {t.name}
                   </span>
-                  <span className="text-[11px] text-gray-400 truncate">
+                  <span className="text-[11px] text-tertiary truncate">
                     {es ? t.roleEs : t.roleEn}
                   </span>
                 </div>

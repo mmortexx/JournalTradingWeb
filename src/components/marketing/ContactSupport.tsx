@@ -126,7 +126,7 @@ export function ContactSupport() {
                   whileHover={reduce ? undefined : { y: -4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                   aria-label={`${title} — ${cta}`}
-                  className="group relative block liquid-glass depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-white/20 hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
+                  className="group relative block liquid-glass depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--divider)/0.20)] hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
                 >
                   {/* Hover accent sweep */}
                   <span
@@ -140,7 +140,7 @@ export function ContactSupport() {
 
                   <div className="flex items-start gap-4">
                     <span
-                      className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-white/5 border border-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] text-primary group-hover:bg-white/8 group-hover:border-white/20 transition-colors"
+                      className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary group-hover:bg-[rgb(var(--divider)/0.08)] group-hover:border-[rgb(var(--divider)/0.20)] transition-colors"
                       aria-hidden="true"
                     >
                       <Icon className="size-5" />

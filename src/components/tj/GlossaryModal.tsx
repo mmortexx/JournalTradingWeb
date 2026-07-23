@@ -253,7 +253,7 @@ export function GlossaryModal({
               onChange={(e) => setQuery(e.target.value)}
               placeholder={es ? "Buscar término…" : "Search term…"}
               aria-label={es ? "Buscar término" : "Search term"}
-              className="pl-9 bg-white/[0.03] border-white/10"
+              className="pl-9 bg-[rgb(var(--divider)/0.03)] border-[rgb(var(--divider)/0.10)]"
             />
           </div>
         </div>
@@ -288,7 +288,7 @@ export function GlossaryModal({
                   setActiveCat(e.target.value as GlossaryCategory | "all")
                 }
                 aria-label={es ? "Filtrar por categoría" : "Filter by category"}
-                className="appearance-none bg-white/5 border border-white/10 rounded-md h-9 pl-3 pr-8 text-sm text-secondary outline-none transition-colors hover:border-white/25 focus-visible:border-white/30 cursor-pointer"
+                className="appearance-none bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-9 pl-3 pr-8 text-sm text-secondary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)] cursor-pointer"
               >
                 {GLOSSARY_CATEGORIES.map((c) => (
                   <option key={c.id} value={c.id} className="bg-background text-primary">
@@ -398,8 +398,8 @@ export function GlossaryModal({
                     className={[
                       "liquid-glass rounded-card p-4 transition-[border-color,box-shadow,background-color] cursor-pointer",
                       isActive
-                        ? "border-white/30 ring-1 ring-white/20 bg-white/[0.06] shadow-[0_0_28px_-8px_rgb(255_255_255/0.18)]"
-                        : "hover:border-white/25",
+                        ? "border-[rgb(var(--divider)/0.30)] ring-1 ring-[rgb(var(--divider)/0.20)] bg-[rgb(var(--divider)/0.06)] shadow-[0_0_28px_-8px_rgb(var(--divider)/0.18)]"
+                        : "hover:border-[rgb(var(--divider)/0.25)]",
                     ].join(" ")}
                     onClick={() => toggleExpanded(g.term)}
                   >

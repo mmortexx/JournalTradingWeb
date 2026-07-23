@@ -67,7 +67,7 @@ export function Integrations() {
                 ease: [0.22, 1, 0.36, 1],
               }}
               whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="group relative liquid-glass depth-1 rounded-card p-4 h-full flex flex-col gap-3 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-white/20 hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
+              className="group relative liquid-glass depth-1 rounded-card p-4 h-full flex flex-col gap-3 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--divider)/0.20)] hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
             >
               {/* Accent border glow on hover. */}
               <div
@@ -80,13 +80,13 @@ export function Integrations() {
               {/* Row: monogram mark (left) + CSV chip (right). */}
               <div className="relative flex items-center justify-between">
                 <span
-                  className="w-9 h-9 rounded-md bg-white/5 border border-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] flex items-center justify-center text-primary text-[11px] font-bold tracking-tight"
+                  className="w-9 h-9 rounded-md bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-primary text-[11px] font-bold tracking-tight"
                   style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
                   aria-hidden="true"
                 >
                   {b.mark}
                 </span>
-                <span className="pill bg-white/5 text-tertiary border border-white/10 text-[10px] uppercase tracking-[0.14em]">
+                <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] text-[10px] uppercase tracking-[0.14em]">
                   CSV
                 </span>
               </div>

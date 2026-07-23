@@ -118,7 +118,7 @@ export function Comparison() {
                         scope="col"
                         className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 ${
                           c.highlight
-                            ? "bg-white/[0.07] shadow-[inset_2px_0_0_0_rgb(var(--accent-base))]"
+                            ? "bg-[rgb(var(--divider)/0.07)] shadow-[inset_2px_0_0_0_rgb(var(--accent-base))]"
                             : ""
                         }`}
                       >
@@ -127,7 +127,7 @@ export function Comparison() {
                             {c.label}
                           </span>
                           {c.highlight && (
-                            <span className="pill bg-white/5 text-primary border border-white/20">
+                            <span className="pill bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)]">
                               {es ? "Recomendado" : "Recommended"}
                             </span>
                           )}
@@ -147,8 +147,8 @@ export function Comparison() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-30px" }}
                       transition={{ duration: 0.45, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                      className={`border-b last:border-b-0 transition-colors hover:bg-white/5 ${
-                        i % 2 === 1 ? "bg-white/[0.015]" : ""
+                      className={`border-b last:border-b-0 transition-colors hover:bg-[rgb(var(--divider)/0.05)] ${
+                        i % 2 === 1 ? "bg-[rgb(var(--divider)/0.015)]" : ""
                       }`}
                     >
                       <th scope="row" className="text-left p-5 md:p-6 font-medium text-secondary text-[14px] h-16 md:h-[72px] align-middle">
@@ -158,7 +158,7 @@ export function Comparison() {
                         <td
                           key={j}
                           className={`p-5 md:p-6 align-middle relative h-16 md:h-[72px] ${
-                            j === 0 ? "bg-white/[0.05] shadow-[inset_2px_0_0_0_rgb(var(--accent-base))]" : ""
+                            j === 0 ? "bg-[rgb(var(--divider)/0.05)] shadow-[inset_2px_0_0_0_rgb(var(--accent-base))]" : ""
                           }`}
                         >
                           <CellRenderer cell={cell} highlight={j === 0} es={es} delay={i * 0.05} />
@@ -227,7 +227,7 @@ function CellRenderer({
           <CheckIcon />
         </motion.span>
         <span className="text-[13px] font-medium text-pnl-pos">{es ? "Sí" : "Yes"}</span>
-        <span className="pill bg-white/5 text-primary border border-white/20 !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
+        <span className="pill bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
           Pro
         </span>
       </span>

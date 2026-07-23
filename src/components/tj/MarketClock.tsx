@@ -156,7 +156,7 @@ function ProgressBar({
 }) {
   return (
     <div
-      className="h-[3px] rounded-full bg-white/[0.06] overflow-hidden"
+      className="h-[3px] rounded-full bg-[rgb(var(--divider)/0.06)] overflow-hidden"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
@@ -164,7 +164,7 @@ function ProgressBar({
     >
       <motion.div
         className={`h-full rounded-full ${
-          isOpen ? "bg-white" : "bg-pnl-neg/40"
+          isOpen ? "bg-[rgb(var(--accent-base))]" : "bg-pnl-neg/40"
         }`}
         initial={false}
         animate={{ width: `${isOpen ? progress : 0}%` }}
@@ -258,7 +258,7 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
               <div
                 key={s.id}
                 className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md shrink-0 transition-colors ${
-                  isOpen ? "bg-white/[0.08]" : "bg-white/[0.02]"
+                  isOpen ? "bg-[rgb(var(--divider)/0.08)]" : "bg-[rgb(var(--divider)/0.02)]"
                 }`}
                 title={`${es ? s.nameEs : s.nameEn} · ${
                   isOpen ? labels.open : labels.closed
@@ -290,7 +290,7 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
               className={`pill text-[10px] tnum ${
                 openCount > 0
                   ? "bg-pnl-pos/10 text-pnl-pos border border-pnl-pos/25"
-                  : "bg-white/5 text-tertiary border border-white/10"
+                  : "bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)]"
               }`}
             >
               {labels.sessionsOpen}
@@ -338,8 +338,8 @@ export function MarketClock({ compact = false }: { compact?: boolean }) {
               key={s.id}
               className={`relative rounded-md p-3 border transition-colors ${
                 isOpen
-                  ? "border-white/20 bg-white/[0.06]"
-                  : " bg-white/[0.02]"
+                  ? "border-[rgb(var(--divider)/0.20)] bg-[rgb(var(--divider)/0.06)]"
+                  : " bg-[rgb(var(--divider)/0.02)]"
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-2">

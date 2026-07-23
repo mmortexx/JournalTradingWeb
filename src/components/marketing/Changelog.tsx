@@ -187,7 +187,7 @@ export function Changelog() {
         <div className="relative mt-16 md:mt-20">
           {/* Center line — left on mobile, center on desktop */}
           <div
-            className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-1/2 bg-gradient-to-b from-transparent via-white/35 to-transparent"
+            className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-1/2 bg-gradient-to-b from-transparent via-[rgb(var(--divider)/0.35)] to-transparent"
             aria-hidden
           />
 
@@ -226,8 +226,8 @@ export function Changelog() {
                         whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                         className={`liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                           isPast
-                            ? "hover:shadow-[0_0_36px_-10px_rgb(var(--accent-base)/0.45)] hover:border-white/20"
-                            : "opacity-90 hover:opacity-100 hover:border-white/20"
+                            ? "hover:shadow-[0_0_36px_-10px_rgb(var(--accent-base)/0.45)] hover:border-[rgb(var(--divider)/0.20)]"
+                            : "opacity-90 hover:opacity-100 hover:border-[rgb(var(--divider)/0.20)]"
                         }`}
                       >
                           <div
@@ -240,7 +240,7 @@ export function Changelog() {
                               className={
                                 isPast
                                   ? ""
-                                  : "border-dashed border-white/15 text-tertiary"
+                                  : "border-dashed border-[rgb(var(--divider)/0.15)] text-tertiary"
                               }
                             >
                               <span className="t-h4 tnum">{entry.version}</span>
@@ -274,7 +274,7 @@ export function Changelog() {
                           >
                             <span
                               className={`inline-block w-1.5 h-1.5 rounded-full ${
-                                isPast ? "bg-white/70" : "bg-pnl-warn/70"
+                                isPast ? "bg-[rgb(var(--divider)/0.70)]" : "bg-pnl-warn/70"
                               }`}
                               aria-hidden
                             />
@@ -298,9 +298,9 @@ export function Changelog() {
                     aria-hidden
                   >
                     {isPast ? (
-                      <span className="block w-3.5 h-3.5 rounded-full bg-white ring-4 ring-white/15 shadow-[0_0_12px_-2px_rgb(var(--accent-base)/0.6)]" />
+                      <span className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))] ring-4 ring-[rgb(var(--accent-base)/0.15)] shadow-[0_0_12px_-2px_rgb(var(--accent-base)/0.6)]" />
                     ) : (
-                      <span className="block w-3.5 h-3.5 rounded-full border-2 border-white/20 bg-background" />
+                      <span className="block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--divider)/0.20)] bg-background" />
                     )}
                   </motion.div>
 

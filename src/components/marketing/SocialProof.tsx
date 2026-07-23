@@ -131,7 +131,7 @@ export function SocialProof() {
                         </motion.svg>
                       ))}
                     </div>
-                    <span className="pill bg-white/5 text-tertiary border border-white/10 tnum">
+                    <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] tnum">
                       {t.yearsTrading} {es ? "años operando" : "yrs trading"}
                     </span>
                   </div>

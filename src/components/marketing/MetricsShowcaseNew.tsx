@@ -20,7 +20,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
   return (
     <section
       id="metrics"
-      className="relative border-t border-b"
+      className="bg-veil relative border-t border-b"
       style={{
         padding: "120px 24px 80px",
         borderColor: "rgb(var(--divider) / 0.06)",
@@ -81,10 +81,10 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
           </p>
           <ul className="m-0 p-0 list-none grid grid-cols-2 gap-3">
             {[
-              { l: "Sharpe", v: "3,34", c: "var(--pos)" },
+              { l: "Sharpe", v: "3,34", c: "rgb(var(--pnl-pos))" },
               { l: "Profit factor", v: "1,56", c: "var(--ink)" },
-              { l: "Expectancy", v: "+0,32R", c: "var(--pos)" },
-              { l: "Max DD", v: "−8,0 %", c: "var(--neg)" },
+              { l: "Expectancy", v: "+0,32R", c: "rgb(var(--pnl-pos))" },
+              { l: "Max DD", v: "−8,0 %", c: "rgb(var(--pnl-neg))" },
             ].map((m) => (
               <li
                 key={m.l}

@@ -23,8 +23,8 @@ const ANCHORS = [
 
 const PAGES = [
   { href: "/features", num: "04", es: "Características", en: "Features" },
-  { href: "/features#metricas", num: "05", es: "Métricas", en: "Metrics" },
-  { href: "/features#guardian", num: "06", es: "Disciplina", en: "Discipline" },
+  { href: "/features/metricas", num: "05", es: "Métricas", en: "Metrics" },
+  { href: "/features/disciplina", num: "06", es: "Disciplina", en: "Discipline" },
   { href: "/pricing", num: "07", es: "Precios", en: "Pricing" },
 ] as const;
 

@@ -17,7 +17,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
   return (
     <section
       id="guardian"
-      className="relative overflow-hidden border-t"
+      className="bg-veil relative overflow-hidden border-t"
       style={{ padding: "120px 24px 80px", borderColor: "rgb(var(--divider) / 0.06)" }}
     >
       <div

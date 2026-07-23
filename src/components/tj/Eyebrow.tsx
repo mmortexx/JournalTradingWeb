@@ -9,7 +9,7 @@ interface EyebrowProps {
 export function Eyebrow({ children, className = "" }: EyebrowProps) {
   return (
     <div className={`eyebrow inline-flex items-center gap-2 ${className}`}>
-      <span className="w-6 h-px bg-white opacity-60" />
+      <span className="w-6 h-px bg-[rgb(var(--divider))] opacity-60" />
       {children}
     </div>
   );

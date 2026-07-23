@@ -38,8 +38,8 @@ export function Wrapped() {
       tone: "accent" as const,
       label: es ? "Tu mejor racha" : "Your best streak",
       value: (
-        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <CountUp to={METRICS.maxWinStreak} className="t-display text-[clamp(2.5rem,6vw,4rem)] tnum text-primary whitespace-nowrap" />
+        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
+          <CountUp to={METRICS.maxWinStreak} className="t-display text-[clamp(1.75rem,9cqi,2.75rem)] tnum text-primary whitespace-nowrap" />
           <span className="text-base text-tertiary font-medium">{es ? "ganadoras seguidas" : "winners in a row"}</span>
         </span>
       ),
@@ -53,9 +53,9 @@ export function Wrapped() {
       label: es ? "Tu setup más rentable" : "Your most profitable setup",
       value: (
         <span className="flex flex-col gap-1 min-w-0">
-          <span className="t-display text-[clamp(2rem,4.5vw,3rem)] text-pnl-pos break-words">{topSetup.name}</span>
-          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum">
-            <Money value={topSetup.totalPnl} sign colorizeSign className="text-2xl font-medium whitespace-nowrap" />
+          <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-pnl-pos break-words leading-tight">{topSetup.name}</span>
+          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum min-w-0">
+            <Money value={topSetup.totalPnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
             <span className="text-sm text-tertiary whitespace-nowrap">
               {es ? `${topSetup.count} ops · ${(topSetup.winRate * 100).toFixed(0)}% win` : `${topSetup.count} trades · ${(topSetup.winRate * 100).toFixed(0)}% win`}
             </span>
@@ -71,9 +71,9 @@ export function Wrapped() {
       tone: "accent" as const,
       label: es ? "Tu día más productivo" : "Your most productive day",
       value: (
-        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="t-display text-[clamp(2rem,4.5vw,3rem)] text-primary whitespace-nowrap">{bestDayName}</span>
-          <Money value={bestDay.pnl} sign colorizeSign className="text-2xl font-medium whitespace-nowrap" />
+        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
+          <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-primary whitespace-nowrap leading-tight">{bestDayName}</span>
+          <Money value={bestDay.pnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
         </span>
       ),
       sub: es
@@ -86,7 +86,7 @@ export function Wrapped() {
       label: es ? "Total operado" : "Total traded",
       value: (
         <span className="flex flex-col items-start gap-1 min-w-0">
-          <Money value={totalOperado} compact colorizeSign={false} className="t-display text-[clamp(2.5rem,6vw,4rem)] tnum text-primary whitespace-nowrap" />
+          <Money value={totalOperado} compact colorizeSign={false} className="t-display text-[clamp(1.75rem,9cqi,2.75rem)] tnum text-primary whitespace-nowrap" />
           <span className="text-base text-tertiary">{es ? "de volumen bruto" : "gross volume"}</span>
         </span>
       ),
@@ -99,8 +99,8 @@ export function Wrapped() {
       tone: "warn" as const,
       label: es ? "Coste de indisciplina" : "Cost of indiscipline",
       value: (
-        <span className="flex items-baseline gap-2">
-          <Money value={METRICS.costOfIndiscipline} colorizeSign className="t-display text-[clamp(2.5rem,6vw,4rem)] tnum text-pnl-warn whitespace-nowrap" />
+        <span className="flex items-baseline gap-2 min-w-0">
+          <Money value={METRICS.costOfIndiscipline} colorizeSign className="t-display text-[clamp(1.75rem,9cqi,2.75rem)] tnum text-pnl-warn whitespace-nowrap" />
         </span>
       ),
       sub: es
@@ -113,9 +113,9 @@ export function Wrapped() {
       label: es ? "Instrumento top" : "Top instrument",
       value: (
         <span className="flex flex-col gap-1 min-w-0">
-          <span className="t-display text-[clamp(2rem,4.5vw,3rem)] text-primary break-words">{topInstrument.name}</span>
-          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum">
-            <Money value={topInstrument.totalPnl} sign colorizeSign className="text-2xl font-medium whitespace-nowrap" />
+          <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-primary break-words leading-tight">{topInstrument.name}</span>
+          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum min-w-0">
+            <Money value={topInstrument.totalPnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
             <span className="text-sm text-tertiary whitespace-nowrap">
               {es ? `${topInstrument.count} ops` : `${topInstrument.count} trades`}
             </span>
@@ -209,7 +209,7 @@ export function Wrapped() {
                   }}
                 />
 
-                <div className="relative p-6 md:p-7 flex flex-col h-full justify-between gap-4">
+                <div className="relative p-6 md:p-7 flex flex-col h-full justify-between gap-4 cq-wrap min-w-0">
                   <span className="eyebrow inline-flex items-center gap-2">
                     <span
                       className="w-1.5 h-1.5 rounded-full"

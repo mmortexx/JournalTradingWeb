@@ -174,7 +174,7 @@ export function Newsletter() {
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Correo electrónico" : "Email address"}
                           aria-invalid={status === "error"}
-                          className="h-12 bg-white/[0.04] border-white/10 text-primary placeholder:text-tertiary focus-visible:border-white/30"
+                          className="h-12 bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary focus-visible:border-[rgb(var(--divider)/0.30)]"
                         />
                         <AnimatePresence>
                           {status === "error" && (

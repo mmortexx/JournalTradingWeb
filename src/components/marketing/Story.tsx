@@ -68,9 +68,9 @@ export function Story() {
   const toneDot: Record<Phase["tone"], string> = {
     neg: "bg-pnl-neg",
     warn: "bg-pnl-warn",
-    neutral: "bg-white/40",
+    neutral: "bg-[rgb(var(--divider)/0.40)]",
     pos: "bg-pnl-pos",
-    accent: "bg-white",
+    accent: "bg-[rgb(var(--accent-base))]",
   };
   // toneText maps each phase tone to a design-system text token so the tag
   // color shifts correctly when the theme flips to light. `neutral` uses the
@@ -119,7 +119,7 @@ export function Story() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <blockquote className="mt-8 relative pl-6 border-l-2 border-white/20">
+            <blockquote className="mt-8 relative pl-6 border-l-2 border-[rgb(var(--divider)/0.20)]">
               <span
                 className="absolute -left-1 -top-3 text-5xl leading-none text-primary/40 font-serif select-none"
                 aria-hidden="true"
@@ -172,7 +172,7 @@ export function Story() {
         <div className="relative">
           {/* Vertical track line — static white gradient from top to bottom. */}
           <span
-            className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-white/60 via-white/30 to-transparent"
+            className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-[rgb(var(--divider)/0.60)] via-[rgb(var(--divider)/0.30)] to-transparent"
             aria-hidden="true"
           />
 

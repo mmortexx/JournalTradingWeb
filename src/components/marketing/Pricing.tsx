@@ -157,7 +157,7 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
               role="radio"
               aria-checked="true"
               tabIndex={0}
-              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5 cursor-default outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5 cursor-default outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--divider)/0.40)]"
               style={{
                 background:
                   "linear-gradient(180deg, rgb(var(--accent-base) / 0.18), rgb(var(--accent-base) / 0.08))",
@@ -166,13 +166,13 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
               }}
             >
               <span
-                className="size-1.5 rounded-full bg-white"
+                className="size-1.5 rounded-full bg-[rgb(var(--divider))]"
                 aria-hidden="true"
               />
-              <span className="text-sm font-semibold text-white tnum">
+              <span className="text-sm font-semibold text-primary tnum">
                 {es ? "Pago único" : "One-time"}
               </span>
-              <span className="pill bg-white/10 text-white border border-white/20 !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
+              <span className="pill bg-[rgb(var(--divider)/0.10)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
                 {es ? "Activo" : "Active"}
               </span>
             </div>
@@ -250,8 +250,8 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className={`relative liquid-glass rounded-card p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isPro
-          ? "gradient-border depth-4 border-white/20"
-          : "depth-2 border-white/10"
+          ? "gradient-border depth-4 border-[rgb(var(--divider)/0.20)]"
+          : "depth-2 border-[rgb(var(--divider)/0.10)]"
       }`}
       style={
         isPro
@@ -287,7 +287,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           className="absolute inset-0 overflow-hidden pointer-events-none rounded-card"
         >
           <span
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-bold tracking-tighter whitespace-nowrap text-white -rotate-12"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-bold tracking-tighter whitespace-nowrap text-primary -rotate-12"
             style={{
               fontSize: "8rem",
               opacity: 0.04,
@@ -306,8 +306,8 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         <span
           className={`pill border ${
             isPro
-              ? "bg-white/5 text-primary border-white/20"
-              : "bg-white/5 text-tertiary border-white/10"
+              ? "bg-[rgb(var(--divider)/0.05)] text-primary border-[rgb(var(--divider)/0.20)]"
+              : "bg-[rgb(var(--divider)/0.05)] text-tertiary border-[rgb(var(--divider)/0.10)]"
           }`}
         >
           {es ? "Para siempre" : "Forever"}

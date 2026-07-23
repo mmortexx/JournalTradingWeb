@@ -20,6 +20,10 @@ const PAGES: PageMeta[] = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   // Top-of-funnel discovery pages — updated when features/pricing shift.
   { path: "/features", priority: 0.9, changeFrequency: "weekly" },
+  // Feature deep-dive sub-routes (Opción A architecture).
+  { path: "/features/metricas", priority: 0.85, changeFrequency: "weekly" },
+  { path: "/features/disciplina", priority: 0.85, changeFrequency: "weekly" },
+  { path: "/features/seguridad", priority: 0.85, changeFrequency: "weekly" },
   { path: "/pricing", priority: 0.9, changeFrequency: "monthly" },
   { path: "/demo", priority: 0.8, changeFrequency: "monthly" },
   // Lower-velocity editorial / trust pages.

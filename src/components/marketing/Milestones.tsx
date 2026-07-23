@@ -139,7 +139,7 @@ export function Milestones() {
                       {isPast ? (
                         <motion.span
                           aria-hidden="true"
-                          className="block w-3.5 h-3.5 rounded-full bg-white ring-4 ring-white/15 shadow-[0_0_12px_-2px_rgb(var(--accent-base)/0.6)]"
+                          className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))] ring-4 ring-[rgb(var(--accent-base)/0.15)] shadow-[0_0_12px_-2px_rgb(var(--accent-base)/0.6)]"
                           initial={{ scale: 0, opacity: 0 }}
                           whileInView={{ scale: 1, opacity: 1 }}
                           viewport={{ once: true, margin: "-40px" }}
@@ -151,12 +151,12 @@ export function Milestones() {
                           }}
                         />
                       ) : (
-                        <span className="block w-3.5 h-3.5 rounded-full border-2 border-white/20 bg-background" />
+                        <span className="block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--divider)/0.20)] bg-background" />
                       )}
                     </div>
 
                     {/* Card */}
-                    <div className="mt-3 liquid-glass depth-1 rounded-card p-4 transition-shadow duration-300 hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.4)] hover:border-white/20">
+                    <div className="mt-3 liquid-glass depth-1 rounded-card p-4 transition-shadow duration-300 hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.4)] hover:border-[rgb(var(--divider)/0.20)]">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-[10px] uppercase tracking-[0.16em] font-semibold text-primary tnum">
                           {m.date}
@@ -164,8 +164,8 @@ export function Milestones() {
                         <span
                           className={`pill text-[10px] uppercase tracking-[0.12em] tnum ${
                             isPast
-                              ? "bg-white/5 text-primary border border-white/20"
-                              : "bg-white/5 text-tertiary border border-dashed border-white/15"
+                              ? "bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)]"
+                              : "bg-[rgb(var(--divider)/0.05)] text-tertiary border border-dashed border-[rgb(var(--divider)/0.15)]"
                           }`}
                         >
                           {isPast
@@ -187,7 +187,7 @@ export function Milestones() {
                       <div className="mt-2 flex items-center gap-1.5 text-[10px] text-tertiary tnum">
                         <span
                           className={`inline-block w-1.5 h-1.5 rounded-full ${
-                            isPast ? "bg-white/70" : "bg-pnl-warn/70"
+                            isPast ? "bg-[rgb(var(--divider)/0.70)]" : "bg-pnl-warn/70"
                           }`}
                           aria-hidden="true"
                         />
@@ -205,13 +205,13 @@ export function Milestones() {
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-wrap items-center gap-4 text-xs text-tertiary">
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-white" aria-hidden="true" />
+              <span className="w-2 h-2 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
               {es ? "En tu mano hoy" : "In your hands today"}
             </span>
             <span aria-hidden="true">·</span>
             <span className="flex items-center gap-2">
               <span
-                className="w-2 h-2 rounded-full border border-white/20 bg-background"
+                className="w-2 h-2 rounded-full border border-[rgb(var(--divider)/0.20)] bg-background"
                 aria-hidden="true"
               />
               {es ? "En camino" : "On the way"}

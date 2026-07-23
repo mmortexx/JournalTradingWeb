@@ -248,7 +248,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={es ? "Buscar en las preguntas…" : "Search questions…"}
               aria-label={es ? "Buscar en las preguntas frecuentes" : "Search frequently asked questions"}
-              className="w-full bg-white/5 border border-white/10 rounded-md h-10 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-white/25 focus-visible:border-white/30"
+              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-10 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)]"
             />
           </div>
         </Reveal>
@@ -288,7 +288,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
                   <AccordionItem
                     key={item.q}
                     value={`item-${i}`}
-                    className="border-white/8 last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-white/25 data-[state=open]:bg-white/[0.05] data-[state=open]:shadow-[0_0_28px_-6px_rgb(var(--accent-base)/0.35)]"
+                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--divider)/0.25)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[0_0_28px_-6px_rgb(var(--accent-base)/0.35)]"
                   >
                     <AccordionTrigger className="text-left text-base md:text-[1.05rem] font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:no-underline py-5 transition-colors">
                       {item.q}

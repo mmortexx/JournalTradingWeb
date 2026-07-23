@@ -75,7 +75,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 
   return (
     <section
-      className="border-t"
+      className="bg-veil border-t"
       style={{
         padding: "100px 24px 80px",
         borderColor: "rgb(var(--divider) / 0.06)",
@@ -142,7 +142,13 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             </div>
             <div className="flex flex-wrap gap-2">
               {presets.map((p) => (
-                <button key={p.label} onClick={() => setRiskPct(p.pct)} style={chipStyle(riskPct === p.pct)}>
+                <button
+                  key={p.label}
+                  onClick={() => setRiskPct(p.pct)}
+                  style={chipStyle(riskPct === p.pct)}
+                  aria-pressed={riskPct === p.pct}
+                  aria-label={es ? `Plantilla ${p.label}, ${fmtNum(p.pct)} por ciento de riesgo` : `${p.label} preset, ${fmtNum(p.pct)} percent risk`}
+                >
                   {p.label} · {fmtNum(p.pct)} %
                 </button>
               ))}
@@ -158,7 +164,13 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             </div>
             <div className="flex flex-wrap gap-2">
               {balances.map((b) => (
-                <button key={b.label} onClick={() => setBalance(b.v)} style={chipStyle(balance === b.v)}>
+                <button
+                  key={b.label}
+                  onClick={() => setBalance(b.v)}
+                  style={chipStyle(balance === b.v)}
+                  aria-pressed={balance === b.v}
+                  aria-label={es ? `Balance ${b.label}` : `Balance ${b.label}`}
+                >
                   {b.label}
                 </button>
               ))}
@@ -204,6 +216,11 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               onChange={(e) => setRiskPct(parseFloat(e.target.value))}
               className="w-full"
               style={{ accentColor: "rgb(var(--accent-base))" }}
+              aria-label={es ? "Riesgo por operación en porcentaje" : "Risk per trade percentage"}
+              aria-valuemin={0.25}
+              aria-valuemax={3}
+              aria-valuenow={riskPct}
+              aria-valuetext={`${fmtNum(riskPct)} %`}
             />
             <div className="flex items-center justify-between mt-1">
               {["0,25 %", "1,00 %", "2,00 %", "3,00 %"].map((t) => (
