@@ -9376,3 +9376,32 @@ Stage Summary:
 - Sitio desplegado: https://mmortexx.github.io/JournalTradingWeb/ (Actions en verde desplegarán el nuevo main).
 - Decisiones de diseño respetadas: BackgroundFX intacto (2 backticks del FRAG preservados), acento verde institucional, .liquid-glass casi-opaco, precios Core $29/Pro $49, capturas reales, demo interna siempre-oscura.
 - Cron webDevReview cada 15 min creado para continuidad de QA y desarrollo.
+
+---
+Task ID: R10-cron-1
+Agent: main (Z.ai Code) — cron webDevReview round 1
+Task: QA del proyecto + mejoras de styling + nuevas features.
+
+Work Log:
+- QA con agent-browser + VLM: home verificado en dark y light (navbar edge-to-edge ✅, ojo visible ✅, texto legible en ambos temas ✅, 0 errores de consola). Build estático de producción: 15/15 rutas compilan limpio.
+- Limitación del sandbox: 4GB RAM sin swap. Turbopack dev server + Chromium excede memoria; servido el build estático via python http.server para QA visual. El dev server muere bajo carga del navegador pero el código está verificado via build + DOM checks.
+- Mejoras implementadas:
+  1. NUEVO FeaturePageNav component (src/components/marketing/FeaturePageNav.tsx): sección de cross-navegación para las 3 subpáginas de features. Incluye:
+     - Botón "Compartir" con Web Share API + fallback de clipboard copy ("¡Enlace copiado!")
+     - Cards Prev/Next con material liquid-glass + hover lift
+     - Grid "Sigue explorando" con 3 cards (Métricas/Disciplina/Seguridad), la activa destacada con accent border + "Aquí" badge
+     - Navegación por teclado: Alt+←/→ para navegar entre subpáginas (skipea cuando el usuario escribe en inputs)
+     - kbd hints (Alt ← / Alt →) en las labels prev/next para discoverability
+  2. PageHeader styling polish: accent gradient divider (1px hairline, transparent→accent→transparent) en el borde inferior del header — "machined edge" que separa el header de la primera sección de contenido. Theme-aware via --accent-base.
+  3. FeaturePageNav montado en las 3 subpáginas (/features/metricas, /disciplina, /seguridad) entre el contenido y FinalCTANew.
+- Verificación: eslint 0 errores, tsc limpio, production build 15/15 rutas, DOM confirma todos los elementos (Share button ✅, "Sigue explorando" ✅, "Siguiente" ✅, axis labels ✅, "Anterior" correctamente ausente en metricas que es la primera).
+- Commit e9c4038 (5 archivos, +271 líneas) pusheado a origin/main.
+
+Stage Summary:
+- Estado: estable. Los 6 problemas originales del dueño resueltos (R9). Esta ronda añade mejoras de UX (cross-nav + share + keyboard nav) y styling polish (accent divider).
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Table of contents sidebar en las subpáginas de features largas
+  (b) Print-friendly stylesheet para /features/*
+  (c) Reading time estimate en los headers de las subpáginas
+  (d) El demo interactivo (HomeDemo) tiene tabs inactivos con bajo contraste — revisar si se puede mejorar sin romper el "siempre-oscura" design intent
+  (e) Optimistic UI: prefetch de las rutas /features/* al hover del megamenú
