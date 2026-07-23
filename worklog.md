@@ -12988,3 +12988,21 @@ Next actions (informational — not blocking):
 - If a future round wants to harden the body bg against WebGL-failure edge cases, change `body { background: #0B0C0E; }` (globals.css:310) to `body { background: var(--bg); }` (or add a `:root[data-theme="light"] body { background: var(--bg); }` override). This is a 1-line edit with no visual change in normal operation but would prevent a dark flash if BackgroundFX's canvas ever fails to mount.
 - The theme-toggle hydration delay (~3s) is the standard SSR-safe theme pattern, but if a future round wants instant toggle availability, the inline anti-FOUC script in `src/app/layout.tsx:244` could be extended to also bind the toggle's click handler pre-hydration. Not necessary for correctness.
 - Out of scope: re-run the same checks on `/demo/dashboard`, `/demo/trades`, `/demo/analytics` at mobile width. Those are always-dark per design intent (the demo is a Bloomberg-terminal-style app) and were last verified in R20-4b; not re-tested here since R21-4c's scope was marketing routes only.
+
+---
+Task ID: R21-FINAL
+Agent: main (Z.ai Code) — 20-subagent mobile+contrast fix (4 rondas de 5)
+Task: Solucionar overflow móvil + secciones ilegibles en claro, revisado al mínimo detalle.
+
+Work Log:
+- Análisis VLM de la captura del dueño (demo dashboard móvil 1440x3120): P&L total desbordando, labels KPI partidas, Y-axis chart ilegible, calendario denso.
+- RONDA 1 (5 audit): demo dashboard, demo pages, marketing mobile, contrast ambos temas, layout overflow. Causa raíz hallada: --pnl-pos/neg/warn IDÉNTICOS en ambos temas → texto invisible en claro (CR 1.5-2.5:1).
+- RONDA 2 (5 fix): demo dashboard (compact+min-w-0+Y-axis hidden+padding), demo pages (delete mobile+scroll hint+tap tooltip+grid 1-col), marketing (Hero clamp+flex-wrap+min-w-0+flex-col), contrast (pnl tokens oscurecidos en claro+bg-veil+Hero scrim 88%), layout (UtcClock lg+TOC 2xl+megamenu max-w).
+- RONDA 3 (5 polish): hero/home mobile (CTAs stack+KPI 2-col+padding clamp), features mobile (action buttons stack+table overflow-x+handle w-12), pricing/faq mobile (cards stack+scroll hint+button w-full), about mobile (divider hidden+button w-full), demo charts (responsive SVG+touch tooltip).
+- RONDA 4 (5 QA): build 15/15+eslint 0+tsc clean+shader 5 backticks, mobile dark 0 overflow, mobile light TEXTO LEGIBLE (pnl tokens readable), desktop ambos temas 0 overflow, responsive 375/768/1440 0 overflow horizontal en NINGÚN breakpoint.
+- Commit a32f466 (33 archivos, +2334/-151) pusheado a origin/main.
+
+Stage Summary:
+- Estado: producción verde. Los 2 problemas del dueño (overflow + secciones ilegibles) RESUELTOS en ambos temas, móvil y desktop.
+- Causa raíz del problema de legibilidad: los tokens de color P&L estaban calibrados solo para oscuro. Ahora tienen overrides de tema claro con colores más oscuros que pasan WCAG AA.
+- 0 overflow horizontal en cualquier breakpoint (375/768/1440/1600). 0 errores de consola. 15/15 rutas estáticas.
