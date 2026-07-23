@@ -9430,3 +9430,26 @@ Stage Summary:
   (c) Back to top button con progreso circular (ya existe BackToTop, se podría enriquecer)
   (d) Breadcrumb estructurado más rico (Article schema en subpáginas)
   (e) Prefetch de rutas /features/* al hover del megamenú (optimistic UI)
+
+---
+Task ID: R10-cron-3
+Agent: main (Z.ai Code) — cron webDevReview round 3
+Task: Reading time estimate + Article schema + print-friendly stylesheet.
+
+Work Log:
+- QA: build estático 15/15 rutas. Verificado que TOC (3 entries en metricas) + ReadingProgressIndicator + FeaturePageNav de rondas anteriores siguen funcionando.
+- Mejoras implementadas:
+  1. Reading time estimate: PageHeader gains optional `readingTimeMin` prop → renders una pill tranquila ("3 min de lectura" / "3 min read") con icono Clock bajo el subtitle. Nuevo helper src/lib/readingTime.ts (estimateReadingTime + countWords, 220 wpm, redondea hacia arriba, min 1). Las 3 subpáginas pasan readingTimeMin={3}.
+  2. Article schema (JSON-LD): cada subpágina emite ahora un schema Article (headline, description, url, author, publisher, inLanguage, timeRequired como ISO 8601 PT3M, about[] keywords). Mejora elegibilidad de rich-results — los buscadores ahora ven estas páginas como artículos de profundidad, no solo landing pages. Breadcrumb schema preservado.
+  3. Print stylesheet (globals.css @media print): fuerza variables de tema claro + bg blanco + fuente serif para papel. Oculta todo el chrome interactivo (WebGL bg, navbar, footer, TOC, progress bar, side rail, cookie banner, back-to-top, command palette, intro sequence). Expande el contenido a ancho completo. Remueve blur/glass/shadows (las impresoras no los renderizan → parches blancos). Page breaks: section+section evita romperse dentro; h2 se queda con su contenido. Links: añade la URL entre paréntesis tras enlaces externos. @page margins 1.5cm × 2cm.
+- Verificación: eslint 0 errores, tsc limpio, production build 15/15 rutas. DOM confirma pill de reading time ("3 min de lectura"), 4 scripts JSON-LD (org + breadcrumb + article + ...). VLM confirma pill visible bajo subtitle con clock icon. Article schema válido: @type=Article, timeRequired=PT3M.
+- Commit 09de1f1 (6 archivos, +267 líneas) pusheado a origin/main.
+
+Stage Summary:
+- Estado: estable y enriqueciéndose. Las subpáginas de features ahora tienen: TOC + progress bar + cross-nav + share + keyboard nav + reading time + Article schema + print stylesheet. Experiencia de lectura profesional.
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Back to top button con progreso circular (enriquecer el BackToTop existente)
+  (b) Prefetch de rutas /features/* al hover del megamenú (optimistic UI)
+  (c) /about y /faq podrían beneficiarse de TOC + reading time también
+  (d) FAQ schema (FAQPage JSON-LD) en /faq para rich-results de preguntas
+  (e) Open Graph images dinámicas por subpágina (og:image específico por eje)
