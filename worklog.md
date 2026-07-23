@@ -9355,3 +9355,24 @@ Stage Summary:
   * Gallery L86 ambient glow: per owner's explicit instruction, `bg-white`→`bg-[rgb(var(--divider))]` (kept neutral, not promoted to accent) so the glow remains a neutral luminance lift rather than a gold halo.
 - Left LEGIT (untouched): all 9 solid-white CTAs (Newsletter submit, DownloadCTA Windows button, Pricing "Most popular" badge + plan CTAs, ContactForm submit, HowItWorks step-number badge, CookieConsent dismiss, SkipLink focused state), all 3 colored-avatar `text-white` on `style={{ background: t.hue }}` saturated brand-color backings (TestimonialsWall L193, ValueTestimonials L194, SocialProof L151), all 14 JSDoc comment references (TechSpecs L23, Ticker L21+L35, ContactForm L24, PricingFAQ L27+L36, Pricing L362, Story L79, PremiumCard L9, Footer L43+L52+L155+L246+L303+L304), Navbar.tsx + Footer.tsx (already migrated), and demo/ (always-dark, out of scope).
 - Out-of-scope flag: ComparisonSlider.tsx (5 remaining matches) was flagged by the Task 3-d audit but was NOT in the owner's execution FILES-TO-EDIT list. Same for Skeleton.tsx, Chip.tsx, Eyebrow.tsx (also audit-flagged, also not in owner's list — these had 0 remaining matches in the rg verification because their hits use patterns outside the 8-token rg set OR they were already clean; verified no remaining matches in the rg output for them). Deferred for a follow-up task if desired.
+
+---
+Task ID: R9-FINAL
+Agent: main (Z.ai Code)
+Task: Fases 1-6 completas + verificación + push a main + cron webDevReview.
+
+Work Log:
+- Fase 1 (galerías completas): FeatureImage fit="contain" + nuevo WindowFrame (mockup ventana WinUI) + Gallery/DemoGallery rediseñadas con rejilla uniforme 16:10, caption bajo el frame (no overlay tapador).
+- Fase 2 (navbar edge-to-edge): píldora flotante → barra full-width con material acrylic premium (blur 24 + saturate 1.8, surface 80%→92% al scroll). Maquinaria intacta (megamenú, reloj UTC, toggles, drawer).
+- Fase 3 (legibilidad claro): .bg-veil en las 4 secciones (GuardianNew, DisciplineCost, MetricsShowcaseNew, RiskCalculator); --pos/--neg → rgb(var(--pnl-pos|neg)); a11y en RiskCalculator (aria-label range + aria-pressed chips); barrido grep migró ~95 hardcoded white/gray a tokens en 28 archivos (vía subagente full-stack). Excluidos demo interna, CTAs sólidos, avatares saturados, JSDoc.
+- Fase 4 (ComparisonSlider): lado "Después" recibe fondo sólido verde-tenue (paralelo al "Antes" rojo); chips/handle migrados a tokens; dirección verificada (izq=Antes rojo / der=Después verde).
+- Fase 5 (Wrapped): clamps vw → cqi (container queries, escalan con la card); máximos conservadores 2.75rem/2.25rem; min-w-0 + break-words; nueva utilidad .cq-wrap en globals.css.
+- Fase 6 (arquitectura Opción A): /features simplificado a overview; 3 nuevas páginas /features/metricas, /disciplina, /seguridad (page+loading+metadata+breadcrumb+PageHeader+FinalCTANew); megamenú, SideRail, sitemap migrados a rutas reales; SectionNav/YouAreHere eliminados.
+- Verificación: eslint 0 errores; tsc limpio (salvo examples/); next build → 15 rutas estáticas (12+3) en 9.3s; Agent Browser home dark+light renderiza sin errores de consola; VLM confirma navbar edge-to-edge + ojo visible + texto legible en AMBOS temas (sin lavado en claro).
+- Commit bc15a7e (52 archivos, +1141/-397) pusheado a origin/main con éxito (token classic con write).
+
+Stage Summary:
+- Los 6 problemas del dueño resueltos y verificados.
+- Sitio desplegado: https://mmortexx.github.io/JournalTradingWeb/ (Actions en verde desplegarán el nuevo main).
+- Decisiones de diseño respetadas: BackgroundFX intacto (2 backticks del FRAG preservados), acento verde institucional, .liquid-glass casi-opaco, precios Core $29/Pro $49, capturas reales, demo interna siempre-oscura.
+- Cron webDevReview cada 15 min creado para continuidad de QA y desarrollo.

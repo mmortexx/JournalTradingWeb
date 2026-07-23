@@ -63,3 +63,9 @@ r3*.png
 download/
 upload/
 db/custom.db
+
+# Sandbox-only helpers (not part of the project)
+.zscripts/run-dev.sh
+.zscripts/dev.log
+.zscripts/dev.pid
+.zscripts/start-dev-persistent.sh
