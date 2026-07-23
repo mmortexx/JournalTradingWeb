@@ -85,6 +85,87 @@ export function ShortcutsHelp() {
       keys: <Kbd>L</Kbd>,
       label: es ? "Cambiar idioma" : "Toggle language",
     },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>h</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Inicio" : "Go to Home",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>f</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Características" : "Go to Features",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>m</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Métricas" : "Go to Metrics",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>d</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Disciplina" : "Go to Discipline",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>s</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Seguridad" : "Go to Security",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>p</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Precios" : "Go to Pricing",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>e</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Demo" : "Go to Demo",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>a</Kbd>
+        </>
+      ),
+      label: es ? "Ir a Acerca de" : "Go to About",
+    },
+    {
+      keys: (
+        <>
+          <Kbd>g</Kbd>
+          <Kbd>q</Kbd>
+        </>
+      ),
+      label: es ? "Ir a FAQ" : "Go to FAQ",
+    },
   ];
 
   return (
