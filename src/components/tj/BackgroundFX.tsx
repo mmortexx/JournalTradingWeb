@@ -52,11 +52,14 @@ import { useEffect, useRef, useState } from "react";
  *    easing, doble parpadeo ocasional, cerrando desde la posición de
  *    reposo almendrada — el gesto que de verdad vende "esto está
  *    vivo", más que cualquier giro.
- *  - SCROLL: dilata la pupila muy sutilmente con la velocidad de
- *    desplazamiento y desplaza la mirada hacia abajo/arriba siguiendo
- *    el avance — el ojo "lee" la página contigo. La exposición baja
- *    apenas en el tramo medio (legibilidad del contenido) y recupera
- *    su máximo hacia el cierre.
+ *  - SCROLL POR FIJACIONES: el ojo está ANCLADO (no se desliza — eso
+ *    leía como parallax barato). Al detectar scroll hace UNA sacada
+ *    balística (160 ms) y FIJA la mirada abajo/arriba mientras dura;
+ *    al parar 500 ms, sacada de retorno al centro — el patrón
+ *    sacada→fijación de un ojo leyendo. La pupila no palpita con la
+ *    velocidad: recibe un pulso de atención al arrancar el gesto y
+ *    decae solo (τ≈0.9s). La exposición baja apenas en el tramo medio
+ *    (legibilidad) y recupera su máximo hacia el cierre.
  *  - PUNTERO: el ojo "mira" — desplazamiento ≤ 3.5 % del radio hacia
  *    el cursor (solo pointer:fine).
  *  - MICRO-SACADAS: cada 1,4-4 s, un flick rápido e involuntario a un
@@ -75,8 +78,10 @@ import { useEffect, useRef, useState } from "react";
  *  - prefers-reduced-motion: un único frame estático bien compuesto.
  *  - Sin WebGL: fallback CSS (gradientes radial+cónico que aproximan
  *    pupila, iris rojo→verde y radios del anillo).
- *  - Tema claro: exposición reducida y base clara (el ojo queda como
- *    marca de agua, no como foco).
+ *  - Tema claro: compuesto "tinta sobre papel" (over por presencia
+ *    geométrica). MISMO TONO que el oscuro: ambas ramas parten del
+ *    mismo richColor (saturación 1.6) — es una decisión de marca
+ *    pedida expresamente, no un accidente.
  *
  * Capas DOM por encima del canvas: halo superior, grain fractal y
  * viñeta — la misma pila del HTML de referencia.
@@ -174,9 +179,11 @@ void main() {
            * (1.0 + 0.10 * (1.0 - uBlink));
 
   /* Ondulación del iris: las fibras se anclan en la pupila y ondean
-     más hacia las puntas. Flujo acelera suavemente con el scroll. */
+     más hacia las puntas. Flujo CONSTANTE — acelerarlo con el scroll
+     era otro efecto pegado al input; el músculo del iris no va más
+     rápido porque tú muevas la rueda. */
   float sway = smoothstep(rp, 1.0, r);
-  float flowT = uTime * (0.045 + 0.05 * uDilate);
+  float flowT = uTime * 0.055;
   float wob = (anoise(a01, 3.0, r * 1.8 - flowT, vec2(31.7, 7.7)) - 0.5)
             * 0.16 * sway;
   float a01w = fract(a01 + wob / TAU * 6.0 + 1.0);
@@ -213,6 +220,13 @@ void main() {
 
     /* Afilar: de campo de ruido a filamentos densos y crujientes. */
     float strand = pow(fine, 3.0) * 2.35 * clump;
+
+    /* Collarette: el anillo de contracción de un iris real — la
+       frontera irregular entre la zona pupilar y la ciliar (~1.55·rp)
+       donde las fibras se apelmazan y brillan un punto más. El ancho
+       varía con el mechón para que no lea como circunferencia. */
+    float collar = exp(-pow((rw - rp * 1.55) / (0.05 + 0.02 * clump), 2.0));
+    strand *= 1.0 + collar * 0.4;
 
     /* Envolvente radial: incandescente junto a la pupila, se apaga
        hacia las puntas (la firma de la referencia). */
@@ -306,6 +320,14 @@ void main() {
   float blinkFactor = mix(1.0, mix(0.10, 1.0, lidMask), eyeZone);
   col *= blinkFactor;
 
+  /* Sombra del párpado superior: oclusión suave sobre la franja alta
+     del iris — un globo ocular real nunca recibe la misma luz arriba
+     (bajo el párpado) que abajo. Solo el hemisferio superior; asienta
+     el ojo en su cuenca en vez de flotar plano. */
+  float lidShadow = smoothstep(aperture - 0.34, aperture, p.y)
+                  * step(0.0, p.y) * eyeZone;
+  col *= 1.0 - 0.22 * lidShadow;
+
   /* ---- Niebla ambiental y bokeh ---- */
   float haze = (1.0 - smoothstep(0.15, 1.55, r));
   float wisp = fbm(p * 1.1 + vec2(uTime * 0.012, -uTime * 0.009));
@@ -359,7 +381,13 @@ void main() {
   float vig = smoothstep(1.65, 0.35, length((uv - 0.5) * vec2(res.x / res.y, 1.0) * 1.35));
   vec3 base = BG_DARK * mix(1.0, 0.72, vig * 0.8);
 
-  vec3 dark = base + col;
+  /* MISMO color en ambos temas: richColor (la saturación 1.6 que hacía
+     tan vívido el modo claro) es ahora la fuente única — el oscuro
+     dejaba de usarla y por eso su tono se veía distinto/apagado frente
+     al claro. A petición expresa: el tono del claro, también en oscuro. */
+  vec3 richColor = mix(vec3(luma), col, 1.6);
+
+  vec3 dark = base + richColor;
 
   /* Tema claro: TINTA sobre papel, no luz añadida sobre blanco.
      Medido con readPixels: la primera versión (BG_LIGHT*(1-luma*k) +
@@ -388,10 +416,11 @@ void main() {
          (rojo a 255 con verde/azul bajos sigue leyendo como "rojo
          vivo"), muy distinto a los tres canales clippeando juntos
          (eso sí lee como blanco, el bug anterior).
-     El tema oscuro no se toca: sigue siendo dark = base + col. */
+     richColor se declara antes de la rama oscura: desde el pivote de
+     "mismo tono en ambos temas" es la fuente ÚNICA de color de las
+     dos ramas. */
   float eyePresence = clamp(pupil + irisBand * 1.15 + halo * 1.3, 0.0, 1.0);
   eyePresence = max(eyePresence, luma * 0.9) * blinkFactor;
-  vec3 richColor = mix(vec3(luma), col, 1.6);
   vec3 light = mix(BG_LIGHT, richColor, eyePresence);
   vec3 outCol = mix(dark, light, uTheme);
 
@@ -510,8 +539,6 @@ export function BackgroundFX() {
     let t0 = last;
 
     let scrollS = 0; // progreso suavizado
-    let velS = 0; // velocidad suavizada
-    let dilate = 0;
     let lastY = window.scrollY;
     let lookX = 0;
     let lookY = 0;
@@ -521,15 +548,26 @@ export function BackgroundFX() {
     let theme = document.documentElement.dataset.theme === "light" ? 1 : 0;
 
     /* Parpadeo: primer blink a los ~3 s (tras el intro); después cada
-       4,5–9 s con doble parpadeo ocasional. Dirección de scroll
-       suavizada para que el ojo "siga" al contenido con la mirada. */
+       4,5–9 s con doble parpadeo ocasional. */
     let blinkStart = t0 - 9999;
     let nextBlink = t0 + 3000;
-    let dirS = 0;
     const hash01 = (x: number) => {
       const s = Math.sin(x * 0.001) * 43758.5453;
       return s - Math.floor(s);
     };
+
+    /* Mirada de scroll por FIJACIONES (sacada → fijación → retorno),
+       como un ojo que lee — sustituye al seguimiento elástico continuo
+       que daba bandazos pegados a la rueda. attention es el pulso de
+       dilatación de pupila: reacciona al ESTÍMULO (inicio de scroll)
+       y decae solo, en vez de palpitar con la velocidad. */
+    let gazeState = 0; // 0 = centro · 1 = leyendo hacia abajo · -1 = arriba
+    let gazeCur = 0;
+    let gazeFrom = 0;
+    let gazeTo = 0;
+    let gazeStart = t0 - 9999;
+    let lastScrollActive = 0;
+    let attention = 0;
 
     /* Micro-sacadas: un ojo real nunca queda perfectamente quieto —
        cada 1,4–4 s hace un flick rápido e involuntario a un punto
@@ -581,17 +619,44 @@ export function BackgroundFX() {
     const draw = (now: number, dt: number) => {
       const t = (now - t0) / 1000;
 
-      /* Scroll: progreso + velocidad → dilatación. */
+      /* Scroll: progreso suavizado (solo para la exposición por tramo). */
       const prog01 = scrollProgress();
       scrollS = damp(scrollS, prog01, 3.2, dt);
       const dy = window.scrollY - lastY;
       lastY = window.scrollY;
-      const v = Math.min(1.4, Math.abs(dy) / Math.max(1, window.innerHeight) / (dt / 1000 + 1e-4) / 2.2);
-      velS = v > velS ? damp(velS, v, 9, dt) : damp(velS, v, 2.2, dt);
-      dilate = Math.min(1, velS);
 
-      /* Mirada de scroll: el ojo baja/sube la vista con el contenido. */
-      dirS = damp(dirS, Math.max(-1, Math.min(1, dy / 14)), 6, dt);
+      /* Mirada de scroll por FIJACIONES: al detectar desplazamiento
+         sostenido, UNA sacada balística (160 ms, easeOutQuart) hacia
+         abajo/arriba y la mirada queda FIJADA ahí mientras dure el
+         scroll; a los 500 ms de parar, sacada de retorno al centro.
+         Es el patrón sacada→fijación de un ojo leyendo — nada de
+         deslizamiento elástico pegado a la velocidad de la rueda.
+         El pulso de atención dilata la pupila al ARRANCAR el gesto
+         (reflejo al estímulo) y decae solo (τ ≈ 0.9 s). */
+      const scrolling = Math.abs(dy) > 2;
+      if (scrolling) lastScrollActive = now;
+      if (!reduce) {
+        const dir = dy > 0 ? 1 : -1;
+        if (scrolling && gazeState !== dir) {
+          gazeState = dir;
+          gazeFrom = gazeCur;
+          gazeTo = dir > 0 ? -0.3 : 0.24;
+          gazeStart = now;
+          attention = Math.min(1, attention + 0.75);
+        } else if (
+          !scrolling &&
+          gazeState !== 0 &&
+          now - lastScrollActive > 500
+        ) {
+          gazeState = 0;
+          gazeFrom = gazeCur;
+          gazeTo = 0;
+          gazeStart = now;
+        }
+        const gk = Math.min(1, (now - gazeStart) / 160);
+        gazeCur = gazeFrom + (gazeTo - gazeFrom) * (1 - Math.pow(1 - gk, 4));
+        attention *= Math.exp(-dt / 900);
+      }
 
       /* Mirada con inercia. */
       lookX = damp(lookX, lookTX, 4.5, dt);
@@ -655,21 +720,21 @@ export function BackgroundFX() {
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform1f(uni.uTime, reduce ? 13.7 : t);
       gl.uniform1f(uni.uScroll, scrollS);
-      gl.uniform1f(uni.uDilate, reduce ? 0 : dilate);
+      gl.uniform1f(uni.uDilate, reduce ? 0 : attention);
       gl.uniform2f(
         uni.uLook,
         (finePointer ? lookX : 0) + saccadeX,
-        (finePointer ? lookY : 0) - 0.35 * dirS + saccadeY
+        (finePointer ? lookY : 0) + gazeCur + saccadeY
       );
       gl.uniform1f(uni.uBlink, reduce ? 1 : open);
       gl.uniform1f(uni.uIntro, introE);
       gl.uniform1f(uni.uExposure, exposure);
       gl.uniform1f(uni.uTheme, theme);
-      /* En el hero el ojo asoma la pupila por encima del titular
-         (43 % desde arriba) y baja al centro al entrar el contenido.
-         gl_FragCoord tiene el eje Y invertido → 1 - yVisual. */
-      const eyeTop = smoothstep01(scrollS / 0.22);
-      gl.uniform1f(uni.uEyeY, 1 - (0.43 + 0.07 * eyeTop));
+      /* Centro FIJO (46 % desde arriba): el ojo es un observador
+         anclado — no se desliza con el scroll (aquello leía como
+         parallax barato); te sigue solo con la MIRADA. gl_FragCoord
+         tiene el eje Y invertido → 1 - yVisual. */
+      gl.uniform1f(uni.uEyeY, 1 - 0.46);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
