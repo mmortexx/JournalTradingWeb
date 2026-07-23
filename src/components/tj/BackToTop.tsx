@@ -99,7 +99,11 @@ export function BackToTop() {
               strokeWidth="1.5"
               fill="none"
             />
-            {/* Progress — accent, dashoffset = (1 - pct) * circumference */}
+            {/* Progress — accent, dashoffset = (1 - pct) * circumference.
+                A subtle drop-shadow glow on the progress arc makes it
+                read as "active" against the liquid-glass button surface.
+                The glow intensifies on hover via the parent button's
+                group-hover. */}
             <circle
               cx="22"
               cy="22"
@@ -110,7 +114,10 @@ export function BackToTop() {
               fill="none"
               strokeDasharray={RING_CIRCUMFERENCE}
               strokeDashoffset={dashOffset}
-              style={{ transition: "stroke-dashoffset 0.1s linear" }}
+              style={{
+                transition: "stroke-dashoffset 0.1s linear, filter 0.2s ease",
+                filter: "drop-shadow(0 0 2px rgb(var(--accent-base) / 0.5))",
+              }}
             />
           </svg>
           {/* Arrow icon — sits above the ring */}

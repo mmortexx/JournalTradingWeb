@@ -3,6 +3,11 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
+import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
+
+// Estimated reading time (capabilities + demo + gallery + stats + ready-to-buy).
+// ~400 words at 220 wpm = ~2 min.
+const READING_TIME_MIN = 2;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -103,11 +108,13 @@ export default function DemoPage() {
         subtitleEn="This isn't a video: it's the app, recreated. Click the tabs, explore the pages. Data is sample data, just like the real app."
         breadcrumbEs="Demo"
         breadcrumbEn="Demo"
+        readingTimeMin={READING_TIME_MIN}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <ReadingProgressIndicator />
       {/* What you can do — 6 feature cards previewing the demo */}
       <DemoCapabilities />
       <section className="section bg-veil scroll-mt-16">

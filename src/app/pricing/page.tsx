@@ -3,6 +3,13 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { GuaranteeBanner } from "@/components/marketing/GuaranteeBanner";
 import { Pricing } from "@/components/marketing/Pricing";
+import { TableOfContents } from "@/components/tj/TableOfContents";
+import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
+
+// Estimated reading time (guarantee + pricing cards + comparison + pricing FAQ +
+// trust strip + testimonials + stats + newsletter + download CTA).
+// ~850 words at 220 wpm = ~4 min.
+const READING_TIME_MIN = 4;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -119,11 +126,13 @@ export default function PricingPage() {
         subtitleEn="No subscriptions. No cloud. No losing access to your history if you stop paying. 30-day no-questions refund guarantee."
         breadcrumbEs="Precios"
         breadcrumbEn="Pricing"
+        readingTimeMin={READING_TIME_MIN}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <ReadingProgressIndicator />
       {/* Prominent 30-day money-back guarantee banner — sits between the
           page header and the pricing cards to reinforce the no-risk promise
           before the visitor even sees the prices. */}
@@ -144,6 +153,7 @@ export default function PricingPage() {
           next action (download the desktop app). */}
       <DownloadCTA />
       <FinalCTANew />
+      <TableOfContents />
     </>
   );
 }
