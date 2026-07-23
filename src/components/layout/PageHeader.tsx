@@ -160,6 +160,19 @@ export function PageHeader({
           </p>
         </FadeIn>
       </div>
+
+      {/* Accent gradient divider — a 1px hairline that transitions from
+          transparent → accent → transparent. Reads as a "machined edge"
+          that separates the header from the first content section with
+          a quiet brand-colored cue. Theme-aware via --accent-base. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 8%, rgb(var(--accent-base) / 0.35) 38%, rgb(var(--accent-base) / 0.5) 50%, rgb(var(--accent-base) / 0.35) 62%, transparent 92%)",
+        }}
+      />
     </section>
   );
 }

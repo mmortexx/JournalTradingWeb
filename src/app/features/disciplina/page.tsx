@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
@@ -79,6 +80,7 @@ export default function DisciplinaPage() {
       <DisciplineCost num="02" />
       <BeforeAfter />
       <ComparisonSlider />
+      <FeaturePageNav current="disciplina" />
       <FinalCTANew />
     </>
   );
