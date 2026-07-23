@@ -54,13 +54,16 @@ type Page = {
 };
 
 /**
- * The 6 site routes. Granular per-section sub-commands and the recent-visit
- * tracker were intentionally removed to keep the palette minimal and
- * uncluttered — the 6-page nav list is enough for a marketing site.
+ * The site routes. Includes the 3 feature subpages (metricas, disciplina,
+ * seguridad) so the command palette offers full keyboard navigation to
+ * every content page — complements the 'g' + letter shortcuts.
  */
 const PAGES: Page[] = [
   { path: "/", es: "Inicio", en: "Home" },
   { path: "/features", es: "Características", en: "Features" },
+  { path: "/features/metricas", es: "Métricas", en: "Metrics" },
+  { path: "/features/disciplina", es: "Disciplina", en: "Discipline" },
+  { path: "/features/seguridad", es: "Seguridad", en: "Security" },
   { path: "/demo", es: "Demo", en: "Demo" },
   { path: "/pricing", es: "Precios", en: "Pricing" },
   { path: "/about", es: "Acerca de", en: "About" },

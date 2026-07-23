@@ -126,6 +126,15 @@ export function GlobalShortcuts() {
         return;
       }
 
+      // Escape cancels an active 'g' prefix explicitly — so the user
+      // can disarm the two-key sequence without waiting for the 1s
+      // timeout. No-op if the prefix isn't armed.
+      if (key === "Escape" && gPrefixActive.current) {
+        e.preventDefault();
+        disarmPrefix();
+        return;
+      }
+
       // Single-character keys only.
       if (key.length !== 1) return;
 
