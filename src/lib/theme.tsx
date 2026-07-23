@@ -10,24 +10,17 @@ import {
 } from "react";
 
 export type Theme = "dark" | "light";
-export type PaletteName = "oro" | "esmeralda" | "onix" | "aurora" | "seda";
+/* Tras el rediseño solo hay una paleta (verde institucional #34B476).
+   El tipo se mantiene como union literal para que el anti-FOUC script y
+   data-palette sigan funcionando sin rupturas. */
+export type PaletteName = "verde";
 
 export const PALETTES: {
   name: PaletteName;
   light: string;
   dark: string;
-  labelKey:
-    | "palGold"
-    | "palEmerald"
-    | "palOnyx"
-    | "palAurora"
-    | "palSilk";
 }[] = [
-  { name: "onix", light: "#45505E", dark: "#8291AF", labelKey: "palOnyx" },
-  { name: "seda", light: "#39566A", dark: "#6D94B0", labelKey: "palSilk" },
-  { name: "esmeralda", light: "#2D766A", dark: "#5CC1B0", labelKey: "palEmerald" },
-  { name: "aurora", light: "#5B356E", dark: "#9C68B6", labelKey: "palAurora" },
-  { name: "oro", light: "#8A6C35", dark: "#C7A76B", labelKey: "palGold" },
+  { name: "verde", light: "#0F8A56", dark: "#34B476" },
 ];
 
 interface ThemeCtx {
@@ -45,8 +38,12 @@ function readSavedTheme(): Theme {
   return (localStorage.getItem("tj-theme") as Theme) || "dark";
 }
 function readSavedPalette(): PaletteName {
-  if (typeof window === "undefined") return "oro";
-  return (localStorage.getItem("tj-palette") as PaletteName) || "oro";
+  if (typeof window === "undefined") return "verde";
+  // Acepta el valor legacy (oro/esmeralda/...) leyendo del localStorage,
+  // pero siempre resuelve a "verde" tras el rediseño. Si en el futuro
+  // vuelve a haber varias paletas, restaurar la lógica del switch aquí.
+  localStorage.getItem("tj-palette");
+  return "verde";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -54,7 +51,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // The inline script in layout.tsx already applied the DOM attributes before
   // paint, so there's no visual flash. We sync to localStorage after mount.
   const [theme, setTheme] = useState<Theme>("dark");
-  const [palette, setPalette] = useState<PaletteName>("oro");
+  const [palette, setPalette] = useState<PaletteName>("verde");
   const [mounted, setMounted] = useState(false);
 
   // Read saved preferences once after mount (standard theme hydration pattern).

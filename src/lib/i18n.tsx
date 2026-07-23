@@ -293,11 +293,13 @@ export const STR = {
   },
 
   // ---- Accent palette names ----
-  palGold: { es: "Oro", en: "Gold" },
-  palEmerald: { es: "Esmeralda", en: "Emerald" },
-  palOnyx: { es: "Ónix", en: "Onyx" },
-  palAurora: { es: "Aurora", en: "Aurora" },
-  palSilk: { es: "Seda", en: "Silk" },
+  // Tras el rediseño solo hay una paleta (verde). Las claves quedan para
+  // no romper referencias pero ya no se renderizan en la UI.
+  palGold: { es: "Verde", en: "Green" },
+  palEmerald: { es: "Verde", en: "Green" },
+  palOnyx: { es: "Verde", en: "Green" },
+  palAurora: { es: "Verde", en: "Green" },
+  palSilk: { es: "Verde", en: "Green" },
 
   // ---- Features (marketing) ----
   featuresEyebrow: { es: "Por qué es distinto", en: "Why it's different" },

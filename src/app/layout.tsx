@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
@@ -26,7 +26,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#C7A76B",
+  themeColor: "#34B476",
 };
 
 const geistSans = Geist({
@@ -39,10 +39,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+/* Tras el rediseño, Instrument Sans reemplaza Inter como sans por defecto
+   (--font-sans) e Instrument Serif se añade como serif (--font-serif)
+   para los titulares "hero" del HTML. Las features Inter (ss01/cv11) se
+   eliminan en globals.css al ser Inter-specific. */
+const instrumentSans = Instrument_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
@@ -74,7 +87,7 @@ const softwareApplicationSchema = {
     {
       "@type": "Offer",
       name: "Core",
-      price: "149",
+      price: "29",
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
       url: `${SITE_URL}/pricing/`,
@@ -82,7 +95,7 @@ const softwareApplicationSchema = {
     {
       "@type": "Offer",
       name: "Pro",
-      price: "249",
+      price: "49",
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
       url: `${SITE_URL}/pricing/`,
@@ -210,17 +223,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning className="dark" data-theme="dark" data-palette="oro">
+    <html lang="es" suppressHydrationWarning className="dark" data-theme="dark" data-palette="verde">
       <head>
         <script
           // Prevent FOUC: apply saved theme/palette before paint
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('tj-theme')||'dark';var p=localStorage.getItem('tj-palette')||'oro';document.documentElement.dataset.theme=t;document.documentElement.dataset.palette=p;if(t==='dark')document.documentElement.classList.add('dark');}catch(e){document.documentElement.dataset.theme='dark';document.documentElement.dataset.palette='oro';}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('tj-theme')||'dark';var p=localStorage.getItem('tj-palette')||'verde';document.documentElement.dataset.theme=t;document.documentElement.dataset.palette=p;if(t==='dark')document.documentElement.classList.add('dark');}catch(e){document.documentElement.dataset.theme='dark';document.documentElement.dataset.palette='verde';}})();`,
           }}
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSans.variable} ${instrumentSerif.variable} antialiased`}
       >
         <script
           type="application/ld+json"

@@ -11,13 +11,15 @@ const config: Config = {
   theme: {
         extend: {
                 fontFamily: {
-                        // Inter is loaded via next/font/google in src/app/layout.tsx and
-                        // exposed as the `--font-inter` CSS variable. Listing it first
-                        // (with Geist Sans as the v4 fallback, then native system-ui)
-                        // guarantees every element that resolves `font-sans` — whether
-                        // through the @theme `--font-sans` token in globals.css or
-                        // through this legacy v3-style config — renders in Inter first.
-                        sans: ['var(--font-inter)', 'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+                        // Instrument Sans es la sans principal tras el rediseño,
+                        // cargada via next/font/google en src/app/layout.tsx y expuesta
+                        // como `--font-sans`. Geist Sans queda como fallback, y
+                        // system-ui como último recurso. Esto mantiene coherencia con
+                        // el token `--font-sans` declarado en `@theme inline` dentro
+                        // de globals.css (Tailwind v4 lo lee de ahí en realidad, pero
+                        // mantener la config v3 sincronizada evita drift).
+                        sans: ['var(--font-sans)', 'var(--font-geist-sans)', '"Segoe UI Variable"', 'system-ui', 'sans-serif'],
+                        serif: ['var(--font-serif)', 'Georgia', 'serif'],
                 },
                 colors: {
                         background: 'hsl(var(--background))',

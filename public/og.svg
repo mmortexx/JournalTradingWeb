@@ -10,8 +10,8 @@
       <stop offset="1" stop-color="#101216"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.85" cy="0.12" r="0.65">
-      <stop offset="0" stop-color="#C7A76B" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#C7A76B" stop-opacity="0"/>
+      <stop offset="0" stop-color="#34B476" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#34B476" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="glow2" cx="0.05" cy="1" r="0.6">
       <stop offset="0" stop-color="#5CC1B0" stop-opacity="0.06"/>
@@ -20,21 +20,21 @@
 
     <!-- Equity curve stroke: warm gold gradient -->
     <linearGradient id="curveStroke" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#C7A76B" stop-opacity="0.55"/>
-      <stop offset="0.55" stop-color="#D6BC85"/>
+      <stop offset="0" stop-color="#34B476" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#5FD196"/>
       <stop offset="1" stop-color="#F0DCAA"/>
     </linearGradient>
 
     <!-- Equity curve fill: gold fading down to transparent -->
     <linearGradient id="curveFill" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#C7A76B" stop-opacity="0.32"/>
-      <stop offset="1" stop-color="#C7A76B" stop-opacity="0"/>
+      <stop offset="0" stop-color="#34B476" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#34B476" stop-opacity="0"/>
     </linearGradient>
 
     <!-- Brand mark stroke -->
     <linearGradient id="markStroke" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#D6BC85"/>
-      <stop offset="1" stop-color="#C7A76B"/>
+      <stop offset="0" stop-color="#5FD196"/>
+      <stop offset="1" stop-color="#34B476"/>
     </linearGradient>
   </defs>
 
@@ -53,7 +53,7 @@
 
   <!-- Brand mark (top-left): rounded square + stylized "Z" -->
   <g transform="translate(80,76)">
-    <rect x="0" y="0" width="48" height="48" rx="10" fill="none" stroke="#C7A76B" stroke-opacity="0.45" stroke-width="1.5"/>
+    <rect x="0" y="0" width="48" height="48" rx="10" fill="none" stroke="#34B476" stroke-opacity="0.45" stroke-width="1.5"/>
     <path d="M14,16 L34,16 L14,32 L34,32" fill="none" stroke="url(#markStroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
@@ -65,7 +65,7 @@
     <path d="M640,440 C700,435 740,420 780,400 C820,380 852,412 900,360 C940,318 972,344 1020,288 C1060,244 1100,236 1140,212 L1140,460 L640,460 Z" fill="url(#curveFill)"/>
     <path d="M640,440 C700,435 740,420 780,400 C820,380 852,412 900,360 C940,318 972,344 1020,288 C1060,244 1100,236 1140,212" fill="none" stroke="url(#curveStroke)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
     <!-- Soft halo + node at the curve's leading edge -->
-    <circle cx="1140" cy="212" r="14" fill="#C7A76B" fill-opacity="0.18"/>
+    <circle cx="1140" cy="212" r="14" fill="#34B476" fill-opacity="0.18"/>
     <circle cx="1140" cy="212" r="6" fill="#F0DCAA"/>
     <circle cx="1140" cy="212" r="2.5" fill="#121418"/>
   </g>

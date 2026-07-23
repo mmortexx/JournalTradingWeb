@@ -14,12 +14,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* Tailwind v4 reads `--font-sans` here to resolve the `font-sans` utility
-     (and any element that opts into it). Putting Inter first makes the
-     utility resolve to Inter everywhere, with the system Geist Sans as
-     a high-quality fallback if the Inter webfont hasn't loaded yet.
-     Matches the body { font-family } cascade in @layer base below. */
-  --font-sans: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+  /* Tailwind v4 reads `--font-sans` / `--font-serif` / `--font-mono` here
+     to resolve the corresponding `font-*` utilities. Tras el rediseño
+     Instrument Sans es la sans principal (la siguiente fuente usada por
+     el body), con Geist Sans como fallback si la webfont aún no ha
+     cargado. Instrument Serif queda disponible como `font-serif` para
+     titulares editoriales. */
+  --font-sans: var(--font-sans), var(--font-geist-sans), "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --font-serif: var(--font-serif), "Newsreader", Georgia, "Times New Roman", serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -72,19 +74,19 @@
   --color-divider: rgb(var(--divider));
 }
 
-/* ===== Default: Oro (gold) — DARK theme ===== */
+/* ===== Default: Verde institucional — DARK theme ===== */
 :root {
   --radius: 0.625rem;
 
-  /* Accent — gold (#C7A76B), matching the user-uploaded golden/esmeralda
-     luxury imagery (dark backdrop, gold pathway hero). Default now points
-     at the "oro" palette (data-palette="oro"), so these :root values are
-     the SSR-safe fallback that already mirrors oro so the first paint is
-     gold even before the palette selector applies. */
-  --accent-base: 199 167 107; /* #C7A76B — gold */
-  --accent-hover: 214 188 133; /* #D6BC85 */
-  --accent-pressed: 176 144 90; /* #B0905A */
-  --accent-soft: 199 167 107;
+  /* Accent — verde (#34B476), default tras el rediseño. La paleta se llama
+     "verde" y se aplica via data-palette="verde". Estos valores en :root
+     son el SSR-safe fallback que ya refleja la nueva paleta para que el
+     primer paint salga verde aunque el script anti-FOUC aún no haya
+     aplicado el data-palette. */
+  --accent-base: 52 180 118; /* #34B476 — verde institucional */
+  --accent-hover: 95 209 150; /* #5FD196 */
+  --accent-pressed: 21 92 60; /* #155C3C */
+  --accent-soft: 52 180 118;
 
   /* P&L — slightly brighter green (Emerald-400 / #34D399) and slightly
      deeper red (Red-600 / #EF4444) so positive/negative figures read
@@ -216,46 +218,18 @@
   --ring: rgb(var(--accent-base));
 }
 
-/* ===== Accent per palette ===== */
-:root[data-palette="oro"] {
-  --accent-base: 199 167 107; --accent-hover: 214 188 133; --accent-pressed: 176 144 90; --accent-soft: 199 167 107;
-  --tint: 32 30 27;
+/* ===== Accent: paleta única "verde" =====
+   Tras el rediseño solo hay una paleta (verde institucional #34B476).
+   El atributo data-palette se mantiene para no romper selectores que lo
+   consultan, pero ya no hay variantes. Si en el futuro se añaden más
+   paletas, restaurar el formato de bloques por nombre. */
+:root[data-palette="verde"] {
+  --accent-base: 52 180 118; --accent-hover: 95 209 150; --accent-pressed: 21 92 60; --accent-soft: 52 180 118;
+  --tint: 11 12 13;
 }
-:root[data-theme="light"][data-palette="oro"] {
-  --accent-base: 138 108 53; --accent-hover: 113 88 31; --accent-pressed: 92 71 24;
-  --tint: 247 244 238;
-}
-:root[data-palette="esmeralda"] {
-  --accent-base: 92 193 176; --accent-hover: 110 206 191; --accent-pressed: 78 165 150; --accent-soft: 92 193 176;
-  --tint: 27 32 31;
-}
-:root[data-theme="light"][data-palette="esmeralda"] {
-  --accent-base: 45 118 106; --accent-hover: 36 95 86; --accent-pressed: 28 75 68;
-  --tint: 238 247 246;
-}
-:root[data-palette="onix"] {
-  --accent-base: 130 145 175; --accent-hover: 145 160 190; --accent-pressed: 110 125 155; --accent-soft: 130 145 175;
-  --tint: 18 20 24;
-}
-:root[data-theme="light"][data-palette="onix"] {
-  --accent-base: 69 80 94; --accent-hover: 55 64 75; --accent-pressed: 44 51 60;
-  --tint: 248 250 252;
-}
-:root[data-palette="aurora"] {
-  --accent-base: 156 104 182; --accent-hover: 172 120 196; --accent-pressed: 132 88 154; --accent-soft: 156 104 182;
-  --tint: 30 27 33;
-}
-:root[data-theme="light"][data-palette="aurora"] {
-  --accent-base: 91 53 110; --accent-hover: 73 42 88; --accent-pressed: 58 33 70;
-  --tint: 244 238 247;
-}
-:root[data-palette="seda"] {
-  --accent-base: 109 148 176; --accent-hover: 125 162 188; --accent-pressed: 92 126 150; --accent-soft: 109 148 176;
-  --tint: 27 31 35;
-}
-:root[data-theme="light"][data-palette="seda"] {
-  --accent-base: 57 86 106; --accent-hover: 46 69 85; --accent-pressed: 36 54 67;
-  --tint: 238 243 247;
+:root[data-theme="light"][data-palette="verde"] {
+  --accent-base: 15 138 86; --accent-hover: 18 160 102; --accent-pressed: 12 110 70;
+  --tint: 243 242 236;
 }
 
 /* Keep shadcn `.dark` variant in sync with data-theme dark */
@@ -275,20 +249,14 @@
   }
   body {
     color: rgb(var(--txt-primary));
-    font-family: var(--font-inter), var(--font-geist-sans), "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
-    /* Institutional fintech font features:
+    font-family: var(--font-sans), var(--font-geist-sans), "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    /* Institutional fintech font features (después del rediseño):
        - `tnum` 1  → tabular figures so every numeric column lines up
          digit-for-digit (financial tables, KPI tiles, equity curves).
-       - `ss01` 1  → Inter Stylistic Set 1: refined lowercase letterforms
-         (open '4' with closed top, straighter 'l') — the
-         Stripe/Linear/Bloomberg-tuned glyph set.
-       - `cv11` 1  → Inter Character Variant 11: single-story 'a' (no
-         overhang) which reads cleaner at small UI sizes and aligns the
-         brand with the geometric-neutral feel of Linear/Vercel.
-       These cascade through every size; .tnum below re-declares tnum
-       + zero so individual numeric spans stay correct even when a
-       Tailwind utility overrides font-feature-settings elsewhere. */
-    font-feature-settings: "tnum" 1, "ss01" 1, "cv11" 1;
+       .tnum más abajo re-declara tnum + zero para spans numéricos. Las
+       features Inter-specific (ss01, cv11) se eliminaron al cambiar la
+       fuente a Instrument Sans, que no las soporta. */
+    font-feature-settings: "tnum" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.4s ease, color 0.4s ease;
