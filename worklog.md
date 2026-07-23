@@ -9506,3 +9506,32 @@ Stage Summary:
   (c) /features overview podría beneficiarse de TOC (tiene FeaturesBento + Gallery + HowItWorks + MoreFeatures)
   (d) Schema Product + Offer en /pricing (rich-results de precios)
   (e) Keyboard shortcut "g" + letra para navegar entre páginas (g m = métricas, etc.)
+
+---
+Task ID: R10-cron-6
+Agent: main (Z.ai Code) — cron webDevReview round 6
+Task: Product+Offer schema en /pricing + prefetch optimista en megamenú.
+
+Work Log:
+- QA: build estático 15/15 rutas.
+- Mejoras implementadas:
+  1. Product + Offer schema (JSON-LD) en /pricing: @type=Product con dos Offers (Core $29 USD, Pro $49 USD, one-time, InStock, priceValidUntil 2026-12-31). Habilita rich-results de precios en el SERP — Google ahora puede mostrar el snippet de precio bajo el listing de /pricing. Precios espejan los valores fijados por el dueño (NUNCA 149/249). Descripciones matchean las features reales de cada tier.
+  2. Prefetch optimista en hover del megamenú: los items de "Producto" ahora inyectan un <link rel="prefetch"> al hacer hover, de modo que la ruta destino ya está en el cache del navegador cuando el visitante hace click. Idempotente (chequea por id antes de añadir). Da navegación casi instantánea desde el megamenú en conexiones lentas sin forzar prefetch de todas las rutas al cargar la página.
+- Verificación: eslint 0 errores, tsc limpio, build 15/15 rutas. curl confirma HTML de pricing contiene @type=Product con price 29 y 49, 2 scripts JSON-LD (breadcrumb + product).
+- Commit 9f95a8f (2 archivos, +62 líneas) pusheado a origin/main.
+
+Stage Summary:
+- Estado: SEO enriquecido + perf optimizada. /pricing ahora tiene breadcrumb + product+offer schemas. Megamenú hace prefetch optimista. Todas las páginas tienen TOC/reading time/progress bar coherentes.
+- Schema coverage total del sitio:
+  / — Organization schema (layout)
+  /features/* — Breadcrumb + Article schema (con timeRequired ISO 8601)
+  /about — Breadcrumb
+  /faq — Breadcrumb + FAQPage schema (16 Q&A)
+  /pricing — Breadcrumb + Product+Offer schema ($29/$49)
+  /demo — Breadcrumb
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Open Graph images dinámicas por subpágina (og:image específico por eje)
+  (b) /features overview podría beneficiarse de TOC
+  (c) Keyboard shortcut "g" + letra para navegar entre páginas (g m = métricas)
+  (d) BreadcrumbList con 3 niveles en /features/* (ya tiene 3: Inicio/Características/eje)
+  (e) Review schema (AggregateRating) en /pricing si hay testimonials verificables
