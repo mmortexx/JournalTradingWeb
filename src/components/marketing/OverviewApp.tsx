@@ -24,7 +24,17 @@ export function OverviewApp() {
     <section
       id="overview"
       className="relative overflow-hidden"
-      style={{ padding: "118px 40px 56px" }}
+      style={{
+        // R21-3a — responsive padding so the section breathes on large
+        // desktops and tightens on mobile. The prior fixed 118/40/56
+        // left 80px of horizontal padding on a 375px viewport (only
+        // 295px of content) and 118px of top padding pushing the whole
+        // frame awkwardly down on small screens. clamp() scales all
+        // three axes smoothly between mobile (64/20/48) and desktop
+        // (118/40/56) floors/caps.
+        padding:
+          "clamp(64px, 9vw, 118px) clamp(20px, 4vw, 40px) clamp(48px, 5vw, 56px)",
+      }}
     >
       {/* Halo derecho superior */}
       <div
@@ -119,7 +129,12 @@ export function OverviewApp() {
               transition={{ duration: 0.5 }}
               className="font-serif m-0"
               style={{
-                fontSize: "clamp(2.4rem, 3.3vw, 3.9rem)",
+                // R21-3a — mobile min dropped 2.4rem -> 2rem so the
+                // forced first line "Todo tu día de trading," (≈22 chars)
+                // fits inside the 327px mobile content box without
+                // clipping. The vw scale (3.3vw) is preserved so the
+                // type still grows to 3.9rem on wide viewports.
+                fontSize: "clamp(2rem, 3.3vw, 3.9rem)",
                 lineHeight: 1,
                 letterSpacing: "-0.02em",
                 color: "var(--ink)",
@@ -169,7 +184,7 @@ export function OverviewApp() {
               )}
             </motion.h2>
             <p
-              className="mt-7 mb-0"
+              className="mt-7 mb-0 break-words"
               style={{
                 maxWidth: "33em",
                 fontSize: "clamp(1.02rem, 1.35vw, 1.16rem)",
@@ -181,10 +196,13 @@ export function OverviewApp() {
                 ? "El diario que mide con el rigor de una mesa profesional: las métricas que de verdad importan, disciplina que te frena antes del error y tus datos —siempre— en tu máquina."
                 : "The journal that measures with the rigour of a professional desk: the metrics that actually matter, discipline that brakes you before the error, and your data —always— on your machine."}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            {/* R21-3a — CTA buttons stack vertically full-width on
+                mobile (375px) so neither pill overflows; side by side
+                on >= sm. Mirrors the Hero CTA pattern. */}
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <a
                 href="/pricing"
-                className="inline-flex items-center gap-2.5 rounded-[11px] relative overflow-hidden"
+                className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px] relative overflow-hidden"
                 style={{
                   height: 52,
                   padding: "0 26px",
@@ -213,7 +231,7 @@ export function OverviewApp() {
               </a>
               <a
                 href="/demo"
-                className="inline-flex items-center gap-2.5 rounded-[11px]"
+                className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px]"
                 style={{
                   height: 52,
                   padding: "0 24px",
@@ -523,18 +541,26 @@ export function OverviewApp() {
                     {es ? "Cómo va tu operativa" : "How your trading is going"}
                   </div>
                   {/* 4 KPIs */}
+                  {/* 4 KPIs. R21-3a — grid drops to 2 cols on mobile
+                      (375px) so the value strings (e.g. "+5.732,24 $"
+                      at 17px/700 ≈ 130px) don't overflow a 57px tile.
+                      Each tile gets its own bg; the container bg bleeds
+                      through the 1px gap as a hairline divider in any
+                      layout (replaces the per-tile borderLeft which
+                      only worked for the 4-col case). */}
                   <div
-                    className="mt-3 grid grid-cols-4 overflow-hidden"
+                    className="mt-3 grid grid-cols-2 sm:grid-cols-4 overflow-hidden"
                     style={{
                       border: "1px solid rgb(var(--divider) / 0.06)",
                       borderRadius: 11,
-                      background: "color-mix(in oklab, var(--surface-2) 45%, transparent)",
+                      background: "rgb(var(--divider) / 0.06)",
+                      gap: 1,
                     }}
                   >
                     <Kpi label={es ? "P&L total" : "Total P&L"} value="+5.732,24 $" color="var(--pos)" />
-                    <Kpi label="Win rate" value="50 %" color="var(--ink)" border />
-                    <Kpi label="Expectancy" value="+28,66 $" color="var(--pos)" border />
-                    <Kpi label="Profit factor" value="1,56" color="var(--ink)" border />
+                    <Kpi label="Win rate" value="50 %" color="var(--ink)" />
+                    <Kpi label="Expectancy" value="+28,66 $" color="var(--pos)" />
+                    <Kpi label="Profit factor" value="1,56" color="var(--ink)" />
                   </div>
                   {/* Curva + calendario */}
                   <div className="mt-2.5 grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-2.5">
@@ -649,7 +675,10 @@ export function OverviewApp() {
                   </span>
                 </div>
               </div>
-              <div className="mt-3 flex items-center justify-between gap-1.5">
+              {/* R21-3a — stack the caption + explore link vertically
+                  on mobile; the 47-char Spanish caption (~235px) + the
+                  18-char link (~110px) don't fit on one 327px line. */}
+              <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-1.5">
                 <span className="tnum" style={{ fontSize: 10, color: "var(--ink-3)" }}>
                   {es ? "Vista Resumen · datos de muestra deterministas" : "Summary view · deterministic sample data"}
                 </span>
@@ -669,18 +698,21 @@ function Kpi({
   label,
   value,
   color,
-  border,
 }: {
   label: string;
   value: string;
   color: string;
-  border?: boolean;
+  // `border` prop removed R21-3a — dividers are now handled by the
+  // grid container's 1px gap + background bleed-through, which works
+  // cleanly in both the 2-col mobile and 4-col desktop layouts (the
+  // old per-tile borderLeft produced a phantom vertical hairline at
+  // the start of row 2 when the grid dropped to 2 cols on mobile).
 }) {
   return (
     <div
       style={{
         padding: "10px 12px",
-        borderLeft: border ? "1px solid rgb(var(--divider) / 0.06)" : undefined,
+        background: "color-mix(in oklab, var(--surface-2) 45%, transparent)",
       }}
     >
       <div

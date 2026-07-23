@@ -48,7 +48,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               "inset 0 1px 0 rgb(255 255 255 / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22), 0 0 24px rgb(var(--accent-base) / 0.06)",
           }}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <span
               className="tnum"
               style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}
@@ -56,7 +56,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               {es ? "Comprobación previa · nueva operación" : "Pre-flight check · new trade"}
             </span>
             <span
-              className="tnum inline-flex items-center gap-1.5"
+              className="tnum inline-flex items-center gap-1.5 self-start sm:self-auto"
               style={{
                 fontSize: 10,
                 padding: "3px 9px",
@@ -164,9 +164,13 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                 : "Reduce size to 2 contracts to keep risk within your limit."}
             </p>
           </div>
-          <div className="flex gap-2">
+          {/* R21-3b: action buttons stack vertically on mobile (flex-col sm:flex-row)
+              so the longest label "Ajustar a 2 contratos" / "Adjust to 2 contracts"
+              (≈147px at 12px/600) fits without overflowing the ≈115px inner half-width
+              on a 375px viewport. At sm+ the buttons resume their side-by-side layout. */}
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
-              className="tnum flex-1"
+              className="tnum flex-1 min-w-0"
               style={{
                 height: 36,
                 padding: "0 12px",
@@ -182,7 +186,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               {es ? "Ajustar a 2 contratos" : "Adjust to 2 contracts"}
             </button>
             <button
-              className="tnum flex-1"
+              className="tnum flex-1 min-w-0"
               style={{
                 height: 36,
                 padding: "0 12px",
@@ -220,7 +224,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
           <h2
             className="font-serif m-0"
             style={{
-              fontSize: "clamp(2rem, 3.6vw, 3rem)",
+              fontSize: "clamp(1.75rem, 3.6vw, 3rem)",
               fontWeight: 400,
               letterSpacing: "-0.022em",
               lineHeight: 1.08,
@@ -230,13 +234,15 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
           >
             {es ? (
               <>
-                Disciplina que <span style={{ color: "rgb(var(--accent-base))" }}>actúa</span>,<br />
-                no que sermonea.
+                Disciplina que <span style={{ color: "rgb(var(--accent-base))" }}>actúa</span>,
+                <br className="hidden sm:block" />
+                {" "}no que sermonea.
               </>
             ) : (
               <>
-                Discipline that <span style={{ color: "rgb(var(--accent-base))" }}>acts</span>,<br />
-                not lectures.
+                Discipline that <span style={{ color: "rgb(var(--accent-base))" }}>acts</span>,
+                <br className="hidden sm:block" />
+                {" "}not lectures.
               </>
             )}
           </h2>

@@ -82,7 +82,7 @@ export function ValueTestimonials() {
   return (
     <section
       aria-label={es ? "Valor por dinero" : "Value for money"}
-      className="section-tight relative overflow-hidden"
+      className="section-tight relative overflow-hidden bg-veil"
     >
       {/* Faint accent wash — single radial glow, no particle field, to keep
           this section lighter than the main SocialProof band. */}

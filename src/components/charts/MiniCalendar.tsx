@@ -55,7 +55,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
 
   return (
     <motion.div
-      className={`relative liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card ${className}`}
+      className={`relative liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4 md:p-5 ${className}`}
       ref={containerRef}
       whileHover={reduce ? undefined : { scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300, damping: 26 }}

@@ -171,9 +171,18 @@
 
 /* ===== Light theme ===== */
 :root[data-theme="light"] {
-  --pnl-pos: 52 211 153;
-  --pnl-neg: 239 68 68;
-  --pnl-warn: 224 147 43;
+  /* R21-2d — Light-theme P&L tokens DARKENED. The dark-theme values
+     (#34D399 / #EF4444 / #E0932B) are calibrated for near-black
+     backgrounds; on the light backdrop (#f3f2ec, L≈0.97) they barely
+     cleared 1.5-2.5:1 — the root cause of "secciones que no se pueden
+     leer" (Wrapped big numbers, Comparison Sí/Parcial cells, Chip
+     pos/warn variants, GuardianNew alerts). The darker values below
+     (#0B8B4B / #991B1B / #92400E) pass WCAG AA on white at ≥5:1 for
+     normal text and ≥7:1 for the tinted backgrounds (bg-pnl-pos/15 etc).
+     Dark theme keeps its bright values — they are correct there. */
+  --pnl-pos: 11 138 75;   /* #0B8B4B — was 52 211 153 (#34D399) */
+  --pnl-neg: 153 27 27;   /* #991B1B — was 239 68 68 (#EF4444) */
+  --pnl-warn: 146 64 14;  /* #92400E — was 224 147 43 (#E0932B) */
 
   --sig-green: 52 211 153;
   --sig-amber: 224 147 43;
@@ -232,7 +241,7 @@
   --tint: 11 12 13;
 }
 :root[data-theme="light"][data-palette="verde"] {
-  --accent-base: 15 138 86; --accent-hover: 18 160 102; --accent-pressed: 12 110 70;
+  --accent-base: 11 110 68; --accent-hover: 18 160 102; --accent-pressed: 12 110 70; /* R21-2d — darkened 1 stop (#0F8A56 → #0B6E44) so 12px eyebrow text clears WCAG AA (4.5:1) on bg-veil in light theme */
   --tint: 243 242 236;
 }
 /* Grafito — el nombre de la clave data-palette se conserva (evita romper
@@ -245,7 +254,7 @@
   --tint: 11 12 13;
 }
 :root[data-theme="light"][data-palette="grafito"] {
-  --accent-base: 15 138 86; --accent-hover: 18 160 102; --accent-pressed: 12 110 70;
+  --accent-base: 11 110 68; --accent-hover: 18 160 102; --accent-pressed: 12 110 70; /* R21-2d — darkened 1 stop (#0F8A56 → #0B6E44) so 12px eyebrow text clears WCAG AA (4.5:1) on bg-veil in light theme */
   --tint: 243 242 236;
 }
 
@@ -894,6 +903,37 @@
       0 2px 20px rgb(255 255 255 / 0.75),
       0 0 8px rgb(255 255 255 / 0.6),
       0 1px 3px rgb(255 255 255 / 0.55);
+  }
+
+  /* .hero-side-scrim — R21-2d. Hero's left-side protective gradient over
+     the eye WebGL. The eye is the visual centerpiece of the hero, so the
+     scrim only covers the left text column (fading to transparent at 52 %
+     width) and leaves the right two-thirds of the iris fully visible.
+
+     DARK theme mixes the bg 72 % toward #000 → deepens the eye into a
+     near-black canvas so white text reads at ≥18:1. ✓ correct.
+
+     LIGHT theme used to inherit the same 72 % mix toward #000 → with
+     #f3f2ec as --bg that produced a mid-gray (~#8e8d87) veil, dropping
+     --accent-base / --ink-2 / --ink-3 contrast to 1.9-3.7:1 (audit
+     R21-1d §3, H1/H2/H3). The override below mixes at 88 % so the veil
+     stays bright (~#e4e2da) — the iris's red/green fibers can't wash out
+     dark text any more. Belt-and-suspenders: Hero's text container also
+     carries `.tj-legible-text` so the chips / scroll indicator in the
+     area where the scrim fades to transparent still get a white halo. */
+  .hero-side-scrim {
+    background:
+      linear-gradient(90deg,
+        color-mix(in oklab, var(--bg) 72%, #000),
+        color-mix(in oklab, var(--bg) 26%, transparent) 34%,
+        transparent 52%);
+  }
+  :root[data-theme="light"] .hero-side-scrim {
+    background:
+      linear-gradient(90deg,
+        color-mix(in oklab, var(--bg) 88%, #000),
+        color-mix(in oklab, var(--bg) 38%, transparent) 34%,
+        transparent 52%);
   }
 
   .divider-grad {

@@ -61,7 +61,12 @@ export function TrustStrip() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3.5 text-secondary text-sm"
+          // R21-3a — tighter horizontal gap on mobile (gap-x-5 vs gap-x-8)
+          // so pairs of trust items fit on each wrapped row instead of
+          // every item ending up alone on its own line at 375px. The
+          // flex-wrap + whitespace-nowrap per item is preserved so the
+          // labels themselves never break mid-word.
+          className="flex flex-wrap items-center justify-center gap-x-5 sm:gap-x-8 gap-y-3.5 text-secondary text-sm"
         >
           {items.map((item, i) => (
             <Fragment key={item.label}>

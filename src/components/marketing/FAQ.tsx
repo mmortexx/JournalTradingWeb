@@ -290,7 +290,13 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
                     className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),0_0_30px_-6px_rgb(var(--accent-base)/0.32)]"
                   >
                     <AccordionTrigger className="text-left text-base md:text-[1.05rem] font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:text-[rgb(var(--accent-base))]">
-                      {item.q}
+                      {/* Wrap the question in a min-w-0 span so the flex
+                          trigger (shadcn AccordionTrigger uses
+                          flex justify-between) can wrap long questions
+                          like "What's the difference between Core and Pro?"
+                          on a 375px viewport without pushing the chevron
+                          off the right edge. */}
+                      <span className="min-w-0 break-words">{item.q}</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-secondary leading-relaxed text-[0.95rem] pb-5">
                       {item.a}

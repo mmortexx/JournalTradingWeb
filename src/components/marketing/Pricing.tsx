@@ -158,7 +158,7 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
               role="radio"
               aria-checked="true"
               tabIndex={0}
-              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5 cursor-default outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--divider)/0.40)]"
+              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] px-3 sm:px-4 py-2.5 cursor-default outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--divider)/0.40)]"
               style={{
                 background:
                   "linear-gradient(180deg, rgb(var(--accent-base) / 0.18), rgb(var(--accent-base) / 0.08))",
@@ -173,7 +173,7 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
               <span className="text-sm font-semibold text-primary tnum">
                 {es ? "Pago único" : "One-time"}
               </span>
-              <span className="pill bg-[rgb(var(--divider)/0.10)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
+              <span className="hidden sm:inline-flex pill bg-[rgb(var(--divider)/0.10)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
                 {es ? "Activo" : "Active"}
               </span>
             </div>
@@ -249,7 +249,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           : { y: -4, scale: 1.005, transition: { type: "spring", stiffness: 300, damping: 24 } }
       }
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      className={`relative liquid-glass rounded-card p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`relative liquid-glass rounded-card p-6 sm:p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isPro
           ? "gradient-border depth-4 border-[rgb(var(--accent-base)/0.22)]"
           : "depth-2 border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--divider)/0.18)] hover:depth-3"
@@ -316,12 +316,12 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl md:text-2xl font-semibold text-primary tracking-tight">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-xl md:text-2xl font-semibold text-primary tracking-tight min-w-0 break-words">
           {plan.name}
         </h3>
         <span
-          className={`pill border ${
+          className={`pill border shrink-0 ${
             isPro
               ? "bg-[rgb(var(--divider)/0.05)] text-primary border-[rgb(var(--divider)/0.20)]"
               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border-[rgb(var(--divider)/0.10)]"
@@ -344,7 +344,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           right at the baseline in a small tertiary label. Both cards share
           the exact same baseline grid so Core $29 and Pro $49 sit on
           identical vertical lines — pixel-perfect parity. */}
-      <div className="mt-6 flex items-baseline gap-1">
+      <div className="mt-6 flex items-baseline gap-1 min-w-0">
         <span className="text-2xl md:text-3xl font-semibold text-tertiary tnum">
           $
         </span>
@@ -387,7 +387,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
             >
               <CheckIcon delay={0.3 + i * 0.06} />
             </span>
-            <span className="text-secondary leading-relaxed">{f}</span>
+            <span className="text-secondary leading-relaxed min-w-0 break-words">{f}</span>
           </li>
         ))}
       </ul>

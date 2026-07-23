@@ -101,7 +101,7 @@ export function HomeDemo() {
             )}
           </h2>
           <p
-            className="mb-0 mt-4"
+            className="mb-0 mt-4 break-words"
             style={{ maxWidth: "38em", fontSize: 15.5, lineHeight: 1.65, color: "var(--ink-2)" }}
           >
             {es

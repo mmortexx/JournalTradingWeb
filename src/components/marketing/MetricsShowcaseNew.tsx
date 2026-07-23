@@ -93,7 +93,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 // so the four KPIs read as tappable stat cards rather than
                 // inert table cells. Border + bg kept identical to before so
                 // the rest-state visual is unchanged.
-                className="group/metric relative flex items-center justify-between gap-3 transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
+                className="group/metric relative flex min-w-0 items-center justify-between gap-2 sm:gap-3 transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
                 style={{
                   padding: "14px 16px",
                   borderRadius: 12,
@@ -104,8 +104,8 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 }}
               >
                 <span className="pointer-events-none absolute inset-0 rounded-[12px] opacity-0 group-hover/metric:opacity-100 transition-opacity duration-300" aria-hidden style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.35)" }} />
-                <span className="relative" style={{ fontSize: 13, color: "var(--ink-2)" }}>{m.l}</span>
-                <span className="tnum relative" style={{ fontSize: 19, fontWeight: 700, color: m.c }}>{m.v}</span>
+                <span className="relative min-w-0 break-words text-[12px] sm:text-[13px]" style={{ color: "var(--ink-2)" }}>{m.l}</span>
+                <span className="tnum relative shrink-0 text-[17px] sm:text-[19px]" style={{ fontWeight: 700, color: m.c }}>{m.v}</span>
               </li>
             ))}
           </ul>

@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useState, type CSSProperties } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Metrics } from "@/lib/trading/data";
 import { useLang } from "@/lib/i18n";
@@ -24,8 +24,17 @@ export const EquityCurve = memo(function EquityCurve({
   const { lang } = useLang();
   const reduce = useReducedMotion();
   const { equityCurve, drawdownCeiling } = metrics;
-  // Hover state: data index + mouse X (px) + container width (px) for clamping.
-  const [hover, setHover] = useState<{ idx: number; mx: number; width: number } | null>(null);
+  // Hover state: data index + pointer X (px) + rendered width & height (px)
+  // for clamping the tooltip and converting viewBox Y → pixel Y. Both mouse
+  // and touch handlers write into this state so the tooltip works on every
+  // pointer modality (the SVG auto-scales via aspect-ratio, so we must track
+  // the live rendered height to position the tooltip above the marker).
+  const [hover, setHover] = useState<{
+    idx: number;
+    mx: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
   const W = 800;
   const H = height;
@@ -75,10 +84,24 @@ export const EquityCurve = memo(function EquityCurve({
     return <div className={`text-gray-400 text-sm ${className}`} style={{ height }}>Sin datos</div>;
   }
 
+  /** Shared pointer→hover resolver used by both mousemove and touch handlers.
+   * Converts a viewport-space clientX into the nearest data-point index and
+   * records the rendered SVG rect so the tooltip can be positioned in pixels
+   * (not viewBox units — the chart auto-scales to its container width). */
+  const updateHover = (clientX: number, target: SVGElement) => {
+    const rect = target.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const svgX = ((clientX - rect.left) / rect.width) * W;
+    const idx = Math.round(((svgX - padL) / (W - padL - padR)) * (points.length - 1));
+    if (idx >= 0 && idx < points.length) {
+      setHover({ idx, mx: clientX - rect.left, width: rect.width, height: rect.height });
+    }
+  };
+
   const locale = lang === "es" ? "es-ES" : "en-US";
   const hoverPoint = hover && points[hover.idx];
 
-  // Tooltip X follows the mouse, clamped so it never overflows left/right edges.
+  // Tooltip X follows the pointer, clamped so it never overflows left/right edges.
   // ~180px tooltip → 90px half-width kept clear of the edges.
   const TOOLTIP_HALF = 92;
   let tooltipLeft: number | null = null;
@@ -87,13 +110,17 @@ export const EquityCurve = memo(function EquityCurve({
   if (hover && hoverPoint) {
     const w = hover.width || W;
     tooltipLeft = Math.max(TOOLTIP_HALF, Math.min(w - TOOLTIP_HALF, hover.mx));
+    // The SVG auto-scales to its container via aspect-ratio, so the marker's
+    // viewBox Y (0–H) must be multiplied by the live scale factor to get its
+    // pixel position inside the rendered chart. Without this the tooltip would
+    // drift away from the marker on any non-1:1 render (e.g. mobile).
+    const markerYPx = hoverPoint.y * (hover.height / H);
     // Place the tooltip just above the marker dot; flip below if too close to the top.
-    const markerY = hoverPoint.y; // SVG y == container px (viewBox H == element H)
-    if (markerY < 92) {
-      tooltipTop = markerY + 14;
+    if (markerYPx < 92) {
+      tooltipTop = markerYPx + 14;
       tooltipTransform = "translateX(-50%)";
     } else {
-      tooltipTop = markerY - 10;
+      tooltipTop = markerYPx - 10;
       tooltipTransform = "translate(-50%, -100%)";
     }
   }
@@ -110,23 +137,39 @@ export const EquityCurve = memo(function EquityCurve({
     >
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full"
-        style={{ height }}
+        className="w-full h-auto sm:h-[var(--eq-h)]"
+        // Responsive sizing: on mobile (`h-auto`) the SVG derives its height
+        // from the viewBox aspect ratio, so the chart fills the card width
+        // with zero letterboxing (a 375px-wide card previously left ~140px
+        // of empty space above/below because `height:240` + `meet` scaled
+        // the chart down to ~100px and centered it). On sm+ we keep the
+        // fixed `height` prop via `sm:h-[var(--eq-h)]` so the desktop grid
+        // layout (where MiniCalendar uses `h-full` to match this card's
+        // height) is preserved exactly. `touch-action: pan-y` lets the page
+        // scroll vertically through the chart while letting us capture
+        // horizontal touch-drags for tooltip scrubbing on mobile.
+        style={{
+          "--eq-h": `${height}px`,
+          aspectRatio: `${W} / ${H}`,
+          touchAction: "pan-y",
+        } as CSSProperties}
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={lang === "es"
           ? `Curva de capital desde $${Math.round(minBal).toLocaleString()} hasta $${Math.round(maxBal).toLocaleString()}`
           : `Equity curve from $${Math.round(minBal).toLocaleString()} to $${Math.round(maxBal).toLocaleString()}`}
         onMouseLeave={() => setHover(null)}
-        onMouseMove={(e) => {
-          const rect = (e.currentTarget as SVGElement).getBoundingClientRect();
-          const svgX = ((e.clientX - rect.left) / rect.width) * W;
-          const idx = Math.round(((svgX - padL) / (W - padL - padR)) * (points.length - 1));
-          if (idx >= 0 && idx < points.length) {
-            const mx = e.clientX - rect.left;
-            setHover({ idx, mx, width: rect.width });
-          }
+        onMouseMove={(e) => updateHover(e.clientX, e.currentTarget as SVGElement)}
+        onTouchStart={(e) => {
+          const t = e.touches[0];
+          if (t) updateHover(t.clientX, e.currentTarget as SVGElement);
         }}
+        onTouchMove={(e) => {
+          const t = e.touches[0];
+          if (t) updateHover(t.clientX, e.currentTarget as SVGElement);
+        }}
+        onTouchEnd={() => setHover(null)}
+        onTouchCancel={() => setHover(null)}
       >
         <defs>
           <linearGradient id="eq-area" x1="0" y1="0" x2="0" y2="1">
@@ -139,20 +182,32 @@ export const EquityCurve = memo(function EquityCurve({
           </linearGradient>
         </defs>
 
-        {/* Grid */}
+        {/* Grid lines — always visible (decorative). */}
         {showAxis &&
           [0, 0.25, 0.5, 0.75, 1].map((t) => {
             const y = padT + t * (H - padT - padB);
-            const val = maxBal - t * (maxBal - minBal);
             return (
-              <g key={t}>
-                <line x1={padL} y1={y} x2={W - padR} y2={y} stroke="rgb(var(--divider) / 0.06)" strokeWidth="1" />
-                <text x={padL - 8} y={y + 3} textAnchor="end" className="text-[10px] tnum" fill="rgb(var(--txt-tertiary))">
-                  ${Math.round(val).toLocaleString()}
-                </text>
-              </g>
+              <line key={t} x1={padL} y1={y} x2={W - padR} y2={y} stroke="rgb(var(--divider) / 0.06)" strokeWidth="1" />
             );
           })}
+
+        {/* Y-axis labels — hidden on mobile. SVG <text> font-size is
+            interpreted in user-units (viewBox 0 0 800 240), so text-[10px]
+            renders at ~3.7px on a 295px-wide mobile card — unreadable.
+            The chart itself stays; only the numeric Y-axis labels hide. */}
+        {showAxis && (
+          <g className="hidden sm:block">
+            {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+              const y = padT + t * (H - padT - padB);
+              const val = maxBal - t * (maxBal - minBal);
+              return (
+                <text key={t} x={padL - 8} y={y + 3} textAnchor="end" className="text-[10px] tnum" fill="rgb(var(--txt-tertiary))">
+                  ${Math.round(val).toLocaleString()}
+                </text>
+              );
+            })}
+          </g>
+        )}
 
         {/* Drawdown shading */}
         {showDrawdown && (

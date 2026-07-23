@@ -217,7 +217,7 @@ const TradeRow = memo(function TradeRow({
                 }}
                 aria-label={t("deleteTrade")}
                 title={t("deleteTrade")}
-                className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-150 h-6 w-6 grid place-items-center rounded text-tertiary hover:text-pnl-neg hover:bg-pnl-neg/15 border border-transparent hover:border-pnl-neg/30"
+                className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100 transition-opacity duration-150 h-6 w-6 grid place-items-center rounded text-tertiary hover:text-pnl-neg hover:bg-pnl-neg/15 border border-transparent hover:border-pnl-neg/30"
               >
                 <svg
                   width="13"
@@ -648,8 +648,9 @@ export function TradesPage() {
 
       {/* ===== Table ===== */}
       <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card overflow-hidden">
-        <div className="overflow-x-auto custom-scroll">
-          <table className="w-full text-sm border-collapse">
+        <div className="relative">
+          <div className="overflow-x-auto custom-scroll">
+            <table className="w-full text-sm border-collapse">
             <thead className="sticky top-0 z-10 liquid-glass border-b border-white/10">
               <tr className="text-left">
                 <th scope="col" className="px-4 py-3 font-medium text-tertiary text-[10px] uppercase tracking-[0.15em] whitespace-nowrap">
@@ -769,6 +770,12 @@ export function TradesPage() {
               )}
             </tbody>
           </table>
+          </div>
+          {/* Right-edge gradient fade — subtle visual hint that the
+              wide table scrolls horizontally. Pointer-events-none so
+              it never blocks taps on the last visible column. Demo
+              is intentionally always-dark, so black/20 reads well. */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-transparent to-black/20" />
         </div>
 
         {/* Load more */}

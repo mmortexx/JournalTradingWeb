@@ -49,13 +49,17 @@ export function Hero() {
           fondo: el ojo WebGL es el protagonista del hero y un lavado al
           90 % sobre el 58 % del ancho lo borraba entero. El scrim ahora
           protege solo la columna de texto y se disuelve antes del
-          centro del iris. */}
+          centro del iris.
+
+          R21-2d — la opacidad del scrim vive ahora en la clase
+          `.hero-side-scrim` (globals.css), con un override de tema
+          claro (88 % en lugar de 72 %) para que el velo siga siendo
+          claro en light theme en vez de tornarse gris medio sobre el
+          iris del ojo. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
+        className="hero-side-scrim pointer-events-none absolute inset-0"
         style={{
-          background:
-            "linear-gradient(90deg, color-mix(in oklab, var(--bg) 72%, #000), color-mix(in oklab, var(--bg) 26%, transparent) 34%, transparent 52%)",
           zIndex: 1,
         }}
       />
@@ -126,8 +130,12 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Contenido */}
-      <div className="relative z-10 w-full max-w-[1240px] mx-auto px-6 sm:px-10 pt-32 pb-20">
+      {/* Contenido — `.tj-legible-text` (R21-2d) añade un halo de
+          text-shadow theme-aware para levantar el contraste del eyebrow,
+          los párrafos y los chips de confianza sobre las zonas donde el
+          scrim lateral se desvanece (x > 52 %) y el iris del ojo sigue
+          mostrándose. En dark sombra oscura, en light halo claro. */}
+      <div className="tj-legible-text relative z-10 w-full max-w-[1240px] mx-auto px-6 sm:px-10 pt-32 pb-20">
         <div data-seq className="inline-flex items-center gap-2.5 mb-5">
           <span
             className="inline-block rounded-full"
@@ -154,9 +162,9 @@ export function Hero() {
         </div>
         <h1
           data-seq
-          className="m-0 mb-2 font-sans uppercase"
+          className="m-0 mb-2 font-sans uppercase break-words hyphens-auto"
           style={{
-            fontSize: "clamp(2.8rem, 7.6vw, 5.8rem)",
+            fontSize: "clamp(2rem, 7.6vw, 5.8rem)",
             fontWeight: 600,
             lineHeight: 1.01,
             letterSpacing: "-0.035em",
@@ -189,7 +197,7 @@ export function Hero() {
         </h1>
         <p
           data-seq
-          className="m-0 mb-3"
+          className="m-0 mb-3 break-words"
           style={{
             fontSize: "clamp(1.1rem, 2.2vw, 1.7rem)",
             fontWeight: 300,
@@ -204,7 +212,7 @@ export function Hero() {
         </p>
         <p
           data-seq
-          className="m-0 mb-8"
+          className="m-0 mb-8 break-words"
           style={{
             fontSize: "clamp(0.95rem, 1.4vw, 1.15rem)",
             fontWeight: 300,
@@ -217,10 +225,14 @@ export function Hero() {
             ? "40+ métricas institucionales, un guardián que te frena antes del error y tus datos 100 % en tu máquina. Nativo de Windows, pago único desde 29 $."
             : "40+ institutional metrics, a guardian that brakes before the error, and your data 100% on your machine. Windows-native, one-time payment from $29."}
         </p>
-        <div data-seq className="flex flex-wrap gap-3">
+        {/* R21-3a — CTA buttons stack vertically full-width on mobile
+            (375px) so neither pill overflows nor wraps awkwardly; side
+            by side on >= sm. `justify-center` centers content within
+            the full-width pill on mobile for a clean native CTA look. */}
+        <div data-seq className="flex flex-col sm:flex-row gap-3">
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2.5 rounded-full"
+            className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full"
             style={{
               height: 54,
               padding: "0 28px",
@@ -254,7 +266,7 @@ export function Hero() {
           </Link>
           <Link
             href="/demo"
-            className="tj-cta-sheen inline-flex items-center gap-2.5 rounded-full"
+            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full"
             style={{
               height: 54,
               padding: "0 26px",

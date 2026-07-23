@@ -129,7 +129,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
                 );
               })}
             </div>
-            <div className="mt-5 flex items-center justify-between">
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
               <div className="flex items-center gap-3">
                 <span
                   className="tnum"
@@ -144,7 +144,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
                   {cal.pnl}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                 {[
                   { c: "rgb(var(--accent-base))", l: "≥ 60 $" },
                   { c: "color-mix(in oklab, rgb(var(--accent-base)) 35%, transparent)", l: "20–60 $" },

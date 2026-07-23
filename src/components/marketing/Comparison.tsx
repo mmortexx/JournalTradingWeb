@@ -68,7 +68,7 @@ export function Comparison() {
   ];
 
   return (
-    <section className="section cv-auto relative overflow-hidden">
+    <section className="section cv-auto relative overflow-hidden bg-veil">
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
         <Reveal className="max-w-2xl">
           <Eyebrow>{es ? "Comparativa" : "Comparison"}</Eyebrow>
@@ -96,8 +96,15 @@ export function Comparison() {
             transition={{ type: "spring", stiffness: 200, damping: 22 }}
             className="liquid-glass depth-3 rounded-card overflow-hidden relative transition-shadow duration-300"
           >
-            {/* Horizontal scroll wrapper for mobile. */}
-            <div className="overflow-x-auto">
+            {/* Horizontal scroll wrapper for mobile. The 4-column comparison
+                table has min-w-[680px] so on a 375px viewport it scrolls
+                horizontally inside this container. Two mobile-only scroll
+                affordances: (1) a theme-aware gradient fade pinned to the
+                right edge that signals "more content this way" without
+                blocking touch, and (2) a tiny eyebrow-style text hint below
+                the table. Both are hidden at md+ where the table fits
+                without scrolling. */}
+            <div className="relative overflow-x-auto">
               <div className="relative min-w-[680px]">
                 <table className="w-full text-sm table-fixed tnum">
                   <colgroup>
@@ -192,8 +199,29 @@ export function Comparison() {
                 </tbody>
               </table>
               </div>
+              {/* Mobile-only right-edge gradient fade — theme-aware via the
+                  --bg token so it reads as a soft depth cue in both dark
+                  and light themes. pointer-events-none keeps taps flowing
+                  through to the underlying scrollable cells. */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 md:hidden"
+                style={{
+                  background:
+                    "linear-gradient(to left, rgb(var(--bg) / 0.92), transparent)",
+                }}
+              />
             </div>
           </motion.div>
+
+          {/* Mobile-only scroll hint — tiny eyebrow-style label with
+              bidirectional arrows. Sits below the table so it doesn't
+              compete with the table header for vertical space. */}
+          <div className="md:hidden mt-3 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.14em] text-tertiary font-semibold">
+            <span aria-hidden="true">←</span>
+            <span>{es ? "Desliza para comparar" : "Swipe to compare"}</span>
+            <span aria-hidden="true">→</span>
+          </div>
         </Reveal>
 
         {/* Footnote */}

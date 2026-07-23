@@ -565,6 +565,9 @@ function DivergingBar({
 
 function PnlBarChart({ data }: { data: { label: string; pnl: number }[] }) {
   const { lang } = useLang();
+  // Mobile has no hover — track which bar was last tapped so its value
+  // tooltip stays visible. Tapping the same bar again dismisses it.
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const maxAbs = Math.max(...data.map((d) => Math.abs(d.pnl)), 1);
   return (
     <div className="flex items-stretch gap-1.5 sm:gap-2 h-44">
@@ -575,6 +578,9 @@ function PnlBarChart({ data }: { data: { label: string; pnl: number }[] }) {
           <div
             key={d.label + i}
             className="flex-1 flex flex-col items-center gap-2 min-w-0 group"
+            onPointerDown={() =>
+              setActiveIdx((cur) => (cur === i ? null : i))
+            }
           >
             <div className="relative w-full flex-1">
               <div className="absolute left-0 right-0 top-1/2 h-px bg-white/10 -translate-y-1/2" />
@@ -593,7 +599,11 @@ function PnlBarChart({ data }: { data: { label: string; pnl: number }[] }) {
                   isPos
                     ? "bottom-[calc(50%+6px)]"
                     : "top-[calc(50%+6px)]"
-                } text-tertiary opacity-0 group-hover:opacity-100 transition-opacity`}
+                } text-tertiary transition-opacity ${
+                  activeIdx === i
+                    ? "opacity-100"
+                    : "opacity-0 group-hover:opacity-100"
+                }`}
               >
                 {isPos ? "+" : "−"}
                 {fmtInt(Math.abs(d.pnl), lang)}
@@ -999,7 +1009,7 @@ export function JournalPage() {
                       }}
                       className="grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-2.5 items-center text-sm border-b border-dashed border-white/10 hover:bg-white/[0.025] transition-colors font-mono"
                     >
-                      <div className="text-secondary truncate">
+                      <div className="text-secondary min-w-0 truncate">
                         {lang === "es" ? row.es : row.en}
                       </div>
                       <div className="text-right tnum text-secondary">

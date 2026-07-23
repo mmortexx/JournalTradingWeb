@@ -71,7 +71,7 @@ export function Newsletter() {
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-          className="liquid-glass depth-3 rounded-card p-8 max-w-2xl mx-auto relative transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          className="liquid-glass depth-3 rounded-card p-6 sm:p-8 max-w-2xl mx-auto relative transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         >
           <div className="flex flex-col items-center text-center">
             <div className="flex justify-center">
@@ -213,7 +213,7 @@ export function Newsletter() {
                             accent glow + 1px lift so the affordance feels alive. */}
                         <Button
                           type="submit"
-                          className="h-12 px-6 rounded-lg bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgb(var(--accent-base)/0.55)] transition-[background-color,transform,box-shadow] duration-200 shrink-0"
+                          className="h-12 px-6 w-full sm:w-auto rounded-lg bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgb(var(--accent-base)/0.55)] transition-[background-color,transform,box-shadow] duration-200 shrink-0"
                         >
                           {es ? "Suscribirme" : "Subscribe"}
                         </Button>

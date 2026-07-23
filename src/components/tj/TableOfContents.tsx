@@ -11,7 +11,10 @@ import { useLang } from "@/lib/i18n";
  * IntersectionObserver (rootMargin clears the sticky navbar at 60px + a
  * 45% band), and smooth-scrolls on click (respecting reduced-motion).
  *
- * - Desktop-only (hidden below xl / 1280px) to avoid cluttering mobile.
+ * - Desktop-only (hidden below 2xl / 1536px) to avoid cluttering mobile
+ *   and to guarantee the TOC never overlaps the page content (which is
+ *   capped at max-w-page=1200px; below 1536px there isn't enough right
+ *   margin to float the 200px panel without covering text).
  * - Sits at `right-[22px]` mirroring the BackToTop pattern but lower on the
  *   page (top-1/2) and only on feature subpages.
  * - Active item gets an accent left-border + filled dot; inactive items
@@ -135,7 +138,7 @@ export function TableOfContents() {
   return (
     <nav
       aria-label={es ? "Índice de la página" : "On this page"}
-      className="fixed right-[22px] top-1/2 z-30 hidden -translate-y-1/2 xl:block"
+      className="fixed right-[22px] top-1/2 z-30 hidden -translate-y-1/2 2xl:block"
     >
       <div className="liquid-glass rounded-card p-3.5 max-w-[200px] border border-[rgb(var(--divider)/0.1)]">
         <span className="tnum block text-[9px] uppercase tracking-[0.18em] text-tertiary font-semibold mb-2.5 px-1">

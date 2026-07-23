@@ -169,10 +169,14 @@ export function Values() {
           ))}
         </div>
 
-        {/* Footer coda */}
+        {/* Footer coda — divider hidden on mobile so the long ES copy
+            ("No son eslóganes. Son decisiones de producto." ~280px at
+            text-sm) doesn't overflow the 335px content box when paired
+            with the 64px divider + 12px gap. Text centers on mobile,
+            returns to the left-aligned divider+text rhythm at sm+. */}
         <Reveal delay={0.4}>
-          <div className="mt-10 flex items-center gap-3 text-sm text-tertiary">
-            <span className="divider-grad w-16" aria-hidden />
+          <div className="mt-10 flex items-center gap-3 text-sm text-tertiary justify-center text-center sm:justify-start sm:text-left">
+            <span className="divider-grad w-16 hidden sm:block" aria-hidden />
             <span>
               {es
                 ? "No son eslóganes. Son decisiones de producto."

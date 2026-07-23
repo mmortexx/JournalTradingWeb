@@ -387,7 +387,7 @@ export function DashboardPage() {
                     initial={{ opacity: 0.55, y: 3 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                    className="text-3xl md:text-4xl font-bold tnum text-primary leading-none"
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold tnum text-primary leading-none min-w-0 break-words"
                   >
                     <Money value={riskUsd} />
                   </motion.div>
@@ -716,6 +716,7 @@ export function DashboardPage() {
                 value={METRICS.netPnl}
                 sign
                 colorizeSign
+                compact
                 className="text-2xl md:text-3xl font-bold"
               />
             </KpiTile>
@@ -947,12 +948,12 @@ export function DashboardPage() {
                     className="group w-full flex items-center gap-3 py-2.5 hover:bg-white/5 -mx-2 px-2 rounded-md transition-colors text-left"
                   >
                     {/* Instrument + asset-class dot */}
-                    <div className="flex items-center gap-2 min-w-0 w-[110px] shrink-0">
+                    <div className="flex items-center gap-2 min-w-0 w-[80px] sm:w-[110px] shrink-0">
                       <span
                         className={`inline-block w-1.5 h-1.5 rounded-full ${dotClass}`}
                         aria-hidden="true"
                       />
-                      <span className="font-medium text-primary truncate">
+                      <span className="font-medium text-primary truncate min-w-0">
                         {tr.instrument}
                       </span>
                     </div>
@@ -983,7 +984,7 @@ export function DashboardPage() {
                       {fmtNum(tr.rMultiple, lang, 2)}R
                     </div>
                     {/* Net P&L */}
-                    <div className="shrink-0 w-24 text-right">
+                    <div className="shrink-0 w-20 sm:w-24 text-right">
                       <Money
                         value={tr.netPnl}
                         sign
@@ -1037,15 +1038,15 @@ function KpiTile({
       whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 24 } }}
       className="liquid-glass depth-1 hover:depth-2 hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.10)] transition-shadow duration-300 rounded-card p-4 flex flex-col gap-1.5 h-full relative"
     >
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] text-tertiary truncate">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.15em] text-tertiary truncate min-w-0">
         {/* Live pulse dot — signals "real-time data" */}
         <span className="relative flex h-1 w-1 shrink-0" aria-hidden="true">
           <span className="absolute inset-0 rounded-full bg-pnl-pos/50 animate-ping" style={{ animationDuration: "2s" }} />
           <span className="relative rounded-full h-1 w-1 bg-pnl-pos" />
         </span>
-        <span className="truncate">{label}</span>
+        <span className="truncate min-w-0">{label}</span>
       </div>
-      <div className="min-w-0 tnum">{children}</div>
+      <div className="min-w-0 break-words tnum">{children}</div>
       {delta && <div className="mt-auto pt-1 text-[10px] tnum">{delta}</div>}
     </motion.div>
   );

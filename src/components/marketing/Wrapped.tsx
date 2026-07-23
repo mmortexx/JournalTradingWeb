@@ -135,7 +135,7 @@ export function Wrapped() {
   ];
 
   return (
-    <section className="section cv-auto relative overflow-hidden">
+    <section className="section cv-auto relative overflow-hidden bg-veil">
       {/* Aurora wash background */}
       <div className="absolute inset-0 aurora-bg opacity-50 pointer-events-none" />
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}

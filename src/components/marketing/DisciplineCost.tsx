@@ -69,7 +69,17 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               ? "Cuando operas en plan ganas. Cuando lo rompes, pierdes. El gap entre ambas cosas es lo que te está costando el dinero."
               : "When you trade the plan, you earn. When you break it, you lose. The gap between the two is what costs you money."}
           </p>
-          {/* Tabla expectancy */}
+          {/* Tabla expectancy — R21-3b: outer keeps rounded corners + border
+              via overflow-hidden; inner wrapper is overflow-x-auto so the
+              3-col grid can scroll horizontally on very narrow viewports
+              (e.g. 320px iPhone SE, where the es-ES "Expectancy" header at
+              10px/0.14em tracking + the longest row label "Fuera de plan"
+              at 13.5px together push the grid's min-content past 280px).
+              The custom-scroll class styles the scrollbar to match the
+              site's liquid-glass aesthetic. min-w-0 on the row label span
+              lets the 1fr column shrink below its content's min-content
+              width so break-words can wrap long labels instead of pushing
+              the value column off the right edge. */}
           <div
             className="rounded-[14px] overflow-hidden"
             style={{
@@ -79,10 +89,11 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               WebkitBackdropFilter: "blur(14px)",
             }}
           >
-            <div className="grid grid-cols-3 text-sm" style={{ padding: "10px 14px", borderBottom: "1px solid rgb(var(--divider) / 0.06)", color: "var(--ink-3)" }}>
-              <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase" }}>{es ? "Modo" : "Mode"}</span>
-              <span className="tnum text-right" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase" }}>{es ? "Operaciones" : "Trades"}</span>
-              <span className="tnum text-right" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase" }}>{es ? "Expectancy" : "Expectancy"}</span>
+          <div className="overflow-x-auto custom-scroll">
+            <div className="grid grid-cols-3 text-sm min-w-[260px]" style={{ padding: "10px 14px", borderBottom: "1px solid rgb(var(--divider) / 0.06)", color: "var(--ink-3)" }}>
+              <span className="tnum min-w-0" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase" }}>{es ? "Modo" : "Mode"}</span>
+              <span className="tnum text-right min-w-0" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase" }}>{es ? "Operaciones" : "Trades"}</span>
+              <span className="tnum text-right min-w-0" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase" }}>{es ? "Expectancy" : "Expectancy"}</span>
             </div>
             {[
               { l: es ? "En plan" : "In plan", n: 36, v: "+29,73 $", c: "rgb(var(--pnl-pos))" },
@@ -91,7 +102,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
             ].map((row, i) => (
               <div
                 key={row.l}
-                className="grid grid-cols-3 group/row relative transition-colors duration-200"
+                className="grid grid-cols-3 group/row relative transition-colors duration-200 min-w-[260px]"
                 style={{
                   padding: "12px 14px 12px 16px",
                   borderBottom: i < 2 ? "1px solid rgb(var(--divider) / 0.06)" : undefined,
@@ -110,11 +121,12 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                       : "rgb(var(--accent-base))",
                   }}
                 />
-                <span className="relative" style={{ fontSize: 13.5, color: "var(--ink)" }}>{row.l}</span>
-                <span className="tnum text-right relative" style={{ fontSize: 13.5, color: "var(--ink-2)" }}>{row.n}</span>
-                <span className="tnum text-right relative" style={{ fontSize: 14, fontWeight: 700, color: row.c }}>{row.v}</span>
+                <span className="relative min-w-0 break-words" style={{ fontSize: 13.5, color: "var(--ink)" }}>{row.l}</span>
+                <span className="tnum text-right relative min-w-0" style={{ fontSize: 13.5, color: "var(--ink-2)" }}>{row.n}</span>
+                <span className="tnum text-right relative min-w-0" style={{ fontSize: 14, fontWeight: 700, color: row.c }}>{row.v}</span>
               </div>
             ))}
+          </div>
           </div>
           <p className="mt-3" style={{ fontSize: 11.5, color: "var(--ink-3)", lineHeight: 1.5 }}>
             {es
@@ -136,7 +148,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
             boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.08)",
           }}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <span
               className="tnum"
               style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}
@@ -144,7 +156,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               {es ? "Factura de indisciplina · julio 2026" : "Indiscipline invoice · July 2026"}
             </span>
             <span
-              className="tnum"
+              className="tnum self-start sm:self-auto"
               style={{
                 fontSize: 10,
                 padding: "3px 9px",
@@ -166,9 +178,9 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               { l: es ? "Mover stop a mano" : "Manually moving stop", pct: 9 },
             ].map((row) => (
               <li key={row.l}>
-                <div className="flex items-center justify-between mb-1">
-                  <span style={{ fontSize: 13, color: "var(--ink)" }}>{row.l}</span>
-                  <span className="tnum" style={{ fontSize: 12, color: "var(--ink-2)" }}>{row.pct} %</span>
+                <div className="flex items-center justify-between mb-1 gap-2">
+                  <span className="min-w-0 break-words" style={{ fontSize: 13, color: "var(--ink)" }}>{row.l}</span>
+                  <span className="tnum shrink-0" style={{ fontSize: 12, color: "var(--ink-2)" }}>{row.pct} %</span>
                 </div>
                 <div className="h-1 rounded-full overflow-hidden relative" style={{ background: "rgb(var(--divider) / 0.13)", boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.18)" }}>
                   <div
@@ -189,10 +201,10 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               </li>
             ))}
           </ul>
-          <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: "rgb(var(--divider) / 0.06)" }}>
-            <span style={{ fontSize: 13, color: "var(--ink-2)" }}>{es ? "Total del mes" : "Month total"}</span>
+          <div className="flex items-center justify-between pt-3 border-t gap-2" style={{ borderColor: "rgb(var(--divider) / 0.06)" }}>
+            <span className="min-w-0 break-words" style={{ fontSize: 13, color: "var(--ink-2)" }}>{es ? "Total del mes" : "Month total"}</span>
             <span
-              className="tnum font-serif"
+              className="tnum font-serif shrink-0"
               style={{ fontSize: 28, fontWeight: 400, color: "rgb(var(--pnl-neg))" }}
             >
               −577,10 $

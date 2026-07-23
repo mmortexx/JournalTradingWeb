@@ -307,7 +307,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="rounded-[12px] px-4 py-3.5 transition-colors duration-200"
+      className="min-w-0 rounded-[12px] px-3 sm:px-4 py-3.5 transition-colors duration-200"
       style={{
         background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
         border: "1px solid rgb(var(--divider) / 0.06)",
@@ -320,7 +320,7 @@ function Result({ label, value, color }: { label: string; value: string; color: 
         {label}
       </div>
       <div
-        className="tnum"
+        className="tnum min-w-0 break-words"
         style={{ fontSize: 17, fontWeight: 700, marginTop: 4, color }}
       >
         {value}

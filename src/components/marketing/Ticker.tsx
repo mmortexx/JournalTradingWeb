@@ -59,7 +59,7 @@ const TICKER_ITEMS: TickerItem[] = [
 
 function Row() {
   return (
-    <div className="flex items-center shrink-0 gap-11" aria-hidden="true">
+    <div className="flex items-center shrink-0 gap-7 sm:gap-11" aria-hidden="true">
       {TICKER_ITEMS.map((it) => {
         const pos = it.chg >= 0;
         return (
@@ -131,9 +131,12 @@ export function Ticker() {
     >
       {/* Left edge gradient fade — black-tinted so items ease out into the
           liquid-glass band's translucent dark surface instead of clipping
-          at a hard edge. Floats over the dark page background. */}
+          at a hard edge. Floats over the dark page background.
+          R21-3a — narrowed on mobile (w-14 ≈ 56px) so less of the visible
+          375px viewport is faded out; widens back to w-20 on sm and w-32
+          on md+ where there's plenty of width to spare for the fade. */}
       <div
-        className="absolute left-0 top-0 bottom-0 z-10 w-20 md:w-32 pointer-events-none"
+        className="absolute left-0 top-0 bottom-0 z-10 w-14 sm:w-20 md:w-32 pointer-events-none"
         style={{
           background:
             "linear-gradient(to right, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.5) 55%, transparent 100%)",
@@ -141,7 +144,7 @@ export function Ticker() {
       />
       {/* Right edge gradient fade — mirror of the left. */}
       <div
-        className="absolute right-0 top-0 bottom-0 z-10 w-20 md:w-32 pointer-events-none"
+        className="absolute right-0 top-0 bottom-0 z-10 w-14 sm:w-20 md:w-32 pointer-events-none"
         style={{
           background:
             "linear-gradient(to left, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.5) 55%, transparent 100%)",

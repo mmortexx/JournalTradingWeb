@@ -349,7 +349,7 @@ export function Navbar() {
             {/* Panel del megamenú */}
             <div
               role="menu"
-              className="absolute left-1/2 w-[520px] rounded-[14px] border p-2.5"
+              className="absolute left-1/2 w-[520px] max-w-[calc(100vw-3rem)] rounded-[14px] border p-2.5"
               style={{
                 top: "calc(100% + 12px)",
                 transform: megaOpen
@@ -658,7 +658,10 @@ export function Navbar() {
  * UtcClock — "UTC HH:MM:SS" en vivo con punto de mercado verde con
  * glow, como en la píldora del HTML. Renderiza "--:--:--" en servidor
  * y primer paint; el intervalo arranca en un efecto (cero mismatch de
- * hidratación). Oculto por debajo de `md` para no saturar la píldora.
+ * hidratación). Oculto por debajo de `lg` (1024 px): a 768–1023 px el
+ * clúster derecho (reloj + tema + idioma + Buy) + nav + marca supera
+ * el ancho interno de la barra y el botón Buy quedaba silenciosamente
+ * recortado por el `overflow-x: hidden` del body (ver R21-1e issue #1).
  */
 function UtcClock() {
   const [time, setTime] = useState("--:--:--");
@@ -677,7 +680,7 @@ function UtcClock() {
   }, []);
   return (
     <span
-      className="mr-0.5 hidden items-center gap-1.5 border-r pr-2 md:inline-flex"
+      className="mr-0.5 hidden items-center gap-1.5 border-r pr-2 lg:inline-flex"
       style={{ borderColor: "rgb(var(--divider) / 0.13)" }}
     >
       <span

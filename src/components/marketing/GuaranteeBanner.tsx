@@ -108,8 +108,11 @@ export function GuaranteeBanner() {
                 </p>
               </div>
 
-              {/* Stat chip — 30 días / 30 days, tnum */}
-              <div className="md:flex-none md:text-right">
+              {/* Stat chip — 30 días / 30 days, tnum. On mobile the chip
+                  lands on its own row (the supporting copy is hidden < md),
+                  so we center it to read as a deliberate credential pill
+                  rather than a stray left-aligned fragment. */}
+              <div className="flex justify-center md:flex-none md:justify-start md:text-right">
                 <div className="inline-flex items-baseline gap-1.5 pill bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] !px-3 !py-1.5">
                   <span className="text-2xl font-bold tnum text-primary leading-none">30</span>
                   <span className="text-xs uppercase tracking-[0.12em] text-tertiary font-semibold">

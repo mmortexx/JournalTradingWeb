@@ -172,7 +172,7 @@ function KpiTile({
       <div className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
         {label}
       </div>
-      <div className="mt-1.5 font-bold text-2xl tnum text-primary leading-none">
+      <div className="mt-1.5 font-bold text-2xl tnum text-primary leading-none min-w-0 break-words pr-12 sm:pr-14">
         {children}
       </div>
       {spark && <div className="absolute right-2 bottom-2 opacity-60">{spark}</div>}
@@ -1111,7 +1111,7 @@ export function AnalyticsPage() {
               </Chip>
             )}
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 auto-rows-fr">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 auto-rows-fr">
             <RatioTile
               label={t("sharpe")}
               reKey={`sharpe-${filterSig}`}

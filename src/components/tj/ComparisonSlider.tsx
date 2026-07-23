@@ -328,6 +328,15 @@ export function ComparisonSlider() {
             </motion.div>
 
             {/* ─────────────── DRAG HANDLE ─────────────── */}
+            {/* R21-3b: widened the button's hit area from w-1 (4px) to w-12 (48px)
+                so the handle is comfortably reachable on touch (iOS HIG minimum
+                is 44×44px; the previous 4px-wide strip was nearly impossible to
+                grab with a finger). The visible drag line stays 4px wide (now a
+                child span) so the visual affordance is unchanged — only the
+                invisible touch target grows. The glow + grip children are now
+                centered on the button's center (which equals the line position)
+                via left-1/2 -translate-x-1/2 instead of the previous -left-1
+                -right-1 (which only worked when the button itself was the line). */}
             <motion.button
               type="button"
               role="slider"
@@ -342,17 +351,25 @@ export function ComparisonSlider() {
               style={{ left: handleLeft, touchAction: "none" }}
               // R20-3b: handle line tinted with a touch of accent (divider/60 →
               //   divider/70 + accent/15 overlay via the glow span below) so the
-              //   affordance reads as part of the site’s accent system rather
+              //   affordance reads as part of the site's accent system rather
               //   than a neutral rule. Hover/focus ring widened 2 → 3 with
               //   offset for clearer grab affordance.
-              className="group/handle absolute top-0 bottom-0 z-30 -translate-x-1/2 w-1 cursor-ew-resize bg-[rgb(var(--divider)/0.70)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.60)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent transition-[background-color] duration-200 hover:bg-[rgb(var(--accent-base)/0.55)]"
+              className="group/handle absolute top-0 bottom-0 z-30 -translate-x-1/2 w-12 cursor-ew-resize focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.60)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
               {/* Soft glow along the line — R20-3b: bumped divider/30 →
                   accent/35 so the glow reads as accent light rather than
-                  neutral haze. */}
+                  neutral haze. R21-3b: re-centered on the button's center
+                  (left-1/2 -translate-x-1/2 w-3) since the button is now
+                  wider than the line. */}
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 -left-1 -right-1 blur-[3px] bg-[rgb(var(--accent-base)/0.35)] opacity-70 group-hover/handle:opacity-100 transition-opacity duration-200"
+                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-3 blur-[3px] bg-[rgb(var(--accent-base)/0.35)] opacity-70 group-hover/handle:opacity-100 transition-opacity duration-200"
+              />
+              {/* Visible drag line — 4px rule, accent on hover. Lives as a
+                  child span so the wider button hit area stays transparent. */}
+              <span
+                aria-hidden="true"
+                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-[rgb(var(--divider)/0.70)] group-hover/handle:bg-[rgb(var(--accent-base)/0.55)] transition-[background-color] duration-200"
               />
               {/* Circular grip with double arrows — R20-3b: refined the grip.
                   Added group-hover/handle:scale-105 + a thin accent inner
