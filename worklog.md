@@ -9405,3 +9405,28 @@ Stage Summary:
   (c) Reading time estimate en los headers de las subpáginas
   (d) El demo interactivo (HomeDemo) tiene tabs inactivos con bajo contraste — revisar si se puede mejorar sin romper el "siempre-oscura" design intent
   (e) Optimistic UI: prefetch de las rutas /features/* al hover del megamenú
+
+---
+Task ID: R10-cron-2
+Agent: main (Z.ai Code) — cron webDevReview round 2
+Task: QA + TableOfContents sidebar + ReadingProgressIndicator + a11y polish.
+
+Work Log:
+- QA: build estático 15/15 rutas. Verificado FeaturePageNav de la ronda anterior sigue funcionando (Share button, Sigue explorando, prev/next).
+- Mejoras implementadas:
+  1. NUEVO TableOfContents (src/components/tj/TableOfContents.tsx): panel sticky en el lado derecho ("En esta página" / "On this page") para subpáginas de features. Escanea el DOM buscando h2 dentro de sections de contenido (excluye FinalCTA + FeaturePageNav via firma de texto "Sigue explorando"/"Empieza hoy"), genera slug IDs estables cuando las sections no tienen id, trackea la sección activa via IntersectionObserver (rootMargin -80px top / -50% bottom), smooth-scroll al click (respeta reduced-motion). Desktop-only (xl:block). Auto-oculta si <2 secciones. Item activo: dot accent + bold; inactivos: dot hueco que se llena en hover.
+  2. NUEVO ReadingProgressIndicator (src/components/tj/ReadingProgressIndicator.tsx): barra accent de 2px fijada bajo el navbar (top:60px) que se llena left-to-right según el scroll. Scroll listener throttleado con requestAnimationFrame. Track tenue + fill accent 0.7 opacity + glow sutil en el leading edge.
+  3. Ambos montados en las 3 subpáginas (/features/metricas, /disciplina, /seguridad).
+  4. A11y polish: focus-visible accent ring (2px ring + 2px offset) en cards prev/next y "Sigue explorando" del FeaturePageNav.
+- Fix durante desarrollo: la primera versión del TOC filtraba por `closest('[id]')` pero las sections de DisciplineCost/BeforeAfter/ComparisonSlider no tenían id (resolvían a #main-content), así que el TOC no renderizaba. Reescrito para generar slug IDs estables del texto del h2 y asignarlos al propio h2 como anchor target.
+- Verificación: eslint 0 errores, tsc limpio, production build 15/15 rutas. DOM confirma TOC con 4 entries en disciplina (Disciplina que actúa / Lo que tu indisciplina te cuesta / El mismo trader. Dos resultados / Mueve la barra). VLM confirma visualmente el panel "EN ESTA PÁGINA" con item activo destacado (green dot + bold). Progress bar presente. Title correcto, 0 errores de consola.
+- Commit 433254e (6 archivos, +269/-3) pusheado a origin/main.
+
+Stage Summary:
+- Estado: estable y mejorando. Las subpáginas de features ahora tienen navegación de contenido profesional (TOC + progress bar + cross-nav + share + keyboard nav).
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Print-friendly stylesheet para /features/*
+  (b) Reading time estimate en los headers de las subpáginas
+  (c) Back to top button con progreso circular (ya existe BackToTop, se podría enriquecer)
+  (d) Breadcrumb estructurado más rico (Article schema en subpáginas)
+  (e) Prefetch de rutas /features/* al hover del megamenú (optimistic UI)
