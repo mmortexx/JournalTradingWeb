@@ -5,20 +5,29 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 
 /**
- * BackToTop — circular accent-liquid-glass floating button.
+ * BackToTop — circular floating button with a scroll-progress ring.
  *
  * - Hidden until the user scrolls more than 600 px down.
- * - Smooth-scrolls to top on click via the browser's native
- *   `window.scrollTo({ behavior: "smooth" })` — no custom RAF tween,
- *   no arrow rotation, no spring. The simpler, cleaner primitive.
+ * - An SVG ring around the arrow fills clockwise as the user scrolls
+ *   down, reaching 100% at the bottom of the page. The ring is
+ *   `rgb(var(--accent-base))` so it reads as a quiet brand-colored
+ *   progress cue layered on top of the liquid-glass button.
+ * - The arrow sits in the center; the ring lives in the background
+ *   (rotated -90deg so 0% starts at 12 o'clock).
+ * - Smooth-scrolls to top on click via `window.scrollTo({ behavior:
+ *   "smooth" })`.
  * - Hover: lifts (-2 px) and gains an accent-tinted glow.
+ * - rAF-throttled scroll listener for smooth ring updates without jank.
  *
  * State strategy: `visible` uses a lazy initializer so a back/forward
  * navigation that restores scroll > 600 px shows the button immediately
  * without a setState-in-effect. Subsequent updates come from the scroll
- * listener (event-handler semantics).
+ * listener (event-handler semantics). `progress` is a separate state
+ * updated via rAF.
  */
 const SHOW_AFTER = 600;
+const RING_RADIUS = 18; // px — matches the 44px button with 4px padding
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 export function BackToTop() {
   const { lang } = useLang();
@@ -27,16 +36,35 @@ export function BackToTop() {
   const [visible, setVisible] = useState<boolean>(() =>
     typeof window !== "undefined" ? window.scrollY > SHOW_AFTER : false
   );
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > SHOW_AFTER);
+    let ticking = false;
+    const update = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+      setProgress(pct);
+      setVisible(scrollTop > SHOW_AFTER);
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
+    update();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  // Ring dash: the filled portion = progress% of the circumference.
+  const dashOffset = RING_CIRCUMFERENCE * (1 - progress / 100);
 
   return (
     <AnimatePresence>
@@ -51,9 +79,45 @@ export function BackToTop() {
           exit={{ opacity: 0, scale: 0.7 }}
           transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
+          {/* Scroll-progress ring — SVG circle with a dash that fills
+              clockwise as the user scrolls. Rotated -90deg so 0% starts
+              at 12 o'clock. Sits behind the arrow. */}
           <svg
-            width="18"
-            height="18"
+            className="absolute inset-0 -rotate-90"
+            width="44"
+            height="44"
+            viewBox="0 0 44 44"
+            fill="none"
+            aria-hidden="true"
+          >
+            {/* Track — faint full circle */}
+            <circle
+              cx="22"
+              cy="22"
+              r={RING_RADIUS}
+              stroke="rgb(var(--divider) / 0.15)"
+              strokeWidth="1.5"
+              fill="none"
+            />
+            {/* Progress — accent, dashoffset = (1 - pct) * circumference */}
+            <circle
+              cx="22"
+              cy="22"
+              r={RING_RADIUS}
+              stroke="rgb(var(--accent-base))"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              fill="none"
+              strokeDasharray={RING_CIRCUMFERENCE}
+              strokeDashoffset={dashOffset}
+              style={{ transition: "stroke-dashoffset 0.1s linear" }}
+            />
+          </svg>
+          {/* Arrow icon — sits above the ring */}
+          <svg
+            className="relative"
+            width="16"
+            height="16"
             viewBox="0 0 18 18"
             fill="none"
             stroke="currentColor"

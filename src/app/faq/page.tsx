@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQ } from "@/components/marketing/FAQ";
+import { TableOfContents } from "@/components/tj/TableOfContents";
+import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
+
+// Estimated reading time (16 Q&A entries + contact sections). ~650 words
+// across all answers at 220 wpm = ~3 min.
+const READING_TIME_MIN = 3;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -245,6 +251,7 @@ export default function FaqPage() {
         subtitleEn="Everything you need to know before buying. Can't find your answer? Browse the glossary or write to us."
         breadcrumbEs="FAQ"
         breadcrumbEn="FAQ"
+        readingTimeMin={READING_TIME_MIN}
       />
       <script
         type="application/ld+json"
@@ -254,11 +261,13 @@ export default function FaqPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
+      <ReadingProgressIndicator />
       <FAQ standalone />
       <StillHaveQuestions />
       <ContactSupport />
       <ContactForm />
       <FinalCTANew />
+      <TableOfContents />
     </>
   );
 }

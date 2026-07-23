@@ -3,7 +3,13 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Story } from "@/components/marketing/Story";
 import { Values } from "@/components/marketing/Values";
+import { TableOfContents } from "@/components/tj/TableOfContents";
+import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
+
+// Estimated reading time (story + values + social proof + testimonials +
+// changelog + milestones + newsletter). ~700 words at 220 wpm = ~4 min.
+const READING_TIME_MIN = 4;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -108,11 +114,13 @@ export default function AboutPage() {
         subtitleEn="Not another SaaS. It's a native Windows app that lives on your machine, with institutional metrics and discipline measured in money."
         breadcrumbEs="Acerca de"
         breadcrumbEn="About"
+        readingTimeMin={READING_TIME_MIN}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <ReadingProgressIndicator />
       <Story />
       <Values />
       <SocialProof />
@@ -121,6 +129,7 @@ export default function AboutPage() {
       <Milestones />
       <Newsletter />
       <FinalCTANew />
+      <TableOfContents />
     </>
   );
 }
