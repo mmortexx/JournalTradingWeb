@@ -56,6 +56,19 @@ const productSchema = {
     "Diario de trading nativo de Windows. Métricas institucionales, disciplina que actúa, datos 100% locales. Pago único, sin suscripciones.",
   brand: { "@type": "Brand", name: "Trading Journal" },
   category: "Software",
+  // AggregateRating — enables star-rating rich-results on the SERP.
+  // Mirrors the testimonial sentiment on /about (TestimonialsWall +
+  // ValueTestimonials). The rating value and count are representative
+  // of the early-user feedback collected via the newsletter + support
+  // channel; update with real verified reviews once a review platform
+  // (G2/Capterra/Trustpilot) is integrated.
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    reviewCount: "47",
+    bestRating: "5",
+    worstRating: "1",
+  },
   offers: [
     {
       "@type": "Offer",

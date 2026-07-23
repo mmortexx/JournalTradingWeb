@@ -59,7 +59,8 @@ const G_NAV_MAP: Record<string, string> = {
 };
 
 export function GlobalShortcuts() {
-  const { toggle: toggleLang } = useLang();
+  const { lang, toggle: toggleLang } = useLang();
+  const es = lang === "es";
   const { toggleTheme } = useTheme();
   const router = useRouter();
   const gPrefixActive = useRef(false);
@@ -184,14 +185,20 @@ export function GlobalShortcuts() {
           transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
           aria-hidden="true"
         >
-          <div className="liquid-glass rounded-full px-3.5 py-1.5 flex items-center gap-1.5 border border-[rgb(var(--divider)/0.15)] shadow-lg">
+          <div className="liquid-glass rounded-full pl-3 pr-3.5 py-1.5 flex items-center gap-2 border border-[rgb(var(--divider)/0.15)] shadow-lg">
+            {/* Label — tells the user what the prefix does */}
+            <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary font-semibold hidden sm:inline">
+              {es ? "navegación" : "navigation"}
+            </span>
+            <span className="hidden sm:inline w-px h-3 bg-[rgb(var(--divider)/0.2)]" aria-hidden />
+            {/* The 'g' key — already pressed, shown as "active" */}
             <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border border-[rgb(var(--divider)/0.15)] bg-[rgb(var(--divider)/0.06)] text-[11px] font-mono text-secondary tnum">
               g
             </kbd>
-            <span className="text-[11px] text-tertiary font-medium tracking-wide">
+            <span className="text-[11px] text-tertiary font-medium">
               +
             </span>
-            {/* Pulsing underscore placeholder for the next key */}
+            {/* Pulsing accent placeholder for the next key */}
             <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border border-dashed border-[rgb(var(--accent-base)/0.5)] text-[11px] font-mono text-[rgb(var(--accent-base))] tnum animate-pulse">
               ?
             </span>
