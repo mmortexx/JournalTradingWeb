@@ -56,10 +56,10 @@ import { useEffect, useRef, useState } from "react";
  *    leía como parallax barato). Al detectar scroll hace UNA sacada
  *    balística (160 ms) y FIJA la mirada abajo/arriba mientras dura;
  *    al parar 500 ms, sacada de retorno al centro — el patrón
- *    sacada→fijación de un ojo leyendo. La pupila no palpita con la
- *    velocidad: recibe un pulso de atención al arrancar el gesto y
- *    decae solo (τ≈0.9s). La exposición baja apenas en el tramo medio
- *    (legibilidad) y recupera su máximo hacia el cierre.
+ *    sacada→fijación de un ojo leyendo. La pupila NO cambia de tamaño
+ *    con el scroll (se retiró: leía como que "crecía"). La exposición
+ *    baja apenas en el tramo medio (legibilidad) y recupera su máximo
+ *    hacia el cierre.
  *  - PUNTERO: la PUPILA sigue al ratón — el muestreo del iris se
  *    desplaza hacia el cursor con caída radial (mucho en el centro,
  *    nada en el limbo), así la pupila negra "observa" a donde va el
@@ -100,7 +100,7 @@ precision highp float;
 uniform vec2  uRes;      // resolución del buffer (px)
 uniform float uTime;     // segundos
 uniform float uScroll;   // progreso de página 0..1 (suavizado)
-uniform float uDilate;   // dilatación de pupila 0..1 (velocidad de scroll)
+uniform float uDilate;   // reservado (0): la dilatación por scroll se retiró
 uniform vec2  uLook;     // mirada hacia el puntero, cada eje ~[-1,1]
 uniform float uIntro;    // apertura inicial 0→1
 uniform float uExposure; // exposición global (legibilidad por tramo)
@@ -187,7 +187,7 @@ void main() {
   /* Pupila: latido + dilatación sutil por scroll + apertura inicial +
      reenfoque al parpadear (se comprime un pelo con el párpado). */
   float beat = 0.014 * sin(uTime * 0.55 + 0.6 * sin(uTime * 0.21));
-  float rp = 0.26 * (1.0 + beat) * (1.0 + 0.10 * uDilate)
+  float rp = 0.26 * (1.0 + beat)
            * (1.0 + 0.55 * (1.0 - uIntro))
            * (1.0 + 0.10 * (1.0 - uBlink));
 
@@ -580,16 +580,14 @@ export function BackgroundFX() {
 
     /* Mirada de scroll por FIJACIONES (sacada → fijación → retorno),
        como un ojo que lee — sustituye al seguimiento elástico continuo
-       que daba bandazos pegados a la rueda. attention es el pulso de
-       dilatación de pupila: reacciona al ESTÍMULO (inicio de scroll)
-       y decae solo, en vez de palpitar con la velocidad. */
+       que daba bandazos pegados a la rueda. Solo mueve la MIRADA; la
+       pupila no cambia de tamaño con el scroll. */
     let gazeState = 0; // 0 = centro · 1 = leyendo hacia abajo · -1 = arriba
     let gazeCur = 0;
     let gazeFrom = 0;
     let gazeTo = 0;
     let gazeStart = t0 - 9999;
     let lastScrollActive = 0;
-    let attention = 0;
 
     /* Micro-sacadas: un ojo real nunca queda perfectamente quieto —
        cada 1,4–4 s hace un flick rápido e involuntario a un punto
@@ -653,8 +651,8 @@ export function BackgroundFX() {
          scroll; a los 500 ms de parar, sacada de retorno al centro.
          Es el patrón sacada→fijación de un ojo leyendo — nada de
          deslizamiento elástico pegado a la velocidad de la rueda.
-         El pulso de atención dilata la pupila al ARRANCAR el gesto
-         (reflejo al estímulo) y decae solo (τ ≈ 0.9 s). */
+         (La pupila NO se dilata con el scroll — el dueño lo pidió
+         retirar: leía como que la pupila "crecía" al hacer scroll.) */
       const scrolling = Math.abs(dy) > 2;
       if (scrolling) lastScrollActive = now;
       if (!reduce) {
@@ -664,7 +662,6 @@ export function BackgroundFX() {
           gazeFrom = gazeCur;
           gazeTo = dir > 0 ? -0.3 : 0.24;
           gazeStart = now;
-          attention = Math.min(1, attention + 0.75);
         } else if (
           !scrolling &&
           gazeState !== 0 &&
@@ -677,7 +674,6 @@ export function BackgroundFX() {
         }
         const gk = Math.min(1, (now - gazeStart) / 160);
         gazeCur = gazeFrom + (gazeTo - gazeFrom) * (1 - Math.pow(1 - gk, 4));
-        attention *= Math.exp(-dt / 900);
       }
 
       /* Mirada con inercia. */
@@ -744,7 +740,7 @@ export function BackgroundFX() {
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform1f(uni.uTime, reduce ? 13.7 : t);
       gl.uniform1f(uni.uScroll, scrollS);
-      gl.uniform1f(uni.uDilate, reduce ? 0 : attention);
+      gl.uniform1f(uni.uDilate, 0.0);
       gl.uniform2f(
         uni.uLook,
         (finePointer ? lookX : 0) + saccadeX,

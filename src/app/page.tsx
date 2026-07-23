@@ -61,10 +61,6 @@ const HomeDemo = dynamic(
   () => import("@/components/marketing/HomeDemo").then((m) => m.HomeDemo),
   { loading: () => sectionFallback }
 );
-const VideoCTA = dynamic(
-  () => import("@/components/marketing/VideoCTA").then((m) => m.VideoCTA),
-  { loading: () => sectionFallback }
-);
 const FinalCTANew = dynamic(
   () => import("@/components/marketing/FinalCTANew").then((m) => m.FinalCTANew),
   { loading: () => sectionFallback }
@@ -79,8 +75,7 @@ const FinalCTANew = dynamic(
  *   2. OverviewApp (#overview) — "Todo tu día en una pantalla" + mockup
  *   3. Ticker                  — banda animada con símbolos
  *   4. HomeDemo (#demo)        — la app recreada, interactiva (§ 02)
- *   5. VideoCTA                — vídeo HLS + "Lo que no se mide, no se mejora."
- *   6. FinalCTANew             — CTA de cierre
+ *   5. FinalCTANew             — CTA de cierre
  *
  * Características / Métricas / Disciplina / Seguridad → /features
  * Precios → /pricing · Demo a página completa → /demo
@@ -98,7 +93,6 @@ export default function Home() {
       <OverviewApp />
       <Ticker />
       <HomeDemo />
-      <VideoCTA />
       <FinalCTANew />
     </>
   );

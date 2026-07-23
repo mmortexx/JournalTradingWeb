@@ -64,7 +64,7 @@ export function BeforeAfter() {
             {es ? "La transformación" : "The transformation"}
           </Eyebrow>
           <h2
-            className="mt-5 t-h2 text-white"
+            className="mt-5 t-h2 text-primary"
           >
             {es ? (
               <>
@@ -78,7 +78,7 @@ export function BeforeAfter() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-gray-300 leading-relaxed">
+          <p className="mt-4 text-secondary leading-relaxed">
             {es
               ? "No te prometemos magia. Te prometemos un espejo: lo que haces hoy, sin maquillaje, y lo que podrías hacer si cada operación tuviera un plan."
               : "We don't promise magic. We promise a mirror: what you do today, without makeup, and what you could do if every trade had a plan."}
@@ -131,7 +131,7 @@ export function BeforeAfter() {
                         <path d="M3 3l6 6M9 3l-6 6" stroke="rgb(var(--pnl-neg))" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     </span>
-                    <span className="text-[14px] text-gray-300/85">{line}</span>
+                    <span className="text-[14px] text-secondary">{line}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -143,7 +143,7 @@ export function BeforeAfter() {
             delay={0.1}
             className="flex lg:flex-col items-center justify-center gap-3 lg:py-6"
           >
-            <span className="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-semibold whitespace-nowrap">
+            <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary font-semibold whitespace-nowrap">
               {es ? "La transformación" : "The transformation"}
             </span>
             <motion.span
@@ -151,7 +151,7 @@ export function BeforeAfter() {
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3, type: "spring", stiffness: 240, damping: 18 }}
-              className="relative inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/8 text-white ring-1 ring-white/25"
+              className="relative inline-flex items-center justify-center w-10 h-10 rounded-full bg-[rgb(var(--divider)/0.08)] text-primary ring-1 ring-[rgb(var(--divider)/0.25)]"
               aria-hidden="true"
             >
               {/* ↓ arrow — mobile */}
@@ -168,13 +168,13 @@ export function BeforeAfter() {
           {/* ───────── AFTER — vibrant, accent glow, ✓, slightly larger ───────── */}
           <Reveal delay={0.2} className="h-full flex flex-col">
             {/* Tinted header pill */}
-            <div className="mb-3 self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/20">
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/8 text-white">
+            <div className="mb-3 self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-base)/0.1)] border border-[rgb(var(--accent-base)/0.3)]">
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[rgb(var(--accent-base)/0.15)] text-[rgb(var(--accent-base))]">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
-              <span className="t-label text-white">
+              <span className="t-label text-[rgb(var(--accent-base))]">
                 {es ? "Con Trading Journal" : "With Trading Journal"}
               </span>
             </div>
@@ -225,7 +225,7 @@ export function BeforeAfter() {
                         <path d="M2 6.5l2.5 2.5L10 3.5" stroke="rgb(var(--pnl-pos))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </span>
-                    <span className="text-[14px] text-white font-medium">{line}</span>
+                    <span className="text-[14px] text-primary font-medium">{line}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -235,7 +235,7 @@ export function BeforeAfter() {
 
         {/* Footnote */}
         <Reveal delay={0.18} className="mt-8">
-          <p className="text-xs text-gray-400 text-center max-w-2xl mx-auto">
+          <p className="text-xs text-tertiary text-center max-w-2xl mx-auto">
             {es
               ? "Sin promesas de rentabilidad. Solo la disciplina de mirarte — y la herramienta para hacerlo en serio."
               : "No profitability promises. Only the discipline of looking at yourself — and the tool to do it seriously."}

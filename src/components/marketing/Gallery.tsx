@@ -17,10 +17,10 @@ export function Gallery() {
 
   const shots = [
     {
-      src: "/img/dashboard-hero.webp",
+      src: "/img/app-analitica.webp",
       alt: es
-        ? "Visualización abstracta del panel de trading con métricas institucionales"
-        : "Abstract visualization of the trading dashboard with institutional metrics",
+        ? "Pantalla de Analítica de Trading Journal con la tabla de métricas por periodo, win rate, profit factor, Sharpe y Sortino"
+        : "Trading Journal Analytics screen with the metrics-by-period table, win rate, profit factor, Sharpe and Sortino",
       title: es ? "Métricas institucionales" : "Institutional metrics",
       desc: es
         ? "40+ ratios calculados de tus operaciones. Sharpe, Sortino, Calmar, profit factor, expectancy en R."
@@ -28,33 +28,33 @@ export function Gallery() {
       span: "md:col-span-2 md:row-span-2",
     },
     {
-      src: "/img/equity-curve.webp",
-      alt: es ? "Visualización abstracta de la curva de equity" : "Abstract equity curve visualization",
-      title: es ? "Curva de equity" : "Equity curve",
-      desc: es ? "Con drawdown sombreado y tooltip al hacer hover." : "With shaded drawdown and hover tooltip.",
+      src: "/img/app-curva.webp",
+      alt: es ? "Curva de rendimiento filtrada con drawdown sombreado y calidad de la curva" : "Filtered performance curve with shaded drawdown and curve quality",
+      title: es ? "Curva de rendimiento" : "Performance curve",
+      desc: es ? "Rendimiento vs balance, con drawdown sombreado y calidad de la curva (R², K-Ratio)." : "Performance vs balance, with shaded drawdown and curve quality (R², K-Ratio).",
       span: "md:col-span-1",
     },
     {
-      src: "/img/discipline-guardian.webp",
-      alt: es ? "Visualización abstracta del guardián de disciplina" : "Abstract discipline guardian visualization",
-      title: es ? "Guardián de disciplina" : "Discipline guardian",
-      desc: es ? "Te frena antes de la tontería." : "Stops you before the dumb trade.",
+      src: "/img/app-diario.webp",
+      alt: es ? "Diario de trading con el check-in del día: horas de sueño, estado mental y físico" : "Trading journal with the daily check-in: hours of sleep, mental and physical state",
+      title: es ? "Diario y disciplina" : "Journal and discipline",
+      desc: es ? "Check-in diario: sueño, estado mental y físico, y si tenías plan." : "Daily check-in: sleep, mental and physical state, and whether you had a plan.",
       span: "md:col-span-1",
     },
     {
-      src: "/img/playbook-cards.webp",
-      alt: es ? "Visualización abstracta del playbook con stats en vivo" : "Abstract playbook with live stats visualization",
+      src: "/img/app-playbook.webp",
+      alt: es ? "Playbook con las fichas de cada setup: Ruptura, Reversión, Pullback, Rango y Tendencia" : "Playbook with each setup card: Breakout, Reversal, Pullback, Range and Trend",
       title: es ? "Playbook en vivo" : "Live playbook",
       desc: es
-        ? "Cada ficha muestra expectancy, win rate y muestra calculados de tus operaciones."
-        : "Each card shows expectancy, win rate and sample computed from your trades.",
+        ? "Cada setup con su expectancy, win rate, muestra y reparto de R calculados de tus operaciones."
+        : "Each setup with its expectancy, win rate, sample and R distribution computed from your trades.",
       span: "md:col-span-2",
     },
     {
-      src: "/img/multi-account.webp",
-      alt: es ? "Visualización abstracta de gestión de múltiples cuentas" : "Abstract multi-account management visualization",
-      title: es ? "Múltiples cuentas" : "Multi-account",
-      desc: es ? "Cuentas ilimitadas en Pro." : "Unlimited accounts on Pro.",
+      src: "/img/app-operaciones.webp",
+      alt: es ? "Registro de operaciones con 200 trades filtrables por instrumento, setup y resultado" : "Trade log with 200 trades filterable by instrument, setup and outcome",
+      title: es ? "Registro de operaciones" : "Trade log",
+      desc: es ? "200 operaciones filtrables por instrumento, setup, dirección y resultado." : "200 trades filterable by instrument, setup, direction and outcome.",
       span: "md:col-span-1",
     },
   ];
