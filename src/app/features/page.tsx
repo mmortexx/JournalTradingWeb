@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { TableOfContents } from "@/components/tj/TableOfContents";
+import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
@@ -84,6 +86,7 @@ export default function FeaturesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <ReadingProgressIndicator />
       {/* Overview sections — broad strokes. Deep dives moved to
           /features/metricas, /features/disciplina, /features/seguridad. */}
       <FeaturesBento num="01" />
@@ -91,6 +94,7 @@ export default function FeaturesPage() {
       <HowItWorks />
       <MoreFeatures />
       <FinalCTANew />
+      <TableOfContents />
     </>
   );
 }

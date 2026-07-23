@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 import { asset } from "@/lib/asset";
@@ -26,9 +27,10 @@ import { openShortcutsHelp } from "@/components/tj/ShortcutsHelp";
  *      `g q` → /faq         (q for "questions")
  *
  * The `g` prefix sets a 1-second window; if no valid second key arrives
- * in time, the prefix expires silently. A subtle on-screen hint chip
- * appears while the prefix is active so the user knows the next key is
- * being captured.
+ * in time, the prefix expires silently. While the prefix is active, a
+ * small floating hint chip ("g _") appears at the bottom-center of the
+ * viewport so the user knows the next key is being captured — this
+ * makes the power-user feature discoverable without a help overlay.
  *
  * All listeners are skipped when:
  *  - The user is typing in an INPUT, TEXTAREA, SELECT, or contentEditable
@@ -40,8 +42,6 @@ import { openShortcutsHelp } from "@/components/tj/ShortcutsHelp";
  *  - A meta/ctrl/alt modifier is held (so we never swallow Cmd+T, Ctrl+L, etc.
  *    which the browser owns). Shift is allowed so `?` and uppercase `T`/`L`
  *    work naturally.
- *
- * Renders nothing — purely a side-effect listener.
  */
 
 const G_PREFIX_TIMEOUT = 1000; // ms — how long the `g` prefix stays active
@@ -64,8 +64,32 @@ export function GlobalShortcuts() {
   const router = useRouter();
   const gPrefixActive = useRef(false);
   const gPrefixTimer = useRef<number | null>(null);
+  // Chip visibility — separate state so the hint shows/hides without
+  // re-rendering the whole component tree. Only flips true/false on
+  // prefix arm/expire, not on every keystroke.
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
+    const armPrefix = () => {
+      gPrefixActive.current = true;
+      setShowHint(true);
+      if (gPrefixTimer.current) window.clearTimeout(gPrefixTimer.current);
+      gPrefixTimer.current = window.setTimeout(() => {
+        gPrefixActive.current = false;
+        setShowHint(false);
+        gPrefixTimer.current = null;
+      }, G_PREFIX_TIMEOUT);
+    };
+
+    const disarmPrefix = () => {
+      gPrefixActive.current = false;
+      setShowHint(false);
+      if (gPrefixTimer.current) {
+        window.clearTimeout(gPrefixTimer.current);
+        gPrefixTimer.current = null;
+      }
+    };
+
     const onKey = (e: KeyboardEvent) => {
       // 1) Skip when typing in a form field or editable region.
       const target = e.target as HTMLElement | null;
@@ -81,24 +105,18 @@ export function GlobalShortcuts() {
         }
       }
 
-      // 2) Skip when the CommandPalette is open — cmdk renders [cmdk-root]
-      //    on its root while mounted.
+      // 2) Skip when the CommandPalette is open.
       if (document.querySelector("[cmdk-root]")) return;
 
-      // 3) Skip when the ShortcutsHelp overlay is open — it manages its own
-      //    keys (Escape) and we don't want T/L/? to fire behind it.
+      // 3) Skip when the ShortcutsHelp overlay is open.
       if (document.body.dataset.shortcutsHelpOpen === "true") return;
 
-      // 4) Never hijack browser shortcuts that involve meta/ctrl/alt (Cmd+T,
-      //    Ctrl+L, etc.). Shift is OK — needed for `?` and Shift+T/L.
+      // 4) Never hijack browser shortcuts that involve meta/ctrl/alt.
       if (e.metaKey || e.ctrlKey || e.altKey) return;
 
       const key = e.key;
 
-      // `?` opens the help overlay. Detect by `e.key === "?"` (covers US
-      // layouts where Shift+/ produces `?`) and also by `e.code === "Slash"`
-      // + shift (layout-independent — works for ES keyboards where `?` lives
-      // elsewhere). Either way, the user's intent is "show help".
+      // `?` opens the help overlay.
       if (
         key === "?" ||
         (e.shiftKey && (key === "/" || e.code === "Slash"))
@@ -108,41 +126,25 @@ export function GlobalShortcuts() {
         return;
       }
 
-      // Single-character keys only — ignore dead keys, arrows, Enter, etc.
+      // Single-character keys only.
       if (key.length !== 1) return;
 
       const lower = key.toLowerCase();
 
-      // `g` prefix handling — GitHub-style two-key navigation. When `g` is
-      // pressed, we arm a 1-second window during which the next letter
-      // navigates to the corresponding page. If the second key isn't a
-      // valid nav target, the prefix simply expires.
+      // `g` prefix handling — GitHub-style two-key navigation.
       if (gPrefixActive.current) {
-        // Cancel the pending expiry timer — we're consuming the prefix now.
-        if (gPrefixTimer.current) {
-          window.clearTimeout(gPrefixTimer.current);
-          gPrefixTimer.current = null;
-        }
-        gPrefixActive.current = false;
+        disarmPrefix();
         const dest = G_NAV_MAP[lower];
         if (dest) {
           e.preventDefault();
           router.push(asset(dest));
         }
-        // If dest is undefined, the prefix is consumed but no navigation
-        // happens (the key was an invalid second key — silent no-op).
         return;
       }
 
       if (lower === "g") {
         e.preventDefault();
-        gPrefixActive.current = true;
-        // Expire the prefix after G_PREFIX_TIMEOUT ms so a stale `g`
-        // doesn't capture a much-later keystroke.
-        gPrefixTimer.current = window.setTimeout(() => {
-          gPrefixActive.current = false;
-          gPrefixTimer.current = null;
-        }, G_PREFIX_TIMEOUT);
+        armPrefix();
         return;
       }
 
@@ -162,5 +164,31 @@ export function GlobalShortcuts() {
     };
   }, [toggleTheme, toggleLang, router]);
 
-  return null;
+  return (
+    <AnimatePresence>
+      {showHint && (
+        <motion.div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          initial={{ opacity: 0, y: 8, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 8, scale: 0.9 }}
+          transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          aria-hidden="true"
+        >
+          <div className="liquid-glass rounded-full px-3.5 py-1.5 flex items-center gap-1.5 border border-[rgb(var(--divider)/0.15)] shadow-lg">
+            <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border border-[rgb(var(--divider)/0.15)] bg-[rgb(var(--divider)/0.06)] text-[11px] font-mono text-secondary tnum">
+              g
+            </kbd>
+            <span className="text-[11px] text-tertiary font-medium tracking-wide">
+              +
+            </span>
+            {/* Pulsing underscore placeholder for the next key */}
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded border border-dashed border-[rgb(var(--accent-base)/0.5)] text-[11px] font-mono text-[rgb(var(--accent-base))] tnum animate-pulse">
+              ?
+            </span>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }
