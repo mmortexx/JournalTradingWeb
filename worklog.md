@@ -9535,3 +9535,37 @@ Stage Summary:
   (c) Keyboard shortcut "g" + letra para navegar entre páginas (g m = métricas)
   (d) BreadcrumbList con 3 niveles en /features/* (ya tiene 3: Inicio/Características/eje)
   (e) Review schema (AggregateRating) en /pricing si hay testimonials verificables
+
+---
+Task ID: R10-cron-7
+Agent: main (Z.ai Code) — cron webDevReview round 7
+Task: GitHub-style 'g' + letter keyboard shortcuts para navegación entre páginas.
+
+Work Log:
+- QA: build estático 15/15 rutas.
+- Mejoras implementadas:
+  1. GlobalShortcuts extendido con navegación two-key estilo GitHub (prefix 'g' + letra):
+     g h → / (home), g f → /features, g m → /features/metricas, g d → /features/disciplina,
+     g s → /features/seguridad, g p → /pricing, g e → /demo, g a → /about, g q → /faq.
+     Al pulsar 'g' se arma una ventana de 1 segundo; la siguiente letra navega a la ruta mapeada via router.push(asset(dest)). Si no llega una segunda key válida a tiempo, el prefix expira silenciosamente. Usa useRef (gPrefixActive + gPrefixTimer) para que el estado del prefix no trigger re-renders. Todos los guards existentes preservados (inputs, CommandPalette, ShortcutsHelp, meta/ctrl/alt).
+  2. ShortcutsHelp overlay actualizado: los 9 atajos 'g' + letra documentados con labels bilingües ("Ir a Métricas" / "Go to Metrics", etc.) para que los usuarios los descubran via el overlay de ayuda (?).
+- Verificación: eslint 0 errores, tsc limpio, build 15/15 rutas. DOM confirma el overlay de shortcuts se abre (? key, data-shortcuts-help-open=true) y muestra todos los atajos 'g' ("Ir a Métricas" presente). Ruta destino /features/metricas devuelve 200. Código GlobalShortcuts (G_NAV_MAP, gPrefixActive) presente en el bundle.
+- Commit cc9c60f (2 archivos, +157/-4) pusheado a origin/main.
+
+Stage Summary:
+- Estado: power-user features añadidas. El sitio ahora tiene navegación por teclado profesional (g+letra) además de los atajos existentes (T tema, L idioma, ? ayuda, ⌘K command palette). ShortcutsHelp overlay documentado con todos los atajos.
+- Atajos de teclado totales del sitio:
+  ⌘/Ctrl+K → command palette
+  ? → shortcuts help overlay
+  T → toggle tema
+  L → toggle idioma
+  g h/f/m/d/s/p/e/a/q → navegación entre páginas
+  1-6 → tabs demo
+  F → fullscreen demo
+  Esc → cerrar
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Open Graph images dinámicas por subpágina (og:image específico por eje)
+  (b) /features overview podría beneficiarse de TOC
+  (c) Review schema (AggregateRating) en /pricing
+  (d) "g" prefix hint chip on-screen mientras el prefix está activo
+  (e) Command palette podría listar las páginas también para navegación por teclado
