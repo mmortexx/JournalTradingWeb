@@ -144,7 +144,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             <Reveal>
               <Link
                 href={asset(AXES[prev].href)}
-                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-all duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)]"
+                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-all duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <span className="grid place-items-center w-10 h-10 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-primary group-hover:bg-[rgb(var(--divider)/0.1)] transition-colors flex-none">
                   <ArrowLeft size={18} />
@@ -167,7 +167,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             <Reveal delay={0.06}>
               <Link
                 href={asset(AXES[next].href)}
-                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-all duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right"
+                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-all duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <span className="grid place-items-center w-10 h-10 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-primary group-hover:bg-[rgb(var(--divider)/0.1)] transition-colors flex-none">
                   <ArrowRight size={18} />
@@ -207,7 +207,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                 <Link
                   href={asset(a.href)}
                   aria-current={isActive ? "page" : undefined}
-                  className={`group relative liquid-glass rounded-card p-5 block transition-all duration-300 hover:-translate-y-0.5 border ${
+                  className={`group relative liquid-glass rounded-card p-5 block transition-all duration-300 hover:-translate-y-0.5 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
                     isActive
                       ? "border-[rgb(var(--accent-base)/0.4)] depth-2"
                       : "border-[rgb(var(--divider)/0.1)] depth-1 hover:depth-2"

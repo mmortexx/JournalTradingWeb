@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
+import { TableOfContents } from "@/components/tj/TableOfContents";
+import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
@@ -72,11 +74,13 @@ export default function MetricasPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <ReadingProgressIndicator />
       <MetricsShowcaseNew num="01" />
       <RiskCalculator num="02" />
       <Wrapped />
       <FeaturePageNav current="metricas" />
       <FinalCTANew />
+      <TableOfContents />
     </>
   );
 }
