@@ -372,6 +372,22 @@ export function Navbar() {
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background =
                         "color-mix(in srgb, var(--ink) 5%, transparent)";
+                      // Optimistic prefetch: inject a <link rel="prefetch">
+                      // for the route so the page is already in the browser
+                      // cache when the visitor clicks. Idempotent — if the
+                      // link already exists, no duplicate is added. This
+                      // gives near-instant navigation from the megamenu on
+                      // slow connections without forcing all routes to
+                      // prefetch on page load.
+                      const id = `prefetch-${item.href.replace(/[^a-z0-9]/gi, "-")}`;
+                      if (!document.getElementById(id)) {
+                        const link = document.createElement("link");
+                        link.id = id;
+                        link.rel = "prefetch";
+                        link.href = item.href;
+                        link.as = "document";
+                        document.head.appendChild(link);
+                      }
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = "transparent";

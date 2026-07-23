@@ -40,6 +40,48 @@ const breadcrumbSchema = {
   ],
 };
 
+/**
+ * Product + Offer structured data — tells search engines this page sells
+ * two software products (Core $29, Pro $49) with one-time pricing. Enables
+ * price rich-results on the SERP (the price snippet under the listing).
+ * Mirrors the actual prices shown in the Pricing component (Core $29 ·
+ * Pro $49, one-time payment, USD). Prices are the brand-fixed values —
+ * NEVER 149/249 (per the owner's decision).
+ */
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: "Trading Journal",
+  description:
+    "Diario de trading nativo de Windows. Métricas institucionales, disciplina que actúa, datos 100% locales. Pago único, sin suscripciones.",
+  brand: { "@type": "Brand", name: "Trading Journal" },
+  category: "Software",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Trading Journal — Core",
+      price: "29",
+      priceCurrency: "USD",
+      priceValidUntil: "2026-12-31",
+      availability: "https://schema.org/InStock",
+      url: `${SITE_URL}/pricing/`,
+      description:
+        "Journal completo, 40+ métricas, 2 cuentas, gestión de riesgo, disciplina, informes PDF básicos.",
+    },
+    {
+      "@type": "Offer",
+      name: "Trading Journal — Pro",
+      price: "49",
+      priceCurrency: "USD",
+      priceValidUntil: "2026-12-31",
+      availability: "https://schema.org/InStock",
+      url: `${SITE_URL}/pricing/`,
+      description:
+        "Todo lo de Core + cuentas ilimitadas, modo prop firm, Monte Carlo, track record, risk of ruin, PDF avanzado, importador de rivales.",
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Precios",
   description:
@@ -131,6 +173,10 @@ export default function PricingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
       <ReadingProgressIndicator />
       {/* Prominent 30-day money-back guarantee banner — sits between the
