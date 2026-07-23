@@ -9453,3 +9453,27 @@ Stage Summary:
   (c) /about y /faq podrían beneficiarse de TOC + reading time también
   (d) FAQ schema (FAQPage JSON-LD) en /faq para rich-results de preguntas
   (e) Open Graph images dinámicas por subpágina (og:image específico por eje)
+
+---
+Task ID: R10-cron-4
+Agent: main (Z.ai Code) — cron webDevReview round 4
+Task: BackToTop con progreso circular + TOC/reading time en about & faq.
+
+Work Log:
+- QA: build estático 15/15 rutas. Verificado que /faq ya tenía FAQPage JSON-LD schema (16 Q&A entries) — ese item del worklog anterior ya estaba cubierto.
+- Mejoras implementadas:
+  1. BackToTop enriquecido (src/components/tj/BackToTop.tsx): añadido un SVG ring de progreso de scroll alrededor de la flecha. El ring se llena clockwise (0% arriba, 100% abajo) usando strokeDasharray/strokeDashoffset. Color accent-base sobre track divider tenue, rotado -90deg para que 0% empiece a las 12. Scroll listener rAF-throttleado actualiza tanto `visible` como `progress`. La flecha queda en el centro sobre el ring; hover lift + accent glow preservados.
+  2. TOC + reading time en /about: readingTimeMin={4}, ReadingProgressIndicator + TableOfContents montados (detecta 6 secciones de contenido).
+  3. TOC + reading time en /faq: readingTimeMin={3}, ReadingProgressIndicator + TableOfContents montados.
+  4. Styling polish: TOC items ahora tienen focus-visible accent ring para accesibilidad de teclado.
+- Verificación: eslint 0 errores, tsc limpio, production build 15/15 rutas. DOM confirma TOC (6 entries en /about), reading-time pill presente, BackToTop ring SVG renderizado. VLM confirma botón circular con partial progress ring visible en bottom-right tras scroll.
+- Commit 326f294 (4 archivos, +91/-9) pusheado a origin/main.
+
+Stage Summary:
+- Estado: estable y pulido. Todas las páginas de contenido (features/*, about, faq) ahora tienen TOC + reading time + progress bar. BackToTop enriquecido con ring de progreso. FAQ ya tenía FAQPage schema.
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Prefetch de rutas /features/* al hover del megamenú (optimistic UI)
+  (b) Open Graph images dinámicas por subpágina (og:image específico por eje)
+  (c) /pricing podría beneficiarse de TOC + reading time
+  (d) /demo podría beneficiarse de TOC
+  (e) Animación de entrada para el BackToTop ring (fill animado al aparecer)
