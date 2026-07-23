@@ -21,7 +21,7 @@ import { FadeIn } from "@/components/tj/FadeIn";
  *
  * Left column: eyebrow pill → character-by-character heading with a
  * gradient-highlighted "medida." / "measured." → refined lead paragraph
- * → primary "Comprar — desde $149" CTA (with arrow that translates on
+ * → primary "Comprar — desde $29" CTA (with arrow that translates on
  * hover) + secondary liquid-glass "Probar la demo" → inline trust strip
  * of 4 small-icon credibility signals (100 % local · Pago único ·
  * ES + EN · Garantía 30 días).
@@ -150,7 +150,7 @@ export function HeroVideo() {
                   href={asset("/pricing")}
                   className="group inline-flex items-center gap-2 rounded-lg bg-white text-black px-8 py-3.5 font-medium shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:-translate-y-0.5 hover:shadow-[0_4px_14px_rgb(0_0_0/0.30)] transition-all duration-200"
                 >
-                  {es ? "Comprar — desde $149" : "Buy — from $149"}
+                  {es ? "Comprar — desde $29" : "Buy — from $29"}
                   <svg
                     className="transition-transform duration-200 group-hover:translate-x-1"
                     width="18"

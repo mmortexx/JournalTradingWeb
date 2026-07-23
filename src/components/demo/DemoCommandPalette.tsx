@@ -106,11 +106,9 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
     return () => cancelAnimationFrame(id);
   }, [open]);
 
-  /* ---- Palette cycle order ---- */
-  const paletteOrder: PaletteName[] = useMemo(
-    () => ["oro", "esmeralda", "onix", "aurora", "seda"],
-    []
-  );
+  /* ---- Palette cycle order — una sola paleta tras el pivote grafito;
+     el comando de ciclo queda como no-op elegante. ---- */
+  const paletteOrder: PaletteName[] = useMemo(() => ["grafito"], []);
 
   /* ---- Command list ---- */
   const commands = useMemo<Command[]>(() => {

@@ -244,6 +244,13 @@ const LANG_OPTIONS = [
   { code: "en", label: "English", code2: "EN" },
 ] as const;
 
+/* Etiqueta visible de cada paleta de acento — "Grafito" es nombre
+   propio y funciona igual en ES y EN (las PALETTES de lib/theme ya no
+   llevan labelKey de i18n). */
+const PALETTE_LABEL: Record<(typeof PALETTES)[number]["name"], string> = {
+  grafito: "Grafito",
+};
+
 export function SettingsPage() {
   const { t, lang, setLang } = useLang();
   const { toast } = useToast();
@@ -639,7 +646,9 @@ export function SettingsPage() {
         </div>
       </SettingSection>
 
-      {/* ---------- Accent color ---------- */}
+      {/* ---------- Accent color ----------
+          Etiqueta visible de cada paleta: "Grafito" funciona igual en
+          ES y EN (las PALETTES ya no llevan labelKey de i18n). */}
       <SettingSection
         eyebrow="03"
         title={t("accentColor")}
@@ -658,7 +667,7 @@ export function SettingsPage() {
                 type="button"
                 role="radio"
                 aria-checked={active}
-                aria-label={t(p.labelKey)}
+                aria-label={PALETTE_LABEL[p.name]}
                 onClick={() => setPalette(p.name)}
                 initial={{ opacity: 0, y: 12, scale: 0.92 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -694,7 +703,7 @@ export function SettingsPage() {
                   className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-primary text-[11px] font-semibold whitespace-nowrap z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
                   style={{ backgroundColor: p.dark }}
                 >
-                  {t(p.labelKey)}
+                  {PALETTE_LABEL[p.name]}
                   <span
                     aria-hidden="true"
                     className="absolute left-1/2 -translate-x-1/2 -bottom-[3px] w-2 h-2 rotate-45"
@@ -755,7 +764,7 @@ export function SettingsPage() {
                     active ? "text-primary" : "text-secondary group-hover:text-primary"
                   }`}
                 >
-                  {t(p.labelKey)}
+                  {PALETTE_LABEL[p.name]}
                 </span>
               </motion.button>
             );

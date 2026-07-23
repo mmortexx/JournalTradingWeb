@@ -10,8 +10,11 @@ import { motion } from "framer-motion";
  * Le siguen catálogo de métricas (4 familias) y la calculadora de
  * riesgo interactiva — esos se renderizan en sus propios componentes
  * y se montan desde la home.
+ *
+ * `num` — ordinal del eyebrow. Por defecto el de la home ("04"); las
+ * páginas internas pasan el suyo para mantener su propia secuencia.
  */
-export function MetricsShowcaseNew() {
+export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
   const { lang } = useLang();
   const es = lang === "es";
   return (
@@ -30,7 +33,7 @@ export function MetricsShowcaseNew() {
               className="tnum"
               style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
             >
-              § 04
+              § {num}
             </span>
             <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
             <span

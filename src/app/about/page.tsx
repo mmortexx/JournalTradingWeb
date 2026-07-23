@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Story } from "@/components/marketing/Story";
 import { Values } from "@/components/marketing/Values";
-import { FinalCTA } from "@/components/marketing/FinalCTA";
+import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -120,7 +120,7 @@ export default function AboutPage() {
       <Changelog />
       <Milestones />
       <Newsletter />
-      <FinalCTA />
+      <FinalCTANew />
     </>
   );
 }

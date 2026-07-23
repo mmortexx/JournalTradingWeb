@@ -12,6 +12,11 @@ import { GlobalShortcuts } from "@/components/tj/GlobalShortcuts";
 import { ShortcutsHelp } from "@/components/tj/ShortcutsHelp";
 import { ScrollToTop } from "@/components/tj/ScrollToTop";
 import { SkipLink } from "@/components/tj/SkipLink";
+import { BackgroundFX } from "@/components/tj/BackgroundFX";
+import { ScrollProgress } from "@/components/tj/ScrollProgress";
+import { IntroSequence } from "@/components/tj/IntroSequence";
+import { SectionReveal } from "@/components/tj/SectionReveal";
+import { DecorFX } from "@/components/tj/DecorFX";
 
 /**
  * Viewport — `viewport-fit=cover` lets the layout extend into the notch /
@@ -26,7 +31,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#34B476",
+  themeColor: "#B9B2A6",
 };
 
 const geistSans = Geist({
@@ -223,12 +228,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning className="dark" data-theme="dark" data-palette="verde">
+    <html lang="es" suppressHydrationWarning className="dark" data-theme="dark" data-palette="grafito">
       <head>
         <script
           // Prevent FOUC: apply saved theme/palette before paint
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('tj-theme')||'dark';var p=localStorage.getItem('tj-palette')||'verde';document.documentElement.dataset.theme=t;document.documentElement.dataset.palette=p;if(t==='dark')document.documentElement.classList.add('dark');}catch(e){document.documentElement.dataset.theme='dark';document.documentElement.dataset.palette='verde';}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('tj-theme')||'dark';var p=localStorage.getItem('tj-palette')||'grafito';document.documentElement.dataset.theme=t;document.documentElement.dataset.palette=p;if(t==='dark')document.documentElement.classList.add('dark');}catch(e){document.documentElement.dataset.theme='dark';document.documentElement.dataset.palette='grafito';}})();`,
+          }}
+        />
+        <script
+          // Intro del HTML de referencia: en la primera visita de la
+          // sesión, oculta los [data-seq] del hero ANTES del primer
+          // paint (IntroSequence los revela tras el loader).
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(!sessionStorage.getItem('tj_intro'))document.documentElement.classList.add('tj-preload')}catch(e){}})();`,
           }}
         />
       </head>
@@ -249,6 +262,14 @@ export default function RootLayout({
         />
         <Providers>
           <div className="min-h-screen flex flex-col">
+            {/* Capa de efectos del HTML de referencia: fondo fijo con
+                rejilla interactiva, barra de progreso de scroll, intro
+                con loader, reveal por sección y spotlight de tarjetas. */}
+            <BackgroundFX />
+            <ScrollProgress />
+            <IntroSequence />
+            <SectionReveal />
+            <DecorFX />
             <SkipLink />
             <CommandPalette />
             <GlobalShortcuts />

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 
@@ -12,10 +11,16 @@ import { useLang } from "@/lib/i18n";
  * - Párrafos lead + CTA doble (Comprar / Ver demo)
  * - Chips de confianza (100 % local, pago único, ES+EN, garantía 30 días)
  * - Indicador "Scroll" abajo
- * - Float-card decorativa superior derecha
+ * - Float-card decorativa superior derecha (con spotlight .tj-spot)
+ *
+ * Entrada: los elementos llevan `data-seq` y los revela IntroSequence
+ * con el escalonado + blur del HTML (tras el loader en primera visita).
+ * Por eso este componente NO usa framer-motion para la entrada — dos
+ * sistemas animando opacity a la vez se pisan.
  *
  * Reemplaza al antiguo `HeroVideo.tsx`. Sin vídeo de fondo — el hero
- * respira sobre el fondo fijo del body con un halo radial verde sutil.
+ * respira sobre el fondo fijo del body (BackgroundFX) con un halo
+ * radial verde sutil.
  */
 export function Hero() {
   const { lang } = useLang();
@@ -77,11 +82,9 @@ export function Hero() {
       </div>
 
       {/* Float-card decorativa */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="absolute right-[6%] top-[120px] z-10 hidden lg:flex flex-col justify-between"
+      <div
+        data-seq
+        className="tj-spot absolute right-[6%] top-[120px] z-10 hidden lg:flex flex-col justify-between"
         style={{
           width: 220,
           height: 220,
@@ -117,16 +120,11 @@ export function Hero() {
             {es ? "Nativo de Windows · v1.4.2" : "Windows native · v1.4.2"}
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Contenido */}
       <div className="relative z-10 w-full max-w-[1240px] mx-auto px-6 sm:px-10 pt-32 pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2.5 mb-5"
-        >
+        <div data-seq className="inline-flex items-center gap-2.5 mb-5">
           <span
             className="inline-block rounded-full"
             style={{
@@ -134,6 +132,7 @@ export function Hero() {
               height: 6,
               background: "rgb(var(--accent-base))",
               boxShadow: "0 0 12px rgb(var(--accent-base))",
+              animation: "tj-glow 2.6s ease-in-out infinite",
             }}
           />
           <span
@@ -148,11 +147,9 @@ export function Hero() {
               ? "Diario de trading · Windows nativo"
               : "Trading journal · Windows native"}
           </span>
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.05 }}
+        </div>
+        <h1
+          data-seq
           className="m-0 mb-2 font-sans uppercase"
           style={{
             fontSize: "clamp(2.8rem, 7.6vw, 5.8rem)",
@@ -177,11 +174,9 @@ export function Hero() {
               <span style={{ color: "rgb(var(--accent-base))" }}>.</span>
             </>
           )}
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
+        </h1>
+        <p
+          data-seq
           className="m-0 mb-3"
           style={{
             fontSize: "clamp(1.1rem, 2.2vw, 1.7rem)",
@@ -194,11 +189,9 @@ export function Hero() {
           {es
             ? "Mídela con el rigor de una mesa profesional."
             : "Measure it with institutional-grade rigour."}
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+        </p>
+        <p
+          data-seq
           className="m-0 mb-8"
           style={{
             fontSize: "clamp(0.95rem, 1.4vw, 1.15rem)",
@@ -211,13 +204,8 @@ export function Hero() {
           {es
             ? "40+ métricas institucionales, un guardián que te frena antes del error y tus datos 100 % en tu máquina. Nativo de Windows, pago único desde 29 $."
             : "40+ institutional metrics, a guardian that brakes before the error, and your data 100% on your machine. Windows-native, one-time payment from $29."}
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-          className="flex flex-wrap gap-3"
-        >
+        </p>
+        <div data-seq className="flex flex-wrap gap-3">
           <Link
             href="/pricing"
             className="inline-flex items-center gap-2.5 rounded-full"
@@ -245,7 +233,7 @@ export function Hero() {
           </Link>
           <Link
             href="/demo"
-            className="inline-flex items-center gap-2.5 rounded-full"
+            className="tj-cta-sheen inline-flex items-center gap-2.5 rounded-full"
             style={{
               height: 54,
               padding: "0 26px",
@@ -267,13 +255,8 @@ export function Hero() {
             <Play size={15} fill="currentColor" aria-hidden />
             {es ? "Ver la demo" : "See the demo"}
           </Link>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2"
-        >
+        </div>
+        <div data-seq className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2">
           {[
             es ? "100 % LOCAL" : "100% LOCAL",
             es ? "PAGO ÚNICO" : "ONE-TIME",
@@ -296,7 +279,7 @@ export function Hero() {
               </span>
             </span>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Indicador Scroll */}

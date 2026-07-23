@@ -113,7 +113,7 @@ export function DemoReadyToBuy() {
             </div>
             <p className="mt-5 text-xs text-tertiary">
               {es ? "desde " : "from "}
-              <span className="tnum text-secondary font-medium">$149</span>
+              <span className="tnum text-secondary font-medium">$29</span>
               {" · "}
               {es ? "pago único · sin suscripción" : "one-time · no subscription"}
             </p>

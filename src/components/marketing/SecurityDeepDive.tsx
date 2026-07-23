@@ -241,8 +241,8 @@ function ComparisonTable({ es }: { es: boolean }) {
     {
       labelEs: "Pago",
       labelEn: "Payment",
-      tjEs: "Pago único — $149 / $249",
-      tjEn: "One-time — $149 / $249",
+      tjEs: "Pago único — $29 / $49",
+      tjEn: "One-time — $29 / $49",
       saasEs: "Suscripción mensual",
       saasEn: "Monthly subscription",
     },

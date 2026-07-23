@@ -316,7 +316,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           so it reads as a currency prefix; the bold tabular-num number is
           the visual anchor; the `/ pago único` suffix sits inline to the
           right at the baseline in a small tertiary label. Both cards share
-          the exact same baseline grid so Core $149 and Pro $249 sit on
+          the exact same baseline grid so Core $29 and Pro $49 sit on
           identical vertical lines — pixel-perfect parity. */}
       <div className="mt-6 flex items-baseline gap-1">
         <span className="text-2xl md:text-3xl font-semibold text-tertiary tnum">

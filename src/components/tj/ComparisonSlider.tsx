@@ -260,13 +260,18 @@ export function ComparisonSlider() {
               style={{ clipPath: beforeClip }}
               aria-hidden="true"
             >
-              {/* Muted liquid-glass surface — sits ABOVE the after layer so its
-                  red wash + desaturated tone override the after card. */}
+              {/* Muted OPAQUE surface — sits ABOVE the after layer and must
+                  mask it completely (if it were translucent, the ✓ list se
+                  vería debajo de la ✗ y el slider parecería "al revés").
+                  `--card` es un token oklch de shadcn, así que
+                  `rgb(var(--card)/x)` era inválido y dejaba esta capa
+                  transparente — de ahí el bug. color-mix sobre --surface
+                  (hex del design system) produce un gris pizarra sólido. */}
               <div
                 className="absolute inset-0 saturate-[0.85] border-r border-pnl-neg/30"
                 style={{
                   background:
-                    "linear-gradient(180deg, rgb(var(--card) / 0.96), rgb(var(--card) / 0.92))",
+                    "linear-gradient(180deg, color-mix(in srgb, var(--surface) 97%, #000), color-mix(in srgb, var(--surface) 86%, #000))",
                 }}
               />
               {/* Soft red wash */}

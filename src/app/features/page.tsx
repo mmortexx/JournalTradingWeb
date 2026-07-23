@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SectionNav } from "@/components/layout/SectionNav";
 import { YouAreHere } from "@/components/layout/YouAreHere";
-import { FinalCTA } from "@/components/marketing/FinalCTA";
+import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -75,20 +75,20 @@ export const metadata: Metadata = {
 const sectionFallback = (
   <div className="section" aria-hidden="true" style={{ minHeight: 360 }} />
 );
-const Bento = dynamic(
-  () => import("@/components/marketing/Bento").then((m) => m.Bento),
+const FeaturesBento = dynamic(
+  () => import("@/components/marketing/FeaturesBento").then((m) => m.FeaturesBento),
   { loading: () => sectionFallback }
 );
 const Gallery = dynamic(
   () => import("@/components/marketing/Gallery").then((m) => m.Gallery),
   { loading: () => sectionFallback }
 );
-const Guardian = dynamic(
-  () => import("@/components/marketing/Guardian").then((m) => m.Guardian),
+const GuardianNew = dynamic(
+  () => import("@/components/marketing/GuardianNew").then((m) => m.GuardianNew),
   { loading: () => sectionFallback }
 );
-const MistakeInvoice = dynamic(
-  () => import("@/components/marketing/MistakeInvoice").then((m) => m.MistakeInvoice),
+const DisciplineCost = dynamic(
+  () => import("@/components/marketing/DisciplineCost").then((m) => m.DisciplineCost),
   { loading: () => sectionFallback }
 );
 const BeforeAfter = dynamic(
@@ -103,12 +103,12 @@ const HowItWorks = dynamic(
   () => import("@/components/marketing/HowItWorks").then((m) => m.HowItWorks),
   { loading: () => sectionFallback }
 );
-const MetricsDeepDive = dynamic(
-  () => import("@/components/marketing/MetricsDeepDive").then((m) => m.MetricsDeepDive),
+const MetricsShowcaseNew = dynamic(
+  () => import("@/components/marketing/MetricsShowcaseNew").then((m) => m.MetricsShowcaseNew),
   { loading: () => sectionFallback }
 );
-const RiskTool = dynamic(
-  () => import("@/components/marketing/RiskTool").then((m) => m.RiskTool),
+const RiskCalculator = dynamic(
+  () => import("@/components/marketing/RiskCalculator").then((m) => m.RiskCalculator),
   { loading: () => sectionFallback }
 );
 const MoreFeatures = dynamic(
@@ -119,8 +119,8 @@ const Wrapped = dynamic(
   () => import("@/components/marketing/Wrapped").then((m) => m.Wrapped),
   { loading: () => sectionFallback }
 );
-const LocalFirst = dynamic(
-  () => import("@/components/marketing/LocalFirst").then((m) => m.LocalFirst),
+const SecuritySection = dynamic(
+  () => import("@/components/marketing/SecuritySection").then((m) => m.SecuritySection),
   { loading: () => sectionFallback }
 );
 const TechSpecs = dynamic(
@@ -157,16 +157,17 @@ export default function FeaturesPage() {
           lands the section heading cleanly below the sticky Navbar
           (64px) + sticky SectionNav (~48px) + a 16px breathing strip. */}
       <div id="disciplina" className="scroll-mt-32">
-        <Bento />
+        <FeaturesBento num="01" />
       </div>
       <div id="galeria" className="scroll-mt-32">
         <Gallery />
       </div>
-      <div id="guardian" className="scroll-mt-32">
-        <Guardian />
-      </div>
+      {/* GuardianNew carries its own id="guardian" (the SectionNav anchor)
+          and 120px of top padding that clears the sticky Navbar+SectionNav
+          stack, so it mounts without a wrapper div to avoid a duplicate id. */}
+      <GuardianNew num="02" />
       <div id="coste" className="scroll-mt-32">
-        <MistakeInvoice />
+        <DisciplineCost num="02·b" />
       </div>
       <div id="transformacion" className="scroll-mt-32">
         <BeforeAfter />
@@ -180,10 +181,10 @@ export default function FeaturesPage() {
         <HowItWorks />
       </div>
       <div id="metricas" className="scroll-mt-32">
-        <MetricsDeepDive />
+        <MetricsShowcaseNew num="03" />
       </div>
       <div id="riesgo" className="scroll-mt-32">
-        <RiskTool />
+        <RiskCalculator num="03·c" />
       </div>
       <div id="mas-features" className="scroll-mt-32">
         <MoreFeatures />
@@ -192,7 +193,7 @@ export default function FeaturesPage() {
         <Wrapped />
       </div>
       <div id="local" className="scroll-mt-32">
-        <LocalFirst />
+        <SecuritySection num="04" />
       </div>
       <div id="tecnico" className="scroll-mt-32">
         <TechSpecs />
@@ -200,7 +201,7 @@ export default function FeaturesPage() {
       <div id="integraciones" className="scroll-mt-32">
         <Integrations />
       </div>
-      <FinalCTA />
+      <FinalCTANew />
       {/* Floating "you are here" indicator — sits above the global
           BackToTop button and reflects the active section from the
           SectionNav. Rendered last so it layers above page content. */}

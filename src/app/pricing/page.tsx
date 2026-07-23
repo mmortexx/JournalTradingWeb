@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { GuaranteeBanner } from "@/components/marketing/GuaranteeBanner";
-import { PlanSwitcher } from "@/components/marketing/PlanSwitcher";
 import { Pricing } from "@/components/marketing/Pricing";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
@@ -37,13 +36,13 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: "Precios",
   description:
-    "Pago único. Sin suscripciones. Core $149 · Pro $249. Garantía de 30 días sin preguntas. Tus datos 100% locales para siempre.",
+    "Pago único. Sin suscripciones. Core $29 · Pro $49. Garantía de 30 días sin preguntas. Tus datos 100% locales para siempre.",
   alternates: {
     canonical: `${SITE_URL}/pricing/`,
   },
   openGraph: {
     title: "Precios — Trading Journal",
-    description: "Pago único. Sin suscripciones. Core $149 · Pro $249. Garantía de 30 días.",
+    description: "Pago único. Sin suscripciones. Core $29 · Pro $49. Garantía de 30 días.",
     url: `${SITE_URL}/pricing/`,
     type: "website",
     siteName: "Trading Journal",
@@ -62,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Precios — Trading Journal",
     description:
-      "Pago único, sin suscripciones. Core $149 · Pro $249 con garantía de 30 días sin preguntas. Tus datos 100% locales para siempre.",
+      "Pago único, sin suscripciones. Core $29 · Pro $49 con garantía de 30 días sin preguntas. Tus datos 100% locales para siempre.",
     images: [OG_IMAGE],
   },
 };
@@ -89,8 +88,8 @@ const ValueTestimonials = dynamic(
   () => import("@/components/marketing/ValueTestimonials").then((m) => m.ValueTestimonials),
   { loading: () => sectionFallback }
 );
-const StatsBand = dynamic(
-  () => import("@/components/marketing/StatsBand").then((m) => m.StatsBand),
+const StatsBandNew = dynamic(
+  () => import("@/components/marketing/StatsBandNew").then((m) => m.StatsBandNew),
   { loading: () => sectionFallback }
 );
 const Newsletter = dynamic(
@@ -101,8 +100,8 @@ const DownloadCTA = dynamic(
   () => import("@/components/marketing/DownloadCTA").then((m) => m.DownloadCTA),
   { loading: () => sectionFallback }
 );
-const FinalCTA = dynamic(
-  () => import("@/components/marketing/FinalCTA").then((m) => m.FinalCTA),
+const FinalCTANew = dynamic(
+  () => import("@/components/marketing/FinalCTANew").then((m) => m.FinalCTANew),
   { loading: () => sectionFallback }
 );
 
@@ -129,11 +128,6 @@ export default function PricingPage() {
           page header and the pricing cards to reinforce the no-risk promise
           before the visitor even sees the prices. */}
       <GuaranteeBanner />
-      {/* Alternative plan switcher — a Core/pro toggle with a single card
-          that cross-fades and counts up/down between the two prices. Sits
-          ABOVE the existing two-card <Pricing /> section so the visitor
-          gets an interactive preview before the side-by-side detail. */}
-      <PlanSwitcher />
       <Pricing />
       <Comparison />
       {/* Pricing-specific FAQ — 5 bilingual Q&A focused on trial, payment,
@@ -143,13 +137,13 @@ export default function PricingPage() {
       {/* Compact 3-testimonial row focused on value-for-money (ROI,
           "paid for itself", one-time vs subscription). */}
       <ValueTestimonials />
-      <StatsBand />
+      <StatsBandNew />
       <Newsletter />
       {/* Download CTA — Windows-app installer button. Sits between the
           Newsletter and the soft close so visitors leave with a concrete
           next action (download the desktop app). */}
       <DownloadCTA />
-      <FinalCTA />
+      <FinalCTANew />
     </>
   );
 }

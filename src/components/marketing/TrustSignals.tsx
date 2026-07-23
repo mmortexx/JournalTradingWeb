@@ -37,8 +37,8 @@ const ITEMS: TrustItem[] = [
     icon: <DollarIcon />,
     labelEs: "Pago único · Sin suscripción",
     labelEn: "One-time · No subscription",
-    subEs: "$149 — para siempre",
-    subEn: "$149 — yours forever",
+    subEs: "$29 — para siempre",
+    subEn: "$29 — yours forever",
   },
   {
     icon: <LockIcon />,

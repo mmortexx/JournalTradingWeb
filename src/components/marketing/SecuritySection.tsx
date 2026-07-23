@@ -7,8 +7,11 @@ import { Database, FileLock2, KeyRound, Check, X } from "lucide-react";
  * SecuritySection — sección `#security` del HTML. Local-first:
  * 3 tarjetas (100 % en local, archivo .sqlite, export/import)
  * + tabla comparativa "Diario en la nube vs Trading Journal".
+ *
+ * `num` — ordinal del eyebrow. Por defecto el de la home ("06"); las
+ * páginas internas pasan el suyo para mantener su propia secuencia.
  */
-export function SecuritySection() {
+export function SecuritySection({ num = "06" }: { num?: string }) {
   const { lang } = useLang();
   const es = lang === "es";
   const cards = [
@@ -36,7 +39,7 @@ export function SecuritySection() {
               className="tnum"
               style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
             >
-              § 06
+              § {num}
             </span>
             <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
             <span

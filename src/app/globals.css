@@ -78,15 +78,16 @@
 :root {
   --radius: 0.625rem;
 
-  /* Accent — verde (#34B476), default tras el rediseño. La paleta se llama
-     "verde" y se aplica via data-palette="verde". Estos valores en :root
-     son el SSR-safe fallback que ya refleja la nueva paleta para que el
-     primer paint salga verde aunque el script anti-FOUC aún no haya
-     aplicado el data-palette. */
-  --accent-base: 52 180 118; /* #34B476 — verde institucional */
-  --accent-hover: 95 209 150; /* #5FD196 */
-  --accent-pressed: 21 92 60; /* #155C3C */
-  --accent-soft: 52 180 118;
+  /* Accent — grafito (#B9B2A6), el default institucional del HTML de
+     referencia (props del diseño: accent "Grafito"). Piedra cálida sin
+     estridencia — el tono "trading floor" de la marca. La paleta verde
+     sigue disponible vía data-palette="verde". Estos valores en :root
+     son el SSR-safe fallback para que el primer paint ya salga grafito
+     aunque el script anti-FOUC aún no haya aplicado el data-palette. */
+  --accent-base: 185 178 166; /* #B9B2A6 — grafito institucional */
+  --accent-hover: 208 202 189; /* #D0CABD */
+  --accent-pressed: 74 70 61; /* #4A463D */
+  --accent-soft: 185 178 166;
 
   /* P&L — slightly brighter green (Emerald-400 / #34D399) and slightly
      deeper red (Red-600 / #EF4444) so positive/negative figures read
@@ -229,6 +230,16 @@
 }
 :root[data-theme="light"][data-palette="verde"] {
   --accent-base: 15 138 86; --accent-hover: 18 160 102; --accent-pressed: 12 110 70;
+  --tint: 243 242 236;
+}
+/* Grafito — default institucional (mapa "Grafito" del HTML de referencia:
+   #b9b2a6 / #d0cabd / #4a463d en dark; #6a6456 / #7d766a en light). */
+:root[data-palette="grafito"] {
+  --accent-base: 185 178 166; --accent-hover: 208 202 189; --accent-pressed: 74 70 61; --accent-soft: 185 178 166;
+  --tint: 11 12 13;
+}
+:root[data-theme="light"][data-palette="grafito"] {
+  --accent-base: 106 100 86; --accent-hover: 125 118 106; --accent-pressed: 74 70 61;
   --tint: 243 242 236;
 }
 
@@ -1466,4 +1477,145 @@ button.icon-btn:hover > svg,
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.6),
     inset 0 -1px 0 rgb(0 0 0 / 0.06);
+}
+
+/* ============================================================
+   TOKENS DEL HTML DE REFERENCIA (Claude Design)
+   Los componentes de la familia nueva hablan el vocabulario del
+   HTML (--bg/--surface/--ink/--line…), pero estos tokens nunca se
+   habían definido: cada color-mix(var(--surface)…) era inválido y
+   silenciosamente transparente — las tarjetas de cristal no tenían
+   relleno y los scrims no existían. Valores 1:1 del <style> del
+   HTML de referencia, en dark y light.
+   ============================================================ */
+:root {
+  --bg: #0b0c0d;
+  --surface: #141618;
+  --surface-2: #1a1d1f;
+  --raised: #212427;
+  --ink: #f1f2ef;
+  --ink-2: #a7abac;
+  --ink-3: #797d80;
+  --line: rgba(255, 255, 255, 0.06);
+  --line-2: rgba(255, 255, 255, 0.13);
+}
+:root[data-theme="light"] {
+  --bg: #f3f2ec;
+  --surface: #fbfaf7;
+  --surface-2: #e8e7e0;
+  --raised: #ffffff;
+  --ink: #15171a;
+  --ink-2: #4a4d4f;
+  --ink-3: #797d80;
+  --line: rgba(20, 21, 23, 0.1);
+  --line-2: rgba(20, 21, 23, 0.19);
+}
+
+/* ============================================================
+   Capa de efectos del HTML de referencia (Claude Design)
+   Keyframes + utilidades que usan BackgroundFX, IntroSequence,
+   DecorFX y los CTAs con sheen. La regla global de
+   prefers-reduced-motion de arriba ya neutraliza todas estas
+   animaciones para quien pide menos movimiento.
+   ============================================================ */
+
+@keyframes tj-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes tj-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+}
+@keyframes tj-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes tj-sheen {
+  0% { transform: translateX(-160%) skewX(-18deg); }
+  55%, 100% { transform: translateX(340%) skewX(-18deg); }
+}
+
+/* Intro — estado pre-hidratación: el script inline del <head> añade
+   `.tj-preload` al <html> en la primera visita de la sesión, así los
+   elementos [data-seq] del hero arrancan ocultos sin flash y el
+   IntroSequence los revela escalonados con blur→0. */
+.tj-preload [data-seq] {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(7px);
+  /* Failsafe CSS puro: si el bundle JS nunca monta IntroSequence, esta
+     animación fuerza la visibilidad a los 5 s. En el flujo normal la
+     clase .tj-preload se retira mucho antes y esto no llega a verse. */
+  animation: tj-preload-release 0.8s cubic-bezier(0.16, 1, 0.3, 1) 5s forwards;
+}
+@keyframes tj-preload-release {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Loader de primera visita (IntroSequence lo monta imperativamente). */
+#tj-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+#tj-loader.done {
+  transform: translateY(-101%);
+  transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Sheen — barrido de luz sobre CTAs oscuros al hacer hover (el HTML lo
+   inyectaba con JS; aquí es CSS puro sobre ::after del propio botón). */
+.tj-cta-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.tj-cta-sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34%;
+  height: 100%;
+  pointer-events: none;
+  transform: translateX(-160%) skewX(-18deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.6),
+    transparent
+  );
+}
+.tj-cta-sheen:hover::after {
+  animation: tj-sheen 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Spotlight — gradiente radial que sigue al cursor en tarjetas .tj-spot
+   (DecorFX actualiza --spot-x/y; en reposo queda fuera de la tarjeta).
+   Convive con .liquid-glass::after: aquí solo se define el background,
+   los box-shadow de los bordes torneados se conservan. */
+.tj-spot {
+  position: relative;
+}
+.tj-spot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    260px circle at var(--spot-x, -999px) var(--spot-y, -999px),
+    rgb(var(--accent-base) / 0.16),
+    transparent 62%
+  );
 }

@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { Ticker } from "@/components/marketing/Ticker";
 import { Hero } from "@/components/marketing/Hero";
-import { StatsBandNew } from "@/components/marketing/StatsBandNew";
+import { SideRail } from "@/components/tj/SideRail";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — see layout.tsx for the rationale (social platforms
@@ -57,32 +57,12 @@ const OverviewApp = dynamic(
   () => import("@/components/marketing/OverviewApp").then((m) => m.OverviewApp),
   { loading: () => sectionFallback }
 );
-const FeaturesBento = dynamic(
-  () => import("@/components/marketing/FeaturesBento").then((m) => m.FeaturesBento),
+const HomeDemo = dynamic(
+  () => import("@/components/marketing/HomeDemo").then((m) => m.HomeDemo),
   { loading: () => sectionFallback }
 );
-const ToolsGrid = dynamic(
-  () => import("@/components/marketing/ToolsGrid").then((m) => m.ToolsGrid),
-  { loading: () => sectionFallback }
-);
-const MetricsShowcaseNew = dynamic(
-  () => import("@/components/marketing/MetricsShowcaseNew").then((m) => m.MetricsShowcaseNew),
-  { loading: () => sectionFallback }
-);
-const RiskCalculator = dynamic(
-  () => import("@/components/marketing/RiskCalculator").then((m) => m.RiskCalculator),
-  { loading: () => sectionFallback }
-);
-const GuardianNew = dynamic(
-  () => import("@/components/marketing/GuardianNew").then((m) => m.GuardianNew),
-  { loading: () => sectionFallback }
-);
-const DisciplineCost = dynamic(
-  () => import("@/components/marketing/DisciplineCost").then((m) => m.DisciplineCost),
-  { loading: () => sectionFallback }
-);
-const SecuritySection = dynamic(
-  () => import("@/components/marketing/SecuritySection").then((m) => m.SecuritySection),
+const VideoCTA = dynamic(
+  () => import("@/components/marketing/VideoCTA").then((m) => m.VideoCTA),
   { loading: () => sectionFallback }
 );
 const FinalCTANew = dynamic(
@@ -91,41 +71,34 @@ const FinalCTANew = dynamic(
 );
 
 /**
- * Home (R6) — composición reescrita para alinear con el HTML de
- * referencia. 11 secciones en scroll:
+ * Home (R7) — composición corta, calcada de la RUTA home del HTML de
+ * referencia (el resto de secciones viven en sus propias páginas, como
+ * en el HTML viven tras el megamenú):
  *
- *   1. Hero (#top)               — portada institucional
- *   2. OverviewApp (#overview)   — "Todo tu día en una pantalla" + mockup
- *   3. Ticker                    — banda animada con símbolos del HTML
- *   4. StatsBandNew              — 40+ / 0 bytes / 30 días / 29 $
- *   5. FeaturesBento (#features) — bento 12-col
- *   6. ToolsGrid                 — 8 herramientas Pro + brokers
- *   7. MetricsShowcaseNew (#metrics) — ratios + histograma R
- *   8. RiskCalculator            — calculadora interactiva
- *   9. GuardianNew (#guardian)   — disciplina que actúa
- *  10. DisciplineCost            — el coste real de la indisciplina
- *  11. SecuritySection (#security) — local-first + comparativa
- *  12. FinalCTANew               — CTA de cierre
+ *   1. Hero (#top)             — portada institucional, entra con el intro
+ *   2. OverviewApp (#overview) — "Todo tu día en una pantalla" + mockup
+ *   3. Ticker                  — banda animada con símbolos
+ *   4. HomeDemo (#demo)        — la app recreada, interactiva (§ 02)
+ *   5. VideoCTA                — vídeo HLS + "Lo que no se mide, no se mejora."
+ *   6. FinalCTANew             — CTA de cierre
  *
- * Las páginas internas (/features, /pricing, /demo) y los componentes
- * viejos de marketing se mantienen en el repo y siguen funcionando
- * desde sus consumidores. Las páginas se actualizarán en commits
- * posteriores (fuera del alcance de este commit).
+ * Características / Métricas / Disciplina / Seguridad → /features
+ * Precios → /pricing · Demo a página completa → /demo
+ *
+ * El SideRail (01–07) mezcla anclas de esta página (Inicio, Vistazo,
+ * Demo) con navegación real a /features y /pricing — la home dejó de
+ * ser "toda la web en vertical".
  */
 export default function Home() {
   return (
     <>
+      {/* Raíl lateral 01–07 del HTML de referencia (solo home, ≥1100px) */}
+      <SideRail />
       <Hero />
       <OverviewApp />
       <Ticker />
-      <StatsBandNew />
-      <FeaturesBento />
-      <ToolsGrid />
-      <MetricsShowcaseNew />
-      <RiskCalculator />
-      <GuardianNew />
-      <DisciplineCost />
-      <SecuritySection />
+      <HomeDemo />
+      <VideoCTA />
       <FinalCTANew />
     </>
   );

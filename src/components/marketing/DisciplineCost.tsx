@@ -6,8 +6,11 @@ import { useLang } from "@/lib/i18n";
  * DisciplineCost — sección § 05·b del HTML. Lo que la indisciplina
  * cuesta: tabla de expectancy (en plan / fuera de plan) + factura
  * detallada de indisciplina.
+ *
+ * `num` — ordinal del eyebrow. Por defecto el de la home ("05·b"); las
+ * páginas internas pasan el suyo para mantener su propia secuencia.
  */
-export function DisciplineCost() {
+export function DisciplineCost({ num = "05·b" }: { num?: string }) {
   const { lang } = useLang();
   const es = lang === "es";
   return (
@@ -22,7 +25,7 @@ export function DisciplineCost() {
               className="tnum"
               style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
             >
-              § 05·b
+              § {num}
             </span>
             <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
             <span

@@ -8,51 +8,29 @@ import { useLang } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 
 /**
- * Sticky navbar — institutional fintech floating bar.
+ * Navbar — píldora flotante del HTML de referencia.
  *
- * Visual states:
- *  - Top of page (`scrolled === false`): transparent — text floats
- *    directly on the (always-dark) hero video / PageHeader band. No
- *    chrome, no border. Lets the hero breathe.
- *  - Scrolled past 16px: `.liquid-glass` material (rgba(0,0,0,0.4) +
- *    4px blur + machined inset edges) on a `rounded-xl` floating bar,
- *    paired with a soft depth-2 shadow (`0 1px 2px` + `0 4px 16px`)
- *    and a `backdrop-saturate-150` boost so the blur reads as
- *    "engaged" rather than passive — the same material language as
- *    Apple's Pro Display chrome.
+ * Composición (desktop):
+ *  - Píldora centrada de 60 px, max-w 1140, `rounded-full`, borde
+ *    hairline y material de vidrio (blur 20 + saturate 1.5) con inset
+ *    highlight. Al hacer scroll >10 px el vidrio se vuelve más opaco
+ *    (70 % → 88 % de surface) y la sombra se hace más profunda.
+ *  - Marca: cuadrado de vidrio con el trío de velas + wordmark serif.
+ *  - "Producto" abre un MEGAMENÚ desplegable de 520 px con 4 entradas
+ *    (Características / Métricas / Disciplina / Seguridad), cada una
+ *    con icono, título y descripción — hover con retardo de cierre de
+ *    140 ms, click alterna, Escape cierra, click en entrada cierra.
+ *  - Demo y Precios como enlaces píldora.
+ *  - Clúster derecho: reloj UTC en vivo con punto de sesión, toggle de
+ *    tema (círculo 38 px), toggle de idioma y CTA "Comprar" en píldora
+ *    accent con flecha.
  *
- * Brand lockup — a precision candlestick trio (three ascending bodies
- * + wicks) drawn as inline SVG in `--accent-base` (gold default),
- * sitting on a dark glass square with a 1px white ring + inset top
- * highlight + a subtle accent radial-gradient backdrop. Crisp at
- * 14px / 16px / 28px. The wordmark uses `text-[15px] font-semibold
- * tracking-tight` — tighter and smaller than the prior `text-2xl`
- * lockup so it reads as a "Stripe / Linear / Vercel" product mark
- * rather than a hero headline.
+ * El drawer móvil (focus-trap, scroll-lock, Escape, cierre por ruta)
+ * se conserva íntegro del navbar anterior — es maquinaria a11y probada.
  *
- * Desktop nav links — minimal color-only base state (`text-gray-300`
- * vs `text-white` for the active page), elevated by a 2px accent
- * underline that grows from center on hover (origin-center
- * scaleX(0)→(1)). The active link holds the underline open and gets
- * `aria-current="page"` for screen readers. The center-grow reads as
- * more institutional than the standard left-sweep (`.link-underline`).
- *
- * CTA cluster — theme + language toggles share a 32px icon-button hit
- * area with `bg-white/5` hover; a 1px hairline divider (`bg-white/10`)
- * separates them from the primary "Buy Pro" CTA, which carries a
- * 1px drop shadow + `-translate-y-0.5` lift on hover. Mobile menu
- * trigger mirrors the toggle pattern. The visible ⌘K pill was
- * intentionally removed — the global listener in CommandPalette
- * still handles the key without UI clutter.
- *
- * Mobile drawer — full-height slide-in from the right with
- * `liquid-glass` + `backdrop-blur-xl` for an opaque material over
- * the page. Touch-friendly links (min-h-[44px]). Active state shows
- * an accent dot indicator at the trailing edge. CTA sits in a
- * dedicated footer band with `safe-bottom` padding so it stays
- * clear of iOS home-indicator. Focus trap + Escape + body-scroll
- * lock mirror native dialog behavior; focus returns to the trigger
- * on close.
+ * El reloj arranca en "--:--:--" tanto en servidor como en el primer
+ * render de cliente y solo empieza a tickear dentro de un efecto — así
+ * la hidratación nunca ve horas distintas (cero mismatch).
  */
 export function Navbar() {
   const { t, lang, toggle } = useLang();
@@ -61,48 +39,41 @@ export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
+  const megaCloseTimer = useRef<number | null>(null);
 
-  // Refs for focus management:
-  //  - `menuButtonRef` — the hamburger button. Focus returns here when the
-  //    drawer closes (mirrors native dialog behavior, gives keyboard users a
-  //    predictable landing point).
-  //  - `drawerRef` — the mobile `<aside>` itself. Used to query its focusable
-  //    descendants for the Tab cycle, and as a fallback focus target if the
-  //    drawer ever renders without focusable children (it never does today,
-  //    but `tabIndex={-1}` keeps it programmatically focusable just in case).
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Focus trap for the mobile drawer. While the drawer is open:
-  //  - On mount, focus the first focusable element inside it (the close
-  //    button — which sits at the top of the drawer, mirroring the
-  //    hamburger's position visually so the focus ring lands naturally).
-  //  - Tab cycles within the drawer: Shift+Tab on the first focusable wraps
-  //    to the last; Tab on the last wraps to the first.
-  //  - Escape closes the drawer (same behavior as a native dialog).
-  //  - On cleanup (any close path: Escape, backdrop click, link tap, route
-  //    change, or the explicit close button), focus returns to the menu
-  //    trigger so keyboard users can resume navigating from where they left
-  //    off.
-  //
-  // The `setMobileOpen(false)` call lives inside the keydown handler, not
-  // the effect body, so it doesn't trip the set-state-in-effect rule. The
-  // `.focus()` calls in the cleanup are pure DOM side effects (not React
-  // setState) and are safe to run there.
+  // Megamenú: hover con retardo de cierre + Escape. El retardo evita
+  // que el panel se cierre al cruzar el hueco entre botón y panel.
+  const megaEnter = () => {
+    if (megaCloseTimer.current) window.clearTimeout(megaCloseTimer.current);
+    setMegaOpen(true);
+  };
+  const megaLeave = () => {
+    if (megaCloseTimer.current) window.clearTimeout(megaCloseTimer.current);
+    megaCloseTimer.current = window.setTimeout(() => setMegaOpen(false), 140);
+  };
+  useEffect(() => {
+    if (!megaOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMegaOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [megaOpen]);
+
+  // Focus trap del drawer móvil (sin cambios respecto al navbar previo).
   useEffect(() => {
     if (!mobileOpen) return;
-
-    // Move focus to the first focusable element on open. `requestAnimationFrame`
-    // lets Framer Motion mount the drawer node before we query it — querying
-    // synchronously here would return an empty list because the conditional
-    // render hasn't been committed to the DOM yet on the very first open.
     const raf = requestAnimationFrame(() => {
       const drawer = drawerRef.current;
       if (!drawer) return;
@@ -110,7 +81,6 @@ export function Navbar() {
       const target = focusables[0] ?? drawer;
       target.focus();
     });
-
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
@@ -122,8 +92,6 @@ export function Navbar() {
       if (!drawer) return;
       const focusables = getFocusables(drawer);
       if (focusables.length === 0) {
-        // No focusable children: keep Tab inside the drawer by focusing
-        // the container itself.
         e.preventDefault();
         drawer.focus();
         return;
@@ -131,8 +99,6 @@ export function Navbar() {
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
       const active = document.activeElement;
-      // If focus has somehow escaped the drawer (it shouldn't while we're
-      // open, but be defensive), pull it back to the appropriate end.
       const inside = drawer.contains(active);
       if (e.shiftKey) {
         if (!inside || active === first) {
@@ -150,13 +116,11 @@ export function Navbar() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("keydown", onKey);
-      // Restore focus to the menu trigger button on close.
       menuButtonRef.current?.focus();
     };
   }, [mobileOpen]);
 
-  // Lock body scroll while the mobile drawer is open so the page behind
-  // doesn't scroll under the backdrop. Restored on close.
+  // Scroll-lock del body con el drawer abierto.
   useEffect(() => {
     if (!mobileOpen) return;
     const prev = document.body.style.overflow;
@@ -166,20 +130,79 @@ export function Navbar() {
     };
   }, [mobileOpen]);
 
-  // Close the drawer whenever the route changes — covers browser back/forward
-  // and Next.js client-side navigations triggered by anything other than a
-  // tap on a drawer link (which already calls setMobileOpen(false)).
-  // The setState-in-effect lint rule is intentionally suppressed here (same
-  // pattern as ThemeProvider in lib/theme.tsx): the only thing the effect
-  // does is reset transient drawer state on navigation, which is exactly
-  // the canonical use case for an effect that calls setState.
+  // Cerrar drawer y megamenú al cambiar de ruta.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setMobileOpen(false);
+    setMegaOpen(false);
   }, [pathname]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  const links: { href: string; labelEs: string; labelEn: string }[] = [
+  const productItems: {
+    href: string;
+    labelEs: string;
+    labelEn: string;
+    descEs: string;
+    descEn: string;
+    icon: React.ReactNode;
+  }[] = [
+    {
+      href: "/features",
+      labelEs: "Características",
+      labelEn: "Features",
+      descEs: "Calendario, playbooks, diario",
+      descEn: "Calendar, playbooks, journal",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" />
+          <rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" />
+          <rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" />
+          <rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" />
+        </svg>
+      ),
+    },
+    {
+      href: "/features#metricas",
+      labelEs: "Métricas",
+      labelEn: "Metrics",
+      descEs: "Sharpe, profit factor, expectancy",
+      descEn: "Sharpe, profit factor, expectancy",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M2 13V7M6 13V3M10 13V9M14 13V5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        </svg>
+      ),
+    },
+    {
+      href: "/features#guardian",
+      labelEs: "Disciplina",
+      labelEn: "Discipline",
+      descEs: "El Guardián frena antes del error",
+      descEn: "The Guardian brakes before the error",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M8 1.6 2.9 3.8v3.5c0 3.1 2.2 5.5 5.1 6.5 2.9-1 5.1-3.4 5.1-6.5V3.8L8 1.6Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
+    {
+      href: "/features#local",
+      labelEs: "Seguridad",
+      labelEn: "Security",
+      descEs: "Local-first, sin nube ni cuentas",
+      descEn: "Local-first, no cloud, no accounts",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <rect x="2.5" y="6.5" width="11" height="7.5" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+          <path d="M5 6.5V4.5a3 3 0 0 1 6 0v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
+      ),
+    },
+  ];
+
+  // Enlaces del drawer móvil — mantiene Acerca de y FAQ (en desktop
+  // viven en el footer; la píldora sigue al HTML: Producto/Demo/Precios).
+  const drawerLinks: { href: string; labelEs: string; labelEn: string }[] = [
     { href: "/features", labelEs: "Características", labelEn: "Features" },
     { href: "/demo", labelEs: "Demo", labelEn: "Demo" },
     { href: "/pricing", labelEs: "Precios", labelEn: "Pricing" },
@@ -187,70 +210,200 @@ export function Navbar() {
     { href: "/faq", labelEs: "FAQ", labelEn: "FAQ" },
   ];
 
-  return (
-    <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300 pt-3 md:pt-4 px-4 sm:px-5 md:px-8">
-      <nav
-        className={`max-w-page mx-auto flex items-center justify-between gap-2 h-12 px-3 md:px-4 rounded-xl transition-all duration-300 ${
-          scrolled
-            ? "liquid-glass backdrop-saturate-150 shadow-[0_1px_2px_rgb(0_0_0/0.20),0_4px_16px_rgb(0_0_0/0.18)]"
-            : "bg-transparent"
-        }`}
+  const pillLink = (href: string, label: string) => {
+    const active = pathname === href;
+    return (
+      <Link
+        key={href}
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className="rounded-full px-[15px] py-[9px] text-sm transition-colors duration-200"
+        style={{
+          color: active ? "var(--ink)" : "var(--ink-2)",
+          background: active
+            ? "color-mix(in srgb, var(--ink) 6%, transparent)"
+            : "transparent",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = "var(--ink)";
+          e.currentTarget.style.background =
+            "color-mix(in srgb, var(--ink) 6%, transparent)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = active ? "var(--ink)" : "var(--ink-2)";
+          e.currentTarget.style.background = active
+            ? "color-mix(in srgb, var(--ink) 6%, transparent)"
+            : "transparent";
+        }}
       >
-        {/* Brand lockup — precision candlestick mark + tight wordmark.
-            The mark sits on a dark glass square with an accent radial
-            backdrop so the gold pops; the wordmark is sized to match
-            the Footer's `text-base` family for lockup consistency. */}
+        {label}
+      </Link>
+    );
+  };
+
+  return (
+    <header className="fixed top-0 inset-x-0 z-50 flex justify-center px-5 pt-3.5">
+      <nav
+        className="flex w-full max-w-[1140px] items-center justify-between gap-4 rounded-full border pl-[18px] pr-[10px]"
+        style={{
+          height: 60,
+          borderColor: "rgb(var(--divider) / 0.13)",
+          background: scrolled
+            ? "color-mix(in srgb, var(--surface) 88%, transparent)"
+            : "color-mix(in srgb, var(--surface) 70%, transparent)",
+          backdropFilter: "blur(20px) saturate(1.5)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.5)",
+          boxShadow: scrolled
+            ? "inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 14px 40px -16px rgb(0 0 0 / 0.62)"
+            : "inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 10px 30px -14px rgb(0 0 0 / 0.5)",
+          transition: "background 0.3s ease, box-shadow 0.3s ease",
+        }}
+      >
+        {/* Marca */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 group min-w-0 shrink-0 rounded-md"
+          className="flex min-w-0 shrink-0 items-center gap-[11px]"
+          style={{ color: "var(--ink)" }}
           aria-label={t("appName")}
         >
           <BrandMark />
-          <span className="text-[15px] font-semibold tracking-tight text-white truncate">
+          <span
+            className="font-serif truncate"
+            style={{ fontSize: 19, fontWeight: 500, letterSpacing: "-0.01em" }}
+          >
             {t("appName")}
           </span>
         </Link>
 
-        {/* Desktop links — color-only base state with a 2px accent
-            underline that grows from center on hover and stays grown
-            on the active page. The `after:` pseudo-element is a single
-            2px pill at `bottom-1`, scaled 0→1 with origin-center so
-            the underline "irises" open from the middle. Linear/Vercel
-            pattern. `aria-current="page"` keeps screen readers informed
-            of the active route. */}
-        <div className="hidden md:flex items-center gap-0.5">
-          {links.map((l) => {
-            const active = pathname === l.href;
-            return (
-              <Link
-                key={l.href}
-                href={l.href}
-                aria-current={active ? "page" : undefined}
-                className={`relative h-9 inline-flex items-center justify-center px-3.5 text-sm rounded-md transition-colors duration-200
-                  after:absolute after:content-[''] after:left-0 after:right-0 after:bottom-1 after:h-[2px] after:rounded-full
-                  after:bg-[rgb(var(--accent-base))]
-                  after:origin-center after:scale-x-0
-                  after:transition-transform after:duration-200 after:ease-[cubic-bezier(0.22,1,0.36,1)]
-                  hover:after:scale-x-100
-                  focus-visible:after:scale-x-100
-                  ${active ? "text-white after:scale-x-100" : "text-gray-300 hover:text-white"}`}
+        {/* Enlaces desktop: Producto (megamenú) · Demo · Precios */}
+        <div className="hidden items-center gap-0.5 md:flex">
+          <div
+            className="relative"
+            onMouseEnter={megaEnter}
+            onMouseLeave={megaLeave}
+          >
+            <button
+              type="button"
+              onClick={() => setMegaOpen((o) => !o)}
+              aria-expanded={megaOpen}
+              aria-haspopup="true"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent px-[15px] py-[9px] text-sm transition-colors duration-200"
+              style={{
+                color: megaOpen ? "var(--ink)" : "var(--ink-2)",
+                background: megaOpen
+                  ? "color-mix(in srgb, var(--ink) 6%, transparent)"
+                  : "transparent",
+                fontFamily: "inherit",
+              }}
+            >
+              {es ? "Producto" : "Product"}
+              <svg
+                width="9"
+                height="9"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden
+                style={{
+                  transition: "transform 0.2s",
+                  transform: megaOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
               >
-                {es ? l.labelEs : l.labelEn}
-              </Link>
-            );
-          })}
+                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {/* Panel del megamenú */}
+            <div
+              role="menu"
+              className="absolute left-1/2 w-[520px] rounded-[14px] border p-2.5"
+              style={{
+                top: "calc(100% + 12px)",
+                transform: megaOpen
+                  ? "translateX(-50%) translateY(0)"
+                  : "translateX(-50%) translateY(-6px)",
+                opacity: megaOpen ? 1 : 0,
+                visibility: megaOpen ? "visible" : "hidden",
+                pointerEvents: megaOpen ? "auto" : "none",
+                transition: "opacity 0.18s ease, transform 0.18s ease, visibility 0.18s",
+                borderColor: "rgb(var(--divider) / 0.13)",
+                background: "color-mix(in srgb, var(--surface) 96%, transparent)",
+                backdropFilter: "blur(24px) saturate(1.4)",
+                WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+                boxShadow:
+                  "0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78)",
+              }}
+            >
+              <div className="grid grid-cols-2 gap-1">
+                {productItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    role="menuitem"
+                    onClick={() => setMegaOpen(false)}
+                    className="flex gap-[11px] rounded-[10px] px-3 py-[11px] transition-colors"
+                    style={{ color: "var(--ink)" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background =
+                        "color-mix(in srgb, var(--ink) 5%, transparent)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    <span
+                      className="grid flex-none place-items-center rounded-lg"
+                      style={{
+                        width: 30,
+                        height: 30,
+                        background: "rgb(var(--accent-base) / 0.14)",
+                        color: "rgb(var(--accent-base))",
+                      }}
+                    >
+                      {item.icon}
+                    </span>
+                    <span>
+                      <span className="block text-[13px] font-semibold">
+                        {es ? item.labelEs : item.labelEn}
+                      </span>
+                      <span
+                        className="mt-0.5 block text-[11.5px] leading-[1.4]"
+                        style={{ color: "var(--ink-3)" }}
+                      >
+                        {es ? item.descEs : item.descEn}
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+          {pillLink("/demo", "Demo")}
+          {pillLink("/pricing", es ? "Precios" : "Pricing")}
         </div>
 
-        {/* Control cluster — theme + language toggles (32px icon
-            buttons), a 1px hairline divider, the primary "Buy Pro"
-            CTA (h-9 with shadow + lift), and the mobile menu trigger.
-            `shrink-0` keeps the cluster from collapsing when the
-            wordmark truncates. */}
-        <div className="flex items-center gap-1 shrink-0">
+        {/* Clúster derecho: reloj UTC · tema · idioma · CTA · hamburguesa */}
+        <div className="flex flex-none items-center gap-2">
+          <UtcClock />
           <button
             onClick={toggleTheme}
             data-theme-toggle
-            className="icon-btn w-8 h-8 rounded-md grid place-items-center text-gray-300 hover:text-white hover:bg-white/5 transition-colors duration-200"
+            className="grid flex-none cursor-pointer place-items-center rounded-full border bg-transparent transition-colors duration-200"
+            style={{
+              width: 38,
+              height: 38,
+              borderColor: "rgb(var(--divider) / 0.06)",
+              color: "var(--ink-2)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--ink)";
+              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.13)";
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--ink) 5%, transparent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--ink-2)";
+              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.06)";
+              e.currentTarget.style.background = "transparent";
+            }}
             aria-label={es ? "Cambiar tema" : "Toggle theme"}
             title={es ? "Cambiar tema" : "Toggle theme"}
           >
@@ -258,45 +411,64 @@ export function Navbar() {
           </button>
           <button
             onClick={toggle}
-            className="w-8 h-8 rounded-md grid place-items-center text-[11px] font-semibold tracking-wide text-gray-300 hover:text-white hover:bg-white/5 transition-colors duration-200"
+            className="grid flex-none cursor-pointer place-items-center rounded-full border bg-transparent text-[11px] font-semibold tracking-wide transition-colors duration-200"
+            style={{
+              width: 38,
+              height: 38,
+              borderColor: "rgb(var(--divider) / 0.06)",
+              color: "var(--ink-2)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--ink)";
+              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.13)";
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--ink) 5%, transparent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--ink-2)";
+              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.06)";
+              e.currentTarget.style.background = "transparent";
+            }}
             aria-label={es ? "Cambiar idioma" : "Toggle language"}
             title={es ? "Cambiar idioma" : "Toggle language"}
           >
             {lang.toUpperCase()}
           </button>
-
-          {/* Hairline divider — visually groups the toggles apart
-              from the primary CTA. Hidden below the `sm` breakpoint
-              where the CTA itself hides. */}
-          <span aria-hidden className="hidden sm:block w-px h-5 bg-white/10 mx-1.5" />
-
-          {/* Primary CTA — Buy Pro. `h-9 px-4` gives a consistent
-              36px hit height that matches the nav-link height; the
-              drop shadow + `-translate-y-0.5` lift reads as a
-              premium button affordance (Stripe / Vercel pattern)
-              without breaking the dark-first palette. */}
           <motion.div
             whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-            className="hidden sm:inline-flex items-center"
+            className="hidden sm:inline-flex"
           >
             <Link
               href="/pricing"
-              className="group inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-white text-black text-sm font-medium shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgb(0_0_0/0.25)] transition-all duration-200"
+              className="inline-flex flex-none items-center gap-[7px] whitespace-nowrap rounded-full text-sm font-semibold transition-[transform,filter] duration-200"
+              style={{
+                height: 40,
+                padding: "0 20px",
+                background: "rgb(var(--accent-base))",
+                color: "#06130d",
+                boxShadow:
+                  "0 10px 26px -12px color-mix(in srgb, rgb(var(--accent-base)) 70%, #000)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.filter = "brightness(1.08)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "";
+                e.currentTarget.style.filter = "";
+              }}
             >
-              {t("buyNow")}
-              <svg className="transition-transform duration-200 group-hover:translate-x-0.5" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              {es ? "Comprar" : "Buy"}
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
                 <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
           </motion.div>
 
-          {/* Mobile menu toggle — `aria-haspopup="dialog"` because the
-              drawer is role="dialog"; `aria-controls` links to its id so
-              screen readers can announce the relationship. */}
           <button
             ref={menuButtonRef}
             onClick={() => setMobileOpen((o) => !o)}
-            className="icon-btn md:hidden w-8 h-8 rounded-md grid place-items-center text-gray-300 hover:text-white hover:bg-white/5 transition-colors duration-200"
+            className="icon-btn md:hidden grid h-9 w-9 place-items-center rounded-full text-gray-300 transition-colors duration-200 hover:bg-white/5 hover:text-white"
             aria-label={mobileOpen ? (es ? "Cerrar menú" : "Close menu") : (es ? "Abrir menú" : "Open menu")}
             aria-expanded={mobileOpen}
             aria-haspopup="dialog"
@@ -311,19 +483,10 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu — full-height slide-in drawer from the right with a
-          click-to-close backdrop. AnimatePresence gives us the exit
-          animation (slide-out + fade) that a bare conditional render can't.
-          role="dialog" + aria-modal makes it announced as a modal to screen
-          readers; the Escape listener above mirrors native dialog behavior.
-          Closes on route change (see the pathname effect above). */}
+      {/* Drawer móvil — maquinaria a11y intacta del navbar anterior. */}
       <AnimatePresence>
         {mobileOpen && (
           <>
-            {/* Backdrop — click anywhere to close. z-[55] sits above the
-                CookieConsent banner (z-50) so the modal correctly masks the
-                whole viewport when the drawer is open, even if the cookie
-                banner is currently visible. */}
             <motion.div
               key="mobile-backdrop"
               initial={{ opacity: 0 }}
@@ -334,16 +497,6 @@ export function Navbar() {
               className="md:hidden fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm"
               aria-hidden="true"
             />
-            {/* Drawer — slides in from the right edge, full viewport height.
-                w-[300px] keeps the drawer proportionate to phone widths.
-                liquid-glass + a heavier backdrop-blur-xl for a more opaque
-                material over the page — matches the navbar's scrolled state
-                (liquid-glass is the unified surface treatment for floating
-                UI per the design system). z-[60] puts the modal above the
-                CookieConsent banner (z-50) and the navbar header (z-50) so
-                the drawer's close button stays clickable while open; still
-                well below the command palette (z-100) and shortcuts help
-                (z-100). */}
             <motion.aside
               key="mobile-drawer"
               ref={drawerRef}
@@ -358,9 +511,6 @@ export function Navbar() {
               transition={{ type: "tween", duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               className="md:hidden fixed top-0 right-0 bottom-0 z-[60] w-[300px] max-w-[84vw] liquid-glass backdrop-blur-xl border-l border-white/10 flex flex-col safe-top outline-none"
             >
-              {/* Drawer header — refined brand lockup (matches the
-                  topbar lockup exactly so the drawer feels like a
-                  continuation, not a separate surface). */}
               <div className="flex items-center justify-between h-16 px-5 border-b border-white/5 shrink-0">
                 <Link
                   href="/"
@@ -369,7 +519,7 @@ export function Navbar() {
                   aria-label={t("appName")}
                 >
                   <BrandMark />
-                  <span className="text-[15px] font-semibold tracking-tight text-white">
+                  <span className="font-serif text-[17px] font-medium tracking-tight text-white">
                     {t("appName")}
                   </span>
                 </Link>
@@ -385,16 +535,8 @@ export function Navbar() {
                 </button>
               </div>
 
-              {/* Nav links — scrollable if the viewport is short. Each link
-                  closes the drawer on click (via onClick) so a tap
-                  immediately dismisses the modal and routes. `min-h-[44px]`
-                  guarantees the iOS/Material touch-target floor. Active
-                  state is a faint `bg-white/[0.06]` + `font-medium` + an
-                  accent dot at the trailing edge (the same accent used by
-                  the desktop underline so the active language is consistent
-                  across breakpoints). */}
               <nav className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-1" aria-label={es ? "Secciones" : "Sections"}>
-                {links.map((l) => {
+                {drawerLinks.map((l) => {
                   const active = pathname === l.href;
                   return (
                     <Link
@@ -420,10 +562,6 @@ export function Navbar() {
                 })}
               </nav>
 
-              {/* CTA footer band — keeps the primary action visible at
-                  the bottom of the drawer (thumb-zone on mobile) and
-                  clears the iOS home indicator via `safe-bottom`. h-11
-                  matches the 44px touch-target floor. */}
               <div className="p-4 border-t border-white/5 safe-bottom shrink-0">
                 <motion.div
                   whileTap={{ scale: 0.98, transition: { type: "spring", stiffness: 400, damping: 25 } }}
@@ -431,7 +569,13 @@ export function Navbar() {
                   <Link
                     href="/pricing"
                     onClick={() => setMobileOpen(false)}
-                    className="group flex items-center justify-center gap-1.5 h-11 w-full rounded-lg bg-white text-black text-sm font-medium shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-gray-100 active:scale-[0.99] transition-all duration-200"
+                    className="group flex items-center justify-center gap-1.5 h-11 w-full rounded-full text-sm font-semibold transition-all duration-200"
+                    style={{
+                      background: "rgb(var(--accent-base))",
+                      color: "#06130d",
+                      boxShadow:
+                        "0 10px 26px -12px color-mix(in srgb, rgb(var(--accent-base)) 70%, #000)",
+                    }}
                   >
                     {t("buyNow")}
                     <svg className="transition-transform duration-200 group-hover:translate-x-0.5" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -449,68 +593,87 @@ export function Navbar() {
 }
 
 /**
- * BrandMark — three ascending candlesticks drawn as inline SVG in
- * `--accent-base` (gold default), sitting on a precision-machined
- * glass square. Designed to read as a "trader's brand mark" rather
- * than a generic line chart: the three bodies ascend (bullish
- * trend) while sharing a uniform 5-unit height so the silhouette
- * stays geometric. Crisp at 14px (drawer close-button area) and
- * 28px (navbar lockup).
- *
- * The container pairs:
- *  - `bg-black/40` dark glass base so the gold pops,
- *  - `ring-1 ring-white/10` hairline border (matches the rest of
- *    the design system's `border-white/10` hairline language),
- *  - `shadow-[inset_0_1px_0_rgb(255_255_255/0.08)]` 1px white top
- *    highlight (the same machined edge `.liquid-glass` uses),
- *  - a radial accent-gradient backdrop (`--accent-base` at 35% →
- *    transparent) so the mark glows faintly from the top edge.
- *
- * `overflow-hidden` clips the radial gradient to the rounded
- * square. The SVG itself uses `currentColor` so a parent
- * `text-[rgb(var(--accent-base))]` (or any future palette swap)
- * drives both the bodies and the wicks in one place.
+ * UtcClock — "UTC HH:MM:SS" en vivo con punto de mercado verde con
+ * glow, como en la píldora del HTML. Renderiza "--:--:--" en servidor
+ * y primer paint; el intervalo arranca en un efecto (cero mismatch de
+ * hidratación). Oculto por debajo de `lg` para no saturar la píldora.
+ */
+function UtcClock() {
+  const [time, setTime] = useState("--:--:--");
+  useEffect(() => {
+    const fmt = new Intl.DateTimeFormat("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    });
+    const tick = () => setTime(fmt.format(new Date()));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return (
+    <span
+      className="mr-0.5 hidden items-center gap-1.5 border-r pr-2 lg:inline-flex"
+      style={{ borderColor: "rgb(var(--divider) / 0.13)" }}
+    >
+      <span
+        aria-hidden
+        className="rounded-full"
+        style={{
+          width: 5,
+          height: 5,
+          background: "rgb(var(--pnl-pos, 62 207 142))",
+          boxShadow: "0 0 8px rgb(var(--pnl-pos, 62 207 142))",
+        }}
+      />
+      <span
+        className="tnum whitespace-nowrap"
+        style={{ fontSize: 10.5, letterSpacing: "0.04em", color: "var(--ink-3)" }}
+      >
+        UTC <span style={{ color: "var(--ink-2)" }}>{time}</span>
+      </span>
+    </span>
+  );
+}
+
+/**
+ * BrandMark — trío de velas del HTML de referencia sobre un cuadrado
+ * de vidrio (32 px, blur + hairline + inset highlight). Los cuerpos
+ * ascienden y las mechas quedan al 45 % para que el trío lea como
+ * marca y no como gráfico genérico.
  */
 function BrandMark() {
   return (
-    <span className="relative shrink-0 w-7 h-7 rounded-md grid place-items-center bg-black/40 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] overflow-hidden">
-      <span
-        aria-hidden
-        className="absolute inset-0 opacity-70"
-        style={{
-          background:
-            "radial-gradient(120% 120% at 50% 0%, rgb(var(--accent-base) / 0.35) 0%, rgb(var(--accent-base) / 0) 60%)",
-        }}
-      />
-      <svg
-        className="relative w-4 h-4 text-[rgb(var(--accent-base))]"
-        viewBox="0 0 16 16"
-        fill="none"
-        aria-hidden="true"
-      >
-        {/* Wicks — full-height verticals at 0.5 opacity so the bodies
-            read as the focal element. */}
+    <span
+      className="relative grid shrink-0 place-items-center overflow-hidden rounded-lg border"
+      style={{
+        width: 32,
+        height: 32,
+        borderColor: "rgb(var(--divider) / 0.13)",
+        background: "color-mix(in srgb, var(--surface) 66%, transparent)",
+        backdropFilter: "blur(18px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(18px) saturate(1.4)",
+        boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06)",
+      }}
+    >
+      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path
-          d="M3 1.5v13M8 1.5v13M13 1.5v13"
-          stroke="currentColor"
+          d="M3 1.8v12.4M8 1.8v12.4M13 1.8v12.4"
+          stroke="rgb(var(--accent-base))"
           strokeWidth="1"
           strokeLinecap="round"
-          opacity="0.5"
+          opacity="0.45"
         />
-        {/* Bodies — three ascending candlesticks, all bullish
-            (uniform 5-unit height, ascending tops: y=6 → y=4 → y=3). */}
-        <rect x="2" y="6" width="2" height="5" rx="0.4" fill="currentColor" />
-        <rect x="7" y="4" width="2" height="5" rx="0.4" fill="currentColor" />
-        <rect x="12" y="3" width="2" height="5" rx="0.4" fill="currentColor" />
+        <rect x="2" y="7" width="2" height="5" rx="0.4" fill="rgb(var(--accent-base))" />
+        <rect x="7" y="4.5" width="2" height="5" rx="0.4" fill="rgb(var(--accent-base))" />
+        <rect x="12" y="2.6" width="2" height="5" rx="0.4" fill="rgb(var(--accent-base))" />
       </svg>
     </span>
   );
 }
 
-// CSS selector for all natively focusable elements. We exclude anything
-// explicitly removed from the tab order via `tabindex="-1"` (which includes
-// the drawer container itself — it has `tabIndex={-1}` so it can be a
-// programmatic fallback focus target only).
 const FOCUSABLE_SELECTOR = [
   "a[href]",
   "button:not([disabled])",
@@ -523,19 +686,10 @@ const FOCUSABLE_SELECTOR = [
   "details > summary:first-of-type",
 ].join(",");
 
-/**
- * Returns the focusable descendants of `container` in DOM order, filtered to
- * elements that are actually visible (have a non-zero bounding rectangle).
- * Visibility check guards against querying inside an animating drawer whose
- * children might be momentarily zero-sized during the slide-in tween.
- */
 function getFocusables(container: HTMLElement): HTMLElement[] {
   return Array.from(
     container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
   ).filter((el) => {
-    // `getClientRects()` is the most reliable zero-size check — works for
-    // `display:none`, `visibility:hidden` (which still has rects but zero
-    // size in the right cases), and elements collapsed by their parent.
     const rects = el.getClientRects();
     if (rects.length === 0) return false;
     const { width, height } = rects[0];

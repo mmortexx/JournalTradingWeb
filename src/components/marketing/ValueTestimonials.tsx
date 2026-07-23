@@ -66,9 +66,9 @@ const TESTIMONIALS: ValueTestimonial[] = [
     initials: "IR",
     hue: "rgb(var(--pnl-warn))",
     quoteEs:
-      "$249 por algo que uso cinco horas al día. El ROI es obsceno. Y sin miedo a que me suban el precio mañana.",
+      "$49 por algo que uso cinco horas al día. El ROI es obsceno. Y sin miedo a que me suban el precio mañana.",
     quoteEn:
-      "$249 for something I use five hours a day. The ROI is obscene. And no fear of a price hike tomorrow.",
+      "$49 for something I use five hours a day. The ROI is obscene. And no fear of a price hike tomorrow.",
     chipEs: "ROI ×100",
     chipEn: "ROI ×100",
   },

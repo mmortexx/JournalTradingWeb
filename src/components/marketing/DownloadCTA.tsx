@@ -98,12 +98,12 @@ export function DownloadCTA() {
                 {es ? (
                   <>
                     Descarga la app para Windows. Sin registro, sin nube. Pago
-                    único desde <span className="tnum text-primary font-medium">$149</span>.
+                    único desde <span className="tnum text-primary font-medium">$29</span>.
                   </>
                 ) : (
                   <>
                     Download the app for Windows. No registration, no cloud.
-                    One-time payment from <span className="tnum text-primary font-medium">$149</span>.
+                    One-time payment from <span className="tnum text-primary font-medium">$29</span>.
                   </>
                 )}
               </p>

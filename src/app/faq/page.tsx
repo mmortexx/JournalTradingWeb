@@ -226,8 +226,8 @@ const ContactForm = dynamic(
   () => import("@/components/marketing/ContactForm").then((m) => m.ContactForm),
   { loading: () => sectionFallback }
 );
-const FinalCTA = dynamic(
-  () => import("@/components/marketing/FinalCTA").then((m) => m.FinalCTA),
+const FinalCTANew = dynamic(
+  () => import("@/components/marketing/FinalCTANew").then((m) => m.FinalCTANew),
   { loading: () => sectionFallback }
 );
 
@@ -258,7 +258,7 @@ export default function FaqPage() {
       <StillHaveQuestions />
       <ContactSupport />
       <ContactForm />
-      <FinalCTA />
+      <FinalCTANew />
     </>
   );
 }

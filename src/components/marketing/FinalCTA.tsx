@@ -150,7 +150,7 @@ export function FinalCTA() {
                   className="group inline-flex items-center justify-center gap-2 h-12 px-7 rounded-lg bg-white text-black text-sm font-medium shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.40),0_1px_2px_rgb(0_0_0/0.20)] hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.55),0_2px_8px_rgb(0_0_0/0.25)] transition-all duration-200"
                 >
                   {es ? "Comprar — desde " : "Buy — from "}
-                  <span className="tnum">$149</span>
+                  <span className="tnum">$29</span>
                   <svg
                     className="ml-0.5 transition-transform duration-200 group-hover:translate-x-0.5"
                     width="16"

@@ -21,7 +21,7 @@ import { MagneticButton } from "@/components/tj/MagneticButton";
  *   segmented controls).
  * - Below the toggle: a SINGLE card showing the selected plan's details.
  *   When the visitor toggles, the card content cross-fades and the price
- *   counts up or down to the new value (149 → 249 or 249 → 149) using a
+ *   counts up or down to the new value (29 → 49 or 49 → 29) using a
  *   requestAnimationFrame tween — the same easing (easeOutExpo) as the
  *   existing <CountUp /> primitive, but untriggered by scroll so it can
  *   be re-run on every toggle.
@@ -103,7 +103,7 @@ export function PlanSwitcher() {
     core: {
       id: "core",
       name: t("core"),
-      price: 149,
+      price: 29,
       tagline: es
         ? "Todo lo esencial para medir y mejorar tu operativa."
         : "Everything you need to measure and improve your trading.",
@@ -113,7 +113,7 @@ export function PlanSwitcher() {
     pro: {
       id: "pro",
       name: t("pro"),
-      price: 249,
+      price: 49,
       popular: true,
       tagline: es
         ? "Para el trader serio con ambición prop firm."
@@ -128,7 +128,7 @@ export function PlanSwitcher() {
   const isPro = active === "pro";
 
   // Price tween — re-run whenever `active` (and thus plan.price) changes.
-  // Display value is rounded so we never render "$ 149.4321".
+  // Display value is rounded so we never render "$ 29.4321".
   //
   // Two values are kept in sync:
   //   • `animatedPrice` — the per-frame tween value, driven by rAF.

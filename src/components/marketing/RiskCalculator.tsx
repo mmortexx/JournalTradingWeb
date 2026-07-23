@@ -9,8 +9,11 @@ import { useLang } from "@/lib/i18n";
  * resultados: riesgo $, tamaño, R:R, beneficio y barra riesgo/beneficio.
  *
  * Estado local con useState + useMemo para los cálculos.
+ *
+ * `num` — ordinal del eyebrow. Por defecto el de la home ("04·c"); las
+ * páginas internas pasan el suyo para mantener su propia secuencia.
  */
-export function RiskCalculator() {
+export function RiskCalculator({ num = "04·c" }: { num?: string }) {
   const { lang } = useLang();
   const es = lang === "es";
 
@@ -85,7 +88,7 @@ export function RiskCalculator() {
               className="tnum"
               style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
             >
-              § 04·c
+              § {num}
             </span>
             <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
             <span

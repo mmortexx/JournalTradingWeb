@@ -10,17 +10,18 @@ import {
 } from "react";
 
 export type Theme = "dark" | "light";
-/* Tras el rediseño solo hay una paleta (verde institucional #34B476).
+/* Paleta única tras el pivote institucional: grafito (#B9B2A6), el
+   accent "Grafito" por defecto del HTML de referencia de Claude Design.
    El tipo se mantiene como union literal para que el anti-FOUC script y
    data-palette sigan funcionando sin rupturas. */
-export type PaletteName = "verde";
+export type PaletteName = "grafito";
 
 export const PALETTES: {
   name: PaletteName;
   light: string;
   dark: string;
 }[] = [
-  { name: "verde", light: "#0F8A56", dark: "#34B476" },
+  { name: "grafito", light: "#6A6456", dark: "#B9B2A6" },
 ];
 
 interface ThemeCtx {
@@ -38,12 +39,13 @@ function readSavedTheme(): Theme {
   return (localStorage.getItem("tj-theme") as Theme) || "dark";
 }
 function readSavedPalette(): PaletteName {
-  if (typeof window === "undefined") return "verde";
-  // Acepta el valor legacy (oro/esmeralda/...) leyendo del localStorage,
-  // pero siempre resuelve a "verde" tras el rediseño. Si en el futuro
-  // vuelve a haber varias paletas, restaurar la lógica del switch aquí.
+  if (typeof window === "undefined") return "grafito";
+  // Acepta cualquier valor legacy (verde/oro/esmeralda/...) leyendo del
+  // localStorage, pero siempre resuelve a "grafito" tras el pivote —
+  // así los visitantes con "verde" guardado migran solos en la próxima
+  // visita. Si vuelve a haber varias paletas, restaurar el switch aquí.
   localStorage.getItem("tj-palette");
-  return "verde";
+  return "grafito";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -51,7 +53,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // The inline script in layout.tsx already applied the DOM attributes before
   // paint, so there's no visual flash. We sync to localStorage after mount.
   const [theme, setTheme] = useState<Theme>("dark");
-  const [palette, setPalette] = useState<PaletteName>("verde");
+  const [palette, setPalette] = useState<PaletteName>("grafito");
   const [mounted, setMounted] = useState(false);
 
   // Read saved preferences once after mount (standard theme hydration pattern).

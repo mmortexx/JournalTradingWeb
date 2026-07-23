@@ -76,16 +76,16 @@ const DemoGallery = dynamic(
   () => import("@/components/demo/DemoGallery").then((m) => m.DemoGallery),
   { loading: () => sectionFallback }
 );
-const StatsBand = dynamic(
-  () => import("@/components/marketing/StatsBand").then((m) => m.StatsBand),
+const StatsBandNew = dynamic(
+  () => import("@/components/marketing/StatsBandNew").then((m) => m.StatsBandNew),
   { loading: () => sectionFallback }
 );
 const DemoReadyToBuy = dynamic(
   () => import("@/components/demo/DemoReadyToBuy").then((m) => m.DemoReadyToBuy),
   { loading: () => sectionFallback }
 );
-const FinalCTA = dynamic(
-  () => import("@/components/marketing/FinalCTA").then((m) => m.FinalCTA),
+const FinalCTANew = dynamic(
+  () => import("@/components/marketing/FinalCTANew").then((m) => m.FinalCTANew),
   { loading: () => sectionFallback }
 );
 
@@ -115,10 +115,10 @@ export default function DemoPage() {
       </section>
       {/* Screenshot gallery — all 8 optimized webp images */}
       <DemoGallery />
-      <StatsBand />
+      <StatsBandNew />
       {/* Ready-to-buy CTA — catches visitors who just played with the demo */}
       <DemoReadyToBuy />
-      <FinalCTA />
+      <FinalCTANew />
     </>
   );
 }

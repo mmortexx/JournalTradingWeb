@@ -7,8 +7,11 @@ import { ShieldCheck, AlertTriangle, HandMetal, Timer } from "lucide-react";
  * GuardianNew — sección `#guardian` del HTML. Disciplina que actúa:
  * mockup de comprobación previa + 3 features de cómo frena antes del
  * error.
+ *
+ * `num` — ordinal del eyebrow. Por defecto el de la home ("05"); las
+ * páginas internas pasan el suyo para mantener su propia secuencia.
  */
-export function GuardianNew() {
+export function GuardianNew({ num = "05" }: { num?: string }) {
   const { lang } = useLang();
   const es = lang === "es";
   return (
@@ -181,7 +184,7 @@ export function GuardianNew() {
               className="tnum"
               style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
             >
-              § 05
+              § {num}
             </span>
             <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
             <span

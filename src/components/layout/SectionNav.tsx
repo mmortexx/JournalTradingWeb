@@ -29,7 +29,7 @@ export interface FeatureSection {
  * sync if a section is ever added or renamed.
  */
 export const FEATURE_SECTIONS: FeatureSection[] = [
-  { id: "disciplina", labelEs: "Disciplina", labelEn: "Discipline" },
+  { id: "disciplina", labelEs: "Características", labelEn: "Features" },
   { id: "galeria", labelEs: "Galería", labelEn: "Gallery" },
   { id: "guardian", labelEs: "Guardián", labelEn: "Guardian" },
   { id: "coste", labelEs: "Coste", labelEn: "Cost" },

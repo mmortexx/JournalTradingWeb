@@ -352,11 +352,7 @@ export function CommandPalette() {
 /* ---------- Bilingual palette labels (mirror i18n STR keys) ---------- */
 
 const PALETTE_LABELS: Record<PaletteName, { es: string; en: string }> = {
-  oro: { es: "Oro", en: "Gold" },
-  esmeralda: { es: "Esmeralda", en: "Emerald" },
-  onix: { es: "Ónix", en: "Onyx" },
-  aurora: { es: "Aurora", en: "Aurora" },
-  seda: { es: "Seda", en: "Silk" },
+  grafito: { es: "Grafito", en: "Graphite" },
 };
 
 /* ---------- Small inline icons (currentColor, no indigo/blue) ---------- */
