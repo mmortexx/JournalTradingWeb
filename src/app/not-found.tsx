@@ -103,7 +103,7 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="mt-6 text-2xl md:text-3xl font-semibold tracking-tight text-white text-balance"
+          className="mt-6 text-2xl md:text-3xl font-semibold tracking-tight text-primary text-balance"
         >
           {es
             ? "Esta página se detuvo como un mal stop loss."
@@ -114,7 +114,7 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
-          className="mt-4 text-base md:text-lg text-gray-300 leading-relaxed"
+          className="mt-4 text-base md:text-lg text-secondary leading-relaxed"
         >
           {es
             ? "La URL que buscas no existe, se ha movido o nunca estuvo en tu watchlist."
@@ -136,7 +136,7 @@ export default function NotFound() {
         >
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-tertiary pointer-events-none"
               aria-hidden="true"
             />
             <input
@@ -149,7 +149,7 @@ export default function NotFound() {
                   : "Search a feature, metric or question…"
               }
               aria-label={es ? "Buscar" : "Search"}
-              className="w-full bg-white/5 border border-white/10 rounded-md h-11 pl-10 pr-24 text-sm text-white placeholder:text-gray-400 outline-none transition-colors hover:border-white/25 focus-visible:border-white/30"
+              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md h-11 pl-10 pr-24 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.3)]"
             />
             <motion.div
               whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
@@ -183,14 +183,14 @@ export default function NotFound() {
             >
               <Link
                 href={tile.href}
-                className="group liquid-glass rounded-card p-4 text-left transition-colors hover:border-white/25 block h-full"
+                className="group liquid-glass rounded-card p-4 text-left transition-colors hover:border-[rgb(var(--divider)/0.25)] block h-full"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-primary">
                     {tile.label}
                   </span>
                   <svg
-                    className="size-3.5 text-gray-400 transition-transform group-hover:translate-x-0.5 group-hover:text-white"
+                    className="size-3.5 text-tertiary transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
                     viewBox="0 0 16 16"
                     fill="none"
                     aria-hidden="true"
@@ -204,7 +204,7 @@ export default function NotFound() {
                     />
                   </svg>
                 </div>
-                <p className="mt-1 text-xs text-gray-300 leading-snug">
+                <p className="mt-1 text-xs text-secondary leading-snug">
                   {tile.desc}
                 </p>
               </Link>

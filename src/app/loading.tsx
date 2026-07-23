@@ -30,8 +30,11 @@ export default function Loading() {
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
-              className="block w-2.5 h-2.5 rounded-full bg-white"
-              style={{ boxShadow: "0 0 8px rgb(var(--accent-base))" }}
+              className="block w-2.5 h-2.5 rounded-full"
+              style={{
+                background: "rgb(var(--accent-base))",
+                boxShadow: "0 0 8px rgb(var(--accent-base))",
+              }}
               // Reduced-motion users get static dots; the loading label
               // below provides the loading affordance on its own.
               animate={
@@ -52,7 +55,7 @@ export default function Loading() {
             />
           ))}
         </div>
-        <span className="text-sm uppercase tracking-[0.2em] text-gray-400">
+        <span className="text-sm uppercase tracking-[0.2em] text-tertiary">
           {es ? "Cargando…" : "Loading…"}
         </span>
       </div>

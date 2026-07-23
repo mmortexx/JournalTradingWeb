@@ -125,7 +125,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="relative mt-auto liquid-glass rounded-t-xl border-t border-white/10 safe-bottom">
+    <footer className="relative mt-auto liquid-glass rounded-t-xl border-t border-[rgb(var(--divider)/0.1)] safe-bottom">
       <div className="relative max-w-page mx-auto px-5 md:px-8 py-12 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-8 md:gap-10">
           {/* Brand column — candlestick mark + wordmark lockup (mirrors
@@ -141,7 +141,7 @@ export function Footer() {
               aria-label={t("appName")}
             >
               <BrandMark />
-              <span className="text-[15px] font-semibold tracking-tight text-white">
+              <span className="text-[15px] font-semibold tracking-tight text-primary">
                 {t("appName")}
               </span>
             </Link>
@@ -153,7 +153,7 @@ export function Footer() {
                 Signals the "your data never leaves your machine" promise
                 inline in the brand column. Same hairline language as the
                 rest of the design system (`border-white/10`). */}
-            <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-secondary">
+            <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-[11px] font-medium text-secondary">
               <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path
                   d="M5 7V5a3 3 0 016 0v2M4 7h8v7H4V7z"
@@ -179,7 +179,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   ariaLabel={label}
                   strength={0.3}
-                  className="icon-btn w-7 h-7 grid place-items-center rounded-full liquid-glass text-secondary hover:bg-white/8 hover:text-primary transition-colors duration-200"
+                  className="icon-btn w-7 h-7 grid place-items-center rounded-full liquid-glass text-secondary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-200"
                 >
                   <Icon />
                 </MagneticButton>
@@ -236,7 +236,7 @@ export function Footer() {
           {trust.map((item) => (
             <span
               key={item}
-              className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.02] px-2.5 py-1 text-xs text-tertiary"
+              className="inline-flex items-center rounded-full border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.02)] px-2.5 py-1 text-xs text-tertiary"
             >
               {item}
             </span>
@@ -314,7 +314,14 @@ export function Footer() {
  */
 function BrandMark() {
   return (
-    <span className="relative shrink-0 w-7 h-7 rounded-md grid place-items-center bg-black/40 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] overflow-hidden">
+    <span
+      className="relative shrink-0 w-7 h-7 rounded-md grid place-items-center border overflow-hidden"
+      style={{
+        borderColor: "rgb(var(--divider) / 0.13)",
+        background: "color-mix(in srgb, var(--surface) 66%, transparent)",
+        boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.08)",
+      }}
+    >
       <span
         aria-hidden
         className="absolute inset-0 opacity-70"

@@ -142,10 +142,10 @@ const capabilities: Capability[] = [
   },
   {
     icon: <PaletteIcon />,
-    titleEs: "Cambia tema y paleta",
-    titleEn: "Change theme and palette",
-    descEs: "Oscuro/claro · oro, esmeralda, ónix, aurora o seda.",
-    descEn: "Dark/light · gold, emerald, onyx, aurora or silk.",
+    titleEs: "Cambia de tema",
+    titleEn: "Switch theme",
+    descEs: "Oscuro o claro, igual que en la app real.",
+    descEn: "Dark or light, just like the real app.",
   },
 ];
 
@@ -161,9 +161,9 @@ export function DemoCapabilities() {
       <div className="max-w-page mx-auto px-5 md:px-8">
         <Reveal className="text-center max-w-2xl mx-auto mb-8">
           <span className="eyebrow inline-flex items-center gap-2 justify-center">
-            <span className="w-6 h-px bg-white opacity-60" />
+            <span className="w-6 h-px bg-current opacity-60" />
             {es ? "Qué puedes hacer" : "What you can do"}
-            <span className="w-6 h-px bg-white opacity-60" />
+            <span className="w-6 h-px bg-current opacity-60" />
           </span>
           <h2
             className="mt-4 font-medium tracking-[-0.02em] leading-tight text-primary"
@@ -187,10 +187,10 @@ export function DemoCapabilities() {
               <motion.div
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                 transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="liquid-glass depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-4 h-full flex flex-col gap-3 hover:border-white/30"
+                className="liquid-glass depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-4 h-full flex flex-col gap-3 hover:border-[rgb(var(--divider)/0.3)]"
               >
                 <span
-                  className="w-9 h-9 rounded-md flex items-center justify-center bg-white/8 text-primary"
+                  className="w-9 h-9 rounded-md flex items-center justify-center bg-[rgb(var(--divider)/0.08)] text-primary"
                   aria-hidden="true"
                 >
                   {c.icon}

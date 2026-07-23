@@ -93,7 +93,8 @@ export function PageHeader({
           no parallax — just a quiet halo. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] opacity-[0.08] bg-white"
+        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] opacity-[0.14]"
+        style={{ background: "rgb(var(--accent-base))" }}
       />
       {/* Section grain — opt-in 3 % fractalNoise overlay so the page
           header reads as the same machined surface as the sections below

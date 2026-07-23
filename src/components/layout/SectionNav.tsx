@@ -103,10 +103,10 @@ export function useActiveSection(): string {
  * z-30 keeps it below the Navbar (z-50) and the global BackToTop /
  * YouAreHere floating buttons (z-40) but above page content.
  *
- * `liquid-glass border-b border-white/5` gives it the same frosted
- * title-bar material as the Navbar, with a very subtle white-on-5%
- * border-white/10 separating it from the page below (matches the Navbar's
- * scrolled surface for visual continuity). On mobile the pill row scrolls horizontally
+ * `liquid-glass` gives it the same frosted title-bar material as the
+ * Navbar, with a very subtle theme-aware hairline (`--divider` at 5%)
+ * separating it from the page below (matches the Navbar's scrolled
+ * surface for visual continuity). On mobile the pill row scrolls horizontally
  * with the scrollbar hidden (`overflow-x-auto no-scrollbar`) so the
  * pills feel like a single clean strip.
  */
@@ -138,7 +138,7 @@ export function SectionNav() {
   );
 
   return (
-    <div className="sticky top-16 z-30 liquid-glass border-b border-white/5 relative">
+    <div className="sticky top-16 z-30 liquid-glass border-b border-[rgb(var(--divider)/0.05)] relative">
       <div className="max-w-page mx-auto px-5 md:px-8">
         <nav
           aria-label={es ? "Secciones de la página" : "Page sections"}
@@ -154,8 +154,8 @@ export function SectionNav() {
                 aria-current={active ? "true" : undefined}
                 className={`liquid-glass rounded-pill px-3 py-1.5 text-xs whitespace-nowrap transition-colors inline-flex items-center gap-1.5 ${
                   active
-                    ? "bg-white/8 text-white font-medium"
-                    : "font-medium text-gray-300 hover:text-white"
+                    ? "bg-[rgb(var(--divider)/0.08)] text-primary font-medium"
+                    : "font-medium text-secondary hover:text-primary"
                 }`}
               >
                 {/* Active pill gets a tiny accent dot prefix so the active
@@ -163,9 +163,10 @@ export function SectionNav() {
                     (color is the weakest signal for accessibility). */}
                 <span
                   aria-hidden="true"
-                  className={`h-1 w-1 rounded-full bg-white transition-opacity ${
+                  className={`h-1 w-1 rounded-full transition-opacity ${
                     active ? "opacity-100" : "opacity-0"
                   }`}
+                  style={{ background: "rgb(var(--accent-base))" }}
                 />
                 {es ? s.labelEs : s.labelEn}
               </a>

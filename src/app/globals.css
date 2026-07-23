@@ -78,16 +78,19 @@
 :root {
   --radius: 0.625rem;
 
-  /* Accent — grafito (#B9B2A6), el default institucional del HTML de
-     referencia (props del diseño: accent "Grafito"). Piedra cálida sin
-     estridencia — el tono "trading floor" de la marca. La paleta verde
-     sigue disponible vía data-palette="verde". Estos valores en :root
-     son el SSR-safe fallback para que el primer paint ya salga grafito
-     aunque el script anti-FOUC aún no haya aplicado el data-palette. */
-  --accent-base: 185 178 166; /* #B9B2A6 — grafito institucional */
-  --accent-hover: 208 202 189; /* #D0CABD */
-  --accent-pressed: 74 70 61; /* #4A463D */
-  --accent-soft: 185 178 166;
+  /* Accent — verde/esmeralda institucional, el mismo verde que usa la
+     app real (capturas de la app nativa: pestaña activa, botones "Long",
+     confirmaciones) y que ya vivía en el sitio como --pnl-pos. Unificar
+     el acento de marketing con el acento real del producto — antes el
+     sitio usaba un "grafito" (#B9B2A6) que no existe en la app de
+     verdad, dos identidades distintas para el mismo producto. Estos
+     valores en :root son el SSR-safe fallback para que el primer paint
+     ya salga con el tono correcto aunque el script anti-FOUC aún no
+     haya aplicado el data-palette. */
+  --accent-base: 52 211 153; /* #34D399 — mismo verde que --pnl-pos */
+  --accent-hover: 103 222 179; /* #67DEB3 */
+  --accent-pressed: 31 127 92; /* #1F7F5C */
+  --accent-soft: 52 211 153;
 
   /* P&L — slightly brighter green (Emerald-400 / #34D399) and slightly
      deeper red (Red-600 / #EF4444) so positive/negative figures read
@@ -232,14 +235,17 @@
   --accent-base: 15 138 86; --accent-hover: 18 160 102; --accent-pressed: 12 110 70;
   --tint: 243 242 236;
 }
-/* Grafito — default institucional (mapa "Grafito" del HTML de referencia:
-   #b9b2a6 / #d0cabd / #4a463d en dark; #6a6456 / #7d766a en light). */
+/* Grafito — el nombre de la clave data-palette se conserva (evita romper
+   selectores/localStorage existentes), pero el valor ya es el verde
+   institucional real de la app: mismo dark que --pnl-pos (#34D399), y en
+   light un verde más profundo y saturado (#0F8A56) para mantener el
+   contraste sobre fondos claros. */
 :root[data-palette="grafito"] {
-  --accent-base: 185 178 166; --accent-hover: 208 202 189; --accent-pressed: 74 70 61; --accent-soft: 185 178 166;
+  --accent-base: 52 211 153; --accent-hover: 103 222 179; --accent-pressed: 31 127 92; --accent-soft: 52 211 153;
   --tint: 11 12 13;
 }
 :root[data-theme="light"][data-palette="grafito"] {
-  --accent-base: 106 100 86; --accent-hover: 125 118 106; --accent-pressed: 74 70 61;
+  --accent-base: 15 138 86; --accent-hover: 18 160 102; --accent-pressed: 12 110 70;
   --tint: 243 242 236;
 }
 
@@ -1473,7 +1479,12 @@ button.icon-btn:hover > svg,
    survive even when a component sets its own outer shadow utility.
    ============================================================ */
 .liquid-glass {
-  background: rgba(0, 0, 0, 0.4);
+  /* Opacidad alta a propósito: las capturas reales de la app (WinUI 3,
+     material Acrylic/Mica) leen como superficies casi sólidas, con solo
+     una insinuación de translucidez en los bordes — nunca el "cristal"
+     muy transparente que tenía esta clase antes (0.4 dejaba ver el fondo
+     de sobra y competía con el contenido). */
+  background: rgba(0, 0, 0, 0.92);
   background-blend-mode: luminosity;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -1505,7 +1516,7 @@ button.icon-btn:hover > svg,
     inset 0 -1px 0 rgb(0 0 0 / 0.08);
 }
 :root[data-theme="light"] .liquid-glass {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.94);
 }
 :root[data-theme="light"] .liquid-glass::after {
   box-shadow:

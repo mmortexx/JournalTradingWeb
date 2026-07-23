@@ -360,7 +360,13 @@ void main() {
   vec2 duv = frag / minDim * 42.0;
   vec2 dcell = floor(duv);
   vec2 dfrac = fract(duv);
-  float dh = hash21(dcell);
+  /* mod() antes del hash: dcell crece sin límite con el ancho de
+     pantalla, y el argumento grande que eso produce dentro de sin()
+     (hash21) pierde precisión en varias GPUs — se ve como bandas
+     verticales regulares en vez de parpadeo aleatorio (bug de
+     portabilidad GLSL conocido). Envolver a un rango pequeño mantiene
+     el argumento seguro sin cambiar el aspecto del polvo. */
+  float dh = hash21(mod(dcell, 19.0));
   float dstar = step(0.987, dh);
   float dtw = 0.35 + 0.65 * sin(uTime * (0.5 + dh * 1.1) + dh * 41.0);
   float ddist = length(dfrac - 0.5);
@@ -424,8 +430,10 @@ void main() {
   vec3 light = mix(BG_LIGHT, richColor, eyePresence);
   vec3 outCol = mix(dark, light, uTheme);
 
-  /* Dithering: mata el banding de los degradados oscuros. */
-  float dith = (hash21(frag + fract(uTime) * 61.7) - 0.5) / 255.0 * 3.0;
+  /* Dithering: mata el banding de los degradados oscuros. mod() antes
+     del hash por la misma razón que el polvo de fondo: frag sin acotar
+     puede producir el mismo artefacto de bandas en vez de disimularlo. */
+  float dith = (hash21(mod(frag + fract(uTime) * 61.7, 61.0)) - 0.5) / 255.0 * 3.0;
   outCol += dith;
 
   gl_FragColor = vec4(outCol, 1.0);

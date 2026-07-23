@@ -249,8 +249,8 @@ export function Navbar() {
           height: 60,
           borderColor: "rgb(var(--divider) / 0.13)",
           background: scrolled
-            ? "color-mix(in srgb, var(--surface) 88%, transparent)"
-            : "color-mix(in srgb, var(--surface) 70%, transparent)",
+            ? "color-mix(in srgb, var(--surface) 97%, transparent)"
+            : "color-mix(in srgb, var(--surface) 92%, transparent)",
           backdropFilter: "blur(20px) saturate(1.5)",
           WebkitBackdropFilter: "blur(20px) saturate(1.5)",
           boxShadow: scrolled
@@ -468,7 +468,7 @@ export function Navbar() {
           <button
             ref={menuButtonRef}
             onClick={() => setMobileOpen((o) => !o)}
-            className="icon-btn md:hidden grid h-9 w-9 place-items-center rounded-full text-gray-300 transition-colors duration-200 hover:bg-white/5 hover:text-white"
+            className="icon-btn md:hidden grid h-9 w-9 place-items-center rounded-full text-[var(--ink-2)] transition-colors duration-200 hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)]"
             aria-label={mobileOpen ? (es ? "Cerrar menú" : "Close menu") : (es ? "Abrir menú" : "Open menu")}
             aria-expanded={mobileOpen}
             aria-haspopup="dialog"
@@ -509,9 +509,9 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="md:hidden fixed top-0 right-0 bottom-0 z-[60] w-[300px] max-w-[84vw] liquid-glass backdrop-blur-xl border-l border-white/10 flex flex-col safe-top outline-none"
+              className="md:hidden fixed top-0 right-0 bottom-0 z-[60] w-[300px] max-w-[84vw] liquid-glass backdrop-blur-xl border-l border-[rgb(var(--divider)/0.1)] flex flex-col safe-top outline-none"
             >
-              <div className="flex items-center justify-between h-16 px-5 border-b border-white/5 shrink-0">
+              <div className="flex items-center justify-between h-16 px-5 border-b border-[rgb(var(--divider)/0.05)] shrink-0">
                 <Link
                   href="/"
                   onClick={() => setMobileOpen(false)}
@@ -519,14 +519,14 @@ export function Navbar() {
                   aria-label={t("appName")}
                 >
                   <BrandMark />
-                  <span className="font-serif text-[17px] font-medium tracking-tight text-white">
+                  <span className="font-serif text-[17px] font-medium tracking-tight text-[var(--ink)]">
                     {t("appName")}
                   </span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="icon-btn w-8 h-8 rounded-md grid place-items-center text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                  className="icon-btn w-8 h-8 rounded-md grid place-items-center text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[rgb(var(--divider)/0.05)] transition-colors"
                   aria-label={es ? "Cerrar menú" : "Close menu"}
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -546,8 +546,8 @@ export function Navbar() {
                       aria-current={active ? "page" : undefined}
                       className={`relative min-h-[44px] flex items-center pl-4 pr-3 py-2.5 text-sm rounded-lg transition-colors ${
                         active
-                          ? "text-white bg-white/[0.06] font-medium"
-                          : "text-gray-300 hover:text-white hover:bg-white/5"
+                          ? "text-[var(--ink)] bg-[rgb(var(--divider)/0.06)] font-medium"
+                          : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[rgb(var(--divider)/0.05)]"
                       }`}
                     >
                       <span className="flex-1">{es ? l.labelEs : l.labelEn}</span>
@@ -562,7 +562,7 @@ export function Navbar() {
                 })}
               </nav>
 
-              <div className="p-4 border-t border-white/5 safe-bottom shrink-0">
+              <div className="p-4 border-t border-[rgb(var(--divider)/0.05)] safe-bottom shrink-0">
                 <motion.div
                   whileTap={{ scale: 0.98, transition: { type: "spring", stiffness: 400, damping: 25 } }}
                 >

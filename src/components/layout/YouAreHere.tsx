@@ -72,7 +72,7 @@ export function YouAreHere() {
               ? `Volver arriba — estás en: ${label}`
               : `Back to top — you are in: ${label}`
           }
-          className="fixed bottom-24 right-6 z-40 liquid-glass rounded-pill pl-3 pr-3 py-2 text-xs font-medium flex items-center gap-2 text-gray-300 hover:text-white transition-colors group"
+          className="fixed bottom-24 right-6 z-40 liquid-glass rounded-pill pl-3 pr-3 py-2 text-xs font-medium flex items-center gap-2 text-secondary hover:text-primary transition-colors group"
           initial={{ opacity: 0, y: 12, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 12, scale: 0.95 }}
@@ -81,11 +81,14 @@ export function YouAreHere() {
           {/* Static location dot — a single solid accent disc reads as a
               "you are here" marker without an animated ping halo. Calmer
               and less attention-grabbing than a pulsing indicator. */}
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white shrink-0" />
-          <span className="text-gray-400 text-[10px] uppercase tracking-[0.12em] whitespace-nowrap">
+          <span
+            className="relative inline-flex h-1.5 w-1.5 rounded-full shrink-0"
+            style={{ background: "rgb(var(--accent-base))" }}
+          />
+          <span className="text-tertiary text-[10px] uppercase tracking-[0.12em] whitespace-nowrap">
             {es ? "Estás en" : "You are in"}
           </span>
-          <span className="text-white font-semibold whitespace-nowrap">
+          <span className="text-primary font-semibold whitespace-nowrap">
             {label}
           </span>
           <svg
@@ -98,7 +101,7 @@ export function YouAreHere() {
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
-            className="text-gray-400 group-hover:text-white transition-colors shrink-0"
+            className="text-tertiary group-hover:text-primary transition-colors shrink-0"
           >
             <path d="M9 14V4M4 8l5-5 5 5" />
           </svg>
