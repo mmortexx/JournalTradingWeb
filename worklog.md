@@ -11040,3 +11040,20 @@ Next actions (deferred, not blocking):
 - (a) If strict WCAG AA conformance becomes a requirement: darken the hero eyebrow + disciplina breadcrumb + footer h4 labels + home trust badges from `--accent-base` / `--ink-3` to `--ink-2` (or `color-mix` darken the accent for the eyebrow specifically).
 - (b) Fix the React #418 hydration mismatch (move anti-FOUC script writes into ThemeProvider's useLayoutEffect, OR switch the persisted theme signal from localStorage to a cookie that SSR can read).
 - (c) No R20-4c-blocked items — the light-theme QA passes cleanly.
+
+---
+Task ID: R20-FINAL
+Agent: main (Z.ai Code) — 20-subagent revamp (4 rondas de 5)
+Task: Revisión al máximo detalle con 20 subagentes en 4 rondas paralelas.
+
+Work Log:
+- RONDA 1 (5 subagentes Explore — audit): SideRail, nav links, TOC coverage, SEO schemas, a11y. Hallazgos críticos: SideRail incompleto, 9 placeholders en Footer, TOC gaps en /faq y /pricing, aggregateRating conflictivo, contraste fails WCAG en claro.
+- RONDA 2 (5 subagentes full-stack — fix): SideRail → home-only 2 entries, orphans eliminados, TOC h2 ungated, schemas enriquecidos (datePublished/image/Thing), a11y (focus traps + contraste + aria-valuetext).
+- RONDA 3 (5 subagentes frontend-styling — polish): 20 componentes pulidos en 5 zonas (hero/home, features/*, pricing/faq, demo, about). Hover rings, machined edges, WCAG avatar fixes, custom range thumb, accordion accent states.
+- RONDA 4 (5 subagentes general — QA): build 15/15 + eslint 0 + tsc clean, dark theme verificado, light theme legibilidad CONFIRMADA (bug dueño resuelto), responsive mobile/tablet sin overflow, keyboard shortcuts todos funcionan.
+- Commit 8567e47 (56 archivos, +2696/-594) pusheado a origin/main.
+
+Stage Summary:
+- Estado: producción verde. Los 6 problemas originales del dueño + todos los hallados por los 20 subagentes están resueltos y verificados.
+- El SideRail ya no indica secciones que no existen — ahora es un índice honesto de 2 entradas (Inicio + Vistazo) exclusivo de la home.
+- Cobertura completa: SEO (Organization + Article + Product + Offer + AggregateRating + FAQPage + Breadcrumb), a11y (WCAG AA en ambos temas, focus traps, aria), UX (TOC + reading time + progress bar + cross-nav + keyboard shortcuts + command palette), responsive (mobile/tablet/desktop).
