@@ -47,37 +47,31 @@ interface TickerItem {
 }
 
 const TICKER_ITEMS: TickerItem[] = [
-  { sym: "BTC/USDT", chg: 2.4 },
-  { sym: "ETH/USDT", chg: -0.8 },
-  { sym: "EURUSD", chg: 0.12 },
-  { sym: "AAPL", chg: 1.1 },
-  { sym: "ES", chg: 0.6 },
-  { sym: "XAU/USD", chg: 0.42 },
-  { sym: "GBPUSD", chg: -0.31 },
-  { sym: "NVDA", chg: 3.2 },
-  { sym: "CL", chg: -1.15 },
-  { sym: "DXY", chg: 0.05 },
-  { sym: "TSLA", chg: 1.94 },
-  { sym: "NQ", chg: -0.47 },
-  { sym: "SPX", chg: 0.38 },
-  { sym: "BRENT", chg: -0.92 },
+  { sym: "ES35", chg: 0.84 },
+  { sym: "NQ", chg: 1.12 },
+  { sym: "SPX", chg: -0.31 },
+  { sym: "EURUSD", chg: 0.22 },
+  { sym: "BTC", chg: -2.04 },
+  { sym: "DAX", chg: 0.57 },
+  { sym: "GOLD", chg: 0.41 },
+  { sym: "CL", chg: -1.18 },
 ];
 
 function Row() {
   return (
-    <div className="flex items-center shrink-0" aria-hidden="true">
-      {TICKER_ITEMS.map((it, i) => {
+    <div className="flex items-center shrink-0 gap-11" aria-hidden="true">
+      {TICKER_ITEMS.map((it) => {
         const pos = it.chg >= 0;
         return (
-          <span key={i} className="flex items-center">
-            <span className="tnum text-xs flex items-center gap-2">
-              <span className="text-secondary font-medium">{it.sym}</span>
-              <span className={`font-medium ${pos ? "text-pnl-pos" : "text-pnl-neg"}`}>
-                {pos ? "+" : "−"}
-                {Math.abs(it.chg).toFixed(2)}%
-              </span>
+          <span key={it.sym} className="tnum flex items-center" style={{ fontSize: 12.5, color: "var(--ink-2)" }}>
+            {it.sym}{" "}
+            <span
+              className="tnum"
+              style={{ color: pos ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))", marginLeft: 6 }}
+            >
+              {pos ? "+" : "−"}
+              {Math.abs(it.chg).toFixed(2)}%
             </span>
-            <span className="mx-3.5 w-1 h-1 rounded-full bg-[rgb(var(--txt-tertiary)/0.5)]" />
           </span>
         );
       })}

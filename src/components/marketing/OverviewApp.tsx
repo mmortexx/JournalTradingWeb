@@ -591,12 +591,17 @@ export function OverviewApp() {
                         </div>
                       </div>
                       <div className="mt-2 grid grid-cols-7 gap-1">
-                        {cal.cells.map((c, i) => (
-                          <div key={i} style={c.style ? `${c.style};padding:2px` : "padding:2px"}>
-                            <span className="tnum" style={{ fontSize: 7, opacity: 0.75 }}>{c.day}</span>
-                            <span className="tnum" style={{ fontSize: 7, fontWeight: 600, lineHeight: 1 }}>{c.val}</span>
-                          </div>
-                        ))}
+                        {cal.cells.map((c, i) => {
+                          const cellStyle = c.style
+                            ? { ...parseInlineStyle(c.style), padding: "2px" }
+                            : { padding: "2px" };
+                          return (
+                            <div key={i} style={cellStyle}>
+                              <span className="tnum" style={{ fontSize: 7, opacity: 0.75 }}>{c.day}</span>
+                              <span className="tnum" style={{ fontSize: 7, fontWeight: 600, lineHeight: 1 }}>{c.val}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -674,4 +679,22 @@ function Kpi({
       </div>
     </div>
   );
+}
+
+/**
+ * Parsea un string estilo CSS inline a un objeto JS compatible con el
+ * `style` prop de React. Solo se usa para los strings generados por
+ * `fixtures.ts` (background/borderRadius/aspectRatio/display/etc.).
+ */
+function parseInlineStyle(s: string): React.CSSProperties {
+  const out: Record<string, string> = {};
+  for (const decl of s.split(";")) {
+    const [k, v] = decl.split(":");
+    if (!k || !v) continue;
+    const key = k.trim();
+    const val = v.trim();
+    const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    out[camel] = val;
+  }
+  return out as React.CSSProperties;
 }

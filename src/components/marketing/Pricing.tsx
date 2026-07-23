@@ -70,7 +70,7 @@ export function Pricing() {
     {
       id: "core",
       name: t("core"),
-      price: 149,
+      price: 29,
       tagline: es
         ? "Todo lo esencial para medir y mejorar tu operativa."
         : "Everything you need to measure and improve your trading.",
@@ -80,7 +80,7 @@ export function Pricing() {
     {
       id: "pro",
       name: t("pro"),
-      price: 249,
+      price: 49,
       popular: true,
       tagline: es
         ? "Para el trader serio con ambición prop firm."

@@ -1,7 +1,8 @@
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { Ticker } from "@/components/marketing/Ticker";
-import { PageTransition } from "@/components/tj/PageTransition";
+import { Hero } from "@/components/marketing/Hero";
+import { StatsBandNew } from "@/components/marketing/StatsBandNew";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — see layout.tsx for the rationale (social platforms
@@ -10,18 +11,16 @@ const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 const OG_IMAGE = `${SITE_URL}/og.png`;
 
 const PAGE_DESCRIPTION =
-  "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina que te frena antes de la tontería y tus datos 100 % en tu máquina. Pago único. Sin suscripciones.";
+  "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina que te frena antes del error y tus datos 100 % en tu máquina. Pago único desde 29 $. Sin suscripciones.";
 
 export const metadata: Metadata = {
-  // `absolute` bypasses the parent template (`%s · Trading Journal`) so the
-  // home page renders its title verbatim instead of "… · Trading Journal".
-  title: { absolute: "Trading Journal — Tu operativa, medida." },
+  title: { absolute: "Trading Journal — Opera como una mesa institucional." },
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}/`,
   },
   openGraph: {
-    title: "Trading Journal — Tu operativa, medida.",
+    title: "Trading Journal — Opera como una mesa institucional.",
     description: PAGE_DESCRIPTION,
     url: `${SITE_URL}/`,
     type: "website",
@@ -33,15 +32,15 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Trading Journal — Tu operativa, medida.",
+        alt: "Trading Journal — Opera como una mesa institucional.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Trading Journal — Tu operativa, medida.",
+    title: "Trading Journal — Opera como una mesa institucional.",
     description:
-      "Diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único.",
+      "Diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único desde 29 $.",
     images: [OG_IMAGE],
   },
 };
@@ -49,82 +48,85 @@ export const metadata: Metadata = {
 // Heavy below-the-fold sections are split into their own JS chunks via
 // `next/dynamic` so the initial bundle stays lean and each section's JS
 // is fetched only when needed. Each gets a lightweight skeleton fallback
-// (a tall spacer) so layout shift is avoided while the chunk loads.
+// so layout shift is avoided while the chunk loads.
 const sectionFallback = (
   <div className="section" aria-hidden="true" style={{ minHeight: 360 }} />
 );
-const HeroVideo = dynamic(
-  () => import("@/components/marketing/HeroVideo").then((m) => m.HeroVideo),
-  { loading: () => <div className="min-h-screen bg-black" aria-hidden="true" /> }
-);
-const Bento = dynamic(
-  () => import("@/components/marketing/Bento").then((m) => m.Bento),
+
+const OverviewApp = dynamic(
+  () => import("@/components/marketing/OverviewApp").then((m) => m.OverviewApp),
   { loading: () => sectionFallback }
 );
-const FeaturePreview = dynamic(
-  () => import("@/components/marketing/FeaturePreview").then((m) => m.FeaturePreview),
+const FeaturesBento = dynamic(
+  () => import("@/components/marketing/FeaturesBento").then((m) => m.FeaturesBento),
   { loading: () => sectionFallback }
 );
-const HomeCTASection = dynamic(
-  () => import("@/components/marketing/HomeCTASection").then((m) => m.HomeCTASection),
+const ToolsGrid = dynamic(
+  () => import("@/components/marketing/ToolsGrid").then((m) => m.ToolsGrid),
   { loading: () => sectionFallback }
 );
-const FinalCTA = dynamic(
-  () => import("@/components/marketing/FinalCTA").then((m) => m.FinalCTA),
+const MetricsShowcaseNew = dynamic(
+  () => import("@/components/marketing/MetricsShowcaseNew").then((m) => m.MetricsShowcaseNew),
   { loading: () => sectionFallback }
 );
-// R4-a: three new institutional marketing sections — split into their
-// own JS chunks so the initial bundle stays lean. Each follows the
-// same `sectionFallback` skeleton pattern as the other sections.
-const TrustSignals = dynamic(
-  () => import("@/components/marketing/TrustSignals").then((m) => m.TrustSignals),
+const RiskCalculator = dynamic(
+  () => import("@/components/marketing/RiskCalculator").then((m) => m.RiskCalculator),
   { loading: () => sectionFallback }
 );
-const MetricsShowcase = dynamic(
-  () => import("@/components/marketing/MetricsShowcase").then((m) => m.MetricsShowcase),
+const GuardianNew = dynamic(
+  () => import("@/components/marketing/GuardianNew").then((m) => m.GuardianNew),
   { loading: () => sectionFallback }
 );
-const SecurityDeepDive = dynamic(
-  () => import("@/components/marketing/SecurityDeepDive").then((m) => m.SecurityDeepDive),
+const DisciplineCost = dynamic(
+  () => import("@/components/marketing/DisciplineCost").then((m) => m.DisciplineCost),
+  { loading: () => sectionFallback }
+);
+const SecuritySection = dynamic(
+  () => import("@/components/marketing/SecuritySection").then((m) => m.SecuritySection),
+  { loading: () => sectionFallback }
+);
+const FinalCTANew = dynamic(
+  () => import("@/components/marketing/FinalCTANew").then((m) => m.FinalCTANew),
   { loading: () => sectionFallback }
 );
 
+/**
+ * Home (R6) — composición reescrita para alinear con el HTML de
+ * referencia. 11 secciones en scroll:
+ *
+ *   1. Hero (#top)               — portada institucional
+ *   2. OverviewApp (#overview)   — "Todo tu día en una pantalla" + mockup
+ *   3. Ticker                    — banda animada con símbolos del HTML
+ *   4. StatsBandNew              — 40+ / 0 bytes / 30 días / 29 $
+ *   5. FeaturesBento (#features) — bento 12-col
+ *   6. ToolsGrid                 — 8 herramientas Pro + brokers
+ *   7. MetricsShowcaseNew (#metrics) — ratios + histograma R
+ *   8. RiskCalculator            — calculadora interactiva
+ *   9. GuardianNew (#guardian)   — disciplina que actúa
+ *  10. DisciplineCost            — el coste real de la indisciplina
+ *  11. SecuritySection (#security) — local-first + comparativa
+ *  12. FinalCTANew               — CTA de cierre
+ *
+ * Las páginas internas (/features, /pricing, /demo) y los componentes
+ * viejos de marketing se mantienen en el repo y siguen funcionando
+ * desde sus consumidores. Las páginas se actualizarán en commits
+ * posteriores (fuera del alcance de este commit).
+ */
 export default function Home() {
-  // R4-a redesigned home — 9-section rhythm with the three new
-  // institutional sections interleaved between the existing ones:
-  //   Hero → TrustSignals → Ticker → Bento → MetricsShowcase →
-  //   FeaturePreview → SecurityDeepDive → HomeCTA → FinalCTA.
-  // TrustSignals (post-Hero) sets the credibility frame before the
-  // user sees anything else. MetricsShowcase (post-Bento) deepens
-  // the metrics story the Bento alludes to. SecurityDeepDive
-  // (post-FeaturePreview) closes the trust loop before conversion.
   return (
-    <PageTransition>
-      {/* Hero — also keeps id="top" inside <Hero> for the command palette's "Go to top". */}
-      <div id="hero" className="scroll-mt-16">
-        <HeroVideo />
-      </div>
-      {/* R4-a — premium trust band right after the Hero (Stripe-style). */}
-      <TrustSignals />
+    <>
+      <Hero />
+      <OverviewApp />
       <Ticker />
-      {/* Anchor target for in-page navigation to the feature preview. */}
-      <div id="features-preview" className="scroll-mt-16">
-        <Bento />
-      </div>
-      {/* R4-a — institutional metrics deep-dive (live ratios + equity curve). */}
-      <MetricsShowcase />
-      {/* Compact 3-card feature preview — bridges Bento and the CTA section. */}
-      <FeaturePreview />
-      {/* R4-a — security & privacy deep-dive (3 cards + comparison table). */}
-      <SecurityDeepDive />
-      {/* Anchor target for the navigation-card CTA section. */}
-      <div id="cta" className="scroll-mt-16">
-        <HomeCTASection />
-      </div>
-      {/* Anchor target for the closing CTA. */}
-      <div id="final-cta" className="scroll-mt-16">
-        <FinalCTA />
-      </div>
-    </PageTransition>
+      <StatsBandNew />
+      <FeaturesBento />
+      <ToolsGrid />
+      <MetricsShowcaseNew />
+      <RiskCalculator />
+      <GuardianNew />
+      <DisciplineCost />
+      <SecuritySection />
+      <FinalCTANew />
+    </>
   );
 }

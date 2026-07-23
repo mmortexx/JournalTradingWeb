@@ -114,12 +114,17 @@ export function FeaturesBento() {
             <div
               className="mt-5 grid grid-cols-7 gap-1.5"
             >
-              {cal.cells.map((c, i) => (
-                <div key={i} style={c.style ? `${c.style};padding:4px` : "padding:4px"}>
-                  <span className="tnum" style={{ fontSize: 8, opacity: 0.75 }}>{c.day}</span>
-                  <span className="tnum" style={{ fontSize: 8.5, fontWeight: 600, lineHeight: 1 }}>{c.val}</span>
-                </div>
-              ))}
+              {cal.cells.map((c, i) => {
+                const cellStyle = c.style
+                  ? { ...parseInlineStyle(c.style), padding: "4px" }
+                  : { padding: "4px" };
+                return (
+                  <div key={i} style={cellStyle}>
+                    <span className="tnum" style={{ fontSize: 8, opacity: 0.75 }}>{c.day}</span>
+                    <span className="tnum" style={{ fontSize: 8.5, fontWeight: 600, lineHeight: 1 }}>{c.val}</span>
+                  </div>
+                );
+              })}
             </div>
             <div className="mt-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -416,4 +421,23 @@ export function FeaturesBento() {
       </div>
     </section>
   );
+}
+
+/**
+ * Parsea un string estilo CSS inline (formato `"prop:val;prop:val"`) a un
+ * objeto JS compatible con el `style` prop de React. Solo se usa para
+ * los strings generados por `fixtures.ts` (background/borderRadius/
+ * aspectRatio/display/etc.). Suficiente para los casos del calendario.
+ */
+function parseInlineStyle(s: string): React.CSSProperties {
+  const out: Record<string, string> = {};
+  for (const decl of s.split(";")) {
+    const [k, v] = decl.split(":");
+    if (!k || !v) continue;
+    const key = k.trim();
+    const val = v.trim();
+    const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    out[camel] = val;
+  }
+  return out as React.CSSProperties;
 }
