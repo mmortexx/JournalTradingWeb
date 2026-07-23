@@ -9591,3 +9591,25 @@ Stage Summary:
   (c) Command palette podría listar las páginas también para navegación por teclado
   (d) Animación de entrada para el BackToTop ring (fill animado al aparecer)
   (e) "g" prefix podría aceptar Escape para cancelar explícitamente
+
+---
+Task ID: R10-cron-9
+Agent: main (Z.ai Code) — cron webDevReview round 9
+Task: Command palette lista las 9 páginas + Escape cancela el prefix 'g'.
+
+Work Log:
+- QA: build estático 15/15 rutas.
+- Mejoras implementadas:
+  1. CommandPalette expandido: el array PAGES ahora incluye las 3 subpáginas de features (/features/metricas, /features/disciplina, /features/seguridad) junto a las 6 rutas originales. La paleta de comandos (⌘/Ctrl+K) ahora ofrece navegación por teclado completa a todas las páginas de contenido — complementa los atajos 'g' + letra. 9 items de nav total (antes 6).
+  2. GlobalShortcuts 'g' prefix Escape cancellation: pulsar Escape mientras el prefix 'g' está armado ahora lo desarma explícitamente al instante, sin esperar al timeout de 1s. El hint chip desaparece inmediatamente. No-op si el prefix no está armado (Escape keeps su comportamiento default en otros contextos).
+- Verificación: eslint 0 errores, tsc limpio, build 15/15 rutas. DOM confirma la paleta de comandos se abre (Ctrl+K), 13 items totales (9 nav + theme + lang + accent + buy), "Métricas" presente en la paleta.
+- Commit 7ef1fe1 (2 archivos, +15/-3) pusheado a origin/main.
+
+Stage Summary:
+- Estado: navegación por teclado completa y coherente. Dos vías de navegación power-user: 'g'+letra (rápido, muscle memory) y ⌘K command palette (descubrible, fuzzy search). Ambas cubren las 9 páginas del sitio.
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Open Graph images dinámicas por subpágina (og:image específico por eje)
+  (b) Review schema (AggregateRating) en /pricing
+  (c) Command palette podría incluir búsqueda de secciones dentro de una página
+  (d) Animación de entrada para el BackToTop ring (fill animado al aparecer)
+  (e) "g" prefix hint chip podría mostrar la letra de la key pulsada mientras se captura
