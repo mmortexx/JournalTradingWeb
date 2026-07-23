@@ -34,10 +34,18 @@ import { useEffect, useRef, useState } from "react";
  *    dithering ±1/255 para eliminar banding en los degradados oscuros.
  *
  * Reactividad (todo con inercia crítica, sin saltos):
- *  - SCROLL: la pupila se dilata con la velocidad de scroll y el iris
- *    rota con el progreso de página; la exposición baja en el tramo
- *    medio (legibilidad del contenido) y vuelve a subir hacia el CTA
- *    final. El flujo de las fibras se acelera sutilmente al desplazarse.
+ *  - SIN ROTACIÓN: un iris real no gira sobre sí mismo — el giro
+ *    continuo de una versión anterior quedó descartado por antinatural.
+ *    Las fibras solo ondulan/respiran en el sitio (ruido de baja
+ *    frecuencia), nunca barren en bloque.
+ *  - PARPADEO: cada 4,5-9 s, cierre 110 ms + apertura 190 ms con
+ *    easing, doble parpadeo ocasional — el gesto que de verdad vende
+ *    "esto está vivo", más que cualquier giro.
+ *  - SCROLL: dilata la pupila muy sutilmente con la velocidad de
+ *    desplazamiento y desplaza la mirada hacia abajo/arriba siguiendo
+ *    el avance — el ojo "lee" la página contigo. La exposición baja
+ *    apenas en el tramo medio (legibilidad del contenido) y recupera
+ *    su máximo hacia el cierre.
  *  - PUNTERO: el ojo "mira" — desplazamiento ≤ 3.5 % del radio hacia
  *    el cursor (solo pointer:fine).
  *  - INTRO: la pupila nace dilatada y contrae al enfocar (1.1 s) con
@@ -138,11 +146,10 @@ void main() {
   float r = length(p);
   float ang = atan(p.y, p.x);
 
-  /* Rotación global: giro CONTINUO perceptible por tiempo (una vuelta
-     cada ~70 s) — desligado del scroll, que daba tirones de giro al
-     desplazarse. El scroll ya solo dilata la pupila y guía la mirada. */
-  float rot = uTime * 0.09;
-  float a01 = fract((ang + rot) / TAU + 1.0);
+  /* Sin rotación: un ojo real no gira su iris — solo mira (uLook, ya
+     aplicado arriba al desplazar center) y respira (el wob de más
+     abajo ondula las fibras in-situ sin barrer el ángulo en bloque). */
+  float a01 = fract(ang / TAU + 1.0);
 
   /* Pupila: latido + dilatación sutil por scroll + apertura inicial +
      reenfoque al parpadear (se comprime un pelo con el párpado). */
@@ -285,8 +292,15 @@ void main() {
 
   vec3 dark = base + col;
 
-  /* Tema claro: el ojo queda como acuarela tenue sobre papel. */
-  vec3 light = BG_LIGHT * (1.0 - luma * 0.42) + col * 0.22;
+  /* Tema claro: el mismo ojo, con color de verdad — antes quedaba
+     lavado (mucho papel, poco color) y "no se veía". Solo se toca esta
+     rama: el tema oscuro no cambia. Saturación extra propia (1.55, vs
+     el 1.06 global de arriba) + mucha más transmisión de color
+     (0.22→0.62) + menos apagado por luma (0.42→0.22) para que rojo,
+     ámbar y verde lean con la misma fuerza que en oscuro sobre el
+     papel claro, sin perder la legibilidad del contenido encima. */
+  vec3 colLight = mix(vec3(luma), col, 1.55);
+  vec3 light = BG_LIGHT * (1.0 - luma * 0.22) + colLight * 0.62;
   vec3 outCol = mix(dark, light, uTheme);
 
   /* Dithering: mata el banding de los degradados oscuros. */

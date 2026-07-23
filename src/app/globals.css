@@ -860,6 +860,25 @@
     background-color: color-mix(in srgb, var(--bg) 82%, transparent);
   }
 
+  /* .tj-legible-text — red de legibilidad para texto que flota
+     DIRECTAMENTE sobre el ojo, sin ningún panel/velo detrás (p. ej.
+     VideoCTA, el cierre de la home): un text-shadow theme-aware en
+     vez de una caja opaca, así el ojo se ve entero y el texto sigue
+     leyéndose. Oscuro → sombra oscura (el texto es claro sobre un
+     fondo que puede iluminarse mucho cerca del rojo/verde del iris).
+     Claro → halo claro (el texto es oscuro sobre papel, pero el iris
+     ahora lleva color real y puede oscurecer el fondo puntualmente). */
+  .tj-legible-text {
+    text-shadow:
+      0 2px 20px rgb(0 0 0 / 0.5),
+      0 1px 3px rgb(0 0 0 / 0.35);
+  }
+  :root[data-theme="light"] .tj-legible-text {
+    text-shadow:
+      0 2px 20px rgb(255 255 255 / 0.7),
+      0 1px 3px rgb(255 255 255 / 0.55);
+  }
+
   .divider-grad {
     height: 1px;
     /* Neutral hairline — uses --divider (white-on-dark, black-on-light) at a
