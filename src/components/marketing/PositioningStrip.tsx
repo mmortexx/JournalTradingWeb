@@ -81,7 +81,7 @@ export function PositioningStrip() {
   ];
 
   return (
-    <section className="section-tight bg-black relative overflow-hidden">
+    <section className="section-tight bg-veil relative overflow-hidden">
       {/* Background slow-mo equity curve */}
       <div className="absolute inset-0 pointer-events-none">
         <SlowMoChart className="w-full h-full" opacity={0.04} cycle={20} />

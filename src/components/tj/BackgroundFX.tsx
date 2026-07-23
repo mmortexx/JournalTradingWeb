@@ -1,283 +1,595 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
- * BackgroundFX — fondo fijo global: filamentos de luz fluyendo.
+ * BackgroundFX — "El Ojo del Mercado": iris de fibras de luz en WebGL.
  *
- * Sustituye a la rejilla de celdas v1 por el lenguaje de la referencia
- * aprobada (hero "NOVA_AI"): hebras luminosas que barren la pantalla en
- * un arco lento, cada una con una cabeza brillante tipo bokeh y una
- * estela que se desvanece. Sobre negro casi puro, en el marfil cálido
- * de la paleta grafito — luz institucional, cero estridencia.
+ * Reemplaza los filamentos canvas-2D por la escena B de la referencia
+ * aprobada (hero "NOVA_AI"): un ojo central hecho de miles de fibras
+ * radiales luminosas que ondulan alrededor de una pupila oscura, con
+ * un anillo exterior de radios blancos y bokeh flotando en el fondo.
  *
- * Simulación (canvas 2D, composite "lighter" para acumular luz):
- *  - Campo de flujo: cada partícula desciende siguiendo un ángulo que
- *    depende de su x (abanico desde el 60 % del ancho) más una
- *    ondulación temporal muy lenta — las hebras "respiran".
- *  - ~90 partículas (escala con el área), velocidades 16–42 px/s,
- *    tamaños mixtos (muchas finas, pocas gordas bokeh), parpadeo
- *    sinusoidal individual.
- *  - Estela: ring-buffer de posiciones muestreado cada ~45 ms; se
- *    dibuja como segmentos con alpha decreciente → filamento.
- *  - Cursor: dentro de 240 px las hebras se avivan (alpha y tamaño
- *    suben con falloff smoothstep) y su rumbo se desvía suavemente —
- *    la luz "responde" sin perseguir.
+ * Traducción cromática a la marca (la referencia es azul):
+ *   núcleo ROJO incandescente (--pnl-neg) → ámbar → puntas VERDE
+ *   esmeralda (--pnl-pos). Rojo dentro, verde fuera: pérdida en el
+ *   centro del ojo, beneficio en la periferia — el lenguaje P&L del
+ *   producto convertido en identidad visual.
  *
- * Rendimiento: dt-based (independiente del frame-rate), dpr ≤ 2, rAF
- * pausado con visibilitychange. `prefers-reduced-motion`: un único
- * frame estático de filamentos tenues.
+ * Implementación (WebGL 1, un solo pase, full-screen triangle):
+ *  - Fibras: ruido de valor en dominio polar con costura envuelta
+ *    (crossfade entre dos muestras desplazadas un periodo) → cientos
+ *    de filamentos sin seam. Tres frecuencias: mechones (14/rev),
+ *    fibra media (~90/rev) y fibra fina (~160/rev), avectadas
+ *    radialmente y onduladas por fbm de baja frecuencia — el iris
+ *    "respira" como una anémona, nunca se congela.
+ *  - Pupila: disco casi negro con borde suave, latido lento y brasa
+ *    roja tenue en el centro. Aro de raíces blanco-marfil incandescente
+ *    justo en el borde (la firma de la referencia).
+ *  - Anillo exterior: circunferencia fina + ~30 cerdas radiales con
+ *    longitud/brillo por-radio (hash), rotando muy despacio.
+ *  - Bokeh: 10 orbes suaves derivando en órbitas lentas, teñidos
+ *    rojo/verde según su hash.
+ *  - Acabado: tonemap exponencial, saturación +6 %, viñeta radial y
+ *    dithering ±1/255 para eliminar banding en los degradados oscuros.
  *
- * Capas fijas por encima del canvas: halo radial superior, grain y
+ * Reactividad (todo con inercia crítica, sin saltos):
+ *  - SCROLL: la pupila se dilata con la velocidad de scroll y el iris
+ *    rota con el progreso de página; la exposición baja en el tramo
+ *    medio (legibilidad del contenido) y vuelve a subir hacia el CTA
+ *    final. El flujo de las fibras se acelera sutilmente al desplazarse.
+ *  - PUNTERO: el ojo "mira" — desplazamiento ≤ 3.5 % del radio hacia
+ *    el cursor (solo pointer:fine).
+ *  - INTRO: la pupila nace dilatada y contrae al enfocar (1.1 s) con
+ *    fade de exposición, sincronizado con el IntroSequence del sitio.
+ *
+ * Rendimiento y robustez:
+ *  - dpr ≤ 2 con ESCALADO ADAPTATIVO: si la media móvil de frame-time
+ *    supera ~13 ms, la resolución interna baja en pasos de 0.85× (mín.
+ *    0.55×) hasta recuperar 60 fps; sube de nuevo si hay holgura.
+ *  - rAF pausado con visibilitychange; manejo de webglcontextlost/
+ *    restored; cleanup completo al desmontar.
+ *  - prefers-reduced-motion: un único frame estático bien compuesto.
+ *  - Sin WebGL: fallback CSS (gradientes radial+cónico que aproximan
+ *    pupila, iris rojo→verde y radios del anillo).
+ *  - Tema claro: exposición reducida y base clara (el ojo queda como
+ *    marca de agua, no como foco).
+ *
+ * Capas DOM por encima del canvas: halo superior, grain fractal y
  * viñeta — la misma pila del HTML de referencia.
  */
 
-type Particle = {
-  x: number;
-  y: number;
-  speed: number;
-  size: number;
-  phase: number;
-  twinkle: number;
-  drift: number;
-  trail: { x: number; y: number }[];
-  lastSample: number;
-};
+const VERT = `
+attribute vec2 aPos;
+void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
+`;
 
-const TRAIL_LEN = 14;
-const TRAIL_EVERY = 45; // ms entre muestras de estela
-const CURSOR_R = 240;
+const FRAG = `
+precision highp float;
+
+uniform vec2  uRes;      // resolución del buffer (px)
+uniform float uTime;     // segundos
+uniform float uScroll;   // progreso de página 0..1 (suavizado)
+uniform float uDilate;   // dilatación de pupila 0..1 (velocidad de scroll)
+uniform vec2  uLook;     // mirada hacia el puntero, cada eje ~[-1,1]
+uniform float uIntro;    // apertura inicial 0→1
+uniform float uExposure; // exposición global (legibilidad por tramo)
+uniform float uTheme;    // 0 = oscuro, 1 = claro
+uniform float uEyeY;     // centro vertical del ojo (fracción, coords GL)
+
+const float TAU = 6.28318530718;
+
+/* ---- Paleta (espejo de los tokens CSS de la marca) ---- */
+const vec3 BG_DARK    = vec3(0.043, 0.047, 0.051); /* --bg  #0b0c0d */
+const vec3 BG_LIGHT   = vec3(0.953, 0.949, 0.925); /* --bg  claro #f3f2ec */
+const vec3 RED_CORE   = vec3(0.937, 0.267, 0.267); /* --pnl-neg #EF4444 */
+const vec3 RED_DEEP   = vec3(0.620, 0.098, 0.078); /* brasa profunda */
+const vec3 EMBER      = vec3(1.000, 0.520, 0.200); /* ámbar de transición */
+const vec3 GREEN_CORE = vec3(0.204, 0.827, 0.600); /* --pnl-pos #34D399 */
+const vec3 GREEN_DEEP = vec3(0.031, 0.310, 0.208); /* esmeralda de fondo */
+const vec3 RIM_WHITE  = vec3(1.000, 0.949, 0.878); /* marfil incandescente */
+const vec3 RING_IVORY = vec3(0.914, 0.894, 0.847); /* --accent-hover familia */
+
+/* ---- Ruido ---- */
+float hash11(float n) { return fract(sin(n) * 43758.5453123); }
+float hash21(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  float a = hash21(i);
+  float b = hash21(i + vec2(1.0, 0.0));
+  float c = hash21(i + vec2(0.0, 1.0));
+  float d = hash21(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 4; i++) {
+    v += a * vnoise(p);
+    p = p * 2.03 + vec2(17.3, 9.1);
+    a *= 0.5;
+  }
+  return v;
+}
+/* Ruido polar sin costura: crossfade entre dos muestras desplazadas
+   un periodo completo K en el eje angular. a01 ∈ [0,1). */
+float anoise(float a01, float K, float rad, vec2 off) {
+  float x = a01 * K;
+  float n1 = vnoise(vec2(x, rad) + off);
+  float n2 = vnoise(vec2(x - K, rad) + off);
+  return mix(n1, n2, a01);
+}
+
+void main() {
+  vec2 frag = gl_FragCoord.xy;
+  vec2 res = uRes;
+  float minDim = min(res.x, res.y);
+
+  /* Radio del anillo exterior = unidad del sistema. Centro con
+     "mirada" sutil hacia el puntero. */
+  float R = 0.335 * minDim;
+  vec2 center = res * vec2(0.5, uEyeY) + uLook * R * 0.035;
+  vec2 p = (frag - center) / R;
+  float r = length(p);
+  float ang = atan(p.y, p.x);
+
+  /* Rotación global: deriva ambiental lentísima + progreso de scroll. */
+  float rot = uTime * 0.008 + uScroll * 0.85;
+  float a01 = fract((ang + rot) / TAU + 1.0);
+
+  /* Pupila: latido + dilatación por scroll + apertura inicial. */
+  float beat = 0.014 * sin(uTime * 0.55 + 0.6 * sin(uTime * 0.21));
+  float rp = 0.26 * (1.0 + beat) * (1.0 + 0.16 * uDilate)
+           * (1.0 + 0.55 * (1.0 - uIntro));
+
+  /* Ondulación del iris: las fibras se anclan en la pupila y ondean
+     más hacia las puntas. Flujo acelera suavemente con el scroll. */
+  float sway = smoothstep(rp, 1.0, r);
+  float flowT = uTime * (0.045 + 0.05 * uDilate);
+  float wob = (anoise(a01, 3.0, r * 1.8 - flowT, vec2(31.7, 7.7)) - 0.5)
+            * 0.16 * sway;
+  float a01w = fract(a01 + wob / TAU * 6.0 + 1.0);
+  float rw = r + (anoise(a01, 5.0, r * 2.6 + flowT * 0.7, vec2(3.1, 91.3)) - 0.5) * 0.03 * sway;
+
+  /* ---- Iris de fibras ---- */
+  /* Radio de las puntas por ángulo (borde emplumado, respira). */
+  float tip = 0.845
+            + (anoise(a01w, 7.0, 2.7, vec2(57.1, 13.9)) - 0.5) * 0.15
+            + 0.012 * sin(uTime * 0.33 + ang * 3.0);
+
+  float enIn = smoothstep(rp * 0.96, rp * 1.10, rw);
+  float enOut = 1.0 - smoothstep(tip * 0.76, tip, rw);
+  float irisBand = enIn * enOut;
+
+  vec3 col = vec3(0.0);
+
+  if (irisBand > 0.001) {
+    /* Avección radial LENTA en frecuencia baja → hebras largas y sedosas. */
+    float rr = rw * 4.5 - uTime * 0.10;
+
+    /* Mechones (≈14/rev) modulan el brillo de las fibras finas. */
+    float clump = anoise(a01w, 14.0, rw * 2.2 - uTime * 0.035, vec2(11.3, 47.9));
+    clump = 0.26 + 1.05 * pow(clump, 1.35);
+
+    /* Dos capas de fibra fina (≈110 y ≈190 por revolución). */
+    float f1 = anoise(a01w, 110.0, rr, vec2(0.0, 5.0));
+    float f2 = anoise(a01w, 190.0, rr * 1.9 + 7.0, vec2(41.0, 23.0));
+    float fine = f1 * 0.58 + f2 * 0.42;
+
+    /* Afilar: de campo de ruido a filamentos densos y crujientes. */
+    float strand = pow(fine, 3.0) * 2.35 * clump;
+
+    /* Envolvente radial: incandescente junto a la pupila, se apaga
+       hacia las puntas (la firma de la referencia). */
+    float radial = mix(1.85, 0.45, smoothstep(rp * 1.02, tip, rw));
+    float irisL = strand * irisBand * radial;
+
+    /* Rampa de color rojo→ámbar→verde (evita el pantano rojo+verde). */
+    float tcol = smoothstep(rp * 0.9, tip * 0.98, rw);
+    vec3 hot  = mix(vec3(0.88, 0.15, 0.12), EMBER, smoothstep(0.30, 0.54, tcol));
+    vec3 cold = mix(GREEN_CORE * 1.06, GREEN_DEEP, smoothstep(0.68, 1.0, tcol));
+    vec3 fiberCol = mix(hot, cold, smoothstep(0.44, 0.68, tcol));
+
+    /* Raíces blanco-fuego: las fibras nacen incandescentes y toman
+       color al alejarse (blanco → rojo → ámbar → verde). */
+    float rootWhite = (1.0 - smoothstep(rp, rp + 0.20, rw)) * 0.62;
+    fiberCol = mix(fiberCol, RIM_WHITE, rootWhite);
+
+    /* Jitter de tono por fibra: profundidad orgánica. */
+    float jit = anoise(a01w, 55.0, rw * 3.0, vec2(77.7, 19.1));
+    fiberCol = mix(fiberCol, mix(RED_DEEP, GREEN_DEEP, tcol), jit * 0.38);
+
+    col += fiberCol * irisL * 2.05;
+
+    /* Aro de raíces incandescente pegado a la pupila. */
+    float rim = exp(-pow((rw - rp * 1.07) / 0.05, 2.0));
+    col += RIM_WHITE * rim * (0.38 + 1.05 * strand) * irisBand * 1.7;
+
+    /* Chispas blancas en el tercio interior de las fibras. */
+    float sparkle = pow(fine, 6.0) * (1.0 - smoothstep(rp, rp + 0.36, rw));
+    col += RIM_WHITE * sparkle * irisBand * 1.5;
+  }
+
+  /* ---- Pupila ---- */
+  float pupil = 1.0 - smoothstep(rp * 0.90, rp * 1.01, r);
+  vec3 pupilCol = vec3(0.016, 0.012, 0.012)
+                + RED_DEEP * 0.16 * exp(-pow(r / (rp * 0.42 + 1e-4), 2.0));
+  col = mix(col, pupilCol, pupil);
+
+  /* ---- Anillo exterior de cerdas ---- */
+  float NS = 30.0;
+  float cell = floor(a01 * NS);
+  float fc = fract(a01 * NS) - 0.5;
+  float h = hash11(cell * 7.13 + 3.7);
+  float ringR = 1.0;
+  /* Circunferencia fina. */
+  float ringLine = exp(-pow((r - ringR) / 0.0045, 2.0)) * 0.55;
+  /* Cerdas: cruzan el anillo, mayormente hacia fuera, longitud por hash. */
+  float spokeIn = ringR - 0.030 - 0.02 * h;
+  float spokeOut = ringR + 0.052 + 0.070 * h;
+  float band = smoothstep(spokeIn, spokeIn + 0.02, r)
+             * (1.0 - smoothstep(spokeOut - 0.03, spokeOut, r));
+  float spoke = smoothstep(0.075, 0.012, abs(fc)) * band;
+  float flick = 0.72 + 0.28 * sin(uTime * 0.8 + h * TAU);
+  float ringL = (ringLine + spoke * 0.95 * flick);
+  col += RING_IVORY * ringL * 0.85;
+
+  /* ---- Niebla ambiental y bokeh ---- */
+  float haze = (1.0 - smoothstep(0.15, 1.55, r));
+  float wisp = fbm(p * 1.1 + vec2(uTime * 0.012, -uTime * 0.009));
+  vec3 hazeCol = mix(RED_DEEP, GREEN_DEEP, smoothstep(0.35, 1.15, r));
+  col += hazeCol * haze * (0.03 + 0.11 * wisp);
+
+  for (int i = 0; i < 10; i++) {
+    float fi = float(i);
+    float h1 = hash11(fi * 13.7 + 1.0);
+    float h2 = hash11(fi * 29.3 + 5.0);
+    vec2 bp = (vec2(h1, h2) * 2.0 - 1.0) * vec2(1.45, 1.15);
+    bp += 0.10 * vec2(sin(uTime * 0.05 + fi * 1.9), cos(uTime * 0.041 + fi * 2.7));
+    float d = length(p - bp);
+    float sz = mix(0.010, 0.034, hash11(fi * 3.1 + 9.0));
+    float tw = 0.5 + 0.5 * sin(uTime * 0.5 + fi * 2.3);
+    vec3 bc = mix(GREEN_CORE, RED_CORE, step(0.62, h1)) * 0.55 + RIM_WHITE * 0.30;
+    col += bc * exp(-(d * d) / (sz * sz)) * 0.5 * (0.35 + 0.65 * tw);
+  }
+
+  /* ---- Composición final ---- */
+  col *= uExposure * (0.35 + 0.65 * uIntro);
+
+  /* Tonemap + saturación leve. */
+  col = 1.0 - exp(-col * 1.30);
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  col = mix(vec3(luma), col, 1.06);
+
+  /* Fondo: profundidad central que respira hacia --bg en los bordes. */
+  vec2 uv = frag / res;
+  float vig = smoothstep(1.65, 0.35, length((uv - 0.5) * vec2(res.x / res.y, 1.0) * 1.35));
+  vec3 base = BG_DARK * mix(1.0, 0.72, vig * 0.8);
+
+  vec3 dark = base + col;
+
+  /* Tema claro: el ojo queda como acuarela tenue sobre papel. */
+  vec3 light = BG_LIGHT * (1.0 - luma * 0.42) + col * 0.22;
+  vec3 outCol = mix(dark, light, uTheme);
+
+  /* Dithering: mata el banding de los degradados oscuros. */
+  float dith = (hash21(frag + fract(uTime) * 61.7) - 0.5) / 255.0 * 3.0;
+  outCol += dith;
+
+  gl_FragColor = vec4(outCol, 1.0);
+}
+`;
+
+/* Suavizado exponencial independiente del frame-rate. */
+const damp = (cur: number, target: number, lambda: number, dt: number) =>
+  cur + (target - cur) * (1 - Math.exp((-lambda * dt) / 1000));
 
 export function BackgroundFX() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [webglFailed, setWebglFailed] = useState(false);
 
   useEffect(() => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const ctx = c.getContext("2d");
-    if (!ctx) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let w = 0;
-    let h = 0;
-    let dpr = 1;
+    const finePointer = matchMedia("(pointer: fine)").matches;
+
+    const gl =
+      (canvas.getContext("webgl", {
+        alpha: false,
+        depth: false,
+        stencil: false,
+        antialias: false,
+        powerPreference: "high-performance",
+        preserveDrawingBuffer: false,
+      }) as WebGLRenderingContext | null) ||
+      (canvas.getContext("experimental-webgl") as WebGLRenderingContext | null);
+
+    if (!gl) {
+      setWebglFailed(true);
+      return;
+    }
+
+    /* ---- Compilación ---- */
+    const mk = (type: number, src: string) => {
+      const s = gl.createShader(type);
+      if (!s) return null;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error("BackgroundFX shader:", gl.getShaderInfoLog(s));
+        gl.deleteShader(s);
+        return null;
+      }
+      return s;
+    };
+
+    let prog: WebGLProgram | null = null;
+    let buf: WebGLBuffer | null = null;
+    let uni: Record<string, WebGLUniformLocation | null> = {};
+
+    const build = () => {
+      const vs = mk(gl.VERTEX_SHADER, VERT);
+      const fs = mk(gl.FRAGMENT_SHADER, FRAG);
+      if (!vs || !fs) return false;
+      const p = gl.createProgram();
+      if (!p) return false;
+      gl.attachShader(p, vs);
+      gl.attachShader(p, fs);
+      gl.linkProgram(p);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+        console.error("BackgroundFX link:", gl.getProgramInfoLog(p));
+        return false;
+      }
+      prog = p;
+      gl.useProgram(prog);
+      buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      /* Full-screen triangle: menos overdraw de setup que un quad. */
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 3, -1, -1, 3]),
+        gl.STATIC_DRAW
+      );
+      const loc = gl.getAttribLocation(prog, "aPos");
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      for (const name of [
+        "uRes",
+        "uTime",
+        "uScroll",
+        "uDilate",
+        "uLook",
+        "uIntro",
+        "uExposure",
+        "uTheme",
+        "uEyeY",
+      ]) {
+        uni[name] = gl.getUniformLocation(prog, name);
+      }
+      return true;
+    };
+
+    if (!build()) {
+      setWebglFailed(true);
+      return;
+    }
+
+    /* ---- Estado de animación ---- */
     let raf: number | null = null;
     let running = true;
+    let destroyed = false;
     let last = performance.now();
-    let elapsed = 0;
-    let cf = 0;
-    let rgb = "208 202 189"; // --accent-hover (grafito) fallback
+    let t0 = last;
 
-    const readAccent = () => {
-      const v = getComputedStyle(document.documentElement)
-        .getPropertyValue("--accent-hover")
-        .trim();
-      if (v) rgb = v;
-    };
+    let scrollS = 0; // progreso suavizado
+    let velS = 0; // velocidad suavizada
+    let dilate = 0;
+    let lastY = window.scrollY;
+    let lookX = 0;
+    let lookY = 0;
+    let lookTX = 0;
+    let lookTY = 0;
+    let intro = reduce ? 1 : 0;
+    let theme = document.documentElement.dataset.theme === "light" ? 1 : 0;
 
-    // Cursor con easing propio para que el brillo siga con inercia.
-    let mx = -9999;
-    let my = -9999;
-    let cx = -9999;
-    let cy = -9999;
-    const onMove = (e: PointerEvent) => {
-      mx = e.clientX;
-      my = e.clientY;
-      if (cx < -9000) {
-        cx = mx;
-        cy = my;
+    /* Escalado adaptativo de resolución. */
+    let quality = 1;
+    let emaFrame = 8;
+    let qCooldown = 0;
+
+    const dprCap = () => Math.min(2, window.devicePixelRatio || 1);
+
+    const resize = () => {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      const s = dprCap() * quality;
+      const bw = Math.max(2, Math.round(w * s));
+      const bh = Math.max(2, Math.round(h * s));
+      if (canvas.width !== bw || canvas.height !== bh) {
+        canvas.width = bw;
+        canvas.height = bh;
+        gl.viewport(0, 0, bw, bh);
       }
     };
-    const onLeave = () => {
-      mx = -9999;
-      my = -9999;
+
+    const scrollProgress = () => {
+      const doc = document.documentElement;
+      const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+      return Math.min(1, Math.max(0, window.scrollY / max));
     };
 
-    // ---- Partículas ----
-    let parts: Particle[] = [];
-    const rand = (a: number, b: number) => a + Math.random() * (b - a);
-
-    const spawn = (p: Particle, fresh: boolean) => {
-      // Nacen repartidas en un abanico centrado en el 60 % del ancho,
-      // por encima del viewport; en el seed inicial, por toda la altura.
-      p.x = w * 0.6 + (Math.random() - 0.5) * w * 1.1;
-      p.y = fresh ? rand(-h * 0.15, h * 1.05) : rand(-140, -20);
-      p.speed = rand(16, 42);
-      // Mayoría finas (2–5 px), ~15 % gordas bokeh (7–13 px).
-      p.size = Math.random() < 0.15 ? rand(7, 13) : rand(2, 5);
-      p.phase = Math.random() * Math.PI * 2;
-      p.twinkle = rand(0.5, 1.4);
-      p.drift = rand(-0.12, 0.12);
-      p.trail = [];
-      p.lastSample = 0;
+    const onPointer = (e: PointerEvent) => {
+      lookTX = (e.clientX / window.innerWidth - 0.5) * 2;
+      lookTY = -(e.clientY / window.innerHeight - 0.5) * 2;
+    };
+    const onPointerLeave = () => {
+      lookTX = 0;
+      lookTY = 0;
     };
 
-    const buildParts = () => {
-      const target = Math.round(Math.min(120, Math.max(55, (w * h) / 16000)));
-      parts = Array.from({ length: target }, () => {
-        const p = {} as Particle;
-        spawn(p, true);
-        return p;
-      });
+    const draw = (now: number, dt: number) => {
+      const t = (now - t0) / 1000;
+
+      /* Scroll: progreso + velocidad → dilatación. */
+      const prog01 = scrollProgress();
+      scrollS = damp(scrollS, prog01, 3.2, dt);
+      const dy = window.scrollY - lastY;
+      lastY = window.scrollY;
+      const v = Math.min(1.4, Math.abs(dy) / Math.max(1, window.innerHeight) / (dt / 1000 + 1e-4) / 2.2);
+      velS = v > velS ? damp(velS, v, 9, dt) : damp(velS, v, 2.2, dt);
+      dilate = Math.min(1, velS);
+
+      /* Mirada con inercia. */
+      lookX = damp(lookX, lookTX, 4.5, dt);
+      lookY = damp(lookY, lookTY, 4.5, dt);
+
+      /* Apertura inicial — anclada a tiempo de reloj (no a dt acumulado)
+         para que dure 1,1 s reales aunque el frame-rate caiga. */
+      if (intro < 1) intro = Math.min(1, (now - t0) / 1100);
+      const introE = 1 - Math.pow(1 - intro, 3); // easeOutCubic
+
+      /* Exposición por tramo: protagonista arriba, discreto en el
+         contenido, vuelve a encenderse hacia el cierre. */
+      const mid = smoothstep01((scrollS - 0.06) / 0.24);
+      const end = smoothstep01((scrollS - 0.78) / 0.2);
+      const exposure = 1.0 - 0.44 * mid + 0.24 * end * 0.44;
+
+      gl.uniform2f(uni.uRes, canvas.width, canvas.height);
+      gl.uniform1f(uni.uTime, reduce ? 13.7 : t);
+      gl.uniform1f(uni.uScroll, scrollS);
+      gl.uniform1f(uni.uDilate, reduce ? 0 : dilate);
+      gl.uniform2f(uni.uLook, finePointer ? lookX : 0, finePointer ? lookY : 0);
+      gl.uniform1f(uni.uIntro, introE);
+      gl.uniform1f(uni.uExposure, exposure);
+      gl.uniform1f(uni.uTheme, theme);
+      /* En el hero el ojo asoma la pupila por encima del titular
+         (43 % desde arriba) y baja al centro al entrar el contenido.
+         gl_FragCoord tiene el eje Y invertido → 1 - yVisual. */
+      const eyeTop = smoothstep01(scrollS / 0.22);
+      gl.uniform1f(uni.uEyeY, 1 - (0.43 + 0.07 * eyeTop));
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
-    // Ángulo del campo de flujo en (x, y, t): descenso en abanico con
-    // una ondulación temporal lenta — la firma visual de la referencia.
-    const flowAngle = (x: number, y: number, t: number, drift: number) =>
-      Math.PI / 2 +
-      (x / w - 0.6) * 0.95 +
-      drift +
-      0.22 * Math.sin(y * 0.0016 + t * 0.00035 + x * 0.0007);
-
-    const smoothstep = (e0: number, e1: number, v: number) => {
-      const t = Math.min(1, Math.max(0, (v - e0) / (e1 - e0)));
-      return t * t * (3 - 2 * t);
-    };
-
-    const render = (dt: number, t: number) => {
-      if (cf++ % 120 === 0) readAccent();
-      ctx.clearRect(0, 0, w, h);
-      ctx.globalCompositeOperation = "lighter";
-
-      if (mx > -9000) {
-        cx += (mx - cx) * Math.min(1, dt * 0.0065);
-        cy += (my - cy) * Math.min(1, dt * 0.0065);
-      }
-
-      for (const p of parts) {
-        // Avance por el campo de flujo.
-        const ang = flowAngle(p.x, p.y, t, p.drift);
-        let vx = Math.cos(ang);
-        let vy = Math.sin(ang);
-
-        // Influencia del cursor: brillo + desvío suave.
-        let boost = 0;
-        if (cx > -9000) {
-          const dx = p.x - cx;
-          const dy = p.y - cy;
-          const d = Math.hypot(dx, dy);
-          if (d < CURSOR_R) {
-            boost = smoothstep(CURSOR_R, 0, d);
-            const side = dx * vy - dy * vx > 0 ? 1 : -1;
-            const bend = boost * 0.5 * side;
-            const ca = Math.cos(bend);
-            const sa = Math.sin(bend);
-            const nvx = vx * ca - vy * sa;
-            vy = vx * sa + vy * ca;
-            vx = nvx;
-          }
-        }
-
-        const step = (p.speed * dt) / 1000;
-        p.x += vx * step;
-        p.y += vy * step;
-
-        // Muestreo de estela espaciado en el tiempo (no por frame) para
-        // que el filamento tenga longitud física estable.
-        if (t - p.lastSample > TRAIL_EVERY) {
-          p.trail.push({ x: p.x, y: p.y });
-          if (p.trail.length > TRAIL_LEN) p.trail.shift();
-          p.lastSample = t;
-        }
-
-        // Reciclaje al salir por abajo o por los lados.
-        if (p.y > h + 40 || p.x < -160 || p.x > w + 160) {
-          spawn(p, false);
-          continue;
-        }
-
-        const tw = 0.72 + 0.28 * Math.sin(t * 0.001 * p.twinkle + p.phase);
-        const alpha = (0.14 + 0.1 * (p.size > 6 ? 1 : 0)) * tw * (1 + boost * 1.5);
-        const size = p.size * (1 + boost * 0.45);
-
-        // Filamento: segmentos de la estela con alpha creciente hacia
-        // la cabeza. Línea fina — la acumulación "lighter" hace el glow.
-        if (p.trail.length > 1) {
-          for (let i = 1; i < p.trail.length; i++) {
-            const a = p.trail[i - 1];
-            const b = p.trail[i];
-            const k = i / p.trail.length;
-            ctx.strokeStyle = `rgb(${rgb} / ${(alpha * 0.34 * k).toFixed(3)})`;
-            ctx.lineWidth = 1 + (size * 0.16) * k;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
-        }
-
-        // Cabeza bokeh: doble gradiente radial (núcleo + halo).
-        const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 3.2);
-        halo.addColorStop(0, `rgb(${rgb} / ${(alpha * 0.5).toFixed(3)})`);
-        halo.addColorStop(1, `rgb(${rgb} / 0)`);
-        ctx.fillStyle = halo;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, size * 3.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        const core = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
-        core.addColorStop(0, `rgb(${rgb} / ${Math.min(0.85, alpha * 2.4).toFixed(3)})`);
-        core.addColorStop(1, `rgb(${rgb} / 0)`);
-        ctx.fillStyle = core;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalCompositeOperation = "source-over";
+    const smoothstep01 = (x: number) => {
+      const c = Math.min(1, Math.max(0, x));
+      return c * c * (3 - 2 * c);
     };
 
     const loop = (now: number) => {
-      if (!running) return;
+      if (!running || destroyed) return;
       const dt = Math.min(64, now - last);
       last = now;
-      elapsed += dt;
-      render(dt, elapsed);
+
+      /* Calidad adaptativa: EMA del frame-time. */
+      emaFrame = emaFrame * 0.94 + dt * 0.06;
+      qCooldown -= dt;
+      if (qCooldown <= 0) {
+        if (emaFrame > 13.2 && quality > 0.55) {
+          quality = Math.max(0.55, quality * 0.85);
+          qCooldown = 900;
+          resize();
+        } else if (emaFrame < 7.5 && quality < 1) {
+          quality = Math.min(1, quality / 0.85);
+          qCooldown = 1600;
+          resize();
+        }
+      }
+
+      draw(now, dt);
       raf = requestAnimationFrame(loop);
     };
 
-    const resize = () => {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      w = c.clientWidth;
-      h = c.clientHeight;
-      c.width = w * dpr;
-      c.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildParts();
-      if (reduce) {
-        // Frame estático: avanza la simulación "en seco" para que las
-        // estelas existan, y pinta una sola vez.
-        for (let i = 0; i < 40; i++) render(80, i * 80);
-      }
-    };
-
-    const onVisibility = () => {
-      running = !document.hidden;
-      if (running && raf === null && !reduce) {
+    const start = () => {
+      if (raf === null && !reduce && !destroyed) {
         last = performance.now();
         raf = requestAnimationFrame(loop);
-      } else if (!running && raf !== null) {
+      }
+    };
+    const stop = () => {
+      if (raf !== null) {
         cancelAnimationFrame(raf);
         raf = null;
       }
     };
 
-    readAccent();
-    window.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("mouseleave", onLeave);
-    window.addEventListener("resize", resize, { passive: true });
+    const onVisibility = () => {
+      running = !document.hidden;
+      if (running) start();
+      else stop();
+    };
+
+    const onResize = () => {
+      resize();
+      if (reduce) draw(performance.now(), 16);
+    };
+
+    /* Cambios de tema en runtime (data-theme en <html>). */
+    const mo = new MutationObserver(() => {
+      const next = document.documentElement.dataset.theme === "light" ? 1 : 0;
+      if (next !== theme) {
+        theme = next;
+        if (reduce) draw(performance.now(), 16);
+      }
+    });
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    const onLost = (e: Event) => {
+      e.preventDefault();
+      stop();
+    };
+    const onRestored = () => {
+      uni = {};
+      if (build()) {
+        resize();
+        start();
+      } else {
+        setWebglFailed(true);
+      }
+    };
+
+    canvas.addEventListener("webglcontextlost", onLost, false);
+    canvas.addEventListener("webglcontextrestored", onRestored, false);
+    window.addEventListener("resize", onResize, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
+    if (finePointer) {
+      window.addEventListener("pointermove", onPointer, { passive: true });
+      document.addEventListener("mouseleave", onPointerLeave);
+    }
+
     resize();
-    if (!reduce) {
-      last = performance.now();
-      raf = requestAnimationFrame(loop);
+    if (reduce) {
+      draw(performance.now(), 16);
+    } else {
+      start();
     }
 
     return () => {
-      window.removeEventListener("pointermove", onMove);
-      document.removeEventListener("mouseleave", onLeave);
-      window.removeEventListener("resize", resize);
+      destroyed = true;
+      stop();
+      mo.disconnect();
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
+      window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
-      if (raf !== null) cancelAnimationFrame(raf);
+      if (finePointer) {
+        window.removeEventListener("pointermove", onPointer);
+        document.removeEventListener("mouseleave", onPointerLeave);
+      }
+      const ext = gl.getExtension("WEBGL_lose_context");
+      if (buf) gl.deleteBuffer(buf);
+      if (prog) gl.deleteProgram(prog);
+      ext?.loseContext();
     };
   }, []);
 
@@ -285,7 +597,52 @@ export function BackgroundFX() {
     <div
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      style={{ background: "var(--bg)" }}
     >
+      {/* Ojo WebGL (o fallback CSS si no hay WebGL) */}
+      {webglFailed ? (
+        <div className="absolute inset-0" style={{ background: "var(--bg)" }}>
+          {/* Aproximación estática: pupila + iris rojo→verde + radios. */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "min(67vmin, 900px)",
+              height: "min(67vmin, 900px)",
+              background:
+                "repeating-conic-gradient(from 0deg, rgb(255 255 255 / 0.10) 0deg 0.7deg, transparent 0.7deg 6deg)",
+              WebkitMaskImage:
+                "radial-gradient(circle, transparent 55%, #000 57%, #000 63%, transparent 66%)",
+              maskImage:
+                "radial-gradient(circle, transparent 55%, #000 57%, #000 63%, transparent 66%)",
+            }}
+          />
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "min(54vmin, 720px)",
+              height: "min(54vmin, 720px)",
+              background:
+                "repeating-conic-gradient(from 2deg, rgb(52 211 153 / 0.55) 0deg 0.5deg, transparent 0.5deg 2.1deg), radial-gradient(circle, rgb(255 244 224 / 0.9) 13.5%, rgb(239 68 68 / 0.85) 17%, rgb(200 90 40 / 0.5) 26%, rgb(52 211 153 / 0.38) 44%, rgb(10 40 28 / 0.25) 58%, transparent 62%)",
+              WebkitMaskImage:
+                "radial-gradient(circle, #000 12%, #000 60%, transparent 64%)",
+              maskImage:
+                "radial-gradient(circle, #000 12%, #000 60%, transparent 64%)",
+            }}
+          />
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              width: "min(15vmin, 200px)",
+              height: "min(15vmin, 200px)",
+              background:
+                "radial-gradient(circle, #060505 62%, rgb(90 15 10 / 0.6) 78%, transparent 100%)",
+              boxShadow: "0 0 60px 10px rgb(255 240 220 / 0.16)",
+            }}
+          />
+        </div>
+      ) : (
+        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+      )}
       {/* Halo superior de tinta */}
       <div
         className="absolute inset-0"
@@ -294,8 +651,6 @@ export function BackgroundFX() {
             "radial-gradient(125% 85% at 50% -8%, color-mix(in srgb, var(--ink) 4%, transparent), transparent 52%)",
         }}
       />
-      {/* Filamentos de luz */}
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       {/* Grano — mismo fractalNoise que el resto del sitio */}
       <div
         className="absolute inset-0"

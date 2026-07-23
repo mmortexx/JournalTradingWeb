@@ -142,7 +142,7 @@ export function Changelog() {
       ];
 
   return (
-    <section id="changelog" className="section cv-auto bg-black relative overflow-hidden scroll-mt-24">
+    <section id="changelog" className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24">
       {/* Aurora tint to lift the section off the page */}
       <div
         className="absolute inset-0 pointer-events-none aurora-bg opacity-40"

@@ -63,7 +63,29 @@ export function PageHeader({
   const es = lang === "es";
 
   return (
-    <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 overflow-hidden bg-black">
+    <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 overflow-hidden">
+      {/* Antes: `bg-black` opaco — tapaba el ojo WebGL global en todas
+          las subpáginas. Ahora el header es transparente y la
+          legibilidad la garantiza un scrim lateral (mismo lenguaje que
+          el hero de la home): el texto vive sobre la zona velada y el
+          iris respira a la derecha. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(90deg, color-mix(in srgb, var(--bg) 76%, transparent), color-mix(in srgb, var(--bg) 30%, transparent) 46%, transparent 68%)",
+        }}
+      />
+      {/* Fade inferior: entrega suave hacia la primera sección velada. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-28"
+        style={{
+          background:
+            "linear-gradient(180deg, transparent, color-mix(in srgb, var(--bg) 52%, transparent))",
+        }}
+      />
       {/* Static accent glow — pinned to the top center, soft enough not to
           compete with the headline. The 600×300 px disc is intentionally
           larger than the heading column so its falloff reads as ambient

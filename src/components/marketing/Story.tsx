@@ -93,7 +93,7 @@ export function Story() {
   const quoteWords = quote.split(" ");
 
   return (
-    <section id="story" className="section bg-black relative scroll-mt-24 overflow-hidden">
+    <section id="story" className="section bg-veil relative scroll-mt-24 overflow-hidden">
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8 grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-20 items-start">

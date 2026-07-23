@@ -254,7 +254,7 @@ export default function FaqPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <FAQ />
+      <FAQ standalone />
       <StillHaveQuestions />
       <ContactSupport />
       <ContactForm />

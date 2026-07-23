@@ -60,7 +60,7 @@ export function Gallery() {
   ];
 
   return (
-    <section className="section bg-black relative overflow-hidden">
+    <section className="section bg-veil relative overflow-hidden">
       {/* Ambient glow */}
       <div
         aria-hidden

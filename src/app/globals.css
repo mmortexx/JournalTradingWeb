@@ -847,6 +847,19 @@
     padding-bottom: clamp(3rem, 6vw, 5rem);
   }
 
+  /* Velo de sección — sustituye al antiguo `bg-black` opaco de las
+     secciones. Deja pasar ~26 % del ojo WebGL del fondo (BackgroundFX)
+     para que la web entera respire sobre él, manteniendo el contraste
+     del contenido: sobre el lienzo casi negro del canvas, el velo lee
+     como el mismo negro institucional de antes. En tema claro cubre
+     al 82 % para que el ojo quede como marca de agua. */
+  .bg-veil {
+    background-color: color-mix(in srgb, var(--bg) 74%, transparent);
+  }
+  :root[data-theme="light"] .bg-veil {
+    background-color: color-mix(in srgb, var(--bg) 82%, transparent);
+  }
+
   .divider-grad {
     height: 1px;
     /* Neutral hairline — uses --divider (white-on-dark, black-on-light) at a

@@ -128,7 +128,7 @@ export default function PricingPage() {
           page header and the pricing cards to reinforce the no-risk promise
           before the visitor even sees the prices. */}
       <GuaranteeBanner />
-      <Pricing />
+      <Pricing standalone />
       <Comparison />
       {/* Pricing-specific FAQ — 5 bilingual Q&A focused on trial, payment,
           guarantee, multi-computer and lost license. */}

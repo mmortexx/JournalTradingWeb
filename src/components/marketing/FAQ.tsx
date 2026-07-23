@@ -32,7 +32,13 @@ import {
 
 type QA = { q: string; a: string };
 
-export function FAQ() {
+/**
+ * @param standalone En la página /faq el `PageHeader` ya titula
+ * "Preguntas frecuentes." — con esta bandera la sección omite su
+ * encabezado interno (que duplicaba el titular) y entra directa al
+ * buscador y la lista.
+ */
+export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
   const { t, lang } = useLang();
   const es = lang === "es";
 
@@ -200,30 +206,34 @@ export function FAQ() {
   const noResults = filtered.length === 0;
 
   return (
-    <section id="faq" className="section cv-auto bg-black relative overflow-hidden scroll-mt-24">
+    <section id="faq" className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24">
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
-        <div className="relative max-w-3xl mx-auto text-center">
-          <Reveal>
-            <div className="relative flex justify-center">
-              <Eyebrow>{t("faqEyebrow")}</Eyebrow>
-            </div>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <h2
-              className="relative mt-5 t-h2 text-primary"
-            >
-              {es ? (
-                <>
-                  Preguntas <span className="text-gradient">frecuentes</span>
-                </>
-              ) : (
-                <>
-                  Frequently asked <span className="text-gradient">questions</span>
-                </>
-              )}
-            </h2>
-          </Reveal>
-        </div>
+        {/* Encabezado interno — omitido en modo standalone (/faq), donde
+            el PageHeader ya titula la página. */}
+        {!standalone && (
+          <div className="relative max-w-3xl mx-auto text-center">
+            <Reveal>
+              <div className="relative flex justify-center">
+                <Eyebrow>{t("faqEyebrow")}</Eyebrow>
+              </div>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <h2
+                className="relative mt-5 t-h2 text-primary"
+              >
+                {es ? (
+                  <>
+                    Preguntas <span className="text-gradient">frecuentes</span>
+                  </>
+                ) : (
+                  <>
+                    Frequently asked <span className="text-gradient">questions</span>
+                  </>
+                )}
+              </h2>
+            </Reveal>
+          </div>
+        )}
 
         {/* Search input — filters FAQ items in real time */}
         <Reveal delay={0.1} y={24}>

@@ -86,7 +86,7 @@ export function TechSpecs() {
   ];
 
   return (
-    <section className="section bg-black relative overflow-hidden">
+    <section className="section bg-veil relative overflow-hidden">
       <div className="relative max-w-page mx-auto px-5 md:px-8">
         {/* Header */}
         <Reveal className="max-w-2xl">

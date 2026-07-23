@@ -18,7 +18,12 @@ type Plan = {
   cta: string;
 };
 
-export function Pricing() {
+/**
+ * @param standalone Cuando la sección vive en su propia página bajo un
+ * `PageHeader` que ya dice "Lo compras una vez…", oculta el encabezado
+ * interno para no repetir el mismo titular dos veces en una pantalla.
+ */
+export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
   const { t, lang } = useLang();
   const es = lang === "es";
 
@@ -93,7 +98,7 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      className="section cv-auto bg-black relative overflow-hidden scroll-mt-24"
+      className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24"
     >
       {/* Soft radial accent glow behind the cards. */}
       <div
@@ -109,26 +114,30 @@ export function Pricing() {
       <div className="grain absolute inset-0 pointer-events-none" aria-hidden="true" />
 
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
-        {/* Header — centered, matches Stripe / Linear / Vercel pricing pages. */}
-        <Reveal className="text-center max-w-3xl mx-auto">
-          <Eyebrow className="justify-center">{t("pricingEyebrow")}</Eyebrow>
-          <h2 className="mt-5 text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance">
-            {es ? (
-              <>
-                Lo compras una vez. Es tuyo para{" "}
-                <span className="text-gradient">siempre.</span>
-              </>
-            ) : (
-              <>
-                You buy it once. It's yours{" "}
-                <span className="text-gradient">forever.</span>
-              </>
-            )}
-          </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed">
-            {t("pricingLead")}
-          </p>
-        </Reveal>
+        {/* Header — centered, matches Stripe / Linear / Vercel pricing
+            pages. Omitido en modo standalone: el PageHeader de /pricing
+            ya dice exactamente esto. */}
+        {!standalone && (
+          <Reveal className="text-center max-w-3xl mx-auto">
+            <Eyebrow className="justify-center">{t("pricingEyebrow")}</Eyebrow>
+            <h2 className="mt-5 text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance">
+              {es ? (
+                <>
+                  Lo compras una vez. Es tuyo para{" "}
+                  <span className="text-gradient">siempre.</span>
+                </>
+              ) : (
+                <>
+                  You buy it once. It's yours{" "}
+                  <span className="text-gradient">forever.</span>
+                </>
+              )}
+            </h2>
+            <p className="mt-4 text-lg text-secondary leading-relaxed">
+              {t("pricingLead")}
+            </p>
+          </Reveal>
+        )}
 
         {/* Visual-only pricing model toggle — reinforces the "no subscription"
             value prop. The active option is "Pago único" (one-time, since the

@@ -110,7 +110,7 @@ export default function DemoPage() {
       />
       {/* What you can do — 6 feature cards previewing the demo */}
       <DemoCapabilities />
-      <section className="section bg-black scroll-mt-16">
+      <section className="section bg-veil scroll-mt-16">
         <AppDemoClient />
       </section>
       {/* Screenshot gallery — all 8 optimized webp images */}

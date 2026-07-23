@@ -67,41 +67,72 @@ export function AnimatedHeading({ text, className = "", style, highlight }: Anim
   });
 
   return (
-    <h1 className={className} style={style}>
-      {lines.map((line, lineIndex) => {
-        const chars = Array.from(line);
-        const range = highlightRangesByLine[lineIndex];
-        return (
-          <span key={lineIndex} style={{ display: "block" }}>
-            {chars.map((char, charIndex) => {
-              const inHighlight =
-                range.start >= 0 &&
-                charIndex >= range.start &&
-                charIndex < range.end;
-              const delay =
-                (lineIndex * line.length * CHAR_DELAY) +
-                (charIndex * CHAR_DELAY);
-              return (
-                <span
-                  key={charIndex}
-                  className={inHighlight ? "text-gradient" : undefined}
-                  style={{
-                    display: "inline-block",
-                    opacity: animate ? 1 : 0,
-                    transform: animate ? "translateX(0)" : "translateX(-18px)",
-                    transitionProperty: "opacity, transform",
-                    transitionDuration: `${CHAR_DURATION}ms`,
-                    transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-                    transitionDelay: `${delay}ms`,
-                  }}
-                >
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              );
-            })}
-          </span>
-        );
-      })}
+    /* aria-label con el texto completo + \u00E1rbol visual aria-hidden: los
+       lectores de pantalla leen la frase entera de una vez en lugar de
+       letra a letra (cada char vive en su propio span). */
+    <h1 className={className} style={style} aria-label={text.replace(/\n/g, " ")}>
+      <span aria-hidden="true">
+        {lines.map((line, lineIndex) => {
+          const range = highlightRangesByLine[lineIndex];
+          /* Agrupar por PALABRAS: cada palabra es un span inline-block
+             con white-space:nowrap y los espacios son nodos de texto
+             normales. As\u00ED el navegador solo puede partir la l\u00EDnea en los
+             espacios \u2014 antes, con cada car\u00E1cter como inline-block
+             independiente, el salto pod\u00EDa caer en mitad de una palabra
+             ("pa|ra") sin guion. La animaci\u00F3n char-a-char no cambia:
+             los delays siguen contados por \u00EDndice global de car\u00E1cter. */
+          const words = line.split(" ");
+          let charCursor = 0; // \u00EDndice de car\u00E1cter dentro de la l\u00EDnea
+          return (
+            <span key={lineIndex} style={{ display: "block" }}>
+              {words.map((word, wordIndex) => {
+                const wordStart = charCursor;
+                const chars = Array.from(word);
+                charCursor += chars.length + 1; // +1 por el espacio
+                return (
+                  <span key={wordIndex}>
+                    {wordIndex > 0 && " "}
+                    <span
+                      style={{ display: "inline-block", whiteSpace: "nowrap" }}
+                    >
+                      {chars.map((char, ci) => {
+                        const charIndex = wordStart + ci;
+                        const inHighlight =
+                          range.start >= 0 &&
+                          charIndex >= range.start &&
+                          charIndex < range.end;
+                        const delay =
+                          (lineIndex * line.length * CHAR_DELAY) +
+                          (charIndex * CHAR_DELAY);
+                        return (
+                          <span
+                            key={ci}
+                            className={inHighlight ? "text-gradient" : undefined}
+                            style={{
+                              display: "inline-block",
+                              opacity: animate ? 1 : 0,
+                              transform: animate
+                                ? "translateX(0)"
+                                : "translateX(-18px)",
+                              transitionProperty: "opacity, transform",
+                              transitionDuration: `${CHAR_DURATION}ms`,
+                              transitionTimingFunction:
+                                "cubic-bezier(0.22, 1, 0.36, 1)",
+                              transitionDelay: `${delay}ms`,
+                            }}
+                          >
+                            {char}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  </span>
+                );
+              })}
+            </span>
+          );
+        })}
+      </span>
     </h1>
   );
 }

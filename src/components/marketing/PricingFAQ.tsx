@@ -105,7 +105,7 @@ export function PricingFAQ() {
     <section
       id="pricing-faq"
       aria-label={es ? "Preguntas frecuentes sobre precios" : "Pricing FAQ"}
-      className="section-tight bg-black relative overflow-hidden scroll-mt-24"
+      className="section-tight bg-veil relative overflow-hidden scroll-mt-24"
     >
       {/* Soft radial accent glow behind the accordion — anchors the
           section to the same dark-premium aesthetic as the Pricing

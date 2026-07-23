@@ -45,13 +45,17 @@ export function Hero() {
           zIndex: 1,
         }}
       />
-      {/* Viñeta lateral + inferior */}
+      {/* Viñeta lateral + inferior — aligerada tras el rediseño del
+          fondo: el ojo WebGL es el protagonista del hero y un lavado al
+          90 % sobre el 58 % del ancho lo borraba entero. El scrim ahora
+          protege solo la columna de texto y se disuelve antes del
+          centro del iris. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(90deg, color-mix(in oklab, var(--bg) 90%, #000), transparent 58%)",
+            "linear-gradient(90deg, color-mix(in oklab, var(--bg) 72%, #000), color-mix(in oklab, var(--bg) 26%, transparent) 34%, transparent 52%)",
           zIndex: 1,
         }}
       />

@@ -72,7 +72,7 @@ export function Values() {
   const es = lang === "es";
 
   return (
-    <section id="values" className="section bg-black relative overflow-hidden scroll-mt-24">
+    <section id="values" className="section bg-veil relative overflow-hidden scroll-mt-24">
       {/* subtle aurora tint to separate from neighbors */}
       <div
         aria-hidden="true"

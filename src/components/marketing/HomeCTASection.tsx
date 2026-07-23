@@ -93,7 +93,7 @@ export function HomeCTASection() {
   ];
 
   return (
-    <section className="section-tight cv-auto bg-black relative overflow-hidden">
+    <section className="section-tight cv-auto bg-veil relative overflow-hidden">
       {/* Soft radial accent glow at the top — anchors the section to the
           hero's dark video aesthetic without competing with the cards. */}
       <div

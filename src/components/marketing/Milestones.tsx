@@ -61,7 +61,7 @@ export function Milestones() {
   ];
 
   return (
-    <section id="milestones" className="section cv-auto bg-black relative overflow-hidden scroll-mt-24">
+    <section id="milestones" className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24">
       {/* faint backdrop line that anchors the whole timeline */}
       <div
         aria-hidden="true"

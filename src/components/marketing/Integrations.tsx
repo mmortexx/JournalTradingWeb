@@ -30,7 +30,7 @@ export function Integrations() {
   const es = lang === "es";
 
   return (
-    <section className="section bg-black relative overflow-hidden">
+    <section className="section bg-veil relative overflow-hidden">
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
       <div className="relative max-w-page mx-auto px-5 md:px-8">
