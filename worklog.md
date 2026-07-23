@@ -9569,3 +9569,25 @@ Stage Summary:
   (c) Review schema (AggregateRating) en /pricing
   (d) "g" prefix hint chip on-screen mientras el prefix está activo
   (e) Command palette podría listar las páginas también para navegación por teclado
+
+---
+Task ID: R10-cron-8
+Agent: main (Z.ai Code) — cron webDevReview round 8
+Task: 'g' prefix hint chip on-screen + TOC en /features overview.
+
+Work Log:
+- QA: build estático 15/15 rutas.
+- Mejoras implementadas:
+  1. 'g' prefix hint chip (GlobalShortcuts): cuando el usuario pulsa 'g' para armar el prefix de navegación two-key, aparece un small floating pill en el bottom-center del viewport mostrando "g + ?" — un placeholder accent pulsante que le dice al usuario que la siguiente key está siendo capturada. Hace el feature power-user discoverable sin abrir el overlay de ayuda. Framer Motion fade+scale entrance/exit (150ms). Auto-expira a los 1s (mismo timeout que el prefix). pointer-events-none para que nunca bloquee clicks. Refactorizado arm/disarm del prefix en helpers nombrados; showHint state drives la visibilidad del chip (solo flipea en arm/expire, no en cada keystroke).
+  2. TOC + progress bar en /features overview: ReadingProgressIndicator + TableOfContents montados en /features (overview con FeaturesBento + Gallery + HowItWorks + MoreFeatures). Completa la cobertura de TOC en todas las páginas de contenido.
+- Verificación: eslint 0 errores, tsc limpio, build 15/15 rutas. DOM confirma el hint chip aparece tras pulsar 'g' (kbd element con 'g' encontrado). VLM confirma pill "g + ?" visible en bottom-center del viewport.
+- Commit a72b39d (2 archivos, +69/-37) pusheado a origin/main.
+
+Stage Summary:
+- Estado: UX pulida. El feature de navegación por teclado 'g'+letra ahora tiene feedback visual on-screen. Cobertura de TOC completa en todas las páginas de contenido (features, features/*, about, faq, pricing). Demo tiene progress bar.
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Open Graph images dinámicas por subpágina (og:image específico por eje)
+  (b) Review schema (AggregateRating) en /pricing
+  (c) Command palette podría listar las páginas también para navegación por teclado
+  (d) Animación de entrada para el BackToTop ring (fill animado al aparecer)
+  (e) "g" prefix podría aceptar Escape para cancelar explícitamente
