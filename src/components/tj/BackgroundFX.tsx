@@ -23,13 +23,19 @@ import { useEffect, useRef, useState } from "react";
  *    fibra media (~90/rev) y fibra fina (~160/rev), avectadas
  *    radialmente y onduladas por fbm de baja frecuencia — el iris
  *    "respira" como una anémona, nunca se congela.
- *  - Pupila: disco casi negro con borde suave, latido lento y brasa
- *    roja tenue en el centro. Aro de raíces blanco-marfil incandescente
- *    justo en el borde (la firma de la referencia).
+ *  - Pupila: disco casi negro con borde suave y ligeramente irregular
+ *    (ninguna pupila real es un círculo perfecto), latido lento, brasa
+ *    roja tenue en el centro y un catch-light corneal de dos manchas
+ *    (dirección fija, como una fuente de luz de estudio — no sigue a
+ *    la mirada) que la hace leer como húmeda/viva. Aro de raíces
+ *    blanco-marfil incandescente justo en el borde (la firma de la
+ *    referencia).
  *  - Anillo exterior: circunferencia fina + ~30 cerdas radiales con
  *    longitud/brillo por-radio (hash), rotando muy despacio.
- *  - Bokeh: 10 orbes suaves derivando en órbitas lentas, teñidos
- *    rojo/verde según su hash.
+ *  - Bokeh: 10 orbes suaves derivando en órbitas lentas cerca del
+ *    iris, teñidos rojo/verde según su hash. Polvo de fondo: motas
+ *    diminutas y tenues repartidas por TODA la pantalla (no solo cerca
+ *    del ojo) para dar sensación de atmósfera, como en la referencia.
  *  - Acabado: tonemap exponencial, saturación +6 %, viñeta radial y
  *    dithering ±1/255 para eliminar banding en los degradados oscuros.
  *
@@ -48,6 +54,10 @@ import { useEffect, useRef, useState } from "react";
  *    su máximo hacia el cierre.
  *  - PUNTERO: el ojo "mira" — desplazamiento ≤ 3.5 % del radio hacia
  *    el cursor (solo pointer:fine).
+ *  - MICRO-SACADAS: cada 1,4-4 s, un flick rápido e involuntario a un
+ *    punto cercano (perfil triangular, 260 ms) que se suma a la mirada
+ *    de puntero/scroll — el detalle que distingue un ojo vivo de una
+ *    animación en bucle.
  *  - INTRO: la pupila nace dilatada y contrae al enfocar (1.1 s) con
  *    fade de exposición, sincronizado con el IntroSequence del sitio.
  *
@@ -230,11 +240,36 @@ void main() {
     col += RIM_WHITE * sparkle * irisBand * 1.5;
   }
 
-  /* ---- Pupila ---- */
-  float pupil = 1.0 - smoothstep(rp * 0.90, rp * 1.01, r);
+  /* ---- Pupila ----
+     Borde con leve irregularidad orgánica (ninguna pupila real es un
+     círculo perfecto): un ruido de baja frecuencia por ángulo desplaza
+     el radio de entrada/salida un ±3,5 %, apenas perceptible pero
+     rompe la geometría "vectorial" de un círculo exacto. */
+  float pupilWobble = (anoise(a01, 9.0, 3.0, vec2(21.0, 61.0)) - 0.5) * 0.035;
+  float pupil = 1.0 - smoothstep(
+    rp * (0.90 + pupilWobble), rp * (1.01 + pupilWobble), r
+  );
   vec3 pupilCol = vec3(0.016, 0.012, 0.012)
                 + RED_DEEP * 0.16 * exp(-pow(r / (rp * 0.42 + 1e-4), 2.0));
   col = mix(col, pupilCol, pupil);
+
+  /* ---- Catch-light corneal ----
+     El reflejo especular que hace leer una pupila como húmeda/viva en
+     vez de plana. Dirección FIJA (no sigue a uLook): un catch-light de
+     verdad es el reflejo de una fuente de luz externa fija en la
+     habitación, no de la mirada — si siguiera al ojo perdería el efecto
+     "foco de estudio" y leería como un brillo pegado en postproducción.
+     Doble mancha (primaria arriba-izquierda + secundaria, pequeña,
+     ligeramente desplazada — el patrón clásico de un retrato de
+     estudio con key + fill light), multiplicada por el propio pupil
+     para quedar confinada al disco y apagarse igual que el resto
+     durante el parpadeo. */
+  vec2 glintDir = vec2(-0.38, 0.58);
+  vec2 glintPos1 = glintDir * rp * 0.5;
+  float glint1 = exp(-pow(length(p - glintPos1) / (rp * 0.17), 2.0));
+  vec2 glintPos2 = glintPos1 * 0.15 + vec2(rp * 0.16, -rp * 0.1);
+  float glint2 = exp(-pow(length(p - glintPos2) / (rp * 0.075), 2.0));
+  col += RIM_WHITE * (glint1 * 0.85 + glint2 * 0.55) * pupil;
 
   /* ---- Halo exterior emplumado ----
      Sustituye al antiguo anillo de cerdas (una circunferencia con
@@ -256,7 +291,8 @@ void main() {
   float aperture = mix(0.03, 1.55, uBlink) * lidCurve;
   float lidMask = 1.0 - smoothstep(aperture - 0.16, aperture, abs(p.y));
   float eyeZone = 1.0 - smoothstep(1.25, 1.7, r);
-  col *= mix(1.0, mix(0.05, 1.0, lidMask), eyeZone);
+  float blinkFactor = mix(1.0, mix(0.05, 1.0, lidMask), eyeZone);
+  col *= blinkFactor;
 
   /* ---- Niebla ambiental y bokeh ---- */
   float haze = (1.0 - smoothstep(0.15, 1.55, r));
@@ -277,6 +313,27 @@ void main() {
     col += bc * exp(-(d * d) / (sz * sz)) * 0.5 * (0.35 + 0.65 * tw);
   }
 
+  /* ---- Polvo de fondo ----
+     Motas diminutas repartidas por TODA la pantalla (coordenadas de
+     pantalla, no del ojo — a diferencia del bokeh, que orbita cerca
+     del iris) para dar la sensación de atmósfera/profundidad de la
+     referencia aprobada: puntos de luz dispersos, no solo el ojo
+     flotando en un vacío plano. Rejilla en espacio de pantalla escalada
+     por minDim (para que la densidad de motas no cambie con el aspect
+     ratio), con solo ~1,3% de celdas activas (hash > umbral) y un
+     parpadeo lento e independiente por mota. Nivel muy bajo (0.09) —
+     es textura ambiental, nunca debe competir con el ojo. */
+  vec2 duv = frag / minDim * 42.0;
+  vec2 dcell = floor(duv);
+  vec2 dfrac = fract(duv);
+  float dh = hash21(dcell);
+  float dstar = step(0.987, dh);
+  float dtw = 0.35 + 0.65 * sin(uTime * (0.5 + dh * 1.1) + dh * 41.0);
+  float ddist = length(dfrac - 0.5);
+  float dspark = dstar * exp(-ddist * ddist * 34.0) * dtw;
+  vec3 dcol = mix(GREEN_CORE, RIM_WHITE, hash11(dh * 91.0 + 3.0));
+  col += dcol * dspark * 0.09;
+
   /* ---- Composición final ---- */
   col *= uExposure * (0.35 + 0.65 * uIntro);
 
@@ -292,15 +349,38 @@ void main() {
 
   vec3 dark = base + col;
 
-  /* Tema claro: el mismo ojo, con color de verdad — antes quedaba
-     lavado (mucho papel, poco color) y "no se veía". Solo se toca esta
-     rama: el tema oscuro no cambia. Saturación extra propia (1.55, vs
-     el 1.06 global de arriba) + mucha más transmisión de color
-     (0.22→0.62) + menos apagado por luma (0.42→0.22) para que rojo,
-     ámbar y verde lean con la misma fuerza que en oscuro sobre el
-     papel claro, sin perder la legibilidad del contenido encima. */
-  vec3 colLight = mix(vec3(luma), col, 1.55);
-  vec3 light = BG_LIGHT * (1.0 - luma * 0.22) + colLight * 0.62;
+  /* Tema claro: TINTA sobre papel, no luz añadida sobre blanco.
+     Medido con readPixels: la primera versión (BG_LIGHT*(1-luma*k) +
+     col*m) daba [255,241,233] en el centro de la pupila — blanco puro
+     clippeado, prácticamente el mismo valor que el fondo [242,243,236].
+     Sumar color sobre una base ~0.95 satura los tres canales casi de
+     inmediato; el resultado siempre iba a leer como "blanco con un
+     tinte", nunca como color de verdad, por mucho que subiera el
+     multiplicador.
+     La técnica correcta es un compuesto "over" (como tinta impresa):
+     donde el ojo tiene presencia real se pinta el color casi entero;
+     donde no la tiene, se ve el papel puro — nunca se SUMAN ambos.
+       - eyePresence: accionado por GEOMETRÍA (pupil + irisBand +
+         halo), no por luma. La primera versión usaba luma y el rojo
+         del centro —naturalmente más brillante que el verde exterior—
+         quedaba casi opaco mientras el verde se diluía hacia el papel:
+         mismo tono en teoría, pero el ojo se leía rojo-dominante en
+         claro y equilibrado en oscuro. irisBand cubre la MISMA banda
+         para el tramo rojo y el verde (solo se apaga en el 38% final
+         emplumado, igual que en oscuro), así que ambos colores reciben
+         la misma cobertura de "tinta" — el tono ya no depende de qué
+         tan brillante sea cada color.
+       - richColor: mismo color que ya usa el tema oscuro (col), con
+         un empujón de saturación adicional (1.6) MÁS allá del 1.06
+         global de la línea de arriba — un canal puede clippear a tope
+         (rojo a 255 con verde/azul bajos sigue leyendo como "rojo
+         vivo"), muy distinto a los tres canales clippeando juntos
+         (eso sí lee como blanco, el bug anterior).
+     El tema oscuro no se toca: sigue siendo dark = base + col. */
+  float eyePresence = clamp(pupil + irisBand * 1.15 + halo * 1.3, 0.0, 1.0);
+  eyePresence = max(eyePresence, luma * 0.9) * blinkFactor;
+  vec3 richColor = mix(vec3(luma), col, 1.6);
+  vec3 light = mix(BG_LIGHT, richColor, eyePresence);
   vec3 outCol = mix(dark, light, uTheme);
 
   /* Dithering: mata el banding de los degradados oscuros. */
@@ -439,6 +519,18 @@ export function BackgroundFX() {
       return s - Math.floor(s);
     };
 
+    /* Micro-sacadas: un ojo real nunca queda perfectamente quieto —
+       cada 1,4–4 s hace un flick rápido e involuntario a un punto
+       cercano y vuelve. Perfil triangular (sube en 90 ms, baja en
+       170 ms) para que se sienta como un movimiento nervioso y rápido,
+       no como una oscilación suave. Amplitud pequeña (0.08–0.22 del
+       rango de `uLook`) — debe leerse como "vivo", nunca como tic o
+       glitch. Se suma al look del puntero/scroll, nunca lo reemplaza. */
+    let saccadeTX = 0;
+    let saccadeTY = 0;
+    let saccadeStart = t0 - 9999;
+    let nextSaccade = t0 + 1200 + hash01(t0) * 1500;
+
     /* Escalado adaptativo de resolución. */
     let quality = 1;
     let emaFrame = 8;
@@ -493,6 +585,30 @@ export function BackgroundFX() {
       lookX = damp(lookX, lookTX, 4.5, dt);
       lookY = damp(lookY, lookTY, 4.5, dt);
 
+      /* Micro-sacadas: dispara un flick nuevo cuando toca, luego anima
+         un perfil triangular (subida rápida, bajada algo más suave)
+         durante 260 ms; el resto del tiempo queda en reposo (0,0). */
+      let saccadeX = 0;
+      let saccadeY = 0;
+      if (!reduce) {
+        if (now >= nextSaccade) {
+          const h = hash01(now);
+          const ang = h * Math.PI * 2;
+          const mag = 0.08 + hash01(now * 1.7) * 0.14;
+          saccadeTX = Math.cos(ang) * mag;
+          saccadeTY = Math.sin(ang) * mag;
+          saccadeStart = now;
+          nextSaccade = now + 1400 + h * 2600;
+        }
+        const st = now - saccadeStart;
+        if (st < 260) {
+          const k = st / 260;
+          const shape = k < 0.35 ? k / 0.35 : 1 - (k - 0.35) / 0.65;
+          saccadeX = saccadeTX * shape;
+          saccadeY = saccadeTY * shape;
+        }
+      }
+
       /* Apertura inicial — anclada a tiempo de reloj (no a dt acumulado)
          para que dure 1,1 s reales aunque el frame-rate caiga. */
       if (intro < 1) intro = Math.min(1, (now - t0) / 1100);
@@ -530,8 +646,8 @@ export function BackgroundFX() {
       gl.uniform1f(uni.uDilate, reduce ? 0 : dilate);
       gl.uniform2f(
         uni.uLook,
-        finePointer ? lookX : 0,
-        (finePointer ? lookY : 0) - 0.35 * dirS
+        (finePointer ? lookX : 0) + saccadeX,
+        (finePointer ? lookY : 0) - 0.35 * dirS + saccadeY
       );
       gl.uniform1f(uni.uBlink, reduce ? 1 : open);
       gl.uniform1f(uni.uIntro, introE);
