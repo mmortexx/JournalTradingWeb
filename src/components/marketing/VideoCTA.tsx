@@ -4,20 +4,21 @@ import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 
 /**
- * VideoCTA — cierre de la home, justo antes del CTA final.
+ * VideoCTA — "El Ojo del Mercado": la sección que da SENTIDO al ojo.
  *
- * Ya NO monta ningún vídeo ni tarjeta de cristal encima. El "vídeo de
- * fondo" de la maqueta original queda sustituido de raíz por el Ojo
- * del Mercado global (`BackgroundFX`, fixed detrás de toda la web):
- * en este tramo de scroll — cerca del final de página — el ojo
- * recupera su exposición máxima por diseño ("vuelve a encenderse
- * hacia el cierre"). Poner aquí un panel opaco lo tapaba entero justo
- * en su momento de mayor protagonismo.
+ * Es el tramo de scroll donde el ojo global (BackgroundFX) recupera su
+ * exposición máxima por diseño, así que aquí es donde la web explica
+ * la metáfora en vez de dejarla como decoración: el ojo está pintado
+ * con el lenguaje P&L del producto — ROJO en el centro (la pérdida,
+ * lo que se vigila de cerca) que se abre en VERDE hacia fuera (el
+ * beneficio, hacia donde se crece) — y la app hace exactamente eso
+ * con tu operativa: 40+ métricas observando cada operación sin
+ * parpadear. El titular y el párrafo verbalizan esa correspondencia;
+ * "Lo que no se mide, no se mejora." queda como sello final en serif.
  *
- * Legibilidad sin caja: el texto flota directo sobre el ojo con
- * `.tj-legible-text` (un text-shadow theme-aware definido en
- * globals.css) como única red — nada de fondo, blur ni borde que le
- * robe presencia al ojo.
+ * Sin vídeo ni tarjeta de cristal: el texto flota directo sobre el
+ * ojo con `.tj-legible-text` (text-shadow theme-aware, globals.css)
+ * como única red de legibilidad — nada que tape al protagonista.
  */
 export function VideoCTA() {
   const { lang } = useLang();
@@ -44,7 +45,7 @@ export function VideoCTA() {
             className="uppercase tnum"
             style={{ fontSize: 12, letterSpacing: "0.18em", color: "rgb(var(--accent-base))" }}
           >
-            {es ? "Tu operativa, medida" : "Your trading, measured"}
+            {es ? "El Ojo del Mercado" : "The Market's Eye"}
           </span>
         </div>
         <h2
@@ -60,30 +61,64 @@ export function VideoCTA() {
         >
           {es ? (
             <>
-              Lo que no se mide,
+              Un ojo siempre abierto
               <br />
-              no se mejora<span style={{ color: "rgb(var(--accent-base))" }}>.</span>
+              sobre tu operativa<span style={{ color: "rgb(var(--accent-base))" }}>.</span>
             </>
           ) : (
             <>
-              What you don&apos;t measure,
+              An eye always open
               <br />
-              you don&apos;t improve<span style={{ color: "rgb(var(--accent-base))" }}>.</span>
+              on your trading<span style={{ color: "rgb(var(--accent-base))" }}>.</span>
             </>
           )}
         </h2>
         <p
           className="tj-legible-text mx-auto mb-0 mt-5"
           style={{
-            maxWidth: "32em",
+            maxWidth: "34em",
             fontSize: "clamp(1rem, 1.5vw, 1.2rem)",
             lineHeight: 1.6,
-            color: "var(--ink-2)",
+            /* Tinta plena (no ink-2): este párrafo flota sobre las fibras
+               más brillantes del ojo y el secundario perdía contraste. */
+            color: "color-mix(in srgb, var(--ink) 92%, transparent)",
+          }}
+        >
+          {es ? (
+            <>
+              Míralo bien: <span style={{ color: "rgb(var(--pnl-neg))", fontWeight: 500 }}>rojo en el centro</span> — la
+              pérdida, vigilada de cerca — que se abre en{" "}
+              <span style={{ color: "rgb(var(--pnl-pos))", fontWeight: 500 }}>verde hacia fuera</span> — el beneficio,
+              siempre a la vista. Así mira este ojo y así mira la app tu
+              operativa: 40+ métricas observando cada operación, cada regla y
+              cada euro que te cuesta la indisciplina. Sin parpadear. En tu
+              equipo, nunca en la nube de nadie.
+            </>
+          ) : (
+            <>
+              Look closely: <span style={{ color: "rgb(var(--pnl-neg))", fontWeight: 500 }}>red at the core</span> — the
+              losses, watched up close — opening into{" "}
+              <span style={{ color: "rgb(var(--pnl-pos))", fontWeight: 500 }}>green at the edges</span> — the profit,
+              always in sight. That&apos;s how this eye watches the market, and
+              how the app watches your trading: 40+ metrics observing every
+              trade, every rule, every euro your indiscipline costs you.
+              Unblinking. On your machine, never in anyone&apos;s cloud.
+            </>
+          )}
+        </p>
+        <p
+          className="tj-legible-text mx-auto mb-0 mt-6 font-serif"
+          style={{
+            maxWidth: "30em",
+            fontSize: "clamp(1.15rem, 1.8vw, 1.45rem)",
+            fontStyle: "italic",
+            lineHeight: 1.4,
+            color: "var(--ink)",
           }}
         >
           {es
-            ? "Cada operación, cada regla, cada euro que te cuesta la indisciplina — a la vista y en tu equipo, nunca en la nube de nadie."
-            : "Every trade, every rule, every euro your indiscipline costs you — visible, on your machine, never in anyone's cloud."}
+            ? "Lo que no se mide, no se mejora."
+            : "What you don't measure, you don't improve."}
         </p>
         <div className="mt-[30px] flex flex-wrap justify-center gap-3">
           <Link

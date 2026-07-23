@@ -44,9 +44,14 @@ import { useEffect, useRef, useState } from "react";
  *    continuo de una versión anterior quedó descartado por antinatural.
  *    Las fibras solo ondulan/respiran en el sitio (ruido de baja
  *    frecuencia), nunca barren en bloque.
+ *  - SILUETA ALMENDRADA: los párpados quedan entreabiertos en reposo
+ *    (apertura 0.84·R en el centro, estrechándose con curva cuadrática
+ *    hacia los extremos) — la forma de ojo real la hacen los párpados,
+ *    nunca deformando el iris, que es circular como en la vida.
  *  - PARPADEO: cada 4,5-9 s, cierre 110 ms + apertura 190 ms con
- *    easing, doble parpadeo ocasional — el gesto que de verdad vende
- *    "esto está vivo", más que cualquier giro.
+ *    easing, doble parpadeo ocasional, cerrando desde la posición de
+ *    reposo almendrada — el gesto que de verdad vende "esto está
+ *    vivo", más que cualquier giro.
  *  - SCROLL: dilata la pupila muy sutilmente con la velocidad de
  *    desplazamiento y desplaza la mirada hacia abajo/arriba siguiendo
  *    el avance — el ojo "lee" la página contigo. La exposición baja
@@ -150,7 +155,7 @@ void main() {
 
   /* Radio del anillo exterior = unidad del sistema. Centro con
      "mirada" sutil hacia el puntero. */
-  float R = 0.385 * minDim;
+  float R = 0.415 * minDim;
   vec2 center = res * vec2(0.5, uEyeY) + uLook * R * 0.035;
   vec2 p = (frag - center) / R;
   float r = length(p);
@@ -283,15 +288,22 @@ void main() {
   col += haloCol * halo * (0.16 + 0.30 * tuft)
        * smoothstep(rp, rp * 1.6, r);
 
-  /* ---- Párpados (parpadeo) ----
-     Cierre curvo desde arriba y abajo con borde suave; solo afecta a
-     la zona del ojo (el bokeh lejano no parpadea). Con uBlink = 1 la
-     máscara es 1.0 y no toca nada. */
-  float lidCurve = 1.0 - 0.30 * p.x * p.x;
-  float aperture = mix(0.03, 1.55, uBlink) * lidCurve;
-  float lidMask = 1.0 - smoothstep(aperture - 0.16, aperture, abs(p.y));
+  /* ---- Párpados: apertura almendrada + parpadeo ----
+     La silueta de ojo real no sale de deformar el iris (los iris son
+     círculos): la hacen los PÁRPADOS. En reposo (uBlink = 1) quedan
+     entreabiertos — apertura vertical de 0.84·R en el centro que se
+     estrecha hacia los extremos con la curva cuadrática (0.52·x²) →
+     la almendra clásica. El parpadeo cierra desde esa posición de
+     reposo, no desde "todo abierto". Borde difuso ancho (0.20) para
+     que el recorte lea como sombra de párpado, no como línea; suelo
+     0.10 para que bajo el párpado quede un resto de brillo apagado
+     (piel translúcida) en vez de negro cortado. Solo afecta a la zona
+     del ojo — el bokeh y el polvo lejanos ni se recortan ni parpadean. */
+  float lidCurve = 1.0 - 0.52 * p.x * p.x;
+  float aperture = mix(0.03, 0.84, uBlink) * lidCurve;
+  float lidMask = 1.0 - smoothstep(aperture - 0.20, aperture, abs(p.y));
   float eyeZone = 1.0 - smoothstep(1.25, 1.7, r);
-  float blinkFactor = mix(1.0, mix(0.05, 1.0, lidMask), eyeZone);
+  float blinkFactor = mix(1.0, mix(0.10, 1.0, lidMask), eyeZone);
   col *= blinkFactor;
 
   /* ---- Niebla ambiental y bokeh ---- */
