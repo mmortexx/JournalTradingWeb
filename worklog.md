@@ -9477,3 +9477,32 @@ Stage Summary:
   (c) /pricing podría beneficiarse de TOC + reading time
   (d) /demo podría beneficiarse de TOC
   (e) Animación de entrada para el BackToTop ring (fill animado al aparecer)
+
+---
+Task ID: R10-cron-5
+Agent: main (Z.ai Code) — cron webDevReview round 5
+Task: TOC + reading time en pricing & demo + BackToTop ring glow.
+
+Work Log:
+- QA: build estático 15/15 rutas.
+- Mejoras implementadas:
+  1. /pricing: readingTimeMin={4}, ReadingProgressIndicator + TableOfContents montados (6 secciones de contenido: garantía, pricing cards, comparación, pricing FAQ, trust strip, value testimonials).
+  2. /demo: readingTimeMin={2}, ReadingProgressIndicator. Sin TOC (la demo es interactiva, no lectura long-form) pero progress bar ayuda a orientarse.
+  3. BackToTop ring polish: añadido drop-shadow glow sutil en el progress arc (filter: drop-shadow(0 0 2px accent/0.5)) para que el ring se lea "activo" contra la superficie liquid-glass. Transición smooth de filter en hover.
+- Verificación: eslint 0 errores, tsc limpio, build 15/15 rutas. DOM confirma pricing TOC (6 entries) + reading time pill. curl confirma demo HTML contiene "2 min de lectura" (server-rendered en static export).
+- Commit 04c67a2 (3 archivos, +26/-2) pusheado a origin/main.
+
+Stage Summary:
+- Estado: consistente y completo. Las 9 páginas del sitio ahora tienen affordances de navegación de contenido coherentes:
+  /features/* — TOC + progress + reading time + Article schema + cross-nav
+  /about      — TOC + progress + reading time
+  /faq        — TOC + progress + reading time + FAQPage schema
+  /pricing    — TOC + progress + reading time
+  /demo       — progress + reading time
+  /           — (home, sin TOC)
+- Próximas oportunidades (para futuras rondas cron):
+  (a) Prefetch de rutas /features/* al hover del megamenú (optimistic UI)
+  (b) Open Graph images dinámicas por subpágina (og:image específico por eje)
+  (c) /features overview podría beneficiarse de TOC (tiene FeaturesBento + Gallery + HowItWorks + MoreFeatures)
+  (d) Schema Product + Offer en /pricing (rich-results de precios)
+  (e) Keyboard shortcut "g" + letra para navegar entre páginas (g m = métricas, etc.)
