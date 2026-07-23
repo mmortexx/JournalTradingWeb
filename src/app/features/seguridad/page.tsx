@@ -6,6 +6,10 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
+// Estimated reading time (security + tech specs + integrations).
+// ~520 words across three sections at 220 wpm = ~3 min.
+const READING_TIME_MIN = 3;
+
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 
 const breadcrumbSchema = {
@@ -16,6 +20,22 @@ const breadcrumbSchema = {
     { "@type": "ListItem", position: 2, name: "Características", item: `${SITE_URL}/features/` },
     { "@type": "ListItem", position: 3, name: "Seguridad", item: `${SITE_URL}/features/seguridad/` },
   ],
+};
+
+// Article schema — in-depth feature article on local-first security.
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: "Tus datos, 100% en tu máquina",
+  description:
+    "Local-first, sin nube ni cuentas. Trading Journal es local-first: tus operaciones viven en tu Windows, cifradas en reposo.",
+  url: `${SITE_URL}/features/seguridad/`,
+  mainEntityOfPage: `${SITE_URL}/features/seguridad/`,
+  author: { "@type": "Organization", name: "Trading Journal" },
+  publisher: { "@type": "Organization", name: "Trading Journal" },
+  inLanguage: "es",
+  timeRequired: `PT${READING_TIME_MIN}M`,
+  about: ["local-first", "data privacy", "encryption", "no cloud", "trading journal security"],
 };
 
 export const metadata: Metadata = {
@@ -69,10 +89,15 @@ export default function SeguridadPage() {
         subtitleEn="No cloud, no accounts, no servers. Trading Journal is local-first: your trades live on your Windows, encrypted at rest, never touching anyone else's server. Privacy by design, not by configuration."
         breadcrumbEs="Características · Seguridad"
         breadcrumbEn="Features · Security"
+        readingTimeMin={READING_TIME_MIN}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <ReadingProgressIndicator />
       <SecuritySection num="01" />

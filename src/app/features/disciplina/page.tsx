@@ -6,6 +6,10 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
+// Estimated reading time (guardian + discipline cost + before/after + comparison
+// slider). ~600 words across four sections at 220 wpm = ~3 min.
+const READING_TIME_MIN = 3;
+
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 
 const breadcrumbSchema = {
@@ -16,6 +20,22 @@ const breadcrumbSchema = {
     { "@type": "ListItem", position: 2, name: "Características", item: `${SITE_URL}/features/` },
     { "@type": "ListItem", position: 3, name: "Disciplina", item: `${SITE_URL}/features/disciplina/` },
   ],
+};
+
+// Article schema — in-depth feature article on trading discipline.
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: "Disciplina que actúa, no que sermonea",
+  description:
+    "El Guardián frena antes del error: bloquea tamaños que exceden tu riesgo, te obliga a respetar el plan y audita cada excepción.",
+  url: `${SITE_URL}/features/disciplina/`,
+  mainEntityOfPage: `${SITE_URL}/features/disciplina/`,
+  author: { "@type": "Organization", name: "Trading Journal" },
+  publisher: { "@type": "Organization", name: "Trading Journal" },
+  inLanguage: "es",
+  timeRequired: `PT${READING_TIME_MIN}M`,
+  about: ["trading discipline", "risk management", "drawdown limits", "guardian", "trade journal"],
 };
 
 export const metadata: Metadata = {
@@ -73,10 +93,15 @@ export default function DisciplinaPage() {
         subtitleEn="The Guardian doesn't tell you what to do. It blocks you when you break your own rules: sizes over your risk, daily drawdowns, off-plan trades. Every override is logged with reason and outcome."
         breadcrumbEs="Características · Disciplina"
         breadcrumbEn="Features · Discipline"
+        readingTimeMin={READING_TIME_MIN}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <ReadingProgressIndicator />
       <GuardianNew num="01" />

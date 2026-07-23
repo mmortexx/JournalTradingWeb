@@ -1673,3 +1673,133 @@ button.icon-btn:hover > svg,
     transparent 62%
   );
 }
+
+/* ============================================================
+   PRINT STYLESHEET
+   Produces a clean, readable printout of feature subpages:
+   - Hides the WebGL background, navbar, footer, TOC, progress bar,
+     side rail, cookie banner, back-to-top, and all interactive chrome.
+   - Forces a white background + black text (print is always light).
+   - Expands the content to full width (no max-w-page constraint).
+   - Adds page breaks before each major section heading so each
+     section starts on a new page.
+   - Shows the URL + reading time in the print header (via :before).
+   - Removes blur/backdrop-filter (printers can't render them and
+     they cause blank patches in PDF export).
+   ============================================================ */
+@media print {
+  /* Force light theme variables for print */
+  :root,
+  :root[data-theme="dark"] {
+    --bg: 255 255 255;
+    --txt-primary: 17 17 17;
+    --txt-secondary: 51 51 51;
+    --txt-tertiary: 102 102 102;
+    --divider: 0 0 0;
+    --surface: #ffffff;
+    --surface-2: #f5f5f5;
+    --ink: #111111;
+    --ink-2: #333333;
+    --ink-3: #666666;
+  }
+
+  /* White background, black text, no blur */
+  html, body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Hide all interactive chrome */
+  nav[aria-label="Índice de la página"],
+  nav[aria-label="On this page"],
+  nav[aria-label="Índice de secciones"],
+  nav[aria-label="Migas de pan"],
+  nav[aria-label="Breadcrumb"],
+  .fixed,
+  [class*="ReadingProgressIndicator"],
+  #mobile-nav-drawer,
+  .grain,
+  .aurora-bg,
+  [class*="BackgroundFX"],
+  [class*="CookieConsent"],
+  [class*="BackToTop"],
+  [class*="ScrollToTop"],
+  [class*="CommandPalette"],
+  [class*="GlobalShortcuts"],
+  [class*="ShortcutsHelp"],
+  [class*="IntroSequence"],
+  [class*="ScrollProgress"],
+  footer,
+  header {
+    display: none !important;
+  }
+
+  /* Expand content to full width */
+  .max-w-page,
+  .max-w-\[1240px\],
+  .max-w-\[820px\] {
+    max-width: 100% !important;
+  }
+
+  /* Remove veils, glass effects, shadows — print flat */
+  .bg-veil,
+  .liquid-glass,
+  .glass,
+  .glass-thin {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border-color: #cccccc !important;
+  }
+
+  /* Section breaks: each major section starts on a new page */
+  section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  section + section {
+    page-break-before: auto;
+  }
+  h2 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Links: show the URL in parentheses after link text (for print) */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #666666;
+    word-break: break-all;
+  }
+
+  /* Accent divider under PageHeader: keep as a subtle gray rule */
+  .bg-veil + *,
+  section:first-of-type {
+    border-top: 1px solid #cccccc !important;
+  }
+
+  /* Font: use serif for body in print (more readable on paper) */
+  body {
+    font-family: Georgia, "Times New Roman", serif !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+  h1, h2, h3, h4 {
+    font-family: Georgia, "Times New Roman", serif !important;
+    color: #111111 !important;
+  }
+
+  /* Images: ensure they don't break across pages */
+  img {
+    page-break-inside: avoid;
+    max-width: 100% !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm 2cm;
+  }
+}

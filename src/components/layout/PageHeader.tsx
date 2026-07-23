@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Clock } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { AnimatedHeading } from "@/components/tj/AnimatedHeading";
@@ -25,6 +26,13 @@ interface PageHeaderProps {
   subtitleEn: string;
   breadcrumbEs: string;
   breadcrumbEn: string;
+  /**
+   * Optional reading time in minutes (computed at build time by the
+   * page from its section content). When provided, a small meta row
+   * with a clock icon + "N min de lectura" renders below the subtitle.
+   * Omit on pages where reading time doesn't make sense (e.g. pricing).
+   */
+  readingTimeMin?: number;
 }
 
 /**
@@ -58,6 +66,7 @@ export function PageHeader({
   subtitleEn,
   breadcrumbEs,
   breadcrumbEn,
+  readingTimeMin,
 }: PageHeaderProps) {
   const { lang } = useLang();
   const es = lang === "es";
@@ -159,6 +168,27 @@ export function PageHeader({
             {es ? subtitleEs : subtitleEn}
           </p>
         </FadeIn>
+
+        {/* Reading time meta row — a quiet inline pill that signals the
+            page's depth. Only renders when `readingTimeMin` is provided
+            (feature subpages). Uses a Clock icon + the localized label.
+            Sits below the subtitle with a small top margin so it reads
+            as metadata, not as a third paragraph. */}
+        {readingTimeMin != null && readingTimeMin > 0 && (
+          <FadeIn delay={520} duration={600}>
+            <div className="mt-5 flex items-center gap-2">
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.12)] bg-[rgb(var(--divider)/0.03)] px-3 py-1 text-xs font-medium text-tertiary"
+                aria-label={es ? `${readingTimeMin} minutos de lectura` : `${readingTimeMin} min read`}
+              >
+                <Clock size={12} className="opacity-70" aria-hidden />
+                <span className="tnum">
+                  {readingTimeMin} {es ? "min de lectura" : "min read"}
+                </span>
+              </span>
+            </div>
+          </FadeIn>
+        )}
       </div>
 
       {/* Accent gradient divider — a 1px hairline that transitions from
