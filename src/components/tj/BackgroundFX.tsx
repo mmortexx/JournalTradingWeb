@@ -76,6 +76,7 @@ uniform float uIntro;    // apertura inicial 0→1
 uniform float uExposure; // exposición global (legibilidad por tramo)
 uniform float uTheme;    // 0 = oscuro, 1 = claro
 uniform float uEyeY;     // centro vertical del ojo (fracción, coords GL)
+uniform float uBlink;    // párpados: 1 = abierto, 0 = cerrado
 
 const float TAU = 6.28318530718;
 
@@ -131,20 +132,24 @@ void main() {
 
   /* Radio del anillo exterior = unidad del sistema. Centro con
      "mirada" sutil hacia el puntero. */
-  float R = 0.335 * minDim;
+  float R = 0.385 * minDim;
   vec2 center = res * vec2(0.5, uEyeY) + uLook * R * 0.035;
   vec2 p = (frag - center) / R;
   float r = length(p);
   float ang = atan(p.y, p.x);
 
-  /* Rotación global: deriva ambiental lentísima + progreso de scroll. */
-  float rot = uTime * 0.008 + uScroll * 0.85;
+  /* Rotación global: giro CONTINUO perceptible por tiempo (una vuelta
+     cada ~70 s) — desligado del scroll, que daba tirones de giro al
+     desplazarse. El scroll ya solo dilata la pupila y guía la mirada. */
+  float rot = uTime * 0.09;
   float a01 = fract((ang + rot) / TAU + 1.0);
 
-  /* Pupila: latido + dilatación por scroll + apertura inicial. */
+  /* Pupila: latido + dilatación sutil por scroll + apertura inicial +
+     reenfoque al parpadear (se comprime un pelo con el párpado). */
   float beat = 0.014 * sin(uTime * 0.55 + 0.6 * sin(uTime * 0.21));
-  float rp = 0.26 * (1.0 + beat) * (1.0 + 0.16 * uDilate)
-           * (1.0 + 0.55 * (1.0 - uIntro));
+  float rp = 0.26 * (1.0 + beat) * (1.0 + 0.10 * uDilate)
+           * (1.0 + 0.55 * (1.0 - uIntro))
+           * (1.0 + 0.10 * (1.0 - uBlink));
 
   /* Ondulación del iris: las fibras se anclan en la pupila y ondean
      más hacia las puntas. Flujo acelera suavemente con el scroll. */
@@ -156,13 +161,17 @@ void main() {
   float rw = r + (anoise(a01, 5.0, r * 2.6 + flowT * 0.7, vec2(3.1, 91.3)) - 0.5) * 0.03 * sway;
 
   /* ---- Iris de fibras ---- */
-  /* Radio de las puntas por ángulo (borde emplumado, respira). */
-  float tip = 0.845
-            + (anoise(a01w, 7.0, 2.7, vec2(57.1, 13.9)) - 0.5) * 0.15
-            + 0.012 * sin(uTime * 0.33 + ang * 3.0);
+  /* Radio de las puntas por ángulo: borde EMPLUMADO en mechones
+     desiguales (dos octavas de variación) que respira — las fibras
+     terminan disolviéndose en el fondo, sin ningún aro geométrico. */
+  float tip = 0.97
+            + (anoise(a01w, 7.0, 2.7, vec2(57.1, 13.9)) - 0.5) * 0.26
+            + (anoise(a01w, 19.0, 5.1, vec2(9.3, 71.7)) - 0.5) * 0.12
+            + 0.014 * sin(uTime * 0.33 + ang * 3.0);
 
   float enIn = smoothstep(rp * 0.96, rp * 1.10, rw);
-  float enOut = 1.0 - smoothstep(tip * 0.76, tip, rw);
+  /* Apagado largo: el último tercio de cada fibra se desvanece. */
+  float enOut = 1.0 - smoothstep(tip * 0.62, tip, rw);
   float irisBand = enIn * enOut;
 
   vec3 col = vec3(0.0);
@@ -220,23 +229,27 @@ void main() {
                 + RED_DEEP * 0.16 * exp(-pow(r / (rp * 0.42 + 1e-4), 2.0));
   col = mix(col, pupilCol, pupil);
 
-  /* ---- Anillo exterior de cerdas ---- */
-  float NS = 30.0;
-  float cell = floor(a01 * NS);
-  float fc = fract(a01 * NS) - 0.5;
-  float h = hash11(cell * 7.13 + 3.7);
-  float ringR = 1.0;
-  /* Circunferencia fina. */
-  float ringLine = exp(-pow((r - ringR) / 0.0045, 2.0)) * 0.55;
-  /* Cerdas: cruzan el anillo, mayormente hacia fuera, longitud por hash. */
-  float spokeIn = ringR - 0.030 - 0.02 * h;
-  float spokeOut = ringR + 0.052 + 0.070 * h;
-  float band = smoothstep(spokeIn, spokeIn + 0.02, r)
-             * (1.0 - smoothstep(spokeOut - 0.03, spokeOut, r));
-  float spoke = smoothstep(0.075, 0.012, abs(fc)) * band;
-  float flick = 0.72 + 0.28 * sin(uTime * 0.8 + h * TAU);
-  float ringL = (ringLine + spoke * 0.95 * flick);
-  col += RING_IVORY * ringL * 0.85;
+  /* ---- Halo exterior emplumado ----
+     Sustituye al antiguo anillo de cerdas (una circunferencia con
+     rayas que leía como gráfico, no como ojo): un resplandor ancho y
+     orgánico que sigue el borde emplumado de las fibras, modulado por
+     los mismos mechones del iris — el ojo se funde con la oscuridad
+     como en la referencia, sin geometría visible. */
+  float tuft = anoise(a01w, 14.0, 3.3, vec2(11.3, 47.9));
+  float halo = exp(-pow((r - tip * 0.90) / (0.20 + 0.10 * tuft), 2.0));
+  vec3 haloCol = mix(GREEN_CORE, GREEN_DEEP, 0.45) * 0.85 + RING_IVORY * 0.10;
+  col += haloCol * halo * (0.16 + 0.30 * tuft)
+       * smoothstep(rp, rp * 1.6, r);
+
+  /* ---- Párpados (parpadeo) ----
+     Cierre curvo desde arriba y abajo con borde suave; solo afecta a
+     la zona del ojo (el bokeh lejano no parpadea). Con uBlink = 1 la
+     máscara es 1.0 y no toca nada. */
+  float lidCurve = 1.0 - 0.30 * p.x * p.x;
+  float aperture = mix(0.03, 1.55, uBlink) * lidCurve;
+  float lidMask = 1.0 - smoothstep(aperture - 0.16, aperture, abs(p.y));
+  float eyeZone = 1.0 - smoothstep(1.25, 1.7, r);
+  col *= mix(1.0, mix(0.05, 1.0, lidMask), eyeZone);
 
   /* ---- Niebla ambiental y bokeh ---- */
   float haze = (1.0 - smoothstep(0.15, 1.55, r));
@@ -371,6 +384,7 @@ export function BackgroundFX() {
         "uExposure",
         "uTheme",
         "uEyeY",
+        "uBlink",
       ]) {
         uni[name] = gl.getUniformLocation(prog, name);
       }
@@ -399,6 +413,17 @@ export function BackgroundFX() {
     let lookTY = 0;
     let intro = reduce ? 1 : 0;
     let theme = document.documentElement.dataset.theme === "light" ? 1 : 0;
+
+    /* Parpadeo: primer blink a los ~3 s (tras el intro); después cada
+       4,5–9 s con doble parpadeo ocasional. Dirección de scroll
+       suavizada para que el ojo "siga" al contenido con la mirada. */
+    let blinkStart = t0 - 9999;
+    let nextBlink = t0 + 3000;
+    let dirS = 0;
+    const hash01 = (x: number) => {
+      const s = Math.sin(x * 0.001) * 43758.5453;
+      return s - Math.floor(s);
+    };
 
     /* Escalado adaptativo de resolución. */
     let quality = 1;
@@ -447,6 +472,9 @@ export function BackgroundFX() {
       velS = v > velS ? damp(velS, v, 9, dt) : damp(velS, v, 2.2, dt);
       dilate = Math.min(1, velS);
 
+      /* Mirada de scroll: el ojo baja/sube la vista con el contenido. */
+      dirS = damp(dirS, Math.max(-1, Math.min(1, dy / 14)), 6, dt);
+
       /* Mirada con inercia. */
       lookX = damp(lookX, lookTX, 4.5, dt);
       lookY = damp(lookY, lookTY, 4.5, dt);
@@ -456,17 +484,42 @@ export function BackgroundFX() {
       if (intro < 1) intro = Math.min(1, (now - t0) / 1100);
       const introE = 1 - Math.pow(1 - intro, 3); // easeOutCubic
 
-      /* Exposición por tramo: protagonista arriba, discreto en el
-         contenido, vuelve a encenderse hacia el cierre. */
+      /* Exposición por tramo: presencia SIEMPRE — protagonista arriba,
+         apenas medio paso atrás sobre el contenido, pleno de nuevo
+         hacia el cierre (antes caía un 44 % y el ojo desaparecía). */
       const mid = smoothstep01((scrollS - 0.06) / 0.24);
       const end = smoothstep01((scrollS - 0.78) / 0.2);
-      const exposure = 1.0 - 0.44 * mid + 0.24 * end * 0.44;
+      const exposure = (1.0 - 0.24 * mid + 0.24 * end) * 1.14;
+
+      /* Parpadeo: cierre 110 ms (acelerando) + apertura 190 ms (suave).
+         Al disparar se decide si habrá doble parpadeo (~1 de cada 4). */
+      let open = 1;
+      if (!reduce) {
+        if (now >= nextBlink) {
+          blinkStart = now;
+          const h = hash01(now);
+          nextBlink = now + (h < 0.25 ? 340 : 4500 + h * 4500);
+        }
+        const bt = now - blinkStart;
+        if (bt < 110) {
+          const k = bt / 110;
+          open = 1 - k * k;
+        } else if (bt < 300) {
+          const k = (bt - 110) / 190;
+          open = 1 - Math.pow(1 - k, 3); /* easeOutCubic 0 → 1 */
+        }
+      }
 
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform1f(uni.uTime, reduce ? 13.7 : t);
       gl.uniform1f(uni.uScroll, scrollS);
       gl.uniform1f(uni.uDilate, reduce ? 0 : dilate);
-      gl.uniform2f(uni.uLook, finePointer ? lookX : 0, finePointer ? lookY : 0);
+      gl.uniform2f(
+        uni.uLook,
+        finePointer ? lookX : 0,
+        (finePointer ? lookY : 0) - 0.35 * dirS
+      );
+      gl.uniform1f(uni.uBlink, reduce ? 1 : open);
       gl.uniform1f(uni.uIntro, introE);
       gl.uniform1f(uni.uExposure, exposure);
       gl.uniform1f(uni.uTheme, theme);
@@ -602,18 +655,15 @@ export function BackgroundFX() {
       {/* Ojo WebGL (o fallback CSS si no hay WebGL) */}
       {webglFailed ? (
         <div className="absolute inset-0" style={{ background: "var(--bg)" }}>
-          {/* Aproximación estática: pupila + iris rojo→verde + radios. */}
+          {/* Aproximación estática: halo suave + iris rojo→verde + pupila
+              (sin el antiguo aro de radios — leía como gráfico, no ojo). */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
-              width: "min(67vmin, 900px)",
-              height: "min(67vmin, 900px)",
+              width: "min(78vmin, 1040px)",
+              height: "min(78vmin, 1040px)",
               background:
-                "repeating-conic-gradient(from 0deg, rgb(255 255 255 / 0.10) 0deg 0.7deg, transparent 0.7deg 6deg)",
-              WebkitMaskImage:
-                "radial-gradient(circle, transparent 55%, #000 57%, #000 63%, transparent 66%)",
-              maskImage:
-                "radial-gradient(circle, transparent 55%, #000 57%, #000 63%, transparent 66%)",
+                "radial-gradient(circle, transparent 38%, rgb(52 211 153 / 0.12) 52%, rgb(52 211 153 / 0.04) 62%, transparent 72%)",
             }}
           />
           <div
