@@ -24,8 +24,9 @@ import {
  *    + lead + 3 reassurance pills) — mirrors the Pricing header rhythm so
  *    the two sections read as one continuous conversion story.
  *  - Single `.liquid-glass depth-2 rounded-card` container holds the
- *    accordion; each item tints `bg-white/[0.04]` when open and picks up
- *    a subtle accent border + glow so the active item reads as "lit".
+ *    accordion; each item tints with `rgb(var(--divider)/0.04)` when open
+ *    and picks up a subtle accent border + glow so the active item reads as
+ *    "lit".
  *
  * Institutional polish (R2-b):
  *  - `.liquid-glass rounded-card` container with `depth-2` elevation +
@@ -33,8 +34,10 @@ import {
  *  - Accordion headers `text-sm font-medium text-primary` + the shadcn
  *    chevron (rotates 180° on open via `[&[data-state=open]>svg]:rotate-180`).
  *  - Smooth open animation via Radix's built-in height transition.
- *  - `bg-white/[0.04]` tint + `border-white/25` + accent glow on the
- *    open item so the active question reads as lifted.
+ *  - `rgb(var(--divider)/0.04)` tint + `rgb(var(--accent-base)/0.30)` border +
+ *    accent glow on the open item so the active question reads as lifted.
+ *    Open state also gains a 3 px inset accent rail on the left edge so the
+ *    "lit" item reads as a focused institutional FAQ row (R20-3c).
  *  - Centered header above the accordion — eyebrow + headline with
  *    `.text-gradient` highlight + lead + 3 reassurance pills.
  *  - Subtle radial accent glow + `.grain` texture layer over the
@@ -188,9 +191,9 @@ export function PricingFAQ() {
                 <AccordionItem
                   key={item.q}
                   value={`item-${i}`}
-                  className="border-[rgb(var(--divider)/0.10)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--divider)/0.25)] data-[state=open]:bg-[rgb(var(--divider)/0.04)] data-[state=open]:shadow-[0_0_28px_-6px_rgb(var(--accent-base)_/_0.18)]"
+                  className="border-[rgb(var(--divider)/0.10)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.04)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),0_0_30px_-6px_rgb(var(--accent-base)/0.22)]"
                 >
-                  <AccordionTrigger className="text-left text-sm font-medium text-primary hover:text-primary hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180">
+                  <AccordionTrigger className="text-left text-sm font-medium text-primary hover:text-primary hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:text-[rgb(var(--accent-base))]">
                     {item.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-secondary leading-relaxed text-[0.95rem] pb-5">

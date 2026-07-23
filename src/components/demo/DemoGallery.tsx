@@ -163,8 +163,17 @@ export function DemoGallery() {
                     />
                   </WindowFrame>
                 </div>
-                {/* Caption LABEL beneath the frame — not an overlay. */}
-                <figcaption className="mt-3 text-center">
+                {/* Caption LABEL beneath the frame — not an overlay.
+                    Two-line stack: a tiny muted index ("01 / 08") in tnum
+                    for an editorial gallery rhythm, then the screen name.
+                    A hairline beneath the frame anchors the caption to the
+                    shot so they read as a single composed unit. */}
+                <figcaption className="mt-3 flex flex-col items-center gap-1 text-center">
+                  <span className="tnum text-[10px] tracking-[0.18em] uppercase text-tertiary">
+                    {String(i + 1).padStart(2, "0")}
+                    <span className="mx-1 opacity-50">/</span>
+                    {String(shots.length).padStart(2, "0")}
+                  </span>
                   <span className="text-xs md:text-sm font-medium text-primary">
                     {es ? s.capEs : s.capEn}
                   </span>
@@ -174,7 +183,7 @@ export function DemoGallery() {
           ))}
         </div>
 
-        {/* CTA row */}
+        {/* CTA row — primary (accent-glow) + secondary (glass + accent-tinted hover) */}
         <Reveal delay={0.1} className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <motion.a
             href={asset("/demo")}
@@ -204,9 +213,25 @@ export function DemoGallery() {
             href={asset("/features")}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-            className="liquid-glass border border-[rgb(var(--divider)/0.2)] text-primary inline-flex items-center gap-2 h-11 px-6 rounded-lg text-sm font-medium hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-all duration-200"
+            className="liquid-glass group inline-flex items-center gap-2 h-11 px-6 rounded-lg text-sm font-medium text-primary border border-[rgb(var(--divider)/0.18)] hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--accent-base)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-all duration-200"
           >
             {es ? "Ver características" : "See features"}
+            <svg
+              className="transition-transform duration-200 group-hover:translate-x-0.5 text-tertiary group-hover:text-[rgb(var(--accent-base))]"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 8h9M8 4l4 4-4 4"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </motion.a>
         </Reveal>
       </div>

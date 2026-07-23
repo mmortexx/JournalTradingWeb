@@ -91,16 +91,28 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
             ].map((row, i) => (
               <div
                 key={row.l}
-                className="grid grid-cols-3"
+                className="grid grid-cols-3 group/row relative transition-colors duration-200"
                 style={{
-                  padding: "12px 14px",
+                  padding: "12px 14px 12px 16px",
                   borderBottom: i < 2 ? "1px solid rgb(var(--divider) / 0.06)" : undefined,
                   background: row.highlight ? "color-mix(in oklab, rgb(var(--pnl-neg)) 6%, transparent)" : undefined,
                 }}
               >
-                <span style={{ fontSize: 13.5, color: "var(--ink)" }}>{row.l}</span>
-                <span className="tnum text-right" style={{ fontSize: 13.5, color: "var(--ink-2)" }}>{row.n}</span>
-                <span className="tnum text-right" style={{ fontSize: 14, fontWeight: 700, color: row.c }}>{row.v}</span>
+                {/* R20-3b: hover rail — accent on neutral rows, deeper red on the gap row.
+                    Sits behind the row content via z-index 0 and pointer-events: none. */}
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-0 bottom-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200 pointer-events-none"
+                  style={{
+                    width: 2,
+                    background: row.highlight
+                      ? "rgb(var(--pnl-neg))"
+                      : "rgb(var(--accent-base))",
+                  }}
+                />
+                <span className="relative" style={{ fontSize: 13.5, color: "var(--ink)" }}>{row.l}</span>
+                <span className="tnum text-right relative" style={{ fontSize: 13.5, color: "var(--ink-2)" }}>{row.n}</span>
+                <span className="tnum text-right relative" style={{ fontSize: 14, fontWeight: 700, color: row.c }}>{row.v}</span>
               </div>
             ))}
           </div>
@@ -158,13 +170,19 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                   <span style={{ fontSize: 13, color: "var(--ink)" }}>{row.l}</span>
                   <span className="tnum" style={{ fontSize: 12, color: "var(--ink-2)" }}>{row.pct} %</span>
                 </div>
-                <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
+                <div className="h-1 rounded-full overflow-hidden relative" style={{ background: "rgb(var(--divider) / 0.13)", boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.18)" }}>
                   <div
                     className="h-full rounded-full"
                     style={{
                       width: `${row.pct * 2.5}%`,
-                      background: "rgb(var(--pnl-neg))",
-                      opacity: 0.75,
+                      // R20-3b: gradient fill — solid red on the leading edge,
+                      // a hair translucent at the trailing edge so the bar reads
+                      // as a meter rather than a flat slab. Top inset highlight
+                      // (rgb white 0.18) gives a “metallic” fill catch.
+                      background:
+                        "linear-gradient(90deg, rgb(var(--pnl-neg)) 0%, color-mix(in oklab, rgb(var(--pnl-neg)) 70%, transparent) 100%)",
+                      boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.20)",
+                      transition: "width 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   />
                 </div>

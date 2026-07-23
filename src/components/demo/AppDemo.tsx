@@ -290,7 +290,7 @@ function AppDemoInner() {
               content, status bar) to the 12px window radius. */}
       <div
         ref={demoRootRef}
-        className={`relative mx-auto transition-all duration-500 ${
+        className={`relative mx-auto transition-[transform,border-radius,box-shadow,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           fullscreen
             ? "fixed inset-3 z-[100] rounded-xl"
             : "rounded-xl"
@@ -372,6 +372,16 @@ function AppDemoInner() {
           <div
             aria-hidden="true"
             className="absolute top-0 left-0 right-0 h-px bg-gradient-to-b from-white/15 to-transparent pointer-events-none z-10"
+          />
+          {/* Window bottom reflection — mirror of the top key-light, an
+              even softer 1px hairline at the bottom of the window. Gives
+              the demo window a machined-feel on both top AND bottom edges
+              (the bottom edge currently relies only on the StatusBar's
+              own border, which reads flat by comparison). Sits above the
+              StatusBar (z-10) and never intercepts clicks. */}
+          <div
+            aria-hidden="true"
+            className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-t from-white/[0.06] to-transparent pointer-events-none z-10"
           />
         </div>
         </div>

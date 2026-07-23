@@ -207,23 +207,43 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                 <Link
                   href={asset(a.href)}
                   aria-current={isActive ? "page" : undefined}
-                  className={`group relative liquid-glass rounded-card p-5 block transition-all duration-300 hover:-translate-y-0.5 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
+                  // R20-3b: hover lift refined — inactive cards now lift
+                  //   -translate-y-0.5 → -translate-y-1 + gain an accent
+                  //   inner ring (ring-accent/30) on hover so the “tappable
+                  //   cross-nav card” affordance is unmistakable. Active card
+                  //   stays put (no hover lift — it IS the current page).
+                  className={`group relative liquid-glass rounded-card p-5 block transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
                     isActive
                       ? "border-[rgb(var(--accent-base)/0.4)] depth-2"
-                      : "border-[rgb(var(--divider)/0.1)] depth-1 hover:depth-2"
+                      : "border-[rgb(var(--divider)/0.1)] depth-1 hover:depth-2 hover:-translate-y-1 hover:border-[rgb(var(--accent-base)/0.28)]"
                   }`}
                 >
-                  {isActive && (
+                  {/* R20-3b: hover-only accent inner ring (inactive cards) —
+                      sits behind content, fades in on hover to read as a
+                      “this card is the target” affordance. Skipped on the
+                      active card (it already has the static accent border). */}
+                  {!isActive && (
                     <span
                       aria-hidden
-                      className="absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] font-semibold text-[rgb(var(--accent-base))]"
+                      className="pointer-events-none absolute inset-0 rounded-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.30)" }}
+                    />
+                  )}
+                  {isActive && (
+                    // R20-3b: "Aquí" / "Here" badge promoted from floating
+                    //   text to a real accent pill — bg accent/12 + border
+                    //   accent/35 + rounded-full — so the “you are here”
+                    //   state reads as a stamped badge rather than a label.
+                    <span
+                      aria-hidden
+                      className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[rgb(var(--accent-base)/0.12)] border border-[rgb(var(--accent-base)/0.35)] text-[10px] uppercase tracking-[0.12em] font-semibold text-[rgb(var(--accent-base))]"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--accent-base))]" />
                       {es ? "Aquí" : "Here"}
                     </span>
                   )}
                   <span
-                    className="grid place-items-center w-9 h-9 rounded-lg mb-3 transition-colors"
+                    className="relative grid place-items-center w-9 h-9 rounded-lg mb-3 transition-colors"
                     style={{
                       background: isActive
                         ? "rgb(var(--accent-base) / 0.14)"
@@ -235,10 +255,10 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                       <path d={a.icon} stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
-                  <span className="block text-sm font-semibold text-primary mb-1">
+                  <span className="relative block text-sm font-semibold text-primary mb-1">
                     {es ? a.labelEs : a.labelEn}
                   </span>
-                  <span className="block text-xs text-tertiary leading-relaxed">
+                  <span className="relative block text-xs text-tertiary leading-relaxed">
                     {es ? a.descEs : a.descEn}
                   </span>
                 </Link>

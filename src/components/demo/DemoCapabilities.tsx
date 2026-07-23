@@ -187,10 +187,14 @@ export function DemoCapabilities() {
               <motion.div
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                 transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="liquid-glass depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-4 h-full flex flex-col gap-3 hover:border-[rgb(var(--divider)/0.3)]"
+                className="group liquid-glass depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-4 h-full flex flex-col gap-3 border border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--accent-base)/0.32)] hover:bg-[rgb(var(--accent-base)/0.04)]"
               >
+                {/* Icon container — accent-tinted chip that deepens on hover.
+                    Rings are theme-aware (white/8 dark → black/8 light via
+                    --divider) so the chip reads cleanly over the eye without
+                    flattening into the glass surface. */}
                 <span
-                  className="w-9 h-9 rounded-md flex items-center justify-center bg-[rgb(var(--divider)/0.08)] text-primary"
+                  className="relative w-9 h-9 rounded-md flex items-center justify-center text-primary transition-[background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-[rgb(var(--divider)/0.08)] ring-1 ring-inset ring-[rgb(var(--divider)/0.10)] group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:ring-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))]"
                   aria-hidden="true"
                 >
                   {c.icon}

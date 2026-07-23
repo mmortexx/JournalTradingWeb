@@ -76,7 +76,7 @@ export function DemoReadyToBuy() {
                 <MagneticButton
                   href={asset("/pricing")}
                   strength={0.25}
-                  className="group inline-flex items-center gap-2 rounded-lg bg-white text-black px-8 py-3 font-medium hover:bg-gray-100 transition-colors"
+                  className="group inline-flex items-center gap-2 rounded-lg bg-white text-black px-8 py-3 font-medium hover:bg-gray-100 hover:-translate-y-0.5 transition-[background-color,box-shadow,transform] duration-200 shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.30),0_1px_2px_rgb(0_0_0/0.20)] hover:shadow-[0_10px_24px_-6px_rgb(var(--accent-base)/0.50),0_2px_8px_rgb(0_0_0/0.25)]"
                 >
                   {es ? "Ver precios" : "See pricing"}
                   <svg
@@ -105,9 +105,25 @@ export function DemoReadyToBuy() {
                 <MagneticButton
                   href={asset("/features")}
                   strength={0.15}
-                  className="liquid-glass border border-white/20 text-primary inline-flex items-center gap-2 px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-black transition-all"
+                  className="liquid-glass group inline-flex items-center gap-2 px-8 py-3 rounded-lg font-medium text-primary border border-[rgb(var(--divider)/0.18)] hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--accent-base)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-[background-color,border-color,box-shadow,transform] duration-200"
                 >
                   {es ? "Explora características" : "Explore features"}
+                  <svg
+                    className="transition-transform group-hover:translate-x-0.5 text-tertiary group-hover:text-[rgb(var(--accent-base))]"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 8h9M8 4l4 4-4 4"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </MagneticButton>
               </motion.div>
             </div>

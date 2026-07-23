@@ -11,8 +11,8 @@ import { useLang } from "@/lib/i18n";
  * IntersectionObserver (rootMargin clears the sticky navbar at 60px + a
  * 45% band), and smooth-scrolls on click (respecting reduced-motion).
  *
- * - Desktop-only (hidden below lg / 1024px) to avoid cluttering mobile.
- * - Sits at `left-[22px]` mirroring the SideRail pattern but lower on the
+ * - Desktop-only (hidden below xl / 1280px) to avoid cluttering mobile.
+ * - Sits at `right-[22px]` mirroring the BackToTop pattern but lower on the
  *   page (top-1/2) and only on feature subpages.
  * - Active item gets an accent left-border + filled dot; inactive items
  *   get a hollow dot that fills on hover.
@@ -94,10 +94,8 @@ export function TableOfContents() {
       if (text) found.push({ id, text });
     });
 
-    found.slice(0, 6);
-
     // eslint-disable-next-line react-hooks/set-state-in-effect -- DOM scan on mount is the canonical pattern for IntersectionObserver setup; this runs once and the state drives the TOC list render.
-    setItems(found.slice(0, 6));
+    setItems(found.slice(0, 8));
     if (found[0]) {
       setActiveId(found[0].id);
     }

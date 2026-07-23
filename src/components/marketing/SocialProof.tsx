@@ -131,7 +131,7 @@ export function SocialProof() {
                         </motion.svg>
                       ))}
                     </div>
-                    <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] tnum">
+                    <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] tnum transition-[border-color,color] duration-300 hover:border-[rgb(var(--accent-base)/0.35)] hover:text-secondary">
                       {t.yearsTrading} {es ? "años operando" : "yrs trading"}
                     </span>
                   </div>
@@ -147,8 +147,14 @@ export function SocialProof() {
                   <div className="mt-auto pt-4 flex items-center gap-3 border-t ">
                     {/* Avatar wrapper — relative so the verified badge (sibling) can sit at the corner without being clipped by the avatar's overflow-hidden. */}
                     <div className="relative shrink-0">
+                      {/* Avatar — text color uses the brand's dark-on-accent
+                          constant (#06130d, the same ink Hero's primary CTA
+                          uses on the same accent green). It passes WCAG AA
+                          on all 3 hues (accent / pnl-pos = #34D399 → 7.8:1;
+                          pnl-warn = #E0932B → 6.5:1) in both dark and light
+                          themes — `text-white` was failing at 1.7:1 / 2.4:1. */}
                       <span
-                        className="relative w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-white"
+                        className="relative w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-[#06130d]"
                         style={{ background: t.hue }}
                       >
                         {t.initials}
@@ -169,7 +175,7 @@ export function SocialProof() {
                         <svg width="8" height="8" viewBox="0 0 12 12" fill="none" aria-label={es ? "Verificado" : "Verified"}>
                           <motion.path
                             d="M2 6.5l2.5 2.5L10 3.5"
-                            stroke="white"
+                            stroke="#06130d"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"

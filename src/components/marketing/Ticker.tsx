@@ -127,7 +127,7 @@ export function Ticker() {
     <div
       role="marquee"
       aria-label="Market ticker"
-      className="relative border-y border-[rgb(var(--divider)/0.10)] py-3 liquid-glass overflow-hidden select-none"
+      className="relative border-y border-[rgb(var(--divider)/0.14)] py-3 liquid-glass overflow-hidden select-none"
     >
       {/* Left edge gradient fade — black-tinted so items ease out into the
           liquid-glass band's translucent dark surface instead of clipping
@@ -149,8 +149,13 @@ export function Ticker() {
       />
 
       {/* Scrolling track — duplicated <Row /> gives the seamless loop point
-          (the animation resets every `half = scrollWidth / 2` pixels). */}
-      <motion.div ref={trackRef} className="flex w-max" style={{ x }}>
+          (the animation resets every `half = scrollWidth / 2` pixels).
+          `willChange: transform` is a GPU-compositing hint that keeps the
+          marquee on its own compositor layer — without it some browsers
+          (notably Safari on macOS) re-rasterize the track each frame as
+          the x value changes, which shows up as a faint sub-pixel jitter
+          on the tabular figures. No behavior change, pure perf hint. */}
+      <motion.div ref={trackRef} className="flex w-max" style={{ x, willChange: "transform" }}>
         <Row />
         <Row />
       </motion.div>

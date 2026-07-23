@@ -41,6 +41,66 @@ const breadcrumbSchema = {
 };
 
 /**
+ * FAQPage structured data — mirrors the 5 visible Q&A items rendered by
+ * the PricingFAQ component (ES-default since the site is ES-default).
+ * Per Google's FAQ rich-result guidelines, FAQPage schema must appear on
+ * the page where the Q&A is visible — that requirement is met on /pricing
+ * (the PricingFAQ component renders here). Unlocks FAQ rich results on
+ * the pricing SERP entry. See worklog Task R20-1d (E5) + R20-2d.
+ *
+ * IMPORTANT: keep this in sync with src/components/marketing/PricingFAQ.tsx
+ * if the visible ES Q&A copy changes — Google penalizes schema/visible-text
+ * mismatches. The 5 Q&A texts below are the ES version verbatim from
+ * PricingFAQ.tsx.
+ */
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "¿Puedo probar antes de comprar?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Sí. Tienes la demo en vivo de esta misma web — sin registro, sin descargar nada, con datos deterministas. Y si después de comprar sientes que no encaja, tienes 30 días de garantía de devolución completa, sin preguntas.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Qué métodos de pago aceptáis?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Tarjeta de crédito/débito y PayPal. Emitimos factura con IVA si procede.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Cómo funciona la garantía de 30 días?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Si en 30 días sientes que la app no es para ti, escribes a soporte y te devolvemos el 100 % del dinero, sin preguntas.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Puedo usarlo en varios ordenadores?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Sí. Una misma licencia te permite instalar Trading Journal en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Activaciones adicionales se gestionan escribiendo a soporte.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Qué pasa si pierdo mi licencia?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Nada. Tu licencia se asocia a tu correo electrónico: escríbenos y te la reenviamos las veces que haga falta. Y aunque pierdas el acceso al correo, tu historial sigue intacto porque vive en tu equipo, no en el nuestro.",
+      },
+    },
+  ],
+};
+
+/**
  * Product + Offer structured data — tells search engines this page sells
  * two software products (Core $29, Pro $49) with one-time pricing. Enables
  * price rich-results on the SERP (the price snippet under the listing).
@@ -190,6 +250,10 @@ export default function PricingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <ReadingProgressIndicator />
       {/* Prominent 30-day money-back guarantee banner — sits between the

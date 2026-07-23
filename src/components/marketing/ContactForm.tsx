@@ -21,8 +21,8 @@ import { Reveal } from "@/components/tj/Reveal";
  *    endpoint later without changing the component shape.
  *
  * Style: `liquid-glass rounded-card p-6 max-w-xl mx-auto`, inputs styled like the
- * rest of the app (bg-white/5 + border-white/10 border, accent focus ring).
- * Accent-only palette — no indigo/blue.
+ * rest of the app (`rgb(var(--divider)/0.05)` fill + `rgb(var(--divider)/0.10)` border,
+ * accent focus ring). Accent-only palette — no indigo/blue.
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -172,7 +172,7 @@ export function ContactForm() {
                           onChange={(e) => setName(e.target.value)}
                           placeholder={es ? "Tu nombre" : "Your name"}
                           aria-label={es ? "Nombre" : "Name"}
-                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)]"
+                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
                         />
                       </Field>
                       <Field label={es ? "Email" : "Email"} htmlFor="cf-email">
@@ -185,7 +185,7 @@ export function ContactForm() {
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Email" : "Email"}
-                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)]"
+                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
                         />
                       </Field>
                       <Field label={es ? "Mensaje" : "Message"} htmlFor="cf-msg">
@@ -196,7 +196,7 @@ export function ContactForm() {
                           placeholder={es ? "¿En qué podemos ayudarte?" : "How can we help?"}
                           aria-label={es ? "Mensaje" : "Message"}
                           rows={4}
-                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md px-3 py-2.5 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)] resize-y min-h-[112px]"
+                          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md px-3 py-2.5 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0 resize-y min-h-[112px]"
                         />
                       </Field>
 
@@ -218,7 +218,7 @@ export function ContactForm() {
                       <motion.button
                         type="submit"
                         whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                        className="bg-white text-black px-6 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors"
+                        className="bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
                         {es ? "Enviar" : "Send"}
                       </motion.button>

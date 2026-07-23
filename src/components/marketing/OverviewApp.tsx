@@ -200,7 +200,7 @@ export function OverviewApp() {
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-2px)";
                   e.currentTarget.style.boxShadow =
-                    "0 16px 34px -14px color-mix(in oklab, rgb(var(--accent-base)) 60%, #000)";
+                    "0 18px 38px -12px color-mix(in oklab, rgb(var(--accent-base)) 65%, #000), 0 0 0 1px rgb(var(--accent-base) / 0.25)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "";
@@ -222,13 +222,24 @@ export function OverviewApp() {
                   color: "var(--ink)",
                   fontSize: 15.5,
                   fontWeight: 500,
-                  transition: "background 0.2s, border-color 0.2s",
+                  transition:
+                    "background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "color-mix(in oklab, var(--ink) 6%, transparent)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.background =
+                    "color-mix(in oklab, var(--ink) 6%, transparent)";
+                  e.currentTarget.style.borderColor =
+                    "rgb(var(--accent-base) / 0.40)";
+                  e.currentTarget.style.boxShadow =
+                    "0 10px 24px -14px rgb(0 0 0 / 0.5)";
                 }}
                 onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "";
                   e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.borderColor =
+                    "rgb(var(--divider) / 0.13)";
+                  e.currentTarget.style.boxShadow = "";
                 }}
               >
                 <span aria-hidden>▶</span>
@@ -344,6 +355,13 @@ export function OverviewApp() {
                   flex: "none",
                   background: "color-mix(in oklab, rgb(var(--accent-base)) 16%, transparent)",
                   color: "rgb(var(--accent-base))",
+                  // Inset accent ring + top specular highlight turn the
+                  // flat tinted square into a machined shield badge —
+                  // reads as "protected" rather than just "greenish
+                  // square". Both layers are theme-agnostic (the ring
+                  // is accent-tinted, the highlight is white-at-8%).
+                  boxShadow:
+                    "inset 0 0 0 1px rgb(var(--accent-base) / 0.30), inset 0 1px 0 rgb(255 255 255 / 0.08)",
                 }}
               >
                 <ShieldCheck size={15} aria-hidden />

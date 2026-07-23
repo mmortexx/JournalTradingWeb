@@ -214,7 +214,12 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               step={0.05}
               value={riskPct}
               onChange={(e) => setRiskPct(parseFloat(e.target.value))}
-              className="w-full"
+              // R20-3b: .tj-range in globals.css swaps the default thumb for a
+              // token-driven accent disc with inset highlight + glow ring on
+              // hover/focus. accent-color kept as a fallback for any browser
+              // that ignores ::-webkit-slider-thumb (Safari < 14, very old
+              // Firefox) so the slider never falls back to the OS default.
+              className="tj-range w-full"
               style={{ accentColor: "rgb(var(--accent-base))" }}
               aria-label={es ? "Riesgo por operación en porcentaje" : "Risk per trade percentage"}
               aria-valuemin={0.25}
@@ -254,8 +259,12 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             ))}
           </div>
 
-          {/* Resultados */}
-          <div className="grid grid-cols-2 gap-3 mb-5">
+          {/* Resultados — R20-3b: gap-3 → gap-3.5 + Result card padding
+              bumped from p-3 to px-4 py-3.5 so each cell breathes and the
+              2×2 grid reads as four tappable stat tiles instead of a packed
+              table. Bottom margin preserved (mb-5) so the per-trade bar
+              below keeps its anchor separation. */}
+          <div className="grid grid-cols-2 gap-3.5 mb-5">
             <Result label={es ? "Riesgo $" : "Risk $"} value={fmtUsd(riskUsd)} color="rgb(var(--pnl-neg))" />
             <Result label={es ? "Beneficio" : "Profit"} value={fmtUsd(profit)} color="rgb(var(--pnl-pos))" />
             <Result label={es ? "Tamaño" : "Size"} value={`${fmtNum(size, 2)} ${es ? "u" : "u"}`} color="var(--ink)" />
@@ -298,7 +307,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="rounded-[12px] p-3"
+      className="rounded-[12px] px-4 py-3.5 transition-colors duration-200"
       style={{
         background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
         border: "1px solid rgb(var(--divider) / 0.06)",

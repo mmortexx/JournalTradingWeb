@@ -208,32 +208,31 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
   return (
     <section id="faq" className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24">
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
-        {/* Encabezado interno — omitido en modo standalone (/faq), donde
-            el PageHeader ya titula la página. */}
-        {!standalone && (
-          <div className="relative max-w-3xl mx-auto text-center">
+        {/* Encabezado interno — el h2 siempre se renderiza (necesario para
+            el TOC + SEO); en modo standalone (/faq) se omite el eyebrow
+            porque el PageHeader ya aporta su propio kicker arriba. */}
+        <div className="relative max-w-3xl mx-auto text-center">
+          {!standalone && (
             <Reveal>
               <div className="relative flex justify-center">
                 <Eyebrow>{t("faqEyebrow")}</Eyebrow>
               </div>
             </Reveal>
-            <Reveal delay={0.06}>
-              <h2
-                className="relative mt-5 t-h2 text-primary"
-              >
-                {es ? (
-                  <>
-                    Preguntas <span className="text-gradient">frecuentes</span>
-                  </>
-                ) : (
-                  <>
-                    Frequently asked <span className="text-gradient">questions</span>
-                  </>
-                )}
-              </h2>
-            </Reveal>
-          </div>
-        )}
+          )}
+          <Reveal delay={0.06}>
+            <h2 className={`relative t-h2 text-primary ${standalone ? "" : "mt-5"}`}>
+              {es ? (
+                <>
+                  Preguntas <span className="text-gradient">frecuentes</span>
+                </>
+              ) : (
+                <>
+                  Frequently asked <span className="text-gradient">questions</span>
+                </>
+              )}
+            </h2>
+          </Reveal>
+        </div>
 
         {/* Search input — filters FAQ items in real time */}
         <Reveal delay={0.1} y={24}>
@@ -248,7 +247,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={es ? "Buscar en las preguntas…" : "Search questions…"}
               aria-label={es ? "Buscar en las preguntas frecuentes" : "Search frequently asked questions"}
-              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-10 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-colors hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--divider)/0.30)]"
+              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-10 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
             />
           </div>
         </Reveal>
@@ -288,9 +287,9 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
                   <AccordionItem
                     key={item.q}
                     value={`item-${i}`}
-                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--divider)/0.25)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[0_0_28px_-6px_rgb(var(--accent-base)/0.35)]"
+                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),0_0_30px_-6px_rgb(var(--accent-base)/0.32)]"
                   >
-                    <AccordionTrigger className="text-left text-base md:text-[1.05rem] font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:no-underline py-5 transition-colors">
+                    <AccordionTrigger className="text-left text-base md:text-[1.05rem] font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:text-[rgb(var(--accent-base))]">
                       {item.q}
                     </AccordionTrigger>
                     <AccordionContent className="text-secondary leading-relaxed text-[0.95rem] pb-5">

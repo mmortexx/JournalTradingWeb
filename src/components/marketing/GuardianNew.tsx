@@ -39,7 +39,13 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
             background: "color-mix(in oklab, var(--surface) 70%, transparent)",
             backdropFilter: "blur(20px) saturate(1.4)",
             WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.1)",
+            // R20-3b: depth-2 elevation + accent-tinted outer glow so the
+            // mockup card floats off the section veil rather than sitting
+            // flat (was a single inset highlight — invisible on the dark
+            // backdrop). Mirrors the depth-2 + accent-glow combo used on
+            // the Wrapped / MetricsShowcaseNew glass panels.
+            boxShadow:
+              "inset 0 1px 0 rgb(255 255 255 / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22), 0 0 24px rgb(var(--accent-base) / 0.06)",
           }}
         >
           <div className="flex items-center justify-between mb-4">
@@ -93,16 +99,19 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               <span className="tnum ml-auto" style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>28 {es ? "pts" : "pts"}</span>
             </div>
           </div>
-          {/* Checklist */}
-          <div className="space-y-2 mb-4">
+          {/* Checklist — R20-3b: widened row spacing (space-y-2 → 2.5) +
+              py-0.5 per row so each audit line breathes; added a faint
+              inset divider tone via row padding to read as a true audit
+              list rather than a stacked label. */}
+          <div className="space-y-2.5 mb-4">
             {[
               { ok: true, l: es ? "Setup Apto: ruptura NY" : "Setup valid: NY break" },
               { ok: true, l: es ? "R:R ≥ 1,5" : "R:R ≥ 1.5" },
               { ok: false, l: es ? "Riesgo 2,4 % — supera tu límite de 1 %" : "Risk 2.4% — over your 1% limit" },
             ].map((c, i) => (
-              <div key={i} className="flex items-center gap-2.5">
+              <div key={i} className="flex items-start gap-2.5 py-0.5">
                 <span
-                  className="inline-grid place-items-center rounded-full"
+                  className="inline-grid place-items-center rounded-full flex-none mt-px"
                   style={{
                     width: 18,
                     height: 18,
@@ -110,22 +119,36 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                       ? "color-mix(in oklab, rgb(var(--pnl-pos)) 18%, transparent)"
                       : "color-mix(in oklab, rgb(var(--pnl-neg)) 18%, transparent)",
                     color: c.ok ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))",
+                    boxShadow: c.ok
+                      ? "inset 0 0 0 1px rgb(var(--pnl-pos) / 0.30)"
+                      : "inset 0 0 0 1px rgb(var(--pnl-neg) / 0.32)",
                   }}
                 >
-                  <span style={{ fontSize: 11, fontWeight: 700 }}>{c.ok ? "✓" : "✕"}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, lineHeight: 1 }}>{c.ok ? "✓" : "✕"}</span>
                 </span>
-                <span style={{ fontSize: 13, color: c.ok ? "var(--ink-2)" : "rgb(var(--pnl-neg))", fontWeight: c.ok ? 400 : 600 }}>{c.l}</span>
+                <span style={{ fontSize: 13, lineHeight: 1.4, color: c.ok ? "var(--ink-2)" : "rgb(var(--pnl-neg))", fontWeight: c.ok ? 400 : 600 }}>{c.l}</span>
               </div>
             ))}
           </div>
-          {/* Aviso bloqueo */}
+          {/* Aviso bloqueo — R20-3b: 3px solid pnl-neg left rail (reads as
+              a “blocked / hard stop” signal even on a quick glance),
+              asymmetric horizontal padding (12px / 14px) so the rail
+              breathes against the icon, plus a soft inset highlight so
+              the box reads as a stamped alert rather than a flat tint. */}
           <div
-            className="rounded-[10px] p-3 mb-3"
+            className="rounded-[10px] mb-3 relative overflow-hidden"
             style={{
+              padding: "12px 14px 12px 16px",
               background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",
               border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 28%, transparent)",
+              boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06)",
             }}
           >
+            <span
+              aria-hidden
+              className="absolute left-0 top-0 bottom-0"
+              style={{ width: 3, background: "rgb(var(--pnl-neg))" }}
+            />
             <div className="flex items-center gap-2 mb-1">
               <AlertTriangle size={14} style={{ color: "rgb(var(--pnl-neg))" }} />
               <span

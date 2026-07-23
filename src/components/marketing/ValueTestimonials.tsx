@@ -181,17 +181,38 @@ export function ValueTestimonials() {
                 </span>
               </div>
 
-              {/* Quote — compact, slightly smaller than the main SocialProof. */}
+              {/* Quote — compact, slightly smaller than the main SocialProof.
+                  The opening/closing quote marks are lifted to editorial
+                  accents: a 2xl serif glyph in the accent green, sitting on
+                  the baseline of the body text so they read as decorative
+                  drop-cap-style marks rather than inline punctuation (R20-3c). */}
               <blockquote className="relative text-[13.5px] text-secondary leading-relaxed flex-1">
-                <span className="text-primary mr-1 text-base">“</span>
+                <span
+                  aria-hidden="true"
+                  className="font-serif text-2xl leading-none text-[rgb(var(--accent-base))] mr-1 align-[-0.18em]"
+                >
+                  “
+                </span>
                 {es ? t.quoteEs : t.quoteEn}
-                <span className="text-primary ml-1 text-base">”</span>
+                <span
+                  aria-hidden="true"
+                  className="font-serif text-2xl leading-none text-[rgb(var(--accent-base))] ml-0.5 align-[-0.18em]"
+                >
+                  ”
+                </span>
               </blockquote>
 
               {/* Author */}
               <div className="relative pt-3 border-t  flex items-center gap-2.5">
+                {/* Avatar — refined with a 1px inset divider ring + a soft
+                    drop shadow so the colored circle reads as a polished
+                    monogram rather than a flat color swatch. Text uses
+                    --accent-pressed (a dark green that pairs with the
+                    accent/pnl-pos/pnl-warn backgrounds in BOTH themes) so
+                    the initials stay legible regardless of which accent
+                    palette is active or which theme is on (R20-3c). */}
                 <span
-                  className="relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+                  className="relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-bold text-[rgb(var(--accent-pressed))] shrink-0 ring-1 ring-inset ring-[rgb(var(--divider)/0.15)] shadow-[0_2px_8px_rgb(0_0_0/0.18)]"
                   style={{ background: t.hue }}
                 >
                   {t.initials}

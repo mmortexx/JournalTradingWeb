@@ -50,6 +50,7 @@ export function Navbar() {
   const megaCloseTimer = useRef<number | null>(null);
 
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const megaButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -72,7 +73,12 @@ export function Navbar() {
   useEffect(() => {
     if (!megaOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMegaOpen(false);
+      if (e.key === "Escape") {
+        setMegaOpen(false);
+        // Return focus to the "Producto" trigger so keyboard users keep
+        // their place in the tab order after closing the panel.
+        megaButtonRef.current?.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -246,7 +252,7 @@ export function Navbar() {
         {label}
         {/* Indicador de página activa — barra de acento bajo la píldora,
             mismo lenguaje que el subrayado de pestaña activa del demo
-            (TopNav) y de SectionNav. */}
+            (TopNav). */}
         {active && (
           <span
             aria-hidden
@@ -312,6 +318,7 @@ export function Navbar() {
           >
             <button
               type="button"
+              ref={megaButtonRef}
               onClick={() => setMegaOpen((o) => !o)}
               aria-expanded={megaOpen}
               aria-haspopup="true"

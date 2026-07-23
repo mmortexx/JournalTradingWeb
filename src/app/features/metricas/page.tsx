@@ -38,7 +38,25 @@ const articleSchema = {
   publisher: { "@type": "Organization", name: "Trading Journal" },
   inLanguage: "es",
   timeRequired: `PT${READING_TIME_MIN}M`,
-  about: ["trading metrics", "Sharpe ratio", "profit factor", "expectancy", "risk calculator"],
+  // datePublished/dateModified use the frozen build date — same value
+  // as sitemap.ts LAST_MODIFIED. Google's Article rich-result spec
+  // REQUIRES datePublished (ISO 8601) and recommends dateModified;
+  // without datePublished the Article schema earns no rich result.
+  // See worklog Task R20-1d (E2) + R20-2d.
+  datePublished: "2025-01-01",
+  dateModified: "2025-01-01",
+  // Reuse the OG image (1200×630 PNG, meets Google's 1.91:1 spec).
+  // See worklog Task R20-1d (E3) + R20-2d.
+  image: `${SITE_URL}/og.png`,
+  // about[] as canonical Thing objects (not plain strings) — slightly
+  // improves classification signals. See worklog Task R20-1d (E7).
+  about: [
+    { "@type": "Thing", name: "trading metrics" },
+    { "@type": "Thing", name: "Sharpe ratio" },
+    { "@type": "Thing", name: "profit factor" },
+    { "@type": "Thing", name: "expectancy" },
+    { "@type": "Thing", name: "risk calculator" },
+  ],
 };
 
 export const metadata: Metadata = {

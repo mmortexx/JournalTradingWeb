@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -18,9 +18,9 @@ import { useTheme, PALETTES, type PaletteName } from "@/lib/theme";
 import { asset } from "@/lib/asset";
 
 /**
- * Cached at module load — see SectionNav.tsx for the same pattern. Used by
- * `navigate()` to switch the in-page smooth-scroll to an instant jump for
- * users with `prefers-reduced-motion: reduce`.
+ * Cached at module load — used by `navigate()` to switch the in-page
+ * smooth-scroll to an instant jump for users with `prefers-reduced-motion:
+ * reduce`.
  */
 const PREFERS_REDUCED_MOTION =
   typeof window !== "undefined" &&
@@ -89,6 +89,8 @@ export function CommandPalette() {
   const { theme, toggleTheme, setPalette, palette: currentPalette } = useTheme();
   const pathname = usePathname();
 
+  const panelRef = useRef<HTMLDivElement>(null);
+
   /* ---------------- Keyboard listeners ---------------- */
 
   // Global Cmd+K (Mac) / Ctrl+K (Win/Linux) toggler — always active.
@@ -116,6 +118,49 @@ export function CommandPalette() {
     };
     window.addEventListener("keydown", onEsc, true);
     return () => window.removeEventListener("keydown", onEsc, true);
+  }, [open]);
+
+  // Focus trap + focus restore. Mirrors the Navbar mobile-drawer pattern
+  // (Navbar.tsx ~L82-128): while the palette is open, Tab / Shift+Tab
+  // cycle within the panel (cmdk handles its own ↑/↓ arrow nav, but Tab
+  // could otherwise escape to the underlying page). On close, focus is
+  // returned to whatever element was focused before the palette opened —
+  // typically the Cmd+K trigger — so keyboard users keep their place.
+  useEffect(() => {
+    if (!open) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = getFocusables(panel);
+      if (focusables.length === 0) {
+        e.preventDefault();
+        panel.focus();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      const inside = panel.contains(active);
+      if (e.shiftKey) {
+        if (!inside || active === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (!inside || active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      previouslyFocused?.focus?.();
+    };
   }, [open]);
 
   /* ---------------- Navigation helpers ---------------- */
@@ -185,6 +230,8 @@ export function CommandPalette() {
 
           {/* Panel — liquid-glass card, springy fade+scale+lift entrance */}
           <motion.div
+            ref={panelRef}
+            tabIndex={-1}
             className="relative w-full max-w-xl liquid-glass rounded-card shadow-2xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.97, y: -8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -461,4 +508,31 @@ function Kbd({ children }: { children: React.ReactNode }) {
       {children}
     </kbd>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Focus-trap helper (mirrors Navbar.tsx getFocusables)               */
+/* ------------------------------------------------------------------ */
+
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  'input:not([disabled]):not([type="hidden"])',
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+  "audio[controls]",
+  "video[controls]",
+  "details > summary:first-of-type",
+].join(",");
+
+function getFocusables(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((el) => {
+    const rects = el.getClientRects();
+    if (rects.length === 0) return false;
+    const { width, height } = rects[0];
+    return width > 0 && height > 0;
+  });
 }

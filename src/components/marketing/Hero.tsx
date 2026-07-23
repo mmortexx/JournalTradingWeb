@@ -161,6 +161,14 @@ export function Hero() {
             lineHeight: 1.01,
             letterSpacing: "-0.035em",
             color: "var(--ink)",
+            // Crisp rendering in both themes — optimizeLegibility enables
+            // kerning + ligatures on the large display type (matters most
+            // for the tight -0.035em tracking where glyph stems would
+            // otherwise rasterize soft); antialiased smoothing kills the
+            // sub-pixel fringe the accent word picks up on the dark
+            // glass backdrop. Both props are theme-agnostic.
+            textRendering: "optimizeLegibility",
+            WebkitFontSmoothing: "antialiased",
           }}
         >
           {es ? (
@@ -220,16 +228,25 @@ export function Hero() {
               color: "#06130d",
               fontSize: 15,
               fontWeight: 600,
-              boxShadow: "0 14px 38px -14px color-mix(in oklab, rgb(var(--accent-base)) 75%, #000)",
-              transition: "transform 0.2s, filter 0.2s",
+              boxShadow:
+                "0 14px 38px -14px color-mix(in oklab, rgb(var(--accent-base)) 75%, #000)",
+              transition: "transform 0.2s, filter 0.2s, box-shadow 0.2s",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.filter = "brightness(1.08)";
+              // Intensify the accent glow + add a 1px accent ring so the
+              // primary CTA reads as "pressed forward" on hover — the
+              // ring is what makes the lift feel deliberate rather than
+              // just a brightness shift.
+              e.currentTarget.style.boxShadow =
+                "0 18px 44px -12px color-mix(in oklab, rgb(var(--accent-base)) 85%, #000), 0 0 0 1px rgb(var(--accent-base) / 0.35)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "";
               e.currentTarget.style.filter = "";
+              e.currentTarget.style.boxShadow =
+                "0 14px 38px -14px color-mix(in oklab, rgb(var(--accent-base)) 75%, #000)";
             }}
           >
             {es ? "Comprar — desde 29 $" : "Buy — from $29"}
@@ -245,22 +262,29 @@ export function Hero() {
               color: "var(--bg)",
               fontSize: 15,
               fontWeight: 600,
-              transition: "transform 0.2s, filter 0.2s",
+              transition: "transform 0.2s, filter 0.2s, box-shadow 0.2s",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.filter = "brightness(0.94)";
+              // Subtle accent ring on the dark CTA — pairs with the
+              // primary CTA's hover ring so both buttons lift together
+              // and read as a coordinated pair rather than two
+              // unrelated hover treatments.
+              e.currentTarget.style.boxShadow =
+                "0 12px 30px -14px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(var(--accent-base) / 0.30)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "";
               e.currentTarget.style.filter = "";
+              e.currentTarget.style.boxShadow = "";
             }}
           >
             <Play size={15} fill="currentColor" aria-hidden />
             {es ? "Ver la demo" : "See the demo"}
           </Link>
         </div>
-        <div data-seq className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div data-seq className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2.5">
           {[
             es ? "100 % LOCAL" : "100% LOCAL",
             es ? "PAGO ÚNICO" : "ONE-TIME",
@@ -272,7 +296,15 @@ export function Hero() {
                 <span
                   aria-hidden
                   className="hidden sm:inline-block"
-                  style={{ width: 1, height: 11, background: "rgb(var(--divider) / 0.13)" }}
+                  style={{
+                    width: 1,
+                    height: 12,
+                    // 0.20 (was 0.13) so the rule reads as a deliberate
+                    // machined hairline in both themes — the prior 0.13
+                    // faded too far on the dark glass and disappeared
+                    // entirely on the light theme's bright surface.
+                    background: "rgb(var(--divider) / 0.20)",
+                  }}
                 />
               )}
               <span

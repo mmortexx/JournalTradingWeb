@@ -74,20 +74,26 @@ const FinalCTANew = dynamic(
  *   1. Hero (#top)             — portada institucional, entra con el intro
  *   2. OverviewApp (#overview) — "Todo tu día en una pantalla" + mockup
  *   3. Ticker                  — banda animada con símbolos
- *   4. HomeDemo (#demo)        — la app recreada, interactiva (§ 02)
+ *   4. HomeDemo                — la app recreada, interactiva (§ 02)
  *   5. FinalCTANew             — CTA de cierre
  *
  * Características / Métricas / Disciplina / Seguridad → /features
- * Precios → /pricing · Demo a página completa → /demo
+ * Precios → /pricing · Demo a página completa → /demo · FAQ → /faq ·
+ * Acerca de → /about.
  *
- * El SideRail (01–07) mezcla anclas de esta página (Inicio, Vistazo,
- * Demo) con navegación real a /features y /pricing — la home dejó de
- * ser "toda la web en vertical".
+ * El SideRail ahora es un índice LOCAL de la home con sólo 2 anclas
+ * (01 Inicio #top, 02 Vistazo #overview) — no un índice del sitio. Las
+ * 9 rutas reales ya viven en el megamenú del Navbar, en el Footer, en
+ * el CommandPalette (⌘K) y en los atajos `g`+letra de GlobalShortcuts;
+ * duplicarlas en el raíl era justo lo que generaba "secciones que no
+ * hay en ese menú". La sección HomeDemo sigue siendo alcanzable con
+ * scroll, pero no la indexamos para evitar la colisión "Demo" (ancla
+ * de la home) vs "/demo" (ruta independiente).
  */
 export default function Home() {
   return (
     <>
-      {/* Raíl lateral 01–07 del HTML de referencia (solo home, ≥1100px) */}
+      {/* Raíl lateral 01–02 — índice local de la home (solo ≥1100px) */}
       <SideRail />
       <Hero />
       <OverviewApp />

@@ -115,29 +115,30 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
 
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
         {/* Header — centered, matches Stripe / Linear / Vercel pricing
-            pages. Omitido en modo standalone: el PageHeader de /pricing
-            ya dice exactamente esto. */}
-        {!standalone && (
-          <Reveal className="text-center max-w-3xl mx-auto">
-            <Eyebrow className="justify-center">{t("pricingEyebrow")}</Eyebrow>
-            <h2 className="mt-5 text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance">
-              {es ? (
-                <>
-                  Lo compras una vez. Es tuyo para{" "}
-                  <span className="text-gradient">siempre.</span>
-                </>
-              ) : (
-                <>
-                  You buy it once. It's yours{" "}
-                  <span className="text-gradient">forever.</span>
-                </>
-              )}
-            </h2>
+            pages. El h2 siempre se renderiza (necesario para el TOC + SEO);
+            en modo standalone (/pricing) se omiten el eyebrow y el lead
+            porque el PageHeader ya aporta su propio kicker + subtítulo. */}
+        <Reveal className="text-center max-w-3xl mx-auto">
+          {!standalone && <Eyebrow className="justify-center">{t("pricingEyebrow")}</Eyebrow>}
+          <h2 className={`text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance ${standalone ? "" : "mt-5"}`}>
+            {es ? (
+              <>
+                Lo compras una vez. Es tuyo para{" "}
+                <span className="text-gradient">siempre.</span>
+              </>
+            ) : (
+              <>
+                You buy it once. It's yours{" "}
+                <span className="text-gradient">forever.</span>
+              </>
+            )}
+          </h2>
+          {!standalone && (
             <p className="mt-4 text-lg text-secondary leading-relaxed">
               {t("pricingLead")}
             </p>
-          </Reveal>
-        )}
+          )}
+        </Reveal>
 
         {/* Visual-only pricing model toggle — reinforces the "no subscription"
             value prop. The active option is "Pago único" (one-time, since the
@@ -250,13 +251,14 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className={`relative liquid-glass rounded-card p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isPro
-          ? "gradient-border depth-4 border-[rgb(var(--divider)/0.20)]"
-          : "depth-2 border-[rgb(var(--divider)/0.10)]"
+          ? "gradient-border depth-4 border-[rgb(var(--accent-base)/0.22)]"
+          : "depth-2 border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--divider)/0.18)] hover:depth-3"
       }`}
       style={
         isPro
           ? {
-              boxShadow: "0 20px 60px -20px rgb(var(--accent-base) / 0.45)",
+              boxShadow:
+                "0 24px 70px -22px rgb(var(--accent-base) / 0.50), inset 0 1px 0 rgb(var(--accent-base) / 0.10)",
               // Establish a stacking context so the "PREMIUM" watermark
               // (z-index: -1) stays trapped inside this card — paints
               // above the liquid-glass fill but below the in-flow text content.
@@ -267,7 +269,22 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
     >
       {isPro && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
-          <span className="pill bg-white text-black border border-white/30 shadow-[0_8px_20px_-6px_rgb(var(--accent-base)/0.7)] uppercase tracking-[0.1em]">
+          {/* "Más popular" badge — accent-tinted gradient pill with a soft
+              outer glow. Replaces the prior hardcoded white-on-black chip
+              with a premium green-on-green treatment that ties to the
+              accent ring + glow already framing the Pro card, so the whole
+              Pro surface reads as a single premium object (R20-3c). */}
+          <span
+            className="pill border uppercase tracking-[0.1em] backdrop-blur-md"
+            style={{
+              background:
+                "linear-gradient(180deg, rgb(var(--accent-base) / 0.95), rgb(var(--accent-hover) / 0.85))",
+              color: "rgb(var(--accent-pressed))",
+              borderColor: "rgb(var(--accent-base) / 0.55)",
+              boxShadow:
+                "0 8px 22px -6px rgb(var(--accent-base) / 0.65), inset 0 1px 0 rgb(var(--divider) / 0.35)",
+            }}
+          >
             {es ? "Más popular" : "Most popular"}
           </span>
         </div>
@@ -343,7 +360,23 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
 
       <div className="divider-grad my-6" />
 
-      <ul className="space-y-3 flex-1">
+      {/* Premium accent rail — only on the Pro card. A 2 px tall gradient
+          bar pinned to the top inside edge of the card, sitting just above
+          the liquid-glass fill. Reads as a "selected / recommended" rail
+          (think Stripe's highlighted pricing tier) and reinforces the
+          gradient-border + glow without adding visual noise. */}
+      {isPro && (
+        <div
+          aria-hidden="true"
+          className="absolute top-0 left-6 right-6 h-[2px] rounded-full pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, rgb(var(--accent-base) / 0.85) 30%, rgb(var(--accent-hover) / 0.95) 50%, rgb(var(--accent-base) / 0.85) 70%, transparent 100%)",
+          }}
+        />
+      )}
+
+      <ul className="space-y-3.5 flex-1">
         {plan.features.map((f, i) => (
           <li key={f} className="flex items-start gap-3 text-sm">
             <span
@@ -359,21 +392,26 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         ))}
       </ul>
 
-      {/* CTA — full-width primary `bg-white text-black` with an
-          accent-tinted shadow + hover lift. Both Core and Pro use the
-          same primary treatment so neither reads as the "lesser" path;
-          the Pro card differentiates via the gradient-border + glow +
-          "Más popular" pill rather than via its CTA. The accent-tinted
-          shadow adds warmth without going garish, and `hover:-translate-y-0.5`
-          gives the pressable affordance institutional sites use. */}
+      {/* CTA — full-width primary high-contrast button using the theme's
+          primary text/bg tokens (white-on-dark in dark theme, near-black on
+          paper in light theme) so the CTA reads as the strongest action on
+          both cards without violating the no-hardcoded-color rule. Both Core
+          and Pro use the same primary treatment so neither reads as the
+          "lesser" path; the Pro card differentiates via the gradient-border +
+          glow + accent rail + "Más popular" pill rather than via its CTA.
+          The accent-tinted shadow adds warmth without going garish, and
+          `hover:-translate-y-0.5` gives the pressable affordance
+          institutional sites use (R20-3c). */}
       <motion.div
         whileTap={{ scale: 0.98, transition: { type: "spring", stiffness: 400, damping: 25 } }}
         className="mt-8"
       >
+        {/* Buy CTA — `href="#"` is intentional (R20-2b): no payment system
+            is wired yet. Replace with the checkout URL when billing lands. */}
         <MagneticButton
           href="#"
           strength={0.18}
-          className="group w-full flex items-center justify-center gap-2 h-12 px-6 rounded-lg text-sm font-medium transition-all duration-200 bg-white text-black shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.40),0_1px_2px_rgb(0_0_0/0.20)] hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.55),0_2px_8px_rgb(0_0_0/0.25)]"
+          className="group w-full flex items-center justify-center gap-2 h-12 px-6 rounded-lg text-sm font-medium transition-all duration-200 bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.40),0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.55),0_2px_8px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         >
           {plan.cta}
           <svg

@@ -120,10 +120,13 @@ export function Values() {
                 transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 className="group relative liquid-glass depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               >
-                {/* Accent edge — grows on hover */}
+                {/* Accent edge — grows on hover. Scaled up from 1.25 → 1.4
+                    for a more pronounced lift; the hover color shifts to a
+                    65 % accent tint so the rule reads as a deliberate accent
+                    stripe, not just a brighter neutral hairline. */}
                 <span
                   aria-hidden="true"
-                  className="absolute left-0 top-6 bottom-6 w-px bg-[rgb(var(--divider)/0.30)] origin-center transition-transform duration-300 group-hover:scale-y-125 group-hover:bg-[rgb(var(--divider)/0.60)]"
+                  className="absolute left-0 top-6 bottom-6 w-px bg-[rgb(var(--divider)/0.30)] origin-center transition-[transform,background-color] duration-300 group-hover:scale-y-[1.4] group-hover:bg-[rgb(var(--accent-base)/0.65)]"
                 />
                 {/* Soft corner glow on hover */}
                 <div
@@ -137,13 +140,19 @@ export function Values() {
 
                 <div className="relative flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
+                    {/* Icon container — switched from rounded-md to rounded-lg
+                        to mirror the card radius (8px / .rounded-card) for a
+                        cohesive surface language. Hover tints the icon stroke
+                        to the accent green so the affordance reads as a live
+                        accent, not a static mono glyph. The bg lifts from a
+                        flat fill to a subtle accent wash on hover too. */}
                     <span
-                      className="shrink-0 w-9 h-9 rounded-md liquid-glass flex items-center justify-center text-primary transition-colors duration-300 group-hover:text-primary"
+                      className="shrink-0 w-9 h-9 rounded-lg liquid-glass flex items-center justify-center text-tertiary transition-[color,background-color,box-shadow] duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_0_0_1px_rgb(var(--accent-base)/0.30)]"
                       aria-hidden="true"
                     >
                       {v.icon}
                     </span>
-                    <span className="text-xs uppercase tracking-[0.16em] font-semibold text-tertiary tnum">
+                    <span className="text-xs uppercase tracking-[0.16em] font-semibold text-tertiary tnum transition-colors duration-300 group-hover:text-secondary">
                       {v.num} / 04
                     </span>
                   </div>

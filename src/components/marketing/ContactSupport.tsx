@@ -46,6 +46,9 @@ const CARDS: Card[] = [
     ctaEn: "Write us",
     href: "mailto:soporte@tradingjournal.app",
   },
+  // `href="#"` for the two cards below is intentional (R20-2b): the docs
+  // portal and the Discord/Telegram community are not live yet. Replace
+  // with real URLs when those land.
   {
     icon: BookOpen,
     titleEs: "Documentación",
@@ -126,7 +129,7 @@ export function ContactSupport() {
                   whileHover={reduce ? undefined : { y: -4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                   aria-label={`${title} — ${cta}`}
-                  className="group relative block liquid-glass depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--divider)/0.20)] hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
+                  className="group relative block liquid-glass depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)] hover:shadow-[0_12px_36px_rgb(var(--accent-base)/0.14)]"
                 >
                   {/* Hover accent sweep */}
                   <span
@@ -139,8 +142,13 @@ export function ContactSupport() {
                   />
 
                   <div className="flex items-start gap-4">
+                    {/* Icon container — accent-tinted on hover so the icon
+                        "lights up" in the brand green when the card is
+                        hovered. Adds a soft accent drop-shadow on hover
+                        to deepen the lift and tie the icon to the accent
+                        sweep on the top edge (R20-3c). */}
                     <span
-                      className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary group-hover:bg-[rgb(var(--divider)/0.08)] group-hover:border-[rgb(var(--divider)/0.20)] transition-colors"
+                      className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:border-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_1px_0_rgb(var(--divider)/0.10),0_4px_14px_-4px_rgb(var(--accent-base)/0.30)] transition-[background-color,border-color,box-shadow,color] duration-300"
                       aria-hidden="true"
                     >
                       <Icon className="size-5" />

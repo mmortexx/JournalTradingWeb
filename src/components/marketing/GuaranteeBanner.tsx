@@ -33,6 +33,18 @@ export function GuaranteeBanner() {
             whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
             className="relative liquid-glass depth-2 rounded-card p-5 md:p-6 overflow-hidden"
           >
+            {/* Accent-tinted radial wash in the upper-right corner — adds
+                depth without breaking the dark-premium palette. Reads as a
+                soft accent halo behind the shield stat chip on the right
+                side of the banner (R20-3c). */}
+            <div
+              aria-hidden="true"
+              className="absolute -top-24 -right-16 w-[320px] h-[200px] rounded-full blur-[80px] pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(circle, rgb(var(--accent-base) / 0.18), transparent 70%)",
+              }}
+            />
             {/* Accent sweep — a thin diagonal gradient that wipes across the
                 top edge on view. Purely decorative. */}
             <motion.div
@@ -52,8 +64,20 @@ export function GuaranteeBanner() {
             <div className="relative flex flex-col md:flex-row md:items-center gap-5 md:gap-6">
               {/* Shield + headline */}
               <div className="flex items-center gap-4 md:gap-5 md:flex-1">
+                {/* Icon container — refined with an accent-tinted gradient
+                    fill + accent border + inset accent ring so the shield
+                    reads as a premium crest rather than a neutral chip.
+                    Ties the banner to the accent palette used across the
+                    rest of the pricing page (R20-3c). */}
                 <span
-                  className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary"
+                  className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-lg border text-[rgb(var(--accent-base))]"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgb(var(--accent-base) / 0.18), rgb(var(--accent-base) / 0.06))",
+                    borderColor: "rgb(var(--accent-base) / 0.32)",
+                    boxShadow:
+                      "inset 0 1px 0 rgb(var(--divider) / 0.10), 0 4px 14px -4px rgb(var(--accent-base) / 0.25)",
+                  }}
                   aria-hidden="true"
                 >
                   <ShieldIcon />

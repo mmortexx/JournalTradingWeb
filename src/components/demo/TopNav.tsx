@@ -142,7 +142,7 @@ export function TopNav() {
               aria-controls="demo-tabpanel"
               tabIndex={active ? 0 : -1}
               onClick={() => setPage(item.key)}
-              className={`relative h-9 px-3 rounded-md flex items-center gap-2 text-[13px] font-medium transition-colors whitespace-nowrap ${
+              className={`relative h-9 px-3 rounded-md flex items-center gap-2 text-[13px] font-medium transition-colors whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.45)] focus-visible:ring-offset-0 ${
                 active
                   ? "text-primary"
                   : "text-tertiary hover:text-secondary hover:bg-white/5"

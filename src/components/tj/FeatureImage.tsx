@@ -48,11 +48,39 @@ export function FeatureImage({
   const isContain = fit === "contain";
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 1.05 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      // Reveal animation — tuned per fit mode. Cover mode keeps the
+      // cinematic scale-1.05→1.0 zoom-out (art/stock art). Contain mode
+      // drops the scale entirely (a 5% zoom on a letterboxed screenshot
+      // visibly clips the screenshot's edge during the reveal) and uses a
+      // pure opacity + 6px lift, so the WHOLE screenshot is visible at
+      // every frame and the reveal reads as a gentle settle, not a crop.
+      initial={isContain ? { opacity: 0, y: 6 } : { opacity: 0, scale: 1.05 }}
+      whileInView={isContain ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`overflow-hidden rounded-card ${isContain ? "bg-[color-mix(in_srgb,var(--surface)_92%,transparent)]" : ""} ${className}`}
+      className={`overflow-hidden rounded-card ${className}`}
+      style={
+        isContain
+          ? {
+              // Contain-mode background: a theme-aware surface fill (92%
+              // alpha so the glass surface beneath reads through subtly) +
+              // a faint radial vignette layered ON TOP of the fill but
+              // UNDER the screenshot. CSS backgrounds stack first→last so
+              // the radial-gradient is painted last (closest to viewer)
+              // within the wrapper's own background layer; the <Image
+              // fill> then paints on top of ALL backgrounds, so the
+              // vignette only colors the letterbox area where the
+              // screenshot doesn't cover. The vignette is so subtle
+              // (alpha 0.10 → 0) that it just nudges the eye to perceive
+              // the screenshot as centered on a soft halo rather than
+              // floating on a flat tile — important for screenshots whose
+              // own background is near-black and would otherwise blend
+              // into the letterbox.
+              background:
+                "radial-gradient(78% 72% at 50% 50%, transparent 58%, rgb(var(--tint) / 0.10) 100%), color-mix(in srgb, var(--surface) 92%, transparent)",
+            }
+          : undefined
+      }
     >
       <Image
         src={src}

@@ -234,14 +234,19 @@ export function ComparisonSlider() {
                     "radial-gradient(120% 80% at 100% 0%, rgb(var(--accent-base) / 0.18), transparent 60%)",
                 }}
               />
-              {/* Header chip top-right */}
-              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.20)]">
+              {/* Header chip top-right — R20-3b: switched the After chip from
+                  neutral divider bg to accent-tinted bg/border so the two chips
+                  read as a symmetric red↔green pair (Before red / After accent).
+                  bg divider/0.05 → accent/0.10; border divider/0.20 → accent/0.30;
+                  label text-primary → text-accent so the chip colour-blocks
+                  correctly with the green-tinted After surface. */}
+              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-base)/0.10)] border border-[rgb(var(--accent-base)/0.30)]">
                 <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-pos/15 text-pnl-pos">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
-                <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary">
+                <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[rgb(var(--accent-base))]">
                   {es ? "Después" : "After"}
                 </span>
               </div>
@@ -270,7 +275,6 @@ export function ComparisonSlider() {
             <motion.div
               className="absolute inset-0"
               style={{ clipPath: beforeClip }}
-              aria-hidden="true"
             >
               {/* Muted OPAQUE surface — sits ABOVE the after layer and must
                   mask it completely (if it were translucent, the ✓ list se
@@ -331,20 +335,31 @@ export function ComparisonSlider() {
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={ariaPct}
+              aria-valuetext={es ? `${ariaPct}% mostrado` : `${ariaPct}% shown`}
               aria-orientation="horizontal"
               onPointerDown={startDrag}
               onKeyDown={onKeyDown}
               style={{ left: handleLeft, touchAction: "none" }}
-              className="absolute top-0 bottom-0 z-30 -translate-x-1/2 w-1 cursor-ew-resize bg-[rgb(var(--divider)/0.60)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.60)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              // R20-3b: handle line tinted with a touch of accent (divider/60 →
+              //   divider/70 + accent/15 overlay via the glow span below) so the
+              //   affordance reads as part of the site’s accent system rather
+              //   than a neutral rule. Hover/focus ring widened 2 → 3 with
+              //   offset for clearer grab affordance.
+              className="group/handle absolute top-0 bottom-0 z-30 -translate-x-1/2 w-1 cursor-ew-resize bg-[rgb(var(--divider)/0.70)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.60)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent transition-[background-color] duration-200 hover:bg-[rgb(var(--accent-base)/0.55)]"
             >
-              {/* Soft glow along the line */}
+              {/* Soft glow along the line — R20-3b: bumped divider/30 →
+                  accent/35 so the glow reads as accent light rather than
+                  neutral haze. */}
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 -left-1 -right-1 blur-[3px] bg-[rgb(var(--divider)/0.30)]"
+                className="absolute inset-y-0 -left-1 -right-1 blur-[3px] bg-[rgb(var(--accent-base)/0.35)] opacity-70 group-hover/handle:opacity-100 transition-opacity duration-200"
               />
-              {/* Circular grip with double arrows */}
+              {/* Circular grip with double arrows — R20-3b: refined the grip.
+                  Added group-hover/handle:scale-105 + a thin accent inner
+                  ring (ring-1 ring-accent/40) so the grip lifts visibly on
+                  hover. Outer accent shadow kept (the signature accent halo). */}
               <span
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-[rgb(var(--divider)/0.30)] shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)]"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-[rgb(var(--divider)/0.30)] ring-1 ring-[rgb(var(--accent-base)/0.40)] shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/handle:scale-105"
                 aria-hidden="true"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

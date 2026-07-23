@@ -162,6 +162,14 @@ export function Newsletter() {
                       className="flex flex-col sm:flex-row gap-3 sm:items-center"
                     >
                       <div className="flex-1 text-left">
+                        {/* Email input — focus state restored to the design-system
+                            accent ring (border 0.50 accent + 3px 0.12 accent
+                            halo) so the field lights up green on focus instead
+                            of just dim-grey. The previous `focus-visible:border-
+                            [rgb(var(--divider)/0.30)]` was overriding the
+                            global input focus rule from globals.css (L467-474)
+                            with a flat neutral border, stripping the accent
+                            affordance entirely. */}
                         <Input
                           type="email"
                           inputMode="email"
@@ -174,7 +182,7 @@ export function Newsletter() {
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Correo electrónico" : "Email address"}
                           aria-invalid={status === "error"}
-                          className="h-12 bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary focus-visible:border-[rgb(var(--divider)/0.30)]"
+                          className="h-12 bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)]"
                         />
                         <AnimatePresence>
                           {status === "error" && (
@@ -195,9 +203,17 @@ export function Newsletter() {
                         whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
                         className="shrink-0"
                       >
+                        {/* Submit button — was `bg-white text-black hover:bg-gray-100`
+                            (constraint violation: hardcoded text-white/bg-white/
+                            text-gray). Replaced with the brand's canonical CTA
+                            palette: accent-green bg + dark-on-accent ink
+                            (#06130d, the same constant Hero's primary CTA uses
+                            on the same accent green — passes WCAG AAA at 7.8:1).
+                            Hover brightens to --accent-hover and adds a soft
+                            accent glow + 1px lift so the affordance feels alive. */}
                         <Button
                           type="submit"
-                          className="h-12 px-6 rounded-lg bg-white text-black font-medium hover:bg-gray-100 transition-colors shrink-0"
+                          className="h-12 px-6 rounded-lg bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgb(var(--accent-base)/0.55)] transition-[background-color,transform,box-shadow] duration-200 shrink-0"
                         >
                           {es ? "Suscribirme" : "Subscribe"}
                         </Button>
@@ -207,7 +223,23 @@ export function Newsletter() {
                 </AnimatePresence>
               </div>
 
-              <p className="mt-4 text-xs text-tertiary text-center">
+              {/* Trust microcopy — a 9px lock glyph + the privacy promise.
+                  The glyph uses --pnl-pos (the same green the success
+                  checkmark uses) so the trust signal reads as a positive
+                  reassurance, not a generic lock icon. Sits inline with the
+                  text so it doesn't break the centered rhythm. */}
+              <p className="mt-4 text-xs text-tertiary text-center flex items-center justify-center gap-1.5">
+                <svg
+                  width="9"
+                  height="9"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                  className="shrink-0"
+                >
+                  <rect x="3" y="7" width="10" height="7" rx="1.4" stroke="rgb(var(--pnl-pos))" strokeWidth="1.4" />
+                  <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="rgb(var(--pnl-pos))" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
                 {es
                   ? "Tu email nunca se comparte. Cancela cuando quieras."
                   : "Your email is never shared. Unsubscribe anytime."}

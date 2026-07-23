@@ -1,31 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 
 /**
- * SideRail — raíl lateral fijo del HTML de referencia (solo home):
- * puntos + etiquetas mono "01 · Inicio … 07 · Precios". Igual que en
- * el HTML, el raíl es NAVEGACIÓN, no solo scroll: los tres primeros
- * puntos anclan a las secciones de la home (con scroll-spy), y los
- * cuatro siguientes navegan a las páginas reales (/features con sus
- * anclas y /pricing).
+ * SideRail — raíl lateral fijo (solo home, ≥1100 px) que indexa ÚNICAMENTE
+ * las secciones anchables de esta página. No es un índice del sitio: las
+ * 9 rutas reales (/features, /features/metricas, /features/disciplina,
+ * /features/seguridad, /pricing, /demo, /about, /faq) ya viven en el
+ * megamenú del Navbar, en el Footer, en el CommandPalette (⌘K) y en los
+ * atajos `g`+letra de GlobalShortcuts. Duplicarlas aquí era justo lo que
+ * generaba la sensación de "índice con secciones que no existen".
  *
- * Oculto por debajo de 1100 px (igual que `.tj-rail` en el HTML) para
- * no pisar el contenido en pantallas estrechas.
+ * Quedan 2 anclas locales:
+ *   01 · Inicio  (#top)      → Hero
+ *   02 · Vistazo (#overview) → OverviewApp
+ *
+ * La sección HomeDemo (#demo) sigue siendo alcanzable haciendo scroll,
+ * pero no la indexamos: llamarla "Demo" colisionaba con la ruta /demo
+ * (página independiente). Un índice honesto de 2 puntos es mejor que
+ * uno inflado y ambiguo de 7.
+ *
+ * Oculto por debajo de 1100 px para no pisar el contenido en pantallas
+ * estrechas.
  */
 const ANCHORS = [
   { id: "top", num: "01", es: "Inicio", en: "Home" },
   { id: "overview", num: "02", es: "Vistazo", en: "Overview" },
-  { id: "demo", num: "03", es: "Demo", en: "Demo" },
-] as const;
-
-const PAGES = [
-  { href: "/features", num: "04", es: "Características", en: "Features" },
-  { href: "/features/metricas", num: "05", es: "Métricas", en: "Metrics" },
-  { href: "/features/disciplina", num: "06", es: "Disciplina", en: "Discipline" },
-  { href: "/pricing", num: "07", es: "Precios", en: "Pricing" },
 ] as const;
 
 export function SideRail() {
@@ -59,18 +60,21 @@ export function SideRail() {
     history.replaceState(null, "", `#${id}`);
   };
 
+  // Inactive label/dot use --ink-2 (not --ink-3) at opacity 0.75 (not 0.6)
+  // so contrast stays ≥ WCAG AA for 10.5 px text in light theme, where
+  // --ink-3 (#797d80) at 60 % over white falls below the 4.5:1 threshold.
   const labelStyle = (on: boolean) =>
     ({
       fontSize: 10.5,
       letterSpacing: "0.08em",
-      color: on ? "var(--ink)" : "var(--ink-3)",
+      color: on ? "var(--ink)" : "var(--ink-2)",
       fontWeight: on ? 600 : 400,
-      opacity: on ? 1 : 0.6,
+      opacity: on ? 1 : 0.75,
     }) as const;
 
   return (
     <nav
-      aria-label={es ? "Índice de secciones" : "Section index"}
+      aria-label={es ? "Secciones de esta página" : "Sections on this page"}
       className="fixed left-[22px] top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-[3px] min-[1100px]:flex"
     >
       {ANCHORS.map((s) => {
@@ -86,7 +90,7 @@ export function SideRail() {
               aria-hidden
               className="h-[7px] w-[7px] flex-none rounded-full transition-[background,border-color,transform] duration-250"
               style={{
-                border: `1.5px solid ${on ? "rgb(var(--accent-base))" : "var(--ink-3)"}`,
+                border: `1.5px solid ${on ? "rgb(var(--accent-base))" : "var(--ink-2)"}`,
                 background: on ? "rgb(var(--accent-base))" : "transparent",
                 transform: on ? "scale(1.3)" : "scale(1)",
               }}
@@ -100,25 +104,6 @@ export function SideRail() {
           </button>
         );
       })}
-      {PAGES.map((p) => (
-        <Link
-          key={p.href}
-          href={p.href}
-          className="group flex items-center gap-[9px] py-[5px]"
-        >
-          <span
-            aria-hidden
-            className="h-[7px] w-[7px] flex-none rounded-full transition-[border-color] duration-200 group-hover:[border-color:rgb(var(--accent-base))]"
-            style={{ border: "1.5px solid var(--ink-3)" }}
-          />
-          <span
-            className="tnum whitespace-nowrap opacity-60 transition-opacity duration-200 group-hover:opacity-100"
-            style={{ fontSize: 10.5, letterSpacing: "0.08em", color: "var(--ink-3)" }}
-          >
-            {p.num} · {es ? p.es : p.en}
-          </span>
-        </Link>
-      ))}
     </nav>
   );
 }

@@ -18,11 +18,51 @@ export function HomeDemo() {
       id="demo"
       className="relative overflow-hidden border-b scroll-mt-16"
       style={{
-        padding: "96px 24px 72px",
+        // Responsive vertical rhythm: top 72–116px, bottom 56–88px,
+        // both scaling with viewport width so the demo breathes on
+        // large desktops and tightens gracefully on mobile. Horizontal
+        // padding 20–32px (was a fixed 24px) keeps the demo frame from
+        // kissing the viewport edge on small screens while capping the
+        // inset on ultra-wide ones. The prior fixed 96/24/72 left the
+        // section feeling either cramped (mobile) or under-padded
+        // (≥1600px desktops) depending on the viewport.
+        padding:
+          "clamp(72px, 9vw, 116px) clamp(20px, 4vw, 32px) clamp(56px, 6vw, 88px)",
         borderColor: "rgb(var(--divider) / 0.06)",
       }}
     >
-      <div className="mx-auto max-w-[1280px]">
+      {/* Top accent hairline — a soft gradient rule that eases the eye
+          into the demo section. Mirrors the closing hairline at the
+          bottom of OverviewApp so the two heavy sections frame each
+          other. Fades to transparent at both edges so it floats rather
+          than terminating in a hard line. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-0 right-0 top-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgb(var(--accent-base) / 0.35) 30%, rgb(var(--accent-base) / 0.35) 70%, transparent)",
+        }}
+      />
+      {/* Soft accent halo at the top of the section — pulls the eye
+          downward into the demo frame. Sits behind the content (z-0)
+          with the content lifted to z-10. The 0.4 opacity + 48px blur
+          reads as a faint glow rather than a solid tint, so it never
+          competes with the demo's own chrome. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+        style={{
+          width: "min(900px, 80%)",
+          height: 240,
+          background:
+            "radial-gradient(50% 50% at 50% 0%, color-mix(in oklab, rgb(var(--accent-base)) 16%, transparent), transparent 70%)",
+          filter: "blur(48px)",
+          opacity: 0.4,
+          zIndex: 0,
+        }}
+      />
+      <div className="relative z-10 mx-auto max-w-[1280px]">
         <div className="mb-10 max-w-[760px]">
           <div className="mb-5 inline-flex items-center gap-3">
             <span

@@ -48,35 +48,61 @@ export function WindowFrame({
 }: WindowFrameProps) {
   return (
     <div
+      data-tj-window-frame=""
       className={`relative rounded-xl overflow-hidden border ${className}`}
       style={{
         borderColor: "rgb(var(--divider) / 0.13)",
         background: "color-mix(in srgb, var(--surface) 70%, transparent)",
+        // Two-layer frame shadow: a tight 1px top inset highlight (the
+        // machined key-light edge that catches where light hits a real
+        // window frame) + a soft ambient drop shadow underneath. The drop
+        // shadow stays subtle in dark theme (where the canvas is already
+        // near-black) and is overridden stronger in light theme via the
+        // [data-tj-window-frame] rule in globals.css so a near-black
+        // 0.35-alpha shadow doesn't vanish against the bright canvas.
         boxShadow:
           "inset 0 1px 0 rgb(var(--divider) / 0.14), 0 8px 28px -12px rgb(0 0 0 / 0.35)",
       }}
     >
-      {/* Title bar */}
+      {/* Title bar — surface-2 fill at 80% with a 1px bottom hairline +
+          a subtle 1px top inset highlight that reads as the machined top
+          edge of a real WinUI/Acrylic title bar (matches the .liquid-glass
+          ::after inset highlight convention used across the site). */}
       <div
-        className="flex items-center gap-2 px-3 h-8 select-none border-b"
+        className="flex items-center gap-2 px-3 h-8 select-none border-b relative"
         style={{
           background: "color-mix(in srgb, var(--surface-2) 80%, transparent)",
           borderColor: "rgb(var(--divider) / 0.08)",
+          boxShadow: "inset 0 1px 0 rgb(var(--divider) / 0.10)",
         }}
       >
-        {/* Traffic lights — subtle, not macOS-bright. */}
+        {/* Traffic lights — three subtle P&L-tinted dots, each with a
+            1px inset highlight + faint ring so they read as glassy beads
+            instead of flat color swatches. */}
         <span className="flex items-center gap-1.5" aria-hidden="true">
           <span
             className="block w-2.5 h-2.5 rounded-full"
-            style={{ background: "rgb(var(--pnl-neg) / 0.7)" }}
+            style={{
+              background: "rgb(var(--pnl-neg) / 0.7)",
+              boxShadow:
+                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.08)",
+            }}
           />
           <span
             className="block w-2.5 h-2.5 rounded-full"
-            style={{ background: "rgb(var(--pnl-warn) / 0.7)" }}
+            style={{
+              background: "rgb(var(--pnl-warn) / 0.7)",
+              boxShadow:
+                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.08)",
+            }}
           />
           <span
             className="block w-2.5 h-2.5 rounded-full"
-            style={{ background: "rgb(var(--pnl-pos) / 0.7)" }}
+            style={{
+              background: "rgb(var(--pnl-pos) / 0.7)",
+              boxShadow:
+                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.08)",
+            }}
           />
         </span>
         {/* Centered caption */}

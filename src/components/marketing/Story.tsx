@@ -170,9 +170,13 @@ export function Story() {
 
         {/* RIGHT — timeline */}
         <div className="relative">
-          {/* Vertical track line — static white gradient from top to bottom. */}
+          {/* Vertical track line — symmetric neutral hairline that fades in at
+              the top and out at the bottom so it reads as a floating rule
+              connecting the dots, not a hard strip clipped to the section.
+              Opacity peaks at 0.45 mid-rail; both edges dissolve into the
+              backdrop so the first/last dots don't sit on a hard line end. */}
           <span
-            className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-[rgb(var(--divider)/0.60)] via-[rgb(var(--divider)/0.30)] to-transparent"
+            className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-transparent via-[rgb(var(--divider)/0.45)] to-transparent"
             aria-hidden="true"
           />
 
@@ -194,19 +198,32 @@ export function Story() {
                     }}
                     aria-hidden="true"
                   />
-                  {/* Dot pulse halo for extra emphasis */}
+                  {/* Dot pulse halo — softened (scale 2.1, initial opacity
+                      0.30) so the emphasis reads as a single quiet breath
+                      rather than a loud pop competing with the dot itself.
+                      Sits BEHIND the dot via the same absolute position. */}
                   <motion.span
                     aria-hidden="true"
                     className={`absolute left-0 top-1.5 w-[15px] h-[15px] rounded-full ${toneDot[p.tone]} pointer-events-none`}
-                    initial={{ scale: 0.6, opacity: 0.4 }}
-                    whileInView={{ scale: 2.4, opacity: 0 }}
+                    initial={{ scale: 0.6, opacity: 0.30 }}
+                    whileInView={{ scale: 2.1, opacity: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
-                    transition={{ delay: i * 0.08 + 0.2, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ delay: i * 0.08 + 0.2, duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
                   />
                   <motion.div
                     whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                    className="liquid-glass depth-2 rounded-card p-5"
+                    className="group relative liquid-glass depth-2 rounded-card p-5 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)] hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.40)]"
                   >
+                    {/* Accent corner glow — fades in on hover to give the
+                        card a focal lift beyond the spring translate. */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute -right-10 -top-10 w-28 h-28 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none"
+                      style={{
+                        background:
+                          "radial-gradient(circle, rgb(var(--accent-base) / 0.30), transparent 70%)",
+                      }}
+                    />
                     <div className="flex items-center justify-between gap-3">
                       <span
                         className={`text-[10px] uppercase tracking-[0.16em] font-semibold tnum ${toneText[p.tone]}`}

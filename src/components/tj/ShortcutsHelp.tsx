@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 
@@ -23,6 +23,8 @@ export function ShortcutsHelp() {
   const { lang } = useLang();
   const es = lang === "es";
   const [open, setOpen] = useState(false);
+
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Open whenever any code dispatches `tj:open-shortcuts-help`.
   useEffect(() => {
@@ -48,6 +50,62 @@ export function ShortcutsHelp() {
     return () => {
       delete document.body.dataset.shortcutsHelpOpen;
       window.removeEventListener("keydown", onEsc, true);
+    };
+  }, [open]);
+
+  // Focus trap + focus restore (mirrors the Navbar mobile-drawer pattern,
+  // Navbar.tsx ~L82-128, and the CommandPalette trap). While the overlay
+  // is open, Tab / Shift+Tab cycle within the panel — the body backdrop
+  // and underlying page can't be reached. On close, focus is returned to
+  // whatever element opened the overlay so keyboard users keep their
+  // place on the page. Escape is handled by the capture-phase effect
+  // above (which also stops propagation so this handler never sees it).
+  useEffect(() => {
+    if (!open) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    // Move initial focus into the panel (first focusable — the close X
+    // button — so the user can immediately read the dialog with their
+    // AT and dismiss it with one Tab + Enter if they wish).
+    const raf = requestAnimationFrame(() => {
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = getFocusables(panel);
+      const target = focusables[0] ?? panel;
+      target.focus();
+    });
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = getFocusables(panel);
+      if (focusables.length === 0) {
+        e.preventDefault();
+        panel.focus();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      const inside = panel.contains(active);
+      if (e.shiftKey) {
+        if (!inside || active === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (!inside || active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("keydown", onKey);
+      previouslyFocused?.focus?.();
     };
   }, [open]);
 
@@ -190,6 +248,8 @@ export function ShortcutsHelp() {
 
           {/* Panel — liquid-glass card, springy fade + scale + lift entrance */}
           <motion.div
+            ref={panelRef}
+            tabIndex={-1}
             className="relative w-full max-w-md liquid-glass rounded-card shadow-2xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.96, y: -8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -273,6 +333,33 @@ function Kbd({ children }: { children: ReactNode }) {
       {children}
     </kbd>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Focus-trap helper (mirrors Navbar.tsx getFocusables)               */
+/* ------------------------------------------------------------------ */
+
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  'input:not([disabled]):not([type="hidden"])',
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+  "audio[controls]",
+  "video[controls]",
+  "details > summary:first-of-type",
+].join(",");
+
+function getFocusables(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((el) => {
+    const rects = el.getClientRects();
+    if (rects.length === 0) return false;
+    const { width, height } = rects[0];
+    return width > 0 && height > 0;
+  });
 }
 
 /**

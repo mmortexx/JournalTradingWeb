@@ -155,8 +155,12 @@ export function Milestones() {
                       )}
                     </div>
 
-                    {/* Card */}
-                    <div className="mt-3 liquid-glass depth-1 rounded-card p-4 transition-shadow duration-300 hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.4)] hover:border-[rgb(var(--divider)/0.20)]">
+                    {/* Card — hover now also lifts (-translate-y-1) for
+                        tactile parity with the Story / Values cards that use
+                        a spring y-shift. The shadow + border tokens stay
+                        accent-tinted so a past milestone reads as "shipped
+                        with energy" and the upcoming one stays muted. */}
+                    <div className="mt-3 liquid-glass depth-1 rounded-card p-4 transition-[box-shadow,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.4)] hover:border-[rgb(var(--accent-base)/0.30)]">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-[10px] uppercase tracking-[0.16em] font-semibold text-primary tnum">
                           {m.date}
@@ -165,7 +169,7 @@ export function Milestones() {
                           className={`pill text-[10px] uppercase tracking-[0.12em] tnum ${
                             isPast
                               ? "bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)]"
-                              : "bg-[rgb(var(--divider)/0.05)] text-tertiary border border-dashed border-[rgb(var(--divider)/0.15)]"
+                              : "bg-[rgb(var(--divider)/0.05)] text-tertiary border border-dashed border-[rgb(var(--divider)/0.22)]"
                           }`}
                         >
                           {isPast
@@ -201,17 +205,23 @@ export function Milestones() {
           </div>
         </Reveal>
 
-        {/* Footer hint */}
+        {/* Footer hint — legend dots separated by a 1px vertical hairline
+            (divider token at 0.12) instead of a bare "·" glyph, so the
+            rhythm matches the .divider-grad separator used across the
+            site's footer codas. Hidden on touch widths where the row wraps. */}
         <Reveal delay={0.3}>
-          <div className="mt-10 flex flex-wrap items-center gap-4 text-xs text-tertiary">
+          <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-tertiary">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
               {es ? "En tu mano hoy" : "In your hands today"}
             </span>
-            <span aria-hidden="true">·</span>
+            <span
+              aria-hidden="true"
+              className="hidden sm:block h-3 w-px bg-[rgb(var(--divider)/0.12)]"
+            />
             <span className="flex items-center gap-2">
               <span
-                className="w-2 h-2 rounded-full border border-[rgb(var(--divider)/0.20)] bg-background"
+                className="w-2 h-2 rounded-full border border-[rgb(var(--divider)/0.22)] bg-background"
                 aria-hidden="true"
               />
               {es ? "En camino" : "On the way"}

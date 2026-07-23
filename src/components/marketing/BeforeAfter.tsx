@@ -105,7 +105,11 @@ export function BeforeAfter() {
               whileInView={{ opacity: 0.7, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.7, ease: EASE }}
-              className="relative flex-1 rounded-card liquid-glass depth-2 overflow-hidden border border-pnl-neg/25 saturate-[0.85] transition-shadow duration-300"
+              // R20-3b: border bumped pnl-neg/25 → 30 so the Before card’s red
+              // edge reads as a hard “past / avoided” signal even at the
+              // rest opacity (0.7); previously the border faded almost to
+              // invisible against the dark backdrop.
+              className="relative flex-1 rounded-card liquid-glass depth-2 overflow-hidden border border-pnl-neg/30 saturate-[0.85] transition-shadow duration-300"
             >
               {/* Soft red wash */}
               <div
@@ -126,7 +130,11 @@ export function BeforeAfter() {
                     transition={{ delay: 0.15 + i * 0.08, duration: 0.5, ease: EASE }}
                     className="flex items-start gap-3"
                   >
-                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-neg/15 items-center justify-center mt-0.5">
+                    {/* R20-3b: ✗ icon container — added ring-1 ring-pnl-neg/35
+                        so the disc reads as a stamped seal against the
+                        desaturated Before card (the bg-pnl-neg/15 fill alone
+                        was barely distinguishable from the red wash behind it). */}
+                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-neg/15 ring-1 ring-pnl-neg/35 items-center justify-center mt-0.5">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                         <path d="M3 3l6 6M9 3l-6 6" stroke="rgb(var(--pnl-neg))" strokeWidth="2" strokeLinecap="round" />
                       </svg>
@@ -186,7 +194,12 @@ export function BeforeAfter() {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
               whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="relative flex-1 rounded-card liquid-glass depth-3 overflow-hidden border border-[rgb(var(--divider)/0.25)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              // R20-3b: border switched neutral divider → accent-tinted so the
+              // After card’s edge matches the green ✓ icons (previously the
+              // neutral border fought the green wash and the card read as
+              // “unbranded glass”). Accent at 0.28 so it never competes with
+              // the static top-line highlight above.
+              className="relative flex-1 rounded-card liquid-glass depth-3 overflow-hidden border border-[rgb(var(--accent-base)/0.28)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{
                 boxShadow:
                   "0 0 0 1px rgb(var(--accent-base) / 0.20), 0 14px 44px -8px rgb(var(--accent-base) / 0.35)",
@@ -220,7 +233,10 @@ export function BeforeAfter() {
                     transition={{ delay: 0.25 + i * 0.08, duration: 0.5, ease: EASE }}
                     className="flex items-start gap-3"
                   >
-                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-pos/15 items-center justify-center mt-0.5">
+                    {/* R20-3b: ✓ icon container — ring-1 ring-pnl-pos/40 for
+                        parity with the ✗ container polish above; the disc
+                        reads as a confirmed-state badge rather than a flat tint. */}
+                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-pos/15 ring-1 ring-pnl-pos/40 items-center justify-center mt-0.5">
                       <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                         <path d="M2 6.5l2.5 2.5L10 3.5" stroke="rgb(var(--pnl-pos))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>

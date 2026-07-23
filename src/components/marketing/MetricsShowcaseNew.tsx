@@ -88,7 +88,12 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
             ].map((m) => (
               <li
                 key={m.l}
-                className="flex items-center justify-between gap-3"
+                // R20-3b: lifted the metric tiles from a flat surface to a
+                // depth-1 hover with an accent-tinted inner ring on hover,
+                // so the four KPIs read as tappable stat cards rather than
+                // inert table cells. Border + bg kept identical to before so
+                // the rest-state visual is unchanged.
+                className="group/metric relative flex items-center justify-between gap-3 transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
                 style={{
                   padding: "14px 16px",
                   borderRadius: 12,
@@ -98,8 +103,9 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                   WebkitBackdropFilter: "blur(12px)",
                 }}
               >
-                <span style={{ fontSize: 13, color: "var(--ink-2)" }}>{m.l}</span>
-                <span className="tnum" style={{ fontSize: 19, fontWeight: 700, color: m.c }}>{m.v}</span>
+                <span className="pointer-events-none absolute inset-0 rounded-[12px] opacity-0 group-hover/metric:opacity-100 transition-opacity duration-300" aria-hidden style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.35)" }} />
+                <span className="relative" style={{ fontSize: 13, color: "var(--ink-2)" }}>{m.l}</span>
+                <span className="tnum relative" style={{ fontSize: 19, fontWeight: 700, color: m.c }}>{m.v}</span>
               </li>
             ))}
           </ul>
@@ -143,36 +149,53 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               {es ? "60 trades" : "60 trades"}
             </span>
           </div>
-          {/* Histograma hardcoded */}
+          {/* Histograma hardcoded — R20-3b: each bar now exposes a native
+              `title` tooltip with its R-bucket + approx trade count (out of
+              the 60-trades badge), plus a hover lift (translateY -3%) +
+              brightness bump so the histogram reads as interactive rather
+              than decorative. Bars remain aria-hidden (the labels row below
+              carries the semantics for AT). */}
           <div className="flex items-end gap-1.5" style={{ height: 160 }}>
             {[
-              14, 28, 46, 62, 80, 68, 52, 36, 20,
-            ].map((h, i) => (
-              <div
-                key={i}
-                className="flex-1 rounded-t relative"
-                style={{
-                  height: `${h}%`,
-                  background:
-                    i === 4
-                      ? "rgb(var(--accent-base))"
-                      : i < 4
-                        ? "color-mix(in oklab, rgb(var(--pnl-pos)) 70%, transparent)"
-                        : "color-mix(in oklab, rgb(var(--pnl-neg)) 60%, transparent)",
-                  opacity: 0.85,
-                }}
-                aria-hidden
-              >
-                {i === 4 && (
-                  <span
-                    className="tnum absolute -top-5 left-1/2 -translate-x-1/2"
-                    style={{ fontSize: 9, letterSpacing: "0.1em", color: "rgb(var(--accent-base))" }}
-                  >
-                    MODA
-                  </span>
-                )}
-              </div>
-            ))}
+              { h: 14, r: "−3R" },
+              { h: 28, r: "−2R" },
+              { h: 46, r: "−1R" },
+              { h: 62, r: "0R" },
+              { h: 80, r: "+1R" },
+              { h: 68, r: "+2R" },
+              { h: 52, r: "+3R" },
+              { h: 36, r: "+4R" },
+              { h: 20, r: "+5R" },
+            ].map((b, i) => {
+              const count = Math.round((b.h / 406) * 60);
+              return (
+                <div
+                  key={i}
+                  title={`${b.r} · ${es ? `${count} operaciones` : `${count} trades`}`}
+                  className="flex-1 rounded-t relative cursor-default transition-[transform,filter] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3%] hover:brightness-110"
+                  style={{
+                    height: `${b.h}%`,
+                    background:
+                      i === 4
+                        ? "rgb(var(--accent-base))"
+                        : i < 4
+                          ? "color-mix(in oklab, rgb(var(--pnl-pos)) 70%, transparent)"
+                          : "color-mix(in oklab, rgb(var(--pnl-neg)) 60%, transparent)",
+                    opacity: 0.85,
+                  }}
+                  aria-hidden
+                >
+                  {i === 4 && (
+                    <span
+                      className="tnum absolute -top-5 left-1/2 -translate-x-1/2"
+                      style={{ fontSize: 9, letterSpacing: "0.1em", color: "rgb(var(--accent-base))" }}
+                    >
+                      MODA
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
           <div className="mt-2 flex items-center justify-between">
             {["−3R", "−2R", "−1R", "0R", "+1R", "+2R", "+3R", "+4R", "+5R"].map((b) => (

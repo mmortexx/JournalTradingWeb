@@ -9,7 +9,7 @@ import { useLang } from "@/lib/i18n";
  * app/layout.tsx before <Navbar /> / <CommandPalette /> / etc.). Visually
  * hidden via Tailwind's `sr-only` utility until it receives keyboard
  * focus, at which point `focus:not-sr-only` swaps it to a visible,
- * fixed-position white pill at the top-left of the viewport so a
+ * fixed-position accent-green pill at the top-left of the viewport so a
  * keyboard user can bypass the navbar + footer and jump straight into
  * the main content area (`<main id="main-content">`).
  *
@@ -28,7 +28,7 @@ export function SkipLink() {
   return (
     <a
       href="#main-content"
-      className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-md focus:bg-white focus:text-black focus:text-sm focus:font-semibold focus:shadow-[0_8px_24px_rgb(255_255_255_/_0.35)]"
+      className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-md focus:bg-[rgb(var(--accent-base))] focus:text-[#06130d] focus:text-sm focus:font-semibold focus:shadow-[0_8px_24px_rgb(var(--accent-base)/_0.45)]"
     >
       {t("skipToContent")}
     </a>

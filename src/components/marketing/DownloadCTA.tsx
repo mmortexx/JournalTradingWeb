@@ -108,27 +108,38 @@ export function DownloadCTA() {
                 )}
               </p>
 
-              {/* System requirements */}
+              {/* System requirements — refined spec sheet row. Each spec
+                  is a CheckSmall icon (pnl-pos green) + a tnum label, with
+                  refined middle separators that use the neutral divider token
+                  instead of `text-tertiary opacity-50` for a crisper, more
+                  institutional read (R20-3c). */}
               <div className="mt-5 flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-2 text-xs text-tertiary">
                 <span className="inline-flex items-center gap-1.5">
                   <CheckSmall />
                   <span className="tnum">Windows 10/11</span>
                 </span>
-                <span className="text-tertiary opacity-50" aria-hidden="true">·</span>
+                <span className="text-[rgb(var(--divider)/0.35)]" aria-hidden="true">·</span>
                 <span className="inline-flex items-center gap-1.5">
                   <CheckSmall />
                   <span className="tnum">64-bit</span>
                 </span>
-                <span className="text-tertiary opacity-50" aria-hidden="true">·</span>
+                <span className="text-[rgb(var(--divider)/0.35)]" aria-hidden="true">·</span>
                 <span className="inline-flex items-center gap-1.5">
                   <CheckSmall />
-                  <span className="tnum">50MB</span>
+                  <span className="tnum">50 MB</span>
                 </span>
               </div>
             </div>
 
             {/* Right: download button + meta */}
             <div className="shrink-0 flex flex-col items-center md:items-end gap-3">
+              {/* Download CTA — `href="#"` is intentional (R20-2b): the Windows
+                  installer is not yet shipped. Replace with the real .exe URL
+                  when the build is released. See header comment for context.
+                  Button uses the theme's primary text/bg tokens (white-on-dark
+                  in dark theme, near-black on paper in light theme) with an
+                  accent-tinted hover shadow + lift for a premium pressable
+                  affordance (R20-3c). */}
               <motion.a
                 href={asset("#")}
                 whileHover={
@@ -137,12 +148,12 @@ export function DownloadCTA() {
                     : { y: -2, transition: { type: "spring", stiffness: 300, damping: 20 } }
                 }
                 whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                className="group relative inline-flex items-center gap-3 px-8 py-3 rounded-lg bg-white text-black font-medium hover:bg-gray-100 transition-colors"
+                className="group relative inline-flex items-center gap-3 px-8 py-3 rounded-lg bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] font-medium transition-all duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-4px_rgb(var(--accent-base)/0.50)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <WindowsIcon className="shrink-0" />
                 <span>{es ? "Descargar para Windows" : "Download for Windows"}</span>
               </motion.a>
-              <span className="text-[11px] text-tertiary">
+              <span className="text-[11px] text-tertiary tnum">
                 {es ? "Instalador offline · sin conexión tras instalar" : "Offline installer · no connection after install"}
               </span>
             </div>

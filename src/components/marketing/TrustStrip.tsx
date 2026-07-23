@@ -61,7 +61,7 @@ export function TrustStrip() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-secondary text-sm"
+          className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3.5 text-secondary text-sm"
         >
           {items.map((item, i) => (
             <Fragment key={item.label}>
@@ -74,7 +74,7 @@ export function TrustStrip() {
                   delay: 0.15 + i * 0.08,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="flex items-center gap-2"
+                className="flex items-center gap-1.5"
               >
                 <span
                   className="text-primary shrink-0 inline-flex"
@@ -87,7 +87,7 @@ export function TrustStrip() {
               {i < items.length - 1 && (
                 <span
                   aria-hidden="true"
-                  className="hidden md:inline-block w-1 h-1 rounded-full bg-[rgb(var(--divider)/0.20)]"
+                  className="hidden md:inline-block w-1 h-1 rounded-full bg-[rgb(var(--divider)/0.30)]"
                 />
               )}
             </Fragment>

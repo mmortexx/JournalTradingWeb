@@ -132,7 +132,7 @@ export function TestimonialsWall() {
                 ease: [0.22, 1, 0.36, 1],
               }}
               whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="group relative liquid-glass depth-1 rounded-card p-5 mb-4 break-inside-avoid transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="group relative liquid-glass depth-2 rounded-card p-5 mb-4 break-inside-avoid transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
             >
               {/* Accent border glow on hover. */}
               <div
@@ -160,7 +160,7 @@ export function TestimonialsWall() {
                     </svg>
                   ))}
                 </div>
-                <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] flex items-center gap-1 text-[10px]">
+                <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] flex items-center gap-1 text-[10px] transition-[border-color,color] duration-300 hover:border-[rgb(var(--accent-base)/0.35)] hover:text-secondary">
                   <svg
                     width="9"
                     height="9"
@@ -187,10 +187,14 @@ export function TestimonialsWall() {
                 <span className="text-primary ml-1 text-base">”</span>
               </blockquote>
 
-              {/* Author — SVG-initials avatar + name + role. */}
+              {/* Author — SVG-initials avatar + name + role. Avatar text
+                  uses #06130d (the brand's dark-on-accent ink, same as
+                  Hero's primary CTA) so the initials read at WCAG AA on
+                  all 3 hues (accent/pos green + warn amber) in both themes.
+                  `text-white` was failing at 1.7:1 / 2.4:1 on the same bg. */}
               <div className="relative mt-4 pt-4 flex items-center gap-3 border-t">
                 <span
-                  className="relative w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+                  className="relative w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-[11px] font-bold text-[#06130d] shrink-0"
                   style={{ background: t.hue }}
                   aria-hidden="true"
                 >

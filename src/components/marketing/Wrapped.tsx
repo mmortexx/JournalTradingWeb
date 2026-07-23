@@ -56,7 +56,11 @@ export function Wrapped() {
           <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-pnl-pos break-words leading-tight">{topSetup.name}</span>
           <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum min-w-0">
             <Money value={topSetup.totalPnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
-            <span className="text-sm text-tertiary whitespace-nowrap">
+            {/* R20-3b: added tnum so the `count` and `winRate` digits align
+                with the adjacent Money figure — mixed proportional /
+                tabular figures in the same baseline row looked jittery when
+                the win-rate changed. */}
+            <span className="tnum text-sm text-tertiary whitespace-nowrap">
               {es ? `${topSetup.count} ops · ${(topSetup.winRate * 100).toFixed(0)}% win` : `${topSetup.count} trades · ${(topSetup.winRate * 100).toFixed(0)}% win`}
             </span>
           </span>
@@ -116,7 +120,9 @@ export function Wrapped() {
           <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-primary break-words leading-tight">{topInstrument.name}</span>
           <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum min-w-0">
             <Money value={topInstrument.totalPnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
-            <span className="text-sm text-tertiary whitespace-nowrap">
+            {/* R20-3b: tnum on the count chip — same rationale as the setup
+                card above. */}
+            <span className="tnum text-sm text-tertiary whitespace-nowrap">
               {es ? `${topInstrument.count} ops` : `${topInstrument.count} trades`}
             </span>
           </span>
@@ -196,9 +202,30 @@ export function Wrapped() {
                   }}
                 />
 
-                {/* Decorative corner glow */}
+                {/* Decorative corner glow — R20-3b: refined the pulse.
+                    Bumped size (w-40 → w-44), tightened the hover lift
+                    (opacity-50 → 65 + scale-125), and extended the
+                    transition to cover transform too so the bloom reads as
+                    a single motion rather than two. Rest opacity nudged down
+                    30 → 28 so the hover delta reads as a clearer "lights up". */}
                 <div
-                  className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-30 pointer-events-none transition-opacity group-hover:opacity-50"
+                  className="absolute -top-12 -right-12 w-44 h-44 rounded-full blur-3xl opacity-[0.28] pointer-events-none transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-[0.65] group-hover:scale-125"
+                  style={{
+                    background:
+                      c.tone === "pos"
+                        ? "radial-gradient(circle, rgb(var(--pnl-pos)), transparent 70%)"
+                        : c.tone === "warn"
+                        ? "radial-gradient(circle, rgb(var(--pnl-warn)), transparent 70%)"
+                        : "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)",
+                  }}
+                />
+                {/* R20-3b: subtle counter-glow at the opposite (bottom-left)
+                    corner so the bloom reads as ambient light rather than a
+                    single sticker. Smaller + dimmer so it doesn’t double
+                    the weight of the top-right bloom. */}
+                <div
+                  aria-hidden
+                  className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full blur-3xl opacity-15 pointer-events-none transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-30 group-hover:scale-110"
                   style={{
                     background:
                       c.tone === "pos"

@@ -118,16 +118,39 @@ export function Comparison() {
                         scope="col"
                         className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 ${
                           c.highlight
-                            ? "bg-[rgb(var(--divider)/0.07)] shadow-[inset_2px_0_0_0_rgb(var(--accent-base))]"
+                            ? "bg-[rgb(var(--divider)/0.08)] shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),inset_0_-1px_0_0_rgb(var(--accent-base)/0.18)]"
                             : ""
                         }`}
                       >
+                        {/* Premium top accent rail on the highlighted column —
+                            a 2px gradient bar pinned to the top inside edge,
+                            visible only when the column is highlighted. Reads
+                            as a "recommended tier" marker (mirrors the Pro
+                            pricing-card rail) and reinforces the inset accent
+                            stroke on the left edge (R20-3c). */}
+                        {c.highlight && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute top-0 left-3 right-3 h-[2px] rounded-full pointer-events-none"
+                            style={{
+                              background:
+                                "linear-gradient(90deg, transparent 0%, rgb(var(--accent-base) / 0.85) 30%, rgb(var(--accent-hover) / 0.95) 50%, rgb(var(--accent-base) / 0.85) 70%, transparent 100%)",
+                            }}
+                          />
+                        )}
                         <div className="flex items-center gap-2">
                           <span className={`font-medium tracking-tight ${c.highlight ? "text-primary" : "text-primary"}`}>
                             {c.label}
                           </span>
                           {c.highlight && (
-                            <span className="pill bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)]">
+                            <span
+                              className="pill border !text-[10px] uppercase tracking-[0.1em]"
+                              style={{
+                                background: "rgb(var(--accent-base) / 0.14)",
+                                color: "rgb(var(--accent-base))",
+                                borderColor: "rgb(var(--accent-base) / 0.35)",
+                              }}
+                            >
                               {es ? "Recomendado" : "Recommended"}
                             </span>
                           )}
@@ -158,7 +181,7 @@ export function Comparison() {
                         <td
                           key={j}
                           className={`p-5 md:p-6 align-middle relative h-16 md:h-[72px] ${
-                            j === 0 ? "bg-[rgb(var(--divider)/0.05)] shadow-[inset_2px_0_0_0_rgb(var(--accent-base))]" : ""
+                            j === 0 ? "bg-[rgb(var(--divider)/0.06)] shadow-[inset_3px_0_0_0_rgb(var(--accent-base))]" : ""
                           }`}
                         >
                           <CellRenderer cell={cell} highlight={j === 0} es={es} delay={i * 0.05} />

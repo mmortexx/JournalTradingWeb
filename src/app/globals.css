@@ -196,10 +196,10 @@
      browns (#1B1A18 / #5A564E / #6E685E) so the light theme reads
      as institutional gray rather than sepia; contrast margins stay
      at the same WCAG 2.1 AA levels (primary ≈ 18:1, secondary ≈ 9:1,
-     tertiary ≈ 5.4:1). */
+     tertiary ≈ 5.5:1). */
   --txt-primary: 20 22 28; /* #14161C — ≈ 18:1 */
   --txt-secondary: 80 85 95; /* #50555F — ≈ 9:1 */
-  --txt-tertiary: 120 125 135; /* #787D87 — ≈ 5.4:1 */
+  --txt-tertiary: 86 91 102; /* #565B66 — ≈ 5.5:1 */
   --divider: 0 0 0;
 
   --background: oklch(0.97 0.006 250);
@@ -1170,6 +1170,98 @@ textarea:focus-visible,
 }
 
 /* ============================================================
+   TJ-RANGE — custom range-slider thumb styled in the site's
+   liquid-glass + accent material. Used by the RiskCalculator
+   (R20-3b): accent-tinted track fill via `accent-color` fallback
+   where `appearance: none` isn't honored (older Firefox), plus
+   a fully custom 18px round thumb with inset highlight + accent
+   glow ring on WebKit / Firefox. The track itself is left to the
+   browser's default — only the thumb is restyled — because the
+   default track already reads as a thin neutral rule on both
+   themes and avoids the usual `appearance: none` track repaint
+   jank on long pages. Token-driven via --accent-base so it
+   follows the active palette (esmeralda / ónix / seda / aurora).
+   ============================================================ */
+.tj-range {
+  -webkit-appearance: none;
+  appearance: none;
+  accent-color: rgb(var(--accent-base));
+  background: transparent;
+  cursor: pointer;
+}
+.tj-range:focus-visible {
+  outline: none;
+}
+/* WebKit thumb */
+.tj-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgb(var(--accent-base));
+  border: 2px solid rgb(var(--card) / 0.95);
+  box-shadow:
+    0 0 0 1px rgb(var(--accent-base) / 0.45),
+    0 4px 12px -2px rgb(var(--accent-base) / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tj-range::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+  box-shadow:
+    0 0 0 1px rgb(var(--accent-base) / 0.6),
+    0 6px 16px -2px rgb(var(--accent-base) / 0.55),
+    inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+.tj-range:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 4px rgb(var(--accent-base) / 0.25),
+    0 0 0 1px rgb(var(--accent-base) / 0.7),
+    inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+/* WebKit track — neutral thin rule */
+.tj-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgb(var(--divider) / 0.18);
+}
+/* Firefox thumb */
+.tj-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgb(var(--accent-base));
+  border: 2px solid rgb(var(--card) / 0.95);
+  box-shadow:
+    0 0 0 1px rgb(var(--accent-base) / 0.45),
+    0 4px 12px -2px rgb(var(--accent-base) / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tj-range::-moz-range-thumb:hover {
+  transform: scale(1.12);
+}
+.tj-range:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 0 0 4px rgb(var(--accent-base) / 0.25),
+    0 0 0 1px rgb(var(--accent-base) / 0.7),
+    inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+/* Firefox track */
+.tj-range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgb(var(--divider) / 0.18);
+}
+:root[data-theme="light"] .tj-range::-webkit-slider-runnable-track,
+:root[data-theme="light"] .tj-range::-moz-range-track {
+  background: rgb(0 0 0 / 0.10);
+}
+
+/* ============================================================
    PAGE-ENTER — subtle fade + slide-up that re-runs on every
    navigation. Driven by app/template.tsx (which Next.js App
    Router re-mounts on each route change, unlike layout.tsx).
@@ -1533,6 +1625,20 @@ button.icon-btn:hover > svg,
     inset 0 -1px 0 rgb(0 0 0 / 0.06);
 }
 
+/* WindowFrame (src/components/tj/WindowFrame.tsx) light-theme shadow
+   override. The dark-theme inline shadow (`0 8px 28px -12px rgb(0 0 0 /
+   0.35)`) is calibrated for the near-black canvas and vanishes against
+   the bright light-theme background — this rule replaces it with a
+   tighter key-light + warmer fill so the framed screenshot reads as a
+   real floating window in both themes. `!important` is required because
+   the inline `style` attribute wins over any selector specificity. */
+:root[data-theme="light"] [data-tj-window-frame] {
+  box-shadow:
+    inset 0 1px 0 rgb(var(--divider) / 0.18),
+    0 2px 6px rgb(0 0 0 / 0.08),
+    0 10px 28px -10px rgb(0 0 0 / 0.22) !important;
+}
+
 /* ============================================================
    TOKENS DEL HTML DE REFERENCIA (Claude Design)
    Los componentes de la familia nueva hablan el vocabulario del
@@ -1560,7 +1666,7 @@ button.icon-btn:hover > svg,
   --raised: #ffffff;
   --ink: #15171a;
   --ink-2: #4a4d4f;
-  --ink-3: #797d80;
+  --ink-3: #565b5e;
   --line: rgba(20, 21, 23, 0.1);
   --line-2: rgba(20, 21, 23, 0.19);
 }

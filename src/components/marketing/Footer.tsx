@@ -6,11 +6,19 @@ import { useLang } from "@/lib/i18n";
 import { GlossaryModal } from "@/components/tj/GlossaryModal";
 import { MagneticButton } from "@/components/tj/MagneticButton";
 
-/** Social link definition — icon + accessible label, placeholder href. */
+/**
+ * Social link definition — icon + accessible label.
+ *
+ * GitHub points at the real source repo. X / YouTube / Discord / RSS are
+ * intentionally left as `href="#"` placeholders — the corresponding social
+ * accounts are not live yet (wiring them in is tracked in R20-1b → R20-2b).
+ * Do NOT replace these with real URLs until each account exists.
+ */
 type SocialLink = { label: string; href: string; Icon: () => ReactElement };
 
 const SOCIAL_LINKS: SocialLink[] = [
-  { label: "GitHub", href: "#", Icon: GitHubIcon },
+  { label: "GitHub", href: "https://github.com/mmortexx/JournalTradingWeb", Icon: GitHubIcon },
+  // Placeholders — social accounts not yet created (see comment above).
   { label: "X / Twitter", href: "#", Icon: XIcon },
   { label: "YouTube", href: "#", Icon: YouTubeIcon },
   { label: "Discord", href: "#", Icon: DiscordIcon },
@@ -97,7 +105,8 @@ export function Footer() {
           href: "#",
           glossary: true,
         },
-        { label: es ? "Blog" : "Blog", href: "/about" },
+        // "Blog" entry removed in R20-2b — no blog exists yet (re-add when
+        // /blog lands). "Documentación" aliases /faq (FAQ serves as docs).
         { label: es ? "Documentación" : "Docs", href: "/faq" },
       ],
     },
