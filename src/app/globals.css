@@ -685,7 +685,7 @@
 
   .eyebrow {
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     font-size: 0.625rem;
     font-weight: 600;
     color: rgb(var(--txt-tertiary));

@@ -292,6 +292,22 @@ export function DashboardPage() {
             className="liquid-glass depth-3 hover:shadow-[0_6px_14px_rgb(0_0_0_/_0.32),0_24px_56px_rgb(0_0_0_/_0.36),0_0_44px_rgb(255_255_255_/_0.08)] transition-shadow duration-300 rounded-card p-5 md:p-6 relative overflow-hidden"
           >
             <div className="relative z-10">
+              {/* R26-1d: wrap the composer inputs + footer actions in a real
+                  <form> so Enter-to-submit works from any field, the form
+                  landmark is exposed to SR, and browser autofill heuristics
+                  have proper form context. The screenshot dropzone, Save
+                  draft, direction toggle and calc-method buttons all carry
+                  type="button" so they don't accidentally submit. The
+                  Register button is now type="submit" and triggers
+                  handleRegister via the form's onSubmit (after
+                  preventDefault). */}
+              <form
+                className="contents"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRegister();
+                }}
+              >
               <div className="grid md:grid-cols-2 gap-6">
                 {/* ============ LEFT COLUMN: image + risk footer ============ */}
                 <div className="flex flex-col">
@@ -341,10 +357,10 @@ export function DashboardPage() {
                     <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary mb-3">
                       {es ? "Riesgo de esta operación" : "Trade risk"}
                     </div>
-                    <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] gap-x-4">
+                    <div className="grid grid-cols-[1fr_1px_1fr_1px_1fr] gap-x-4 items-stretch">
                       {/* Risk $ */}
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary">
+                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+                        <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
                           {t("riskUsd")}
                         </div>
                         <Money
@@ -352,11 +368,14 @@ export function DashboardPage() {
                           className="text-lg font-semibold text-primary"
                         />
                       </div>
-                      {/* Vertical hairline */}
-                      <div className="my-1 w-px bg-white/10" aria-hidden="true" />
+                      {/* Vertical hairline — full height with subtle gradient */}
+                      <div
+                        className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent"
+                        aria-hidden="true"
+                      />
                       {/* R:R planned */}
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary">
+                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+                        <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
                           {t("rr")}
                         </div>
                         <span
@@ -372,10 +391,13 @@ export function DashboardPage() {
                         </span>
                       </div>
                       {/* Vertical hairline */}
-                      <div className="my-1 w-px bg-white/10" aria-hidden="true" />
+                      <div
+                        className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent"
+                        aria-hidden="true"
+                      />
                       {/* % of account */}
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary">
+                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+                        <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
                           {es ? "% cuenta" : "% acct"}
                         </div>
                         <span
@@ -420,8 +442,8 @@ export function DashboardPage() {
                             className={`relative h-11 rounded-md border text-sm font-medium transition-colors ${
                               active
                                 ? d === "long"
-                                  ? "bg-pnl-pos/15 border-pnl-pos/30 text-primary"
-                                  : "bg-pnl-neg/15 border-pnl-neg/30 text-primary"
+                                  ? "bg-pnl-pos/15 border-pnl-pos/40 text-primary"
+                                  : "bg-pnl-neg/15 border-pnl-neg/40 text-primary"
                                 : "bg-white/5 border-white/10 text-tertiary hover:text-secondary hover:border-white/20"
                             }`}
                           >
@@ -430,8 +452,8 @@ export function DashboardPage() {
                                 layoutId="dir-pill"
                                 className={`absolute inset-0 rounded-md ${
                                   d === "long"
-                                    ? "bg-pnl-pos/15 border border-pnl-pos/30"
-                                    : "bg-pnl-neg/15 border border-pnl-neg/30"
+                                    ? "bg-pnl-pos/15 border border-pnl-pos/40"
+                                    : "bg-pnl-neg/15 border border-pnl-neg/40"
                                 }`}
                                 transition={{
                                   type: "spring",
@@ -441,8 +463,21 @@ export function DashboardPage() {
                               />
                             )}
                             <span className="relative flex items-center justify-center gap-2">
-                              <span
-                                className={`inline-block w-1.5 h-1.5 rounded-full ${
+                              {/* P&L semantic dot — green for Long, red for Short.
+                                  Larger + glowing when active so the direction
+                                  reads at-a-glance, mirroring the real app's
+                                  PnlPositiveDot / PnlNegativeDot. */}
+                              <motion.span
+                                animate={{
+                                  scale: active ? 1.15 : 1,
+                                  boxShadow: active
+                                    ? d === "long"
+                                      ? "0 0 8px 1px rgb(var(--pnl-pos) / 0.6)"
+                                      : "0 0 8px 1px rgb(var(--pnl-neg) / 0.6)"
+                                    : "0 0 0px 0px rgb(0 0 0 / 0)",
+                                }}
+                                transition={{ duration: 0.25 }}
+                                className={`inline-block w-2 h-2 rounded-full ${
                                   d === "long" ? "bg-pnl-pos" : "bg-pnl-neg"
                                 }`}
                                 aria-hidden="true"
@@ -660,12 +695,11 @@ export function DashboardPage() {
                     {t("saveDraft")}
                   </motion.button>
                   <motion.button
-                    type="button"
-                    onClick={handleRegister}
+                    type="submit"
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
                     title={es ? "Ctrl+Enter" : "Ctrl+Enter"}
-                    className="h-11 min-w-[200px] px-4 rounded-md bg-white text-black font-medium text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
+                    className="group h-11 min-w-[200px] px-4 rounded-md bg-white text-black font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors shadow-[0_2px_8px_rgb(255_255_255_/_0.18)]"
                   >
                     <svg
                       width="14"
@@ -673,7 +707,7 @@ export function DashboardPage() {
                       viewBox="0 0 16 16"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="2.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       aria-hidden="true"
@@ -681,9 +715,19 @@ export function DashboardPage() {
                       <path d="M3 8h10M8 3v10" />
                     </svg>
                     {t("registerTrade")}
+                    {/* Keyboard hint — visible ⌘↵ chip on hover, mirrors the
+                        real app's accelerator-key badge on primary CTAs. */}
+                    <kbd
+                      className="hidden sm:inline-flex items-center gap-0.5 h-5 px-1.5 rounded-[3px] bg-black/10 text-[10px] font-semibold text-black/70 tabular-nums group-hover:bg-black/15 transition-colors"
+                      aria-hidden="true"
+                    >
+                      <span>⌘</span>
+                      <span>↵</span>
+                    </kbd>
                   </motion.button>
                 </div>
               </div>
+              </form>
             </div>
           </motion.div>
         </Reveal>
@@ -968,7 +1012,7 @@ export function DashboardPage() {
                       />
                     </div>
                     <svg
-                      className="hidden md:block text-tertiary opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0"
+                      className="hidden md:block text-tertiary opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-[opacity,transform] shrink-0"
                       width="12"
                       height="12"
                       viewBox="0 0 16 16"
@@ -994,7 +1038,7 @@ export function DashboardPage() {
   );
 }
 
-/** Single KPI cell — small caption above + 18px tabular value below.
+/** Single KPI cell — small caption above + 18px tabular SemiBold value below.
  *  No card, no hover lift: the strip is a flat band of statistics with
  *  hairline dividers, mirroring the WinUI strip. */
 function KpiCell({
@@ -1005,21 +1049,26 @@ function KpiCell({
   value: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-center min-w-0">
-      <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary truncate max-w-full">
+    <div className="flex flex-col items-center gap-1 text-center min-w-0 px-1 py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+      <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary truncate max-w-full">
         {label}
       </div>
-      <div className="tnum min-w-0 break-words">{value}</div>
+      {/* Tabular-nums + SemiBold enforced on the cell wrapper so all 7
+          cells share the exact same numeric typography, regardless of
+          whether the value is a <Money> span, a plain number, or a streak
+          chip — keeps the row's baseline perfectly aligned. */}
+      <div className="min-w-0 break-words [&>*]:text-lg [&>*]:font-semibold [&>span]:tnum">{value}</div>
     </div>
   );
 }
 
 /** Vertical hairline divider between KPI cells — matches the WinUI
- *  VerticalHairlineStyle (1px column, full height, low-opacity stroke). */
+ *  VerticalHairlineStyle (1px column, full height, low-opacity stroke
+ *  with a subtle top/bottom fade for premium feel). */
 function KpiDivider() {
   return (
     <div
-      className="my-1 w-px bg-white/10 justify-self-center"
+      className="self-stretch w-px justify-self-center bg-gradient-to-b from-transparent via-white/15 to-transparent"
       aria-hidden="true"
     />
   );

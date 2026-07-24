@@ -108,7 +108,7 @@ export default function Error({
             <button
               type="button"
               onClick={reset}
-              className="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors text-sm font-semibold hover:bg-gray-100 transition-all hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
+              className="bg-white text-black px-6 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-[background-color,box-shadow] hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
             >
               <svg
                 className="mr-2 transition-transform group-hover:-rotate-45"
@@ -135,7 +135,7 @@ export default function Error({
           >
             <Link
               href="/"
-              className="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-black transition-all transition-all hover:-translate-y-0.5"
+              className="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-black transition-[background-color,color,transform] hover:-translate-y-0.5"
             >
               {es ? "Volver al inicio" : "Back to home"}
             </Link>

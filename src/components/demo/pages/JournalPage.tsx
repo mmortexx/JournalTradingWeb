@@ -567,7 +567,7 @@ function PnlBarChart({ data }: { data: { label: string; pnl: number }[] }) {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: `${pct / 2}%`, opacity: 1 }}
                 transition={{ duration: 0.7, delay: 0.04 * i, ease: EASE }}
-                className={`absolute left-1/2 -translate-x-1/2 w-2/3 rounded-sm group-hover:w-4/5 transition-all ${
+                className={`absolute left-1/2 -translate-x-1/2 w-2/3 rounded-sm group-hover:w-4/5 transition-[width] ${
                   isPos
                     ? "bottom-1/2 bg-pnl-pos/80"
                     : "top-1/2 bg-pnl-neg/80"
@@ -816,7 +816,7 @@ function PlanToggle({
       >
         <span
           className={`relative w-11 h-6 rounded-full transition-colors ${
-            on ? "bg-[rgb(var(--accent-base))]" : "bg-white/10"
+            on ? "bg-[rgb(var(--accent-base))]" : "bg-pnl-warn/40"
           }`}
         >
           <motion.span
@@ -827,7 +827,11 @@ function PlanToggle({
             } w-5 h-5 rounded-full bg-white shadow-md`}
           />
         </span>
-        <span className={`text-xs tnum ${on ? "text-primary" : "text-tertiary"}`}>
+        <span
+          className={`text-xs tnum font-medium ${
+            on ? "text-primary" : "text-pnl-warn"
+          }`}
+        >
           {on
             ? lang === "es" ? "Con plan" : "With plan"
             : lang === "es" ? "Sin plan" : "No plan"}
@@ -1157,17 +1161,30 @@ export function JournalPage() {
                 <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
                   {L("Constancia del check-in · 30 días", "Check-in consistency · 30 days")}
                 </span>
-                <div className="flex items-center gap-5">
-                  <span className="text-[11px] text-tertiary">
-                    {L("Actual", "Current")}{" "}
-                    <span className="text-primary font-semibold tnum">
+                <div className="flex items-center gap-2">
+                  {/* Current streak — accent-tinted pill so the count reads
+                      as the strip's focal point. */}
+                  <span className="inline-flex items-center gap-1.5 px-2.5 h-7 rounded-full bg-[rgb(var(--accent-base)/0.12)] border border-[rgb(var(--accent-base)/0.3)]">
+                    <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
+                      {L("Actual", "Current")}
+                    </span>
+                    <span className="text-sm font-bold tnum text-primary leading-none">
                       {currentStreak}
                     </span>
+                    <span className="text-[10px] text-tertiary">
+                      {L("días", "days")}
+                    </span>
                   </span>
-                  <span className="text-[11px] text-tertiary">
-                    {L("Mejor", "Best")}{" "}
-                    <span className="text-primary font-semibold tnum">
+                  {/* Best streak — neutral pill. */}
+                  <span className="inline-flex items-center gap-1.5 px-2.5 h-7 rounded-full bg-white/[0.04] border border-white/10">
+                    <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
+                      {L("Mejor", "Best")}
+                    </span>
+                    <span className="text-sm font-bold tnum text-primary leading-none">
                       {bestStreak}
+                    </span>
+                    <span className="text-[10px] text-tertiary">
+                      {L("días", "days")}
                     </span>
                   </span>
                 </div>
@@ -1407,10 +1424,20 @@ export function JournalPage() {
                         delay: i * 0.05,
                         ease: EASE,
                       }}
-                      className="grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-2.5 items-center text-sm border-b border-dashed border-white/10 hover:bg-white/[0.025] transition-colors font-mono"
+                      className={`grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-2.5 items-center text-sm border-b border-dashed border-white/10 hover:bg-white/[0.025] transition-colors font-mono ${
+                        i % 2 === 1 ? "bg-white/[0.012]" : ""
+                      }`}
                     >
-                      <div className="text-secondary min-w-0 truncate">
-                        {lang === "es" ? row.es : row.en}
+                      <div className="text-secondary min-w-0 truncate flex items-center gap-2">
+                        <span
+                          aria-hidden
+                          className={`inline-block w-1 h-1 rounded-full ${
+                            isSaver ? "bg-pnl-pos" : "bg-pnl-neg"
+                          }`}
+                        />
+                        <span className="italic">
+                          {lang === "es" ? row.es : row.en}
+                        </span>
                       </div>
                       <div className="text-right tnum text-secondary">
                         {fmtInt(row.count, lang)}
@@ -1419,7 +1446,7 @@ export function JournalPage() {
                         {fmtPct(pctOfTotal, lang, 0)}
                       </div>
                       <div
-                        className={`text-right tnum font-semibold ${
+                        className={`text-right tnum font-semibold tabular-nums ${
                           isSaver ? "text-pnl-pos" : "text-pnl-neg"
                         }`}
                       >

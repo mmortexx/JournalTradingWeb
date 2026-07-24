@@ -427,7 +427,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         <MagneticButton
           href="#"
           strength={0.18}
-          className="group w-full flex items-center justify-center gap-2 h-12 px-6 rounded-lg text-sm font-medium transition-all duration-200 bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.40),0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.55),0_2px_8px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="group w-full flex items-center justify-center gap-2 h-12 px-6 rounded-lg text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.40),0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.55),0_2px_8px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         >
           {plan.cta}
           <svg

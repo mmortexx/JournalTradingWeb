@@ -374,11 +374,16 @@ function RSpread({
 
   return (
     <div className="space-y-1.5">
-      <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
-        {label}
-      </span>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
+          {label}
+        </span>
+        <span className="text-[9px] text-tertiary/70 tnum">
+          {lang === "es" ? "P5–P95" : "P5–P95"}
+        </span>
+      </div>
       <div
-        className="relative h-2.5 rounded-sm"
+        className="relative h-3 rounded-sm group/rs"
         role="img"
         aria-label={`${label}: P25 ${p25.toFixed(2)}R · mediana ${p50.toFixed(2)}R · P75 ${p75.toFixed(2)}R`}
       >
@@ -388,26 +393,31 @@ function RSpread({
           style={{ backgroundColor: "rgba(255,255,255,0.18)" }}
           aria-hidden
         />
-        {/* P25–P75 box */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 h-2.5 rounded-sm"
+        {/* P25–P75 box — slightly taller + hover lift for affordance */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true, margin: "-20px" }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
           style={{
+            transformOrigin: "left center",
             left: `${leftPct}%`,
             width: `${boxPct}%`,
             backgroundColor: `rgb(${hue} / 0.55)`,
           }}
+          className="absolute top-1/2 -translate-y-1/2 h-3 rounded-sm group-hover/rs:h-3.5 transition-all"
           aria-hidden
         />
-        {/* Median tick */}
+        {/* Median tick — taller + thicker so it reads as the focal point */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3 rounded-full bg-white"
+          className="absolute top-1/2 -translate-y-1/2 w-[2px] h-4 rounded-full bg-white shadow-[0_0_4px_rgb(255_255_255_/_0.5)]"
           style={{ left: `${medianPct}%` }}
           aria-hidden
         />
       </div>
       <div className="text-[10px] text-tertiary tnum">
         {lang === "es" ? "P25" : "P25"} {p25.toFixed(2)}R ·{" "}
-        {lang === "es" ? "mediana" : "median"} {p50.toFixed(2)}R ·{" "}
+        {lang === "es" ? "mediana" : "median"} <span className="text-secondary">{p50.toFixed(2)}R</span> ·{" "}
         P75 {p75.toFixed(2)}R
       </div>
     </div>
@@ -504,11 +514,27 @@ function SetupCard({
           aria-label={`${es ? "Setup" : "Setup"} ${name}`}
         >
           {/* Accent top-edge bar — mirrors the real app's `Border Height="3"`
-              accent strip atop each setup card. */}
+              accent strip atop each setup card. Carries a subtle glow halo
+              below the bar so the setup's hue reads as the card's identity
+              color, not just a thin line. */}
           <div
             aria-hidden
             className="absolute inset-x-0 top-0 h-[3px] rounded-t-card"
-            style={{ background: colorCss, opacity: 0.85 }}
+            style={{
+              background: colorCss,
+              opacity: 0.9,
+              boxShadow: `0 0 12px 1px rgb(${hue} / 0.55)`,
+            }}
+          />
+          {/* Subtle accent glow under the bar — fades into the card so the
+              hue identity extends ~24px below the top edge. */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-12 pointer-events-none rounded-t-card"
+            style={{
+              background: `linear-gradient(to bottom, rgb(${hue} / 0.16), transparent 100%)`,
+              opacity: 0.7,
+            }}
           />
 
           {/* Header: glyph + name + edit + chevron (mirrors the real
@@ -782,13 +808,19 @@ function StatCell({
   return (
     <div
       className={`relative px-3 first:pl-0 last:pr-0 ${
-        divider ? "before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-white/10" : ""
+        divider
+          ? "before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-px before:bg-gradient-to-b before:from-transparent before:via-white/15 before:to-transparent"
+          : ""
       }`}
     >
-      <div className="text-[10px] uppercase tracking-[0.08em] text-tertiary mb-1 text-center">
+      <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary mb-1 text-center">
         {label}
       </div>
-      <div className="text-center">{children}</div>
+      {/* Consistent typography across all 4 cells: 16px medium/semibold +
+          tabular-nums so the row reads as one band of stats. */}
+      <div className="text-center tnum [&>*]:text-base [&>*]:font-semibold [&>span]:tnum">
+        {children}
+      </div>
     </div>
   );
 }
@@ -814,7 +846,7 @@ function SummaryStat({
     <Reveal delay={delay} y={18} className="h-full">
       <motion.div
         whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-        className={`h-full relative ${divider ? "lg:before:absolute lg:before:left-0 lg:before:top-2 lg:before:bottom-2 lg:before:w-px lg:before:bg-white/10" : ""}`}
+        className={`h-full relative ${divider ? "lg:before:absolute lg:before:left-0 lg:before:top-3 lg:before:bottom-3 lg:before:w-px lg:before:bg-gradient-to-b lg:before:from-transparent lg:before:via-white/15 lg:before:to-transparent" : ""}`}
       >
         <div className="liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 rounded-card p-4 h-full flex flex-col gap-1.5 lg:mx-3">
           <div className="eyebrow text-[10px]">{label}</div>

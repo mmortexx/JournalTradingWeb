@@ -131,7 +131,13 @@ function KPICard({
 }) {
   return (
     <Reveal delay={delay} y={10}>
-      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4">
+      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4 relative overflow-hidden">
+        {/* Accent top-edge bar — subtle, ties each KPI card to the
+            demo's accent identity (mirrors the Playbook setup-card bar). */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[2px] bg-[rgb(var(--accent-base)/0.6)]"
+        />
         <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-2">
           {label}
         </div>
@@ -233,7 +239,7 @@ export function ExperimentsPage() {
             </Chip>
           </div>
           {/* Column header */}
-          <div className="hidden md:grid grid-cols-[1.6fr_0.9fr_0.9fr_0.7fr_0.8fr_0.7fr] gap-3 px-4 py-2 text-[10px] uppercase tracking-[0.12em] text-tertiary border-b border-white/5">
+          <div className="hidden md:grid grid-cols-[1.6fr_0.9fr_0.9fr_0.7fr_0.8fr_0.7fr] gap-3 px-4 py-2.5 text-[10px] uppercase tracking-[0.12em] text-tertiary border-b border-white/10 bg-white/[0.015]">
             <span>{es ? "Hipótesis" : "Hypothesis"}</span>
             <span className="text-right">{es ? "Línea base" : "Baseline"}</span>
             <span className="text-right">{es ? "Variante" : "Variant"}</span>
@@ -256,18 +262,26 @@ export function ExperimentsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.32, ease: EASE, delay: i * 0.03 }}
-                  className="md:grid md:grid-cols-[1.6fr_0.9fr_0.9fr_0.7fr_0.8fr_0.7fr] md:gap-3 md:items-center px-4 py-3 hover:bg-white/[0.03] transition-colors"
+                  className="md:grid md:grid-cols-[1.6fr_0.9fr_0.9fr_0.7fr_0.8fr_0.7fr] md:gap-3 md:items-center px-4 py-3 hover:bg-white/[0.03] transition-colors -mx-0"
                 >
                   {/* Hypothesis */}
-                  <div className="min-w-0 mb-2 md:mb-0">
-                    <div className="text-sm font-medium text-primary truncate">
-                      {es ? exp.nameEs : exp.nameEn}
-                    </div>
-                    <div className="text-[11px] text-tertiary line-clamp-1 mt-0.5">
-                      {es ? exp.hypothesisEs : exp.hypothesisEn}
-                    </div>
-                    <div className="text-[10px] text-tertiary mt-1 md:hidden">
-                      {es ? "Inicio" : "Started"} {fmtDate(exp.startedAt, lang)}
+                  <div className="min-w-0 mb-2 md:mb-0 flex items-start gap-2.5">
+                    <span
+                      className="shrink-0 mt-0.5 inline-flex items-center justify-center w-6 h-6 rounded-md text-[10px] font-bold tnum bg-white/5 border border-white/10 text-tertiary"
+                      aria-hidden
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-primary truncate">
+                        {es ? exp.nameEs : exp.nameEn}
+                      </div>
+                      <div className="text-[11px] text-tertiary line-clamp-1 mt-0.5">
+                        {es ? exp.hypothesisEs : exp.hypothesisEn}
+                      </div>
+                      <div className="text-[10px] text-tertiary mt-1 md:hidden">
+                        {es ? "Inicio" : "Started"} {fmtDate(exp.startedAt, lang)}
+                      </div>
                     </div>
                   </div>
                   {/* Baseline expectancy */}
@@ -284,18 +298,20 @@ export function ExperimentsPage() {
                     <div className="text-[10px] uppercase tracking-wider text-tertiary md:hidden">
                       {es ? "Variante" : "Variant"}
                     </div>
-                    <span className="text-sm tnum text-primary">
+                    <span className="text-sm tnum text-primary font-medium">
                       {fmtMoney(exp.variant.expectancy, lang, { sign: true })}
                     </span>
                   </div>
-                  {/* Lift */}
+                  {/* Lift — pill-style chip so the +/− reads at a glance */}
                   <div className="text-right mb-2 md:mb-0">
                     <div className="text-[10px] uppercase tracking-wider text-tertiary md:hidden">
                       {es ? "Lift" : "Lift"}
                     </div>
                     <span
-                      className={`text-sm tnum font-medium ${
-                        lift >= 0 ? "text-pnl-pos" : "text-pnl-neg"
+                      className={`inline-flex items-center px-1.5 h-5 rounded text-[11px] tnum font-semibold border ${
+                        lift >= 0
+                          ? "bg-pnl-pos/12 text-pnl-pos border-pnl-pos/25"
+                          : "bg-pnl-neg/12 text-pnl-neg border-pnl-neg/25"
                       }`}
                     >
                       {lift >= 0 ? "+" : "−"}

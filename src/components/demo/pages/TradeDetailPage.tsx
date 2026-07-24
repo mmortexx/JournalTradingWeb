@@ -262,7 +262,7 @@ function HeroStat({
     <div
       className={`relative px-5 first:pl-0 ${
         divider
-          ? "before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-white/12"
+          ? "before:absolute before:left-0 before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-transparent before:via-white/15 before:to-transparent"
           : ""
       }`}
     >

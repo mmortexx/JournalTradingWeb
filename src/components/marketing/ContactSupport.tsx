@@ -153,7 +153,7 @@ export function ContactSupport() {
                         brand color is present before hover, then
                         deepens to 12 % / 30 % on hover. */}
                     <span
-                      className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.15)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:border-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_1px_0_rgb(var(--divider)/0.10),0_4px_14px_-4px_rgb(var(--accent-base)/0.30)] transition-[background-color,border-color,box-shadow,color] duration-300"
+                      className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-lg bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.15)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:border-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_1px_0_rgb(var(--divider)/0.10),0_4px_14px_-4px_rgb(var(--accent-base)/0.30)] transition-[background-color,border-color,box-shadow,color] duration-300"
                       aria-hidden="true"
                     >
                       <Icon className="size-5" />

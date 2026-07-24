@@ -148,7 +148,7 @@ function KpiStripCell({
 }) {
   return (
     <div className="flex items-stretch flex-1 min-w-0">
-      <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2 sm:px-3 items-center text-center">
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2 sm:px-3 items-center text-center rounded-md transition-colors hover:bg-white/[0.03]">
         <div className="text-[10px] uppercase tracking-[0.14em] text-tertiary truncate">
           {label}
         </div>
@@ -158,7 +158,7 @@ function KpiStripCell({
       </div>
       {showHairline && (
         <div
-          className="w-px self-stretch my-1 bg-[rgb(var(--divider)/0.18)]"
+          className="self-stretch w-px my-1 bg-gradient-to-b from-transparent via-white/15 to-transparent"
           aria-hidden="true"
         />
       )}
@@ -1001,7 +1001,7 @@ function SectionBar({
               {isActive && (
                 <motion.span
                   layoutId="analytics-section-underline"
-                  className="absolute left-2 right-2 -bottom-0.5 h-px bg-[rgb(var(--accent-base))]"
+                  className="absolute left-2 right-2 -bottom-0.5 h-[2px] rounded-full bg-[rgb(var(--accent-base))] shadow-[0_0_8px_rgb(var(--accent-base)/0.5)]"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
@@ -1534,11 +1534,26 @@ export function AnalyticsPage() {
             <div className="space-y-4">
               {/* Verdict row — LED + label + p-value pill. */}
               <div className="flex flex-wrap items-center gap-3">
-                <span
-                  className={`inline-block w-3 h-3 rounded-full ${verdictLedClass}`}
-                  aria-hidden="true"
-                />
-                <span className={`text-base font-medium ${verdictTextClass}`}>
+                <span className="relative inline-flex items-center justify-center">
+                  {/* Verdict LED — larger + with a soft pulsing glow so the
+                      verdict reads as the card's focal point. Mirrors the
+                      real app's verdict Ellipse with a subtle glow halo. */}
+                  <span
+                    aria-hidden
+                    className={`absolute -inset-1.5 rounded-full blur-md ${verdictLedClass} opacity-40`}
+                  />
+                  <motion.span
+                    animate={{ opacity: [1, 0.65, 1] }}
+                    transition={{
+                      duration: 2.4,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className={`relative inline-block w-4 h-4 rounded-full ${verdictLedClass} ring-2 ring-white/10`}
+                    aria-hidden="true"
+                  />
+                </span>
+                <span className={`text-base font-semibold ${verdictTextClass}`}>
                   {lang === "es" && edge.verdict === "Edge confirmado"
                     ? "Edge confirmado"
                     : lang === "es" && edge.verdict === "Sugerente"
@@ -1634,29 +1649,44 @@ export function AnalyticsPage() {
                 )}
               </p>
               <div className="space-y-3">
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
-                    R²
-                  </span>
-                  <div className="font-semibold tnum text-primary text-xl">
+                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-white/[0.03]">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                      R²
+                    </span>
+                    <span className="text-[10px] text-tertiary tnum">
+                      {lang === "es" ? "bondad del ajuste" : "goodness of fit"}
+                    </span>
+                  </div>
+                  <div className="font-semibold tnum text-primary text-2xl leading-none">
                     {fmtNum(equityQ.r2, lang, 3)}
                   </div>
                 </div>
                 <div className="h-px bg-[rgb(var(--divider)/0.18)]" />
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
-                    K-Ratio
-                  </span>
-                  <div className="font-semibold tnum text-primary text-xl">
+                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-white/[0.03]">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                      K-Ratio
+                    </span>
+                    <span className="text-[10px] text-tertiary tnum">
+                      {lang === "es" ? "pendiente / error" : "slope / error"}
+                    </span>
+                  </div>
+                  <div className="font-semibold tnum text-primary text-2xl leading-none">
                     {fmtNum(equityQ.kRatio, lang, 2)}
                   </div>
                 </div>
                 <div className="h-px bg-[rgb(var(--divider)/0.18)]" />
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
-                    {lang === "es" ? "Pendiente" : "Slope"}
-                  </span>
-                  <div className="font-semibold tnum text-primary text-xl">
+                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-white/[0.03]">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                      {lang === "es" ? "Pendiente" : "Slope"}
+                    </span>
+                    <span className="text-[10px] text-tertiary tnum">
+                      {lang === "es" ? "€ / operación" : "$ / trade"}
+                    </span>
+                  </div>
+                  <div className="font-semibold tnum text-2xl leading-none">
                     <Money value={equityQ.slope} sign colorizeSign decimals={0} />
                   </div>
                 </div>

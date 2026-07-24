@@ -168,7 +168,7 @@ export function Hero() {
             className="uppercase tnum"
             style={{
               fontSize: 12,
-              letterSpacing: "0.18em",
+              letterSpacing: "0.14em",
               color: "rgb(var(--accent-base))",
             }}
           >
@@ -283,65 +283,14 @@ export function Hero() {
         <div data-seq className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/pricing"
-            className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full"
-            style={{
-              height: 54,
-              padding: "0 28px",
-              background: "rgb(var(--accent-base))",
-              color: "#06130d",
-              fontSize: 15,
-              fontWeight: 600,
-              boxShadow:
-                "0 14px 38px -14px color-mix(in oklab, rgb(var(--accent-base)) 75%, #000)",
-              transition: "transform 0.2s, filter 0.2s, box-shadow 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.filter = "brightness(1.08)";
-              // Intensify the accent glow + add a 1px accent ring so the
-              // primary CTA reads as "pressed forward" on hover — the
-              // ring is what makes the lift feel deliberate rather than
-              // just a brightness shift.
-              e.currentTarget.style.boxShadow =
-                "0 18px 44px -12px color-mix(in oklab, rgb(var(--accent-base)) 85%, #000), 0 0 0 1px rgb(var(--accent-base) / 0.35)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "";
-              e.currentTarget.style.filter = "";
-              e.currentTarget.style.boxShadow =
-                "0 14px 38px -14px color-mix(in oklab, rgb(var(--accent-base)) 75%, #000)";
-            }}
+            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-7 bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             {es ? "Comprar — desde 29 $" : "Buy — from $29"}
             <ArrowRight size={16} aria-hidden />
           </Link>
           <Link
             href="/demo"
-            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full"
-            style={{
-              height: 54,
-              padding: "0 26px",
-              background: "var(--ink)",
-              color: "var(--bg)",
-              fontSize: 15,
-              fontWeight: 600,
-              transition: "transform 0.2s, filter 0.2s, box-shadow 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.filter = "brightness(0.94)";
-              // Subtle accent ring on the dark CTA — pairs with the
-              // primary CTA's hover ring so both buttons lift together
-              // and read as a coordinated pair rather than two
-              // unrelated hover treatments.
-              e.currentTarget.style.boxShadow =
-                "0 12px 30px -14px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(var(--accent-base) / 0.30)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "";
-              e.currentTarget.style.filter = "";
-              e.currentTarget.style.boxShadow = "";
-            }}
+            className="liquid-glass inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-[26px] border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-[15px] font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             <Play size={15} fill="currentColor" aria-hidden />
             {es ? "Ver la demo" : "See the demo"}

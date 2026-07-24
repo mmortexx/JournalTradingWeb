@@ -243,7 +243,7 @@ export function Story() {
                     />
                     <div className="flex items-center justify-between gap-3">
                       <span
-                        className={`text-[10px] uppercase tracking-[0.16em] font-semibold tnum ${toneText[p.tone]}`}
+                        className={`text-[10px] uppercase tracking-[0.14em] font-semibold tnum ${toneText[p.tone]}`}
                       >
                         {p.tag}
                       </span>

@@ -53,13 +53,19 @@ function KPICard({
 }) {
   return (
     <Reveal delay={delay} y={10}>
-      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4">
+      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4 relative overflow-hidden">
+        {/* Subtle accent top bar — same visual language as ExperimentsPage /
+            FiscalPage so the Negocio tab reads as part of the same family. */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[2px] bg-[rgb(var(--accent-base)/0.6)]"
+        />
         <div className="flex items-baseline justify-between mb-2">
           <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
             {label}
           </div>
           {hint && (
-            <span className="text-[10px] text-tertiary opacity-70">{hint}</span>
+            <span className="text-[10px] text-tertiary opacity-70 tnum">{hint}</span>
           )}
         </div>
         {children}
@@ -229,14 +235,44 @@ export function BusinessPage() {
               sits at the vertical midpoint so positive bars grow up and
               negative bars grow down from the same axis. */}
           <div className="relative h-44 flex items-stretch gap-2">
-            {/* Zero axis line */}
+            {/* Zero axis line — slightly brighter + carries end caps. */}
             <div
               aria-hidden="true"
-              className="absolute left-0 right-0 top-1/2 h-px bg-white/10"
+              className="absolute left-0 right-0 top-1/2 h-px bg-white/15"
             />
+            {/* Gridlines at ±50% — subtle visual reference for the
+                bar heights so the user can gauge magnitude at a glance. */}
+            <div
+              aria-hidden="true"
+              className="absolute left-0 right-0 top-1/4 h-px bg-white/[0.04]"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute left-0 right-0 bottom-1/4 h-px bg-white/[0.04]"
+            />
+            {/* Left axis labels (− / 0 / +) */}
+            <div
+              aria-hidden="true"
+              className="absolute left-0 top-1/4 -translate-y-1/2 text-[9px] text-tertiary/60 tnum"
+            >
+              +
+            </div>
+            <div
+              aria-hidden="true"
+              className="absolute left-0 top-1/2 -translate-y-1/2 text-[9px] text-tertiary/60 tnum"
+            >
+              0
+            </div>
+            <div
+              aria-hidden="true"
+              className="absolute left-0 bottom-1/4 -translate-y-1/2 text-[9px] text-tertiary/60 tnum"
+            >
+              −
+            </div>
             {monthly.map((m, i) => {
               const heightPct = (Math.abs(m.pnl) / maxAbs) * 50; // 50% max half-height
               const positive = m.pnl >= 0;
+              const isBest = bestMonth && bestMonth.month === m.month;
               return (
                 <motion.div
                   key={m.month}
@@ -249,13 +285,15 @@ export function BusinessPage() {
                     delay: i * 0.05,
                   }}
                   style={{ transformOrigin: positive ? "bottom" : "top" }}
-                  className="relative flex-1 flex flex-col items-center justify-center group"
+                  className="relative flex-1 flex flex-col items-center justify-center group pl-3"
                 >
                   <div className="absolute inset-0 flex flex-col justify-center pointer-events-none">
                     <div className="flex-1 flex flex-col justify-end">
                       {positive && (
                         <div
-                          className="w-full rounded-t-sm bg-pnl-pos/70 group-hover:bg-pnl-pos/90 transition-colors"
+                          className={`w-full rounded-t-sm bg-pnl-pos/70 group-hover:bg-pnl-pos/90 transition-colors ${
+                            isBest ? "ring-1 ring-pnl-pos/60 shadow-[0_0_12px_rgb(var(--pnl-pos)/0.35)]" : ""
+                          }`}
                           style={{ height: `${heightPct * 2}%` }}
                           aria-hidden="true"
                         />
@@ -271,12 +309,24 @@ export function BusinessPage() {
                       )}
                     </div>
                   </div>
-                  {/* Hover tooltip */}
-                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 backdrop-blur-sm rounded-md px-2 py-1 text-[10px] tnum text-primary whitespace-nowrap pointer-events-none z-10">
+                  {/* Hover tooltip — anchored to the bar's top (positive) or
+                      bottom (negative) so it never overlaps the bar itself. */}
+                  <div
+                    className={`absolute left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/85 backdrop-blur-sm rounded-md px-2 py-1 text-[10px] tnum text-primary whitespace-nowrap pointer-events-none z-10 border border-white/10 ${
+                      positive
+                        ? "bottom-[calc(50%+6px)]"
+                        : "top-[calc(50%+6px)]"
+                    }`}
+                  >
                     {fmtMoney(m.pnl, lang, { sign: true, decimals: 0 })}
+                    {isBest && (
+                      <span className="ml-1 text-pnl-pos">
+                        {es ? " ★" : " ★"}
+                      </span>
+                    )}
                   </div>
                   {/* Month label */}
-                  <div className="absolute -bottom-5 left-0 right-0 text-center text-[10px] text-tertiary">
+                  <div className="absolute -bottom-5 left-0 right-0 text-center text-[10px] text-tertiary tnum">
                     {m.month}
                   </div>
                 </motion.div>
@@ -285,6 +335,13 @@ export function BusinessPage() {
           </div>
           {/* Spacer for month labels */}
           <div className="h-5" />
+          {/* Legend — explains the best-month ring */}
+          <div className="flex items-center justify-end gap-3 mt-1 text-[10px] uppercase tracking-[0.12em] text-tertiary">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-sm bg-pnl-pos/80 ring-1 ring-pnl-pos/60" />
+              {es ? "Mejor mes" : "Best month"}
+            </span>
+          </div>
         </div>
       </Reveal>
 
@@ -323,9 +380,20 @@ export function BusinessPage() {
           </div>
         </Reveal>
         <Reveal delay={0.16}>
-          <div className="liquid-glass rounded-card p-5 h-full">
-            <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-2">
-              {es ? "Margen neto" : "Net margin"}
+          {/* Net Margin — emphasized with a subtle accent top bar + ring
+              because it's the bottom-line number the trader cares about. */}
+          <div className="liquid-glass rounded-card p-5 h-full relative overflow-hidden border border-[rgb(var(--accent-base)/0.25)]">
+            <div
+              aria-hidden
+              className="absolute inset-x-0 top-0 h-[2px] bg-[rgb(var(--accent-base))]"
+            />
+            <div className="flex items-baseline justify-between mb-2">
+              <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
+                {es ? "Margen neto" : "Net margin"}
+              </div>
+              <span className="text-[10px] text-pnl-pos font-semibold uppercase tracking-[0.1em]">
+                {es ? "Resultado" : "Bottom line"}
+              </span>
             </div>
             <div
               className={`text-xl md:text-2xl font-semibold tnum mb-1 ${

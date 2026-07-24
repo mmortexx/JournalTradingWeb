@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   // (double-branded). See worklog Task R22-1d (G1) + R23-2a.
   title: { absolute: "Disciplina — Trading Journal" },
   description:
-    "El Guardián frena antes del error: bloquea tamaños que exceden tu riesgo, te obliga a respetar el plan y audita cada excepción. Lo que tu indisciplina te cuesta, medido.",
+    "El Guardián frena antes del error: bloquea tamaños sobre tu riesgo, te obliga a respetar el plan y audita cada excepción. Indisciplina medida en dinero.",
   alternates: { canonical: `${SITE_URL}/features/disciplina/` },
   openGraph: {
     title: "Disciplina — Trading Journal",

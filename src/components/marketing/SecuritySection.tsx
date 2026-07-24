@@ -29,10 +29,9 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
   return (
     <section
       id="security"
-      className="border-t"
-      style={{ padding: "120px 24px", borderColor: "rgb(var(--divider) / 0.06)" }}
+      className="section border-t border-[rgb(var(--divider)/0.06)]"
     >
-      <div className="max-w-[1240px] mx-auto">
+      <div className="max-w-[1240px] mx-auto px-5 md:px-8">
         <div className="max-w-[760px] mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-3 mb-5">
             <span
@@ -102,20 +101,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
                 }}
               >
                 <span
-                  className="inline-grid place-items-center rounded-lg"
-                  style={{
-                    width: 38,
-                    height: 38,
-                    background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
-                    color: "rgb(var(--accent-base))",
-                    // R25-1e — inset accent ring gives the icon container
-                    // a machined "double-edge" look: outer border (none
-                    // here, the bg-tint is the edge) + inner accent ring.
-                    // Same vocabulary as the GuaranteeBanner shield crest
-                    // + FeaturesBento icon containers (also polished in
-                    // this round). Holds definition in both themes.
-                    boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)",
-                  }}
+                  className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.15)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] inline-grid place-items-center text-[rgb(var(--accent-base))]"
                 >
                   <Icon size={18} aria-hidden />
                 </span>

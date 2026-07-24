@@ -30,20 +30,7 @@ export function HomeDemo() {
   return (
     <section
       id="demo"
-      className="relative overflow-hidden border-b scroll-mt-16"
-      style={{
-        // Responsive vertical rhythm: top 72–116px, bottom 56–88px,
-        // both scaling with viewport width so the demo breathes on
-        // large desktops and tightens gracefully on mobile. Horizontal
-        // padding 20–32px (was a fixed 24px) keeps the demo frame from
-        // kissing the viewport edge on small screens while capping the
-        // inset on ultra-wide ones. The prior fixed 96/24/72 left the
-        // section feeling either cramped (mobile) or under-padded
-        // (≥1600px desktops) depending on the viewport.
-        padding:
-          "clamp(72px, 9vw, 116px) clamp(20px, 4vw, 32px) clamp(56px, 6vw, 88px)",
-        borderColor: "rgb(var(--divider) / 0.06)",
-      }}
+      className="section relative overflow-hidden border-b border-[rgb(var(--divider)/0.06)] scroll-mt-16"
     >
       {/* Top accent hairline — a soft gradient rule that eases the eye
           into the demo section. Mirrors the closing hairline at the
@@ -76,7 +63,7 @@ export function HomeDemo() {
           zIndex: 0,
         }}
       />
-      <div className="relative z-10 mx-auto max-w-[1280px]">
+      <div className="relative z-10 mx-auto max-w-[1280px] px-5 md:px-8">
         <div className="mb-10 max-w-[760px]">
           <div
             className="mb-5 inline-flex items-center gap-3"
@@ -157,32 +144,7 @@ export function HomeDemo() {
           <Link
             href="/demo"
             aria-label={es ? "Abrir la demo a página completa" : "Open the full-page demo"}
-            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center items-center gap-2.5 rounded-full"
-            style={{
-              height: 52,
-              padding: "0 26px",
-              background: "var(--ink)",
-              color: "var(--bg)",
-              fontSize: 15,
-              fontWeight: 600,
-              boxShadow: "0 12px 30px -14px rgb(0 0 0 / 0.6)",
-              transition: "transform 0.2s, filter 0.2s, box-shadow 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.filter = "brightness(0.94)";
-              // Accent ring on hover — pairs with Hero's dark-CTA
-              // hover ring so the two `/demo` buttons lift together
-              // and read as a coordinated pair rather than two
-              // unrelated hover treatments.
-              e.currentTarget.style.boxShadow =
-                "0 14px 34px -12px rgb(0 0 0 / 0.65), 0 0 0 1px rgb(var(--accent-base) / 0.30)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "";
-              e.currentTarget.style.filter = "";
-              e.currentTarget.style.boxShadow = "0 12px 30px -14px rgb(0 0 0 / 0.6)";
-            }}
+            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center items-center gap-2.5 rounded-full h-[52px] px-[26px] bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             <Maximize2 size={15} aria-hidden />
             <span>{es ? "Abrir demo a página completa" : "Open full-page demo"}</span>

@@ -224,7 +224,7 @@ export default function NotFound() {
           >
             <Link
               href="/"
-              className="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors text-sm font-semibold hover:bg-gray-100 transition-all hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
+              className="bg-white text-black px-6 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-[background-color,box-shadow] hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
             >
               {es ? "Volver al inicio" : "Back to home"}
               <svg

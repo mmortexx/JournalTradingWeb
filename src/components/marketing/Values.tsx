@@ -157,7 +157,7 @@ export function Values() {
                     >
                       {v.icon}
                     </span>
-                    <span className="text-xs uppercase tracking-[0.16em] font-semibold text-tertiary tnum transition-colors duration-300 group-hover:text-secondary">
+                    <span className="text-xs uppercase tracking-[0.14em] font-semibold text-tertiary tnum transition-colors duration-300 group-hover:text-secondary">
                       {/* Number split: current in secondary, total in tertiary
                           — same editorial treatment as Story's phase index. */}
                       <span className="text-secondary">{v.num}</span>

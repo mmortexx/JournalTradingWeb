@@ -11,7 +11,7 @@ const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 const OG_IMAGE = `${SITE_URL}/og.png`;
 
 const PAGE_DESCRIPTION =
-  "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina que te frena antes del error y tus datos 100 % en tu máquina. Pago único desde 29 $. Sin suscripciones.";
+  "Diario de trading nativo de Windows. Métricas institucionales, disciplina que frena el error y datos 100% locales. Pago único desde 29 $. Sin suscripciones.";
 
 export const metadata: Metadata = {
   title: { absolute: "Trading Journal — Opera como una mesa institucional." },

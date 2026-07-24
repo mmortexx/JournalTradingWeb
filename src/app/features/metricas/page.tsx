@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   // (double-branded). See worklog Task R22-1d (G1) + R23-2a.
   title: { absolute: "Métricas — Trading Journal" },
   description:
-    "40+ ratios institucionales: Sharpe, Sortino, Calmar, profit factor, expectancy en R. Calculadora de riesgo interactiva. Métricas que correlacionan con la consistencia, no gráficos bonitos.",
+    "40+ ratios institucionales: Sharpe, Sortino, Calmar, profit factor, expectancy en R. Calculadora de riesgo. Métricas que correlacionan con la consistencia.",
   alternates: { canonical: `${SITE_URL}/features/metricas/` },
   openGraph: {
     title: "Métricas — Trading Journal",

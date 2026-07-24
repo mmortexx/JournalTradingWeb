@@ -26,18 +26,7 @@ export function OverviewApp() {
   return (
     <section
       id="overview"
-      className="relative overflow-hidden"
-      style={{
-        // R21-3a — responsive padding so the section breathes on large
-        // desktops and tightens on mobile. The prior fixed 118/40/56
-        // left 80px of horizontal padding on a 375px viewport (only
-        // 295px of content) and 118px of top padding pushing the whole
-        // frame awkwardly down on small screens. clamp() scales all
-        // three axes smoothly between mobile (64/20/48) and desktop
-        // (118/40/56) floors/caps.
-        padding:
-          "clamp(64px, 9vw, 118px) clamp(20px, 4vw, 40px) clamp(48px, 5vw, 56px)",
-      }}
+      className="section relative overflow-hidden"
     >
       {/* Halo derecho superior */}
       <div
@@ -74,7 +63,7 @@ export function OverviewApp() {
         }}
       />
 
-      <div className="relative max-w-[1280px] mx-auto">
+      <div className="relative max-w-[1280px] mx-auto px-5 md:px-8">
         {/* Cabecera de sección */}
         <div className="flex items-center justify-between flex-wrap gap-4 pb-3.5 border-b" style={{ borderColor: "rgb(var(--divider) / 0.06)" }}>
           <div className="inline-flex items-center gap-3">
@@ -205,63 +194,14 @@ export function OverviewApp() {
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <a
                 href="/pricing"
-                className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px] relative overflow-hidden"
-                style={{
-                  height: 52,
-                  padding: "0 26px",
-                  background:
-                    "linear-gradient(180deg, color-mix(in oklab, var(--ink) 88%, #fff), var(--ink))",
-                  color: "var(--bg)",
-                  fontSize: 15.5,
-                  fontWeight: 500,
-                  boxShadow:
-                    "inset 0 1px 0 rgb(255 255 255 / 0.35), 0 10px 24px -10px color-mix(in oklab, rgb(var(--accent-base)) 45%, #000)",
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 18px 38px -12px color-mix(in oklab, rgb(var(--accent-base)) 65%, #000), 0 0 0 1px rgb(var(--accent-base) / 0.25)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "";
-                  e.currentTarget.style.boxShadow =
-                    "inset 0 1px 0 rgb(255 255 255 / 0.35), 0 10px 24px -10px color-mix(in oklab, rgb(var(--accent-base)) 45%, #000)";
-                }}
+                className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px] h-[52px] px-[26px] bg-[rgb(var(--accent-base))] text-[#06130d] text-[15.5px] font-medium shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {es ? "Comprar — desde 29 $" : "Buy — from $29"}
                 <span aria-hidden>→</span>
               </a>
               <a
                 href="/demo"
-                className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px]"
-                style={{
-                  height: 52,
-                  padding: "0 24px",
-                  border: "1px solid rgb(var(--divider) / 0.13)",
-                  background: "transparent",
-                  color: "var(--ink)",
-                  fontSize: 15.5,
-                  fontWeight: 500,
-                  transition:
-                    "background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.background =
-                    "color-mix(in oklab, var(--ink) 6%, transparent)";
-                  e.currentTarget.style.borderColor =
-                    "rgb(var(--accent-base) / 0.40)";
-                  e.currentTarget.style.boxShadow =
-                    "0 10px 24px -14px rgb(0 0 0 / 0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "";
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.borderColor =
-                    "rgb(var(--divider) / 0.13)";
-                  e.currentTarget.style.boxShadow = "";
-                }}
+                className="liquid-glass inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px] h-[52px] px-6 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-[15.5px] font-medium transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <span aria-hidden>▶</span>
                 {es ? "Ver la demo" : "See the demo"}

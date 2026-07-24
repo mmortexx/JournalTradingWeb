@@ -51,13 +51,18 @@ function KPICard({
 }) {
   return (
     <Reveal delay={delay} y={10}>
-      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4">
+      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4 relative overflow-hidden">
+        {/* Subtle accent top bar — same visual language as ExperimentsPage. */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[2px] bg-[rgb(var(--accent-base)/0.6)]"
+        />
         <div className="flex items-baseline justify-between mb-2">
           <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
             {label}
           </div>
           {hint && (
-            <span className="text-[10px] text-tertiary opacity-70">{hint}</span>
+            <span className="text-[10px] text-tertiary opacity-70 tnum">{hint}</span>
           )}
         </div>
         {children}
@@ -205,7 +210,7 @@ export function FiscalPage() {
             </div>
           </div>
           {/* Column header */}
-          <div className="hidden md:grid grid-cols-[0.8fr_1fr_0.8fr_1fr] gap-3 px-4 py-2 text-[10px] uppercase tracking-[0.12em] text-tertiary border-b border-white/5">
+          <div className="hidden md:grid grid-cols-[0.8fr_1fr_0.8fr_1fr] gap-3 px-4 py-2.5 text-[10px] uppercase tracking-[0.12em] text-tertiary border-b border-white/10 bg-white/[0.015]">
             <span>{es ? "Mes" : "Month"}</span>
             <span className="text-right">{es ? "P&L" : "P&L"}</span>
             <span className="text-right">{es ? "Operaciones" : "Trades"}</span>
@@ -242,7 +247,9 @@ export function FiscalPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.28, ease: EASE, delay: i * 0.025 }}
-                    className="md:grid md:grid-cols-[0.8fr_1fr_0.8fr_1fr] md:gap-3 md:items-center px-4 py-2.5 hover:bg-white/[0.03] transition-colors"
+                    className={`md:grid md:grid-cols-[0.8fr_1fr_0.8fr_1fr] md:gap-3 md:items-center px-4 py-2.5 hover:bg-white/[0.03] transition-colors ${
+                      i % 2 === 1 ? "bg-white/[0.012]" : ""
+                    }`}
                   >
                     {/* Month */}
                     <div className="text-sm font-medium text-primary mb-1 md:mb-0">
@@ -263,7 +270,7 @@ export function FiscalPage() {
                         aria-hidden="true"
                       />
                       <span
-                        className={`text-sm tnum font-medium ${
+                        className={`text-sm tnum font-semibold ${
                           m.pnl >= 0 ? "text-pnl-pos" : "text-pnl-neg"
                         }`}
                       >
@@ -277,8 +284,9 @@ export function FiscalPage() {
                       </span>
                       {fmtInt(count, lang)}
                     </div>
-                    {/* Cumulative */}
-                    <div className="text-right text-sm tnum text-secondary">
+                    {/* Cumulative — emphasized as the running balance,
+                        which is the column the trader scans down. */}
+                    <div className="text-right text-sm tnum text-primary font-medium">
                       <span className="text-[10px] uppercase tracking-wider text-tertiary md:hidden">
                         {es ? "Acum " : "Cum "}
                       </span>

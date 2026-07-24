@@ -75,13 +75,9 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 
   return (
     <section
-      className="bg-veil border-t"
-      style={{
-        padding: "100px 24px 80px",
-        borderColor: "rgb(var(--divider) / 0.06)",
-      }}
+      className="section-tight bg-veil border-t border-[rgb(var(--divider)/0.06)]"
     >
-      <div className="max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+      <div className="max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         <div>
           <div className="inline-flex items-center gap-3 mb-5">
             <span

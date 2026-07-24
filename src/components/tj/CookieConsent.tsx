@@ -123,7 +123,7 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={dismiss}
-              className="bg-[rgb(var(--accent-base))] text-[#06130d] px-6 py-2 rounded-lg text-sm font-medium hover:brightness-110 active:scale-[0.97] transition-all"
+              className="bg-[rgb(var(--accent-base))] text-[#06130d] px-6 py-2 rounded-lg text-sm font-medium hover:brightness-110 active:scale-[0.97] transition-[filter,transform]"
             >
               {es ? "Entendido" : "Got it"}
             </button>

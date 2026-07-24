@@ -21,8 +21,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
   return (
     <section
       id="features"
-      className="relative overflow-hidden"
-      style={{ padding: "120px 24px 80px" }}
+      className="section relative overflow-hidden"
     >
       <div
         aria-hidden
@@ -32,7 +31,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             "radial-gradient(70% 60% at 30% 0%, color-mix(in oklab, var(--ink) 5%, transparent), transparent 60%)",
         }}
       />
-      <div className="relative max-w-[1280px] mx-auto">
+      <div className="relative max-w-[1280px] mx-auto px-5 md:px-8">
         <div className="max-w-[760px] mb-12">
           <div className="inline-flex items-center gap-3 mb-5">
             <span
@@ -85,9 +84,13 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             // R25-1e — snappy hover lift (separate transition from the
             // entrance so hover doesn't feel laggy). All 5 bento cards
             // share this treatment for a coordinated hover rhythm.
+            // R26-1b — added an absolute inset accent-glow div so the
+            // bento cards match the canonical “lift + accent border
+            // glow” hover vocabulary used by Integrations / TestimonialsWall
+            // / ValueTestimonials / Story / Milestones / ContactSupport.
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5 }}
-            className="lg:col-span-7 relative overflow-hidden"
+            className="group lg:col-span-7 relative overflow-hidden"
             style={{
               padding: 24,
               borderRadius: 18,
@@ -98,6 +101,13 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               minHeight: 360,
             }}
           >
+            {/* R26-1b — accent border glow on hover (matches the canonical
+                marketing-card hover vocabulary). */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
+            />
             {/* R25-1e — premium top-edge accent sweep. The calendar is
                 the bento's anchor (span 7); a 2px accent gradient at the
                 top edge marks it as the lead card. Same vocabulary as the
@@ -183,7 +193,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="lg:col-span-5"
+            className="group lg:col-span-5 relative overflow-hidden"
             style={{
               padding: 24,
               borderRadius: 18,
@@ -194,6 +204,12 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               minHeight: 360,
             }}
           >
+            {/* R26-1b — accent border glow on hover. */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
+            />
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
@@ -265,7 +281,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-4"
+            className="group lg:col-span-4 relative overflow-hidden"
             style={{
               padding: 24,
               borderRadius: 18,
@@ -275,6 +291,12 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             }}
           >
+            {/* R26-1b — accent border glow on hover. */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
+            />
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
@@ -325,7 +347,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="lg:col-span-4"
+            className="group lg:col-span-4 relative overflow-hidden"
             style={{
               padding: 24,
               borderRadius: 18,
@@ -335,6 +357,12 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             }}
           >
+            {/* R26-1b — accent border glow on hover. */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
+            />
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
@@ -385,7 +413,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-4"
+            className="group lg:col-span-4 relative overflow-hidden"
             style={{
               padding: 24,
               borderRadius: 18,
@@ -395,6 +423,12 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             }}
           >
+            {/* R26-1b — accent border glow on hover. */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
+            />
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"

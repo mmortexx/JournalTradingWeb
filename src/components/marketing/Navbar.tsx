@@ -339,10 +339,11 @@ export function Navbar() {
           >
             <button
               type="button"
+              id="navbar-producto-trigger"
               ref={megaButtonRef}
               onClick={() => setMegaOpen((o) => !o)}
               aria-expanded={megaOpen}
-              aria-haspopup="true"
+              aria-haspopup="menu"
               className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent px-[15px] py-[9px] text-sm transition-colors duration-200"
               style={{
                 color: megaOpen ? "var(--ink)" : "var(--ink-2)",
@@ -370,6 +371,7 @@ export function Navbar() {
             {/* Panel del megamenú */}
             <div
               role="menu"
+              aria-labelledby="navbar-producto-trigger"
               className="absolute left-1/2 w-[520px] max-w-[calc(100vw-3rem)] rounded-[14px] border p-2.5"
               style={{
                 top: "calc(100% + 12px)",
@@ -708,7 +710,7 @@ export function Navbar() {
                   <Link
                     href="/pricing"
                     onClick={() => setMobileOpen(false)}
-                    className="tj-cta-sheen group flex items-center justify-center gap-1.5 h-11 w-full rounded-full text-sm font-semibold transition-all duration-200"
+                    className="tj-cta-sheen group flex items-center justify-center gap-1.5 h-11 w-full rounded-full text-sm font-semibold transition-[background-color,box-shadow,transform] duration-200"
                     style={{
                       background: "rgb(var(--accent-base))",
                       color: "#06130d",

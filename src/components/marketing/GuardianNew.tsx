@@ -17,8 +17,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
   return (
     <section
       id="guardian"
-      className="bg-veil relative overflow-hidden border-t"
-      style={{ padding: "120px 24px 80px", borderColor: "rgb(var(--divider) / 0.06)" }}
+      className="section bg-veil relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)]"
     >
       <div
         aria-hidden
@@ -28,7 +27,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
             "radial-gradient(60% 50% at 80% 30%, color-mix(in oklab, rgb(var(--pnl-warn)) 8%, transparent), transparent 70%)",
         }}
       />
-      <div className="relative max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="relative max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Mockup tarjeta "Comprobación previa" */}
         <div
           className="relative"
@@ -308,13 +307,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               return (
                 <li key={f.t} className="flex items-start gap-3">
                   <span
-                    className="inline-grid place-items-center rounded-lg flex-none"
-                    style={{
-                      width: 36,
-                      height: 36,
-                      background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
-                      color: "rgb(var(--accent-base))",
-                    }}
+                    className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.15)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex-none inline-grid place-items-center text-[rgb(var(--accent-base))]"
                   >
                     <Icon size={18} aria-hidden />
                   </span>

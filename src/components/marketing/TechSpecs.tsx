@@ -141,7 +141,7 @@ export function TechSpecs() {
                       {/* R25-1e — accent dot prefix ties each spec row to
                           the accent palette, matching the StatsBandNew
                           accent-dot vocabulary. */}
-                      <span aria-hidden className="size-1 rounded-full bg-[rgb(var(--accent-base))]" />
+                      <span aria-hidden className="size-1.5 rounded-full bg-[rgb(var(--accent-base))]" />
                       {es ? r.labelEs : r.labelEn}
                     </dt>
                     <dd className="text-primary text-sm font-medium leading-snug tnum tracking-[-0.005em]">

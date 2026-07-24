@@ -196,7 +196,7 @@ export function DemoGallery() {
                         with the centered caption or left traffic lights. */}
                     <span
                       aria-hidden
-                      className="absolute top-2 right-2 z-10 inline-flex items-center justify-center w-7 h-7 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 text-white/85 opacity-60 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-200"
+                      className="absolute top-2 right-2 z-10 inline-flex items-center justify-center w-7 h-7 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 text-white/85 opacity-60 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-[opacity,transform] duration-200"
                     >
                       <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
                         <path
@@ -241,7 +241,7 @@ export function DemoGallery() {
             href="#demo"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-            className="group inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-black text-sm font-medium hover:bg-gray-100 hover:-translate-y-0.5 transition-all duration-200 shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.30),0_1px_2px_rgb(0_0_0/0.20)] hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.50),0_2px_8px_rgb(0_0_0/0.25)]"
+            className="group inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-black text-sm font-medium hover:bg-gray-100 hover:-translate-y-0.5 transition-[background-color,box-shadow,transform] duration-200 shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.30),0_1px_2px_rgb(0_0_0/0.20)] hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.50),0_2px_8px_rgb(0_0_0/0.25)]"
           >
             {es ? "Abrir la demo" : "Open the demo"}
             <svg
@@ -265,7 +265,7 @@ export function DemoGallery() {
             href={asset("/features")}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-            className="liquid-glass group inline-flex items-center gap-2 h-11 px-6 rounded-lg text-sm font-medium text-primary border border-[rgb(var(--divider)/0.18)] hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--accent-base)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-all duration-200"
+            className="liquid-glass group inline-flex items-center gap-2 h-11 px-6 rounded-lg text-sm font-medium text-primary border border-[rgb(var(--divider)/0.18)] hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--accent-base)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-[background-color,border-color,box-shadow,transform] duration-200"
           >
             {es ? "Ver características" : "See features"}
             <svg

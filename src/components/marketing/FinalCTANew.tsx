@@ -16,14 +16,7 @@ export function FinalCTANew() {
   const es = lang === "es";
   return (
     <section
-      className="relative overflow-hidden border-t"
-      style={{
-        // Mobile: 72px top / 64px bottom (was 120/100 — too tall on phones).
-        // Desktop: clamps back to the original 120/100. Keeps the cinematic
-        // closing-CTA breathing room on desktop without crushing mobile.
-        padding: "clamp(72px, 10vw, 120px) 24px clamp(64px, 8vw, 100px)",
-        borderColor: "rgb(var(--divider) / 0.06)",
-      }}
+      className="section relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)]"
     >
       <div
         aria-hidden
@@ -60,7 +53,7 @@ export function FinalCTANew() {
             "radial-gradient(120% 80% at 50% 120%, transparent, var(--bg) 78%)",
         }}
       />
-      <div className="relative max-w-[820px] mx-auto text-center">
+      <div className="relative max-w-[820px] mx-auto px-5 md:px-8 text-center">
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -121,7 +114,7 @@ export function FinalCTANew() {
           </Link>
           <Link
             href="/demo"
-            className="inline-flex items-center gap-2.5 rounded-full h-14 px-7 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-base font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="liquid-glass inline-flex items-center gap-2.5 rounded-full h-14 px-7 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-base font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             {/* R25-1e — Play icon prefix matches the Hero's "Ver la demo"
                 button pattern so the two CTAs read as a coordinated pair

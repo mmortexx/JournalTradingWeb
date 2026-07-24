@@ -20,13 +20,9 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
   return (
     <section
       id="metrics"
-      className="bg-veil relative border-t border-b"
-      style={{
-        padding: "120px 24px 80px",
-        borderColor: "rgb(var(--divider) / 0.06)",
-      }}
+      className="section bg-veil relative border-t border-b border-[rgb(var(--divider)/0.06)]"
     >
-      <div className="max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
           <div className="inline-flex items-center gap-3 mb-5">
             <span

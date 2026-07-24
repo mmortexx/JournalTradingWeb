@@ -181,7 +181,7 @@ export function Milestones() {
                         with energy" and the upcoming one stays muted. */}
                     <div className="mt-3 liquid-glass depth-1 rounded-card p-4 transition-[box-shadow,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.4)] hover:border-[rgb(var(--accent-base)/0.30)]">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] uppercase tracking-[0.16em] font-semibold text-primary tnum">
+                        <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary tnum">
                           {m.date}
                         </span>
                         <span
@@ -231,7 +231,7 @@ export function Milestones() {
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-tertiary">
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
+              <span className="size-1.5 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
               {es ? "En tu mano hoy" : "In your hands today"}
             </span>
             <span

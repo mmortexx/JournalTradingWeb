@@ -81,8 +81,8 @@ function RChip({ value, lang }: { value: number; lang: "es" | "en" }) {
   }
   const cls =
     tone === "pos"
-      ? "bg-pnl-pos/15 text-pnl-pos border-pnl-pos/25"
-      : "bg-pnl-neg/15 text-pnl-neg border-pnl-neg/25";
+      ? "bg-pnl-pos/15 text-pnl-pos border-pnl-pos/30 shadow-[inset_0_0_0_1px_rgb(var(--pnl-pos)/0.08)]"
+      : "bg-pnl-neg/15 text-pnl-neg border-pnl-neg/30 shadow-[inset_0_0_0_1px_rgb(var(--pnl-neg)/0.08)]";
   return (
     <span className={`pill tnum text-[11px] font-semibold border ${cls}`}>
       {value > 0 ? "+" : ""}
@@ -113,25 +113,31 @@ function SortHeader({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-1 px-0 py-0 group/sort transition-colors ${
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 -mx-1.5 rounded-sm group/sort transition-colors hover:bg-white/[0.04] ${
         align === "right" ? "flex-row-reverse ml-auto" : ""
       }`}
     >
       <span
         className={`text-[10px] uppercase tracking-[0.15em] whitespace-nowrap transition-colors ${
-          active ? "text-primary" : "text-tertiary group-hover/sort:text-secondary"
+          active ? "text-primary font-semibold" : "text-tertiary group-hover/sort:text-secondary"
         }`}
       >
         {children}
       </span>
-      <span
+      {/* Sort arrow — animate the swap between ascending / descending
+          with a rotate so the user feels the column toggle. */}
+      <motion.span
+        key={active ? `${dir}` : "idle"}
+        initial={{ opacity: 0, scale: 0.6, rotate: active && dir === "asc" ? -90 : 0 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
         className={`text-[9px] leading-none transition-colors ${
-          active ? "text-primary" : "text-tertiary/60 group-hover/sort:text-secondary"
+          active ? "text-primary" : "text-tertiary/50 group-hover/sort:text-secondary"
         }`}
         aria-hidden="true"
       >
         {active ? (dir === "asc" ? "▲" : "▼") : "⇅"}
-      </span>
+      </motion.span>
     </button>
   );
 }
@@ -499,9 +505,16 @@ function BulkActionBar({
 }) {
   const [tag, setTag] = useState("");
   return (
-    <div className="border-y border-white/10 bg-white/[0.03] px-5 py-2.5">
+    // The accent left-edge bar (3px wide, full height) signals that the
+    // bar is a contextual action strip — mirrors the WinUI accent bar on
+    // command bars.
+    <div className="relative border-y border-white/10 bg-[rgb(var(--accent-base)/0.04)] px-5 py-2.5">
+      <div
+        aria-hidden
+        className="absolute left-0 top-0 bottom-0 w-[3px] bg-[rgb(var(--accent-base))]"
+      />
       <div className="flex flex-wrap items-center gap-3">
-        <span className="pill tnum text-[11px] font-semibold bg-[rgb(var(--divider)/0.10)] text-primary border border-[rgb(var(--divider)/0.18)]">
+        <span className="pill tnum text-[11px] font-semibold bg-[rgb(var(--accent-base)/0.15)] text-primary border border-[rgb(var(--accent-base)/0.35)]">
           {count}
         </span>
         <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary hidden sm:inline">
@@ -1135,14 +1148,20 @@ export function TradesPage() {
           <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-transparent to-black/20" />
         </div>
 
-        {/* Bulk action bar — only when rows are selected. */}
+        {/* Bulk action bar — only when rows are selected. Spring in
+            from the top with a subtle slide + opacity + height so the bar
+            reads as a contextual strip rather than a sudden panel. */}
         <AnimatePresence>
           {selectedIds.size > 0 && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, height: 0, y: -8 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -8 }}
+              transition={{
+                duration: 0.24,
+                ease: [0.22, 1, 0.36, 1],
+                opacity: { duration: 0.18 },
+              }}
               className="overflow-hidden"
             >
               <BulkActionBar

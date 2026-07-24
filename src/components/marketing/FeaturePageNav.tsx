@@ -114,13 +114,13 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
   };
 
   return (
-    <section className="bg-veil relative border-t" style={{ borderColor: "rgb(var(--divider) / 0.06)" }}>
-      <div className="relative max-w-page mx-auto px-5 md:px-8 py-14 md:py-16">
+    <section className="section-tight bg-veil relative border-t border-[rgb(var(--divider)/0.06)]">
+      <div className="relative max-w-page mx-auto px-5 md:px-8">
         {/* Share button — top-right */}
         <Reveal className="flex justify-center mb-10">
           <button
             onClick={handleShare}
-            className="liquid-glass inline-flex items-center gap-2 h-10 px-5 rounded-full text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-all duration-200"
+            className="liquid-glass inline-flex items-center gap-2 h-10 px-5 rounded-full text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-[background-color,transform] duration-200"
             aria-label={es ? "Compartir esta página" : "Share this page"}
           >
             {copied ? (
@@ -144,7 +144,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             <Reveal>
               <Link
                 href={asset(AXES[prev].href)}
-                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-all duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {/* R24-1c: arrow icon container shifts on hover from neutral
                     divider bg + tertiary text to accent-tinted bg + accent
@@ -157,7 +157,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                   {/* R24-1c: kbd hint now wears a hairline accent border +
                       accent dot before so the keyboard shortcut reads as a
                       real key rather than floating tertiary text. */}
-                  <span className="block text-[10px] uppercase tracking-[0.15em] text-tertiary font-semibold mb-1">
+                  <span className="block text-[10px] uppercase tracking-[0.14em] text-tertiary font-semibold mb-1">
                     <span aria-hidden className="inline-block w-1 h-1 rounded-full mr-1.5 align-middle" style={{ background: "rgb(var(--accent-base))" }} />
                     {es ? "Anterior" : "Previous"}
                     <kbd className="kbd ml-1.5" style={{ borderColor: "rgb(var(--accent-base) / 0.30)" }}>Alt ←</kbd>
@@ -175,14 +175,14 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             <Reveal delay={0.06}>
               <Link
                 href={asset(AXES[next].href)}
-                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-all duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {/* R24-1c: mirror of the prev card’s icon-container polish. */}
                 <span className="grid place-items-center w-10 h-10 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-[rgb(var(--accent-base))] group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:shadow-[0_0_14px_rgb(var(--accent-base)/0.20)] transition-[background-color,color,box-shadow] duration-300 flex-none">
                   <ArrowRight size={18} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-[10px] uppercase tracking-[0.15em] text-tertiary font-semibold mb-1">
+                  <span className="block text-[10px] uppercase tracking-[0.14em] text-tertiary font-semibold mb-1">
                     <span aria-hidden className="inline-block w-1 h-1 rounded-full mr-1.5 align-middle" style={{ background: "rgb(var(--accent-base))" }} />
                     {es ? "Siguiente" : "Next"}
                     <kbd className="kbd ml-1.5" style={{ borderColor: "rgb(var(--accent-base) / 0.30)" }}>Alt →</kbd>
