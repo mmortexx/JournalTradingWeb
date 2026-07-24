@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Maximize2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
 import { useLang } from "@/lib/i18n";
 
@@ -105,11 +106,11 @@ export function HomeDemo() {
           >
             {es ? (
               <>
-                La app, <span style={{ color: "rgb(var(--accent-base))" }}>en tu navegador</span>.
+                La app, <span style={{ color: "rgb(var(--accent-base))", fontStyle: "italic" }}>en tu navegador</span>.
               </>
             ) : (
               <>
-                The app, <span style={{ color: "rgb(var(--accent-base))" }}>in your browser</span>.
+                The app, <span style={{ color: "rgb(var(--accent-base))", fontStyle: "italic" }}>in your browser</span>.
               </>
             )}
           </h2>
@@ -136,17 +137,40 @@ export function HomeDemo() {
             `tj-cta-sheen` class for the same animated sheen sweep.
 
             Mobile (375px): button is full-width so it never overflows
-            and the tap target stays comfortable (52px tall). ≥sm:
-            shrinks to content, centered under the demo frame. The
-            secondary "no download" hint reinforces the value prop
-            without competing for the click. */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5">
+            and the tap target stays comfortable (54px tall, matching
+            Hero). ≥sm: shrinks to content, centered under the demo
+            frame. The secondary "no download" hint reinforces the
+            value prop without competing for the click.
+
+            R26-2c polish:
+            • `Maximize2` icon dropped — the button label "Abrir demo
+              a página completa" already says "full-page", so the
+              expand icon was redundant with the text; the remaining
+              `ArrowRight` matches Hero's primary CTA's directional
+              cue, so the two CTAs across the page read as one pair.
+            • `h-[52px] px-[26px]` → `h-[54px] px-7` to match Hero's
+              primary CTA dimensions exactly (the 2px difference was
+              an easy tell that the two CTAs weren't the same pill).
+            • Wrapped in `motion.div` with a gentle opacity + 8px lift
+              reveal (`whileInView`, `once: true`) so after the demo
+              hydrates and the user scrolls to the bottom of the demo
+              frame, the CTA fades up into view rather than popping in
+              — the transition from "trying the demo" to "next step"
+              now feels continuous instead of abrupt. The reveal fires
+              only once and is safe to layer on top of AppDemoClient
+              (the motion wraps the CTA row only, not the demo). */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5"
+        >
           <Link
             href="/demo"
             aria-label={es ? "Abrir la demo a página completa" : "Open the full-page demo"}
-            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center items-center gap-2.5 rounded-full h-[52px] px-[26px] bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center items-center gap-2.5 rounded-full h-[54px] px-7 bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.12),0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
-            <Maximize2 size={15} aria-hidden />
             <span>{es ? "Abrir demo a página completa" : "Open full-page demo"}</span>
             <ArrowRight size={16} aria-hidden />
           </Link>
@@ -158,7 +182,7 @@ export function HomeDemo() {
               ? "Sin descargar nada · 100 % en tu navegador"
               : "No download · 100 % in your browser"}
           </span>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
