@@ -193,6 +193,22 @@ export function Wrapped() {
                 transition={{ duration: 0.5, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                 className={`group relative liquid-glass depth-2 rounded-card overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${span}`}
+                style={{
+                  // R24-1c: persistent tone-tinted inner ring at rest so each
+                  // card reads as "stamped" with its own tone (accent for
+                  // streak/day/total, pos for setup/instrument, warn for the
+                  // cost-of-indiscipline card). Without this the warn card
+                  // was visually indistinguishable from the accent cards at
+                  // rest — it only earned its red glow on hover. The ring is
+                  // whisper-faint (1px inset at 8–12 % alpha) so it reads as
+                  // material weight, not a colored frame.
+                  boxShadow:
+                    c.tone === "warn"
+                      ? "inset 0 0 0 1px rgb(var(--pnl-warn) / 0.12), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)"
+                      : c.tone === "pos"
+                        ? "inset 0 0 0 1px rgb(var(--pnl-pos) / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)"
+                        : "inset 0 0 0 1px rgb(var(--accent-base) / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)",
+                }}
               >
                 {/* Accent border glow on hover. */}
                 <div
@@ -237,7 +253,15 @@ export function Wrapped() {
                 />
 
                 <div className="relative p-6 md:p-7 flex flex-col h-full justify-between gap-4 cq-wrap min-w-0">
+                  {/* R24-1c: editorial index (01 — 06) before the eyebrow so
+                      the bento reads as a numbered sequence (magazine
+                      rhythm). tnum + tabular-nums so the indices align
+                      digit-for-digit across the grid. */}
                   <span className="eyebrow inline-flex items-center gap-2">
+                    <span className="tnum tabular-nums" style={{ color: "rgb(var(--accent-base))", fontWeight: 600 }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span aria-hidden className="w-px h-3" style={{ background: "rgb(var(--divider) / 0.18)" }} />
                     <span
                       className="w-1.5 h-1.5 rounded-full"
                       style={{

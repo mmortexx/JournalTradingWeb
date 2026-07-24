@@ -131,7 +131,7 @@ export function SocialProof() {
                         </motion.svg>
                       ))}
                     </div>
-                    <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] tnum transition-[border-color,color] duration-300 hover:border-[rgb(var(--accent-base)/0.35)] hover:text-secondary">
+                    <span className="pill bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.15)] tnum">
                       {t.yearsTrading} {es ? "años operando" : "yrs trading"}
                     </span>
                   </div>
@@ -159,9 +159,13 @@ export function SocialProof() {
                       >
                         {t.initials}
                       </span>
-                      {/* Verified badge — scales in, then the check draws via pathLength. Sits outside the avatar so it isn't clipped. */}
+                      {/* Verified badge — scales in, then the check draws via pathLength. Sits outside the avatar so it isn't clipped.
+                          Bumped from 16px → 18px so the 8px check has more
+                          breathing room inside the 2px border (was 12px inner,
+                          now 14px) — the check reads crisper at a glance on
+                          both Retina and standard displays. */}
                       <motion.span
-                        className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-pnl-pos border-2 border-[rgb(var(--card))] flex items-center justify-center"
+                        className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full bg-pnl-pos border-2 border-[rgb(var(--card))] flex items-center justify-center"
                         initial={{ scale: 0, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
                         viewport={{ once: true, margin: "-50px" }}
@@ -193,7 +197,7 @@ export function SocialProof() {
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="t-h4 text-primary truncate">{t.name}</span>
-                      <span className="text-xs text-tertiary truncate">{es ? t.roleEs : t.roleEn}</span>
+                      <span className="text-xs text-tertiary truncate transition-colors duration-300 group-hover:text-secondary">{es ? t.roleEs : t.roleEn}</span>
                     </div>
                   </div>
                 </div>

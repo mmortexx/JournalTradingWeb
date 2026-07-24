@@ -201,14 +201,31 @@ export function Story() {
                   {/* Dot pulse halo — softened (scale 2.1, initial opacity
                       0.30) so the emphasis reads as a single quiet breath
                       rather than a loud pop competing with the dot itself.
-                      Sits BEHIND the dot via the same absolute position. */}
+                      Sits BEHIND the dot via the same absolute position.
+                      For the terminal "pos" phase (the trader's destination)
+                      the halo loops continuously — a slow breath that draws
+                      the eye to where the arc arrives, while every other
+                      phase keeps its one-shot entry pulse. */}
                   <motion.span
                     aria-hidden="true"
                     className={`absolute left-0 top-1.5 w-[15px] h-[15px] rounded-full ${toneDot[p.tone]} pointer-events-none`}
                     initial={{ scale: 0.6, opacity: 0.30 }}
-                    whileInView={{ scale: 2.1, opacity: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ delay: i * 0.08 + 0.2, duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
+                    {...(p.tone === "pos"
+                      ? {
+                          animate: { scale: [0.6, 2.1], opacity: [0.35, 0] },
+                          transition: {
+                            delay: i * 0.08 + 1.2,
+                            duration: 2.2,
+                            ease: [0.22, 1, 0.36, 1],
+                            repeat: Infinity,
+                            repeatDelay: 0.8,
+                          },
+                        }
+                      : {
+                          whileInView: { scale: 2.1, opacity: 0 },
+                          viewport: { once: true, margin: "-40px" },
+                          transition: { delay: i * 0.08 + 0.2, duration: 1.05, ease: [0.22, 1, 0.36, 1] },
+                        })}
                   />
                   <motion.div
                     whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
@@ -230,8 +247,17 @@ export function Story() {
                       >
                         {p.tag}
                       </span>
+                      {/* Phase index — split so the current number reads in
+                          secondary (one step above tertiary) and the total
+                          stays tertiary. The contrast reinforces "you are
+                          here" vs "of N" without adding a new color token.
+                          Both keep tnum for tabular alignment. */}
                       <span className="text-[10px] text-tertiary tnum">
-                        {String(i + 1).padStart(2, "0")} / {String(phases.length).padStart(2, "0")}
+                        <span className="text-secondary">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        {" / "}
+                        {String(phases.length).padStart(2, "0")}
                       </span>
                     </div>
                     <h3 className="mt-2 t-h3 text-primary">

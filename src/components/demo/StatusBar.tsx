@@ -12,8 +12,16 @@ import { fmtMoney, fmtPct } from "@/lib/trading/format";
 /* ------------------------------------------------------------------ */
 
 interface StatusBarProps {
-  /** Open the in-demo keyboard-shortcuts overlay (Feature 3). */
-  onOpenShortcuts: () => void;
+  /** Open the in-demo keyboard-shortcuts overlay (Feature 3). If omitted,
+   *  the keyboard-icon button is hidden — used by RealScreenshotDemo, which
+   *  doesn't render the shortcuts overlay (its shortcuts differ from the
+   *  interactive AppDemo's). */
+  onOpenShortcuts?: () => void;
+  /** Override the reset button's behavior. If omitted, the reset button
+   *  snaps the demo context's `page` back to "dashboard" (the default for
+   *  the interactive AppDemo). RealScreenshotDemo passes its own handler
+   *  to snap the active screenshot tab back to the first one. */
+  onReset?: () => void;
 }
 
 /**
@@ -42,10 +50,16 @@ interface StatusBarProps {
  * status-bar pattern. The bottom corners are rounded automatically by the
  * parent window's `overflow-hidden` + `rounded-xl`.
  */
-export function StatusBar({ onOpenShortcuts }: StatusBarProps) {
+export function StatusBar({ onOpenShortcuts, onReset }: StatusBarProps = {}) {
   const { t, lang } = useLang();
   const { fullscreen, setFullscreen, setPage } = useDemo();
   const es = lang === "es";
+  // R24-1c (courtesy fix): pull onOpenShortcuts into a local const so TS
+  // narrows it from `(() => void) | undefined` to `() => void` inside the
+  // JSX `&&` clause below — the destructured-prop narrowing in `{onOpenShortcuts && ...}`
+  // was unreliable and produced a tsc2322 error at the KeyboardIconButton
+  // call site. Local const narrowing is rock-solid.
+  const openShortcuts = onOpenShortcuts;
 
   return (
     <div className="liquid-glass border-t border-white/10 relative flex items-center justify-between px-3 h-7 text-[11px] text-tertiary select-none">
@@ -74,7 +88,7 @@ export function StatusBar({ onOpenShortcuts }: StatusBarProps) {
           <span className="text-secondary">{METRICS.closedCount}</span>
           {es ? " operaciones" : " trades"}
         </span>
-        <KeyboardIconButton onClick={onOpenShortcuts} es={es} />
+        {openShortcuts && <KeyboardIconButton onClick={openShortcuts} es={es} />}
         <button
           type="button"
           onClick={() => setFullscreen(!fullscreen)}
@@ -88,7 +102,7 @@ export function StatusBar({ onOpenShortcuts }: StatusBarProps) {
           )}
         </button>
         <ShareButton />
-        <ResetButton onReset={() => setPage("dashboard")} />
+        <ResetButton onReset={onReset ?? (() => setPage("dashboard"))} />
       </span>
     </div>
   );

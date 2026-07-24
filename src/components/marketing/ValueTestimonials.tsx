@@ -147,9 +147,14 @@ export function ValueTestimonials() {
                 aria-hidden="true"
               />
 
-              {/* Value chip — the headline stat the trader attributes to the app. */}
+              {/* Value chip — the headline stat the trader attributes to the app.
+                  R24-1d adds a small accent dot prefix (matches the
+                  PricingFAQ reassurance-pill dot pattern) so the chip
+                  reads as a deliberate credential stat rather than a
+                  bare text pill. */}
               <div className="relative flex items-center justify-between gap-2">
-                <span className="pill bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !text-[11px] uppercase tracking-[0.1em] tnum">
+                <span className="pill bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !text-[11px] uppercase tracking-[0.1em] tnum gap-1.5">
+                  <span className="size-1.5 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
                   {es ? t.chipEs : t.chipEn}
                 </span>
                 <span
@@ -183,20 +188,23 @@ export function ValueTestimonials() {
 
               {/* Quote — compact, slightly smaller than the main SocialProof.
                   The opening/closing quote marks are lifted to editorial
-                  accents: a 2xl serif glyph in the accent green, sitting on
+                  accents: a 3xl serif glyph in the accent green, sitting on
                   the baseline of the body text so they read as decorative
-                  drop-cap-style marks rather than inline punctuation (R20-3c). */}
+                  drop-cap-style marks rather than inline punctuation.
+                  R24-1d bumps from 2xl → 3xl for stronger editorial
+                  drop-cap presence + aligns -0.18em → -0.22em so the
+                  larger glyph still sits on the body baseline. */}
               <blockquote className="relative text-[13.5px] text-secondary leading-relaxed flex-1">
                 <span
                   aria-hidden="true"
-                  className="font-serif text-2xl leading-none text-[rgb(var(--accent-base))] mr-1 align-[-0.18em]"
+                  className="font-serif text-3xl leading-none text-[rgb(var(--accent-base))] mr-1 align-[-0.22em]"
                 >
                   “
                 </span>
                 {es ? t.quoteEs : t.quoteEn}
                 <span
                   aria-hidden="true"
-                  className="font-serif text-2xl leading-none text-[rgb(var(--accent-base))] ml-0.5 align-[-0.18em]"
+                  className="font-serif text-3xl leading-none text-[rgb(var(--accent-base))] ml-0.5 align-[-0.22em]"
                 >
                   ”
                 </span>
@@ -225,16 +233,20 @@ export function ValueTestimonials() {
                     {es ? t.roleEs : t.roleEn}
                   </span>
                 </div>
-                {/* Verified check */}
+                {/* Verified check — R24-1d bumps 14×14 → 16×16 for better
+                    visibility at a glance, and adds a subtle pnl-pos ring
+                    around the circle so the badge holds definition in light
+                    theme (where the /18 fill alone was nearly invisible on
+                    the paper veil). */}
                 <svg
-                  width="14"
-                  height="14"
+                  width="16"
+                  height="16"
                   viewBox="0 0 12 12"
                   fill="none"
                   className="ml-auto text-pnl-pos shrink-0"
                   aria-label={es ? "Verificado" : "Verified"}
                 >
-                  <circle cx="6" cy="6" r="5.5" fill="rgb(var(--pnl-pos) / 0.18)" />
+                  <circle cx="6" cy="6" r="5.5" fill="rgb(var(--pnl-pos) / 0.18)" stroke="rgb(var(--pnl-pos) / 0.30)" strokeWidth="0.5" />
                   <path
                     d="M3.5 6.2l1.8 1.8L8.5 4.8"
                     stroke="rgb(var(--pnl-pos))"

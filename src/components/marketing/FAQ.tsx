@@ -247,7 +247,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={es ? "Buscar en las preguntas…" : "Search questions…"}
               aria-label={es ? "Buscar en las preguntas frecuentes" : "Search frequently asked questions"}
-              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-10 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
+              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
             />
           </div>
         </Reveal>
@@ -270,7 +270,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
                 <button
                   type="button"
                   onClick={() => setGlossaryOpen(true)}
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:underline transition-colors"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.5)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm"
                 >
                   {es ? "Abrir glosario →" : "Open glossary →"}
                 </button>
@@ -287,7 +287,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
                   <AccordionItem
                     key={item.q}
                     value={`item-${i}`}
-                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),0_0_30px_-6px_rgb(var(--accent-base)/0.32)]"
+                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=closed]:hover:bg-[rgb(var(--divider)/0.04)] data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),0_0_30px_-6px_rgb(var(--accent-base)/0.32)]"
                   >
                     <AccordionTrigger className="text-left text-base md:text-[1.05rem] font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:text-[rgb(var(--accent-base))]">
                       {/* Wrap the question in a min-w-0 span so the flex
@@ -331,7 +331,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
               trigger={
                 <button
                   type="button"
-                  className="text-sm text-tertiary hover:text-primary transition-colors inline-flex items-center gap-1.5"
+                  className="text-sm text-tertiary hover:text-primary transition-colors inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.5)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm"
                 >
                   {es
                     ? "¿No encuentras tu término? Consulta el glosario →"

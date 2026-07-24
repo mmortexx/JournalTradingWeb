@@ -34,8 +34,22 @@ import { useDemo } from "./DemoContext";
  *   • Close exits fullscreen when active; otherwise it's a visual control
  *     only (the demo can't be "closed" — there's no parent shell to return
  *     to). Minimize is visual-only with a proper aria-label.
+ *
+ * `viewLabel` prop: by default the centered doc-title is resolved from the
+ * active `page` in the demo context (with the `detail` → trades special
+ * case). Callers that drive the centered label from a different source of
+ * truth (e.g. RealScreenshotDemo, which has 8 screenshot tabs that don't
+ * map 1:1 to the 7-value DemoPage enum) can pass an explicit `viewLabel`
+ * string to override the page-based resolution. Backward compatible — if
+ * omitted, the page-based resolution is used.
  */
-export function WindowChrome() {
+interface WindowChromeProps {
+  /** Override the centered doc-title label. If omitted, the label is
+   *  resolved from the active `page` in the demo context. */
+  viewLabel?: string;
+}
+
+export function WindowChrome({ viewLabel }: WindowChromeProps = {}) {
   const { t } = useLang();
   const { page, fullscreen, setFullscreen } = useDemo();
 
@@ -51,6 +65,10 @@ export function WindowChrome() {
           | "pageJournal"
           | "pagePlaybook"
           | "pageSettings");
+
+  // Explicit `viewLabel` prop overrides the page-based resolution. Used by
+  // RealScreenshotDemo, where the active tab isn't one of the 7 DemoPages.
+  const resolvedLabel = viewLabel ?? t(viewLabelKey);
 
   return (
     <div className="liquid-glass border-b border-white/10 flex items-center justify-between h-9 text-xs shrink-0 relative cursor-default select-none">
@@ -85,7 +103,7 @@ export function WindowChrome() {
           never intercepts the title-bar's hover texture or caption clicks. */}
       <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-[1]">
         <span className="text-xs text-tertiary hidden md:inline truncate max-w-[220px]">
-          {t(viewLabelKey)}
+          {resolvedLabel}
         </span>
       </div>
 

@@ -28,6 +28,17 @@ interface FeatureImageProps {
    * `(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw`).
    */
   sizes?: string;
+  /**
+   * Override the contain-mode surface background. By default contain mode
+   * paints a theme-aware surface fill (`var(--surface)` at 92% alpha) plus
+   * a faint radial vignette so the screenshot reads as centered on a soft
+   * halo. In always-dark contexts (e.g. the live demo window, which is
+   * intentionally always-dark to match the dark-themed app screenshots),
+   * pass a flat dark color like `"#0b0c0d"` to override the theme-aware
+   * fill — otherwise the letterbox area turns near-white when the user is
+   * in light theme, clashing with the surrounding dark panel.
+   */
+  surfaceBg?: string;
 }
 
 /**
@@ -44,6 +55,7 @@ export function FeatureImage({
   delay = 0,
   fit = "cover",
   sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  surfaceBg,
 }: FeatureImageProps) {
   const isContain = fit === "contain";
   return (
@@ -76,8 +88,15 @@ export function FeatureImage({
               // floating on a flat tile — important for screenshots whose
               // own background is near-black and would otherwise blend
               // into the letterbox.
-              background:
-                "radial-gradient(78% 72% at 50% 50%, transparent 58%, rgb(var(--tint) / 0.10) 100%), color-mix(in srgb, var(--surface) 92%, transparent)",
+              //
+              // `surfaceBg` override: when the caller passes a flat color
+              // (e.g. the live demo's always-dark `"#0b0c0d"`), we drop
+              // the theme-aware fill + vignette entirely and use the flat
+              // color — necessary for always-dark contexts where the
+              // theme-aware `var(--surface)` would clash in light theme.
+              background: surfaceBg
+                ? surfaceBg
+                : "radial-gradient(78% 72% at 50% 50%, transparent 58%, rgb(var(--tint) / 0.10) 100%), color-mix(in srgb, var(--surface) 92%, transparent)",
             }
           : undefined
       }

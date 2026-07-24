@@ -227,7 +227,7 @@ export function Changelog() {
                         className={`liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                           isPast
                             ? "hover:shadow-[0_0_36px_-10px_rgb(var(--accent-base)/0.45)] hover:border-[rgb(var(--accent-base)/0.30)]"
-                            : "opacity-90 hover:opacity-100 hover:border-[rgb(var(--divider)/0.25)]"
+                            : "opacity-90 hover:opacity-100 hover:border-[rgb(var(--divider)/0.25)] hover:shadow-[0_0_28px_-10px_rgb(var(--pnl-warn)/0.30)]"
                         }`}
                       >
                           <div
@@ -339,7 +339,7 @@ export function Changelog() {
           <div className="mt-14 flex flex-col items-center gap-3 text-center">
             <div className="divider-grad w-40" aria-hidden />
             <p className="text-sm text-secondary">
-              <span className="text-primary font-medium">✓</span>{" "}
+              <span className="text-[rgb(var(--pnl-pos))] font-medium">✓</span>{" "}
               {es
                 ? "Tu licencia incluye las actualizaciones de tu versión mayor. Las próximas, con descuento."
                 : "Your license includes updates within your major version. Future majors at a discount."}

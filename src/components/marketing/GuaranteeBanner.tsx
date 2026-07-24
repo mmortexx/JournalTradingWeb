@@ -46,10 +46,14 @@ export function GuaranteeBanner() {
               }}
             />
             {/* Accent sweep — a thin diagonal gradient that wipes across the
-                top edge on view. Purely decorative. */}
+                top edge on view. Bumped from h-px to h-[2px] (R24-1d) so the
+                sweep reads as a deliberate premium top-edge marker matching
+                the Pro pricing-card rail + DownloadCTA top sweep, rather
+                than a hairline that vanishes on light theme. Purely
+                decorative. */}
             <motion.div
               aria-hidden="true"
-              className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+              className="absolute top-0 left-0 right-0 h-[2px] pointer-events-none"
               style={{
                 background:
                   "linear-gradient(90deg, transparent 0%, rgb(var(--accent-base)) 50%, transparent 100%)",
@@ -68,9 +72,12 @@ export function GuaranteeBanner() {
                     fill + accent border + inset accent ring so the shield
                     reads as a premium crest rather than a neutral chip.
                     Ties the banner to the accent palette used across the
-                    rest of the pricing page (R20-3c). */}
+                    rest of the pricing page. R24-1d adds a second inset
+                    accent ring (ring-1 ring-inset) at 0.20 alpha for a
+                    double-edge machined look that holds definition in
+                    light theme. */}
                 <span
-                  className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-lg border text-[rgb(var(--accent-base))]"
+                  className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-lg border ring-1 ring-inset ring-[rgb(var(--accent-base)/0.20)] text-[rgb(var(--accent-base))]"
                   style={{
                     background:
                       "linear-gradient(135deg, rgb(var(--accent-base) / 0.18), rgb(var(--accent-base) / 0.06))",
@@ -111,11 +118,15 @@ export function GuaranteeBanner() {
               {/* Stat chip — 30 días / 30 days, tnum. On mobile the chip
                   lands on its own row (the supporting copy is hidden < md),
                   so we center it to read as a deliberate credential pill
-                  rather than a stray left-aligned fragment. */}
+                  rather than a stray left-aligned fragment. R24-1d swaps
+                  the neutral divider-tinted bg/border for an accent-tinted
+                  treatment (mirroring the shield icon's accent crest) so
+                  the "30" reads as a deliberate premium credential rather
+                  than a neutral stat. */}
               <div className="flex justify-center md:flex-none md:justify-start md:text-right">
-                <div className="inline-flex items-baseline gap-1.5 pill bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] !px-3 !py-1.5">
+                <div className="inline-flex items-baseline gap-1.5 pill bg-[rgb(var(--accent-base)/0.10)] border border-[rgb(var(--accent-base)/0.30)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.18)] !px-3 !py-1.5">
                   <span className="text-2xl font-bold tnum text-primary leading-none">30</span>
-                  <span className="text-xs uppercase tracking-[0.12em] text-tertiary font-semibold">
+                  <span className="text-xs uppercase tracking-[0.12em] text-[rgb(var(--accent-base))] font-semibold">
                     {es ? "días" : "days"}
                   </span>
                 </div>

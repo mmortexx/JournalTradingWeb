@@ -7,6 +7,16 @@ import { useLang } from "@/lib/i18n";
 /**
  * Thin trust band: a single row of trust signals with inline SVG icons,
  * separated by dots. Uses section-tight padding and centered layout.
+ *
+ * R24-1b polish:
+ *  - Icon↔label gap 1.5 → 2 (8 px): 6 px was tight enough that the icon
+ *    and label read as a single dense token; 8 px gives the icon room
+ *    to breathe as its own glyph while keeping the pair cohesive.
+ *  - SparkIcon rebuilt as a single 4-point star path (was 8 radiating
+ *    lines — visually heavier than the other 4 icons, broke the row's
+ *    stroke-weight consistency even though all share strokeWidth 1.3).
+ *    The 4-point star is a single path with strokeLinejoin=round, so
+ *    it renders at the same visual weight as the Shield / Lock / Globe.
  */
 export function TrustStrip() {
   const { lang } = useLang();
@@ -79,7 +89,7 @@ export function TrustStrip() {
                   delay: 0.15 + i * 0.08,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="flex items-center gap-1.5"
+                className="flex items-center gap-2"
               >
                 <span
                   className="text-primary shrink-0 inline-flex"
@@ -92,7 +102,7 @@ export function TrustStrip() {
               {i < items.length - 1 && (
                 <span
                   aria-hidden="true"
-                  className="hidden md:inline-block w-1 h-1 rounded-full bg-[rgb(var(--divider)/0.30)]"
+                  className="hidden md:inline-block w-1 h-1 rounded-full bg-[rgb(var(--accent-base)/0.50)]"
                 />
               )}
             </Fragment>
@@ -177,11 +187,15 @@ function GlobeIcon() {
 function SparkIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      {/* R24-1b — single 4-point star path (was 8 radiating lines).
+          Same strokeWidth 1.3 as the other 4 icons in this strip; the
+          strokeLinejoin=round caps the 4 outer points softly so the
+          star reads as a coordinated sparkle, not a heavier sun-burst. */}
       <path
-        d="M8 1.5v3M8 11.5v3M1.5 8h3M11.5 8h3M3.6 3.6l2 2M10.4 10.4l2 2M3.6 12.4l2-2M10.4 5.6l2-2"
+        d="M8 2.5L9.4 6.6L13.5 8L9.4 9.4L8 13.5L6.6 9.4L2.5 8L6.6 6.6Z"
         stroke="currentColor"
         strokeWidth="1.3"
-        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

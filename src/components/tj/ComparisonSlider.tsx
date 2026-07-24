@@ -239,8 +239,12 @@ export function ComparisonSlider() {
                   read as a symmetric red↔green pair (Before red / After accent).
                   bg divider/0.05 → accent/0.10; border divider/0.20 → accent/0.30;
                   label text-primary → text-accent so the chip colour-blocks
-                  correctly with the green-tinted After surface. */}
-              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-base)/0.10)] border border-[rgb(var(--accent-base)/0.30)]">
+                  correctly with the green-tinted After surface.
+                  R24-1c: added an accent-tinted drop shadow so the chip
+                  floats above the After surface (matches the depth-2 card
+                  chrome) + a tiny accent dot before the label so the chip
+                  reads as a stamped badge rather than a floating label. */}
+              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-base)/0.10)] border border-[rgb(var(--accent-base)/0.30)] shadow-[0_4px_12px_-4px_rgb(var(--accent-base)/0.30)]">
                 <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-pos/15 text-pnl-pos">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -300,7 +304,10 @@ export function ComparisonSlider() {
                 }}
               />
               {/* Header chip top-left */}
-              <div className="absolute top-3 left-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pnl-neg/10 border border-pnl-neg/25">
+              {/* R24-1c: same drop-shadow treatment as the After chip so the
+                  Before chip floats symmetrically — pnl-neg-tinted shadow
+                  instead of accent so it stays in the “caution” color block. */}
+              <div className="absolute top-3 left-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pnl-neg/10 border border-pnl-neg/25 shadow-[0_4px_12px_-4px_rgb(var(--pnl-neg)/0.30)]">
                 <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-neg/15 text-pnl-neg">
                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -366,17 +373,30 @@ export function ComparisonSlider() {
                 className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-3 blur-[3px] bg-[rgb(var(--accent-base)/0.35)] opacity-70 group-hover/handle:opacity-100 transition-opacity duration-200"
               />
               {/* Visible drag line — 4px rule, accent on hover. Lives as a
-                  child span so the wider button hit area stays transparent. */}
+                  child span so the wider button hit area stays transparent.
+                  R24-1c: replaced the flat divider/70 fill with a vertical
+                  3-stop gradient (top + bottom = accent/35, middle =
+                  divider/70) so the line reads as a glowing filament that
+                  fades at the card edges rather than a hard 4px rule.
+                  Hover swaps the middle stop to accent/55 (already in place). */}
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-[rgb(var(--divider)/0.70)] group-hover/handle:bg-[rgb(var(--accent-base)/0.55)] transition-[background-color] duration-200"
+                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 group-hover/handle:bg-[rgb(var(--accent-base)/0.55)] transition-[background-color] duration-200"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgb(var(--accent-base) / 0.35) 0%, rgb(var(--divider) / 0.70) 22%, rgb(var(--divider) / 0.70) 78%, rgb(var(--accent-base) / 0.35) 100%)",
+                }}
               />
               {/* Circular grip with double arrows — R20-3b: refined the grip.
                   Added group-hover/handle:scale-105 + a thin accent inner
                   ring (ring-1 ring-accent/40) so the grip lifts visibly on
-                  hover. Outer accent shadow kept (the signature accent halo). */}
+                  hover. Outer accent shadow kept (the signature accent halo).
+                  R24-1c: deepened the hover halo — grip now lifts with a
+                  brighter accent outer shadow (0.55 → 0.70) + scale-105 →
+                  scale-110 + ring color 0.40 → 0.65 so the grab affordance
+                  reads unmistakably on a quick mouse-over. */}
               <span
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-[rgb(var(--divider)/0.30)] ring-1 ring-[rgb(var(--accent-base)/0.40)] shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/handle:scale-105"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-[rgb(var(--divider)/0.30)] ring-1 ring-[rgb(var(--accent-base)/0.40)] group-hover/handle:ring-[rgb(var(--accent-base)/0.65)] shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)] group-hover/handle:shadow-[0_10px_28px_-6px_rgb(var(--accent-base)/0.70)] transition-[transform,box-shadow,--tw-ring-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/handle:scale-110"
                 aria-hidden="true"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -392,7 +412,11 @@ export function ComparisonSlider() {
             </motion.button>
 
             {/* Edge hint — top-center line showing this is interactive */}
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+            {/* R24-1c: tj-float animation on the hint so it gently bobs
+                ±4px vertically (keyframe in globals.css) — reads as an
+                invitation to interact rather than a static label. Reduced
+                by the global prefers-reduced-motion rule. */}
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none" style={{ animation: "tj-float 2.4s ease-in-out infinite" }}>
               <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary/70 font-semibold">
                 {es ? "Arrastra →" : "Drag →"}
               </span>

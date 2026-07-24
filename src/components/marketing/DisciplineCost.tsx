@@ -110,10 +110,14 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                 }}
               >
                 {/* R20-3b: hover rail — accent on neutral rows, deeper red on the gap row.
-                    Sits behind the row content via z-index 0 and pointer-events: none. */}
+                    Sits behind the row content via z-index 0 and pointer-events: none.
+                    R24-1c: the Gap row now shows its red rail STATICALLY
+                    (opacity-100 instead of opacity-0) so the most important
+                    row reads as stamped even without hover — the hover
+                    transition still applies to the other rows. */}
                 <span
                   aria-hidden
-                  className="absolute left-0 top-0 bottom-0 opacity-0 group-hover/row:opacity-100 transition-opacity duration-200 pointer-events-none"
+                  className={`absolute left-0 top-0 bottom-0 pointer-events-none transition-opacity duration-200 ${row.highlight ? "opacity-100" : "opacity-0 group-hover/row:opacity-100"}`}
                   style={{
                     width: 2,
                     background: row.highlight
@@ -121,9 +125,9 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                       : "rgb(var(--accent-base))",
                   }}
                 />
-                <span className="relative min-w-0 break-words" style={{ fontSize: 13.5, color: "var(--ink)" }}>{row.l}</span>
+                <span className="relative min-w-0 break-words" style={{ fontSize: 13.5, color: "var(--ink)", fontWeight: row.highlight ? 600 : 400 }}>{row.l}</span>
                 <span className="tnum text-right relative min-w-0" style={{ fontSize: 13.5, color: "var(--ink-2)" }}>{row.n}</span>
-                <span className="tnum text-right relative min-w-0" style={{ fontSize: 14, fontWeight: 700, color: row.c }}>{row.v}</span>
+                <span className="tnum text-right relative min-w-0" style={{ fontSize: row.highlight ? 16 : 14, fontWeight: 700, color: row.c }}>{row.v}</span>
               </div>
             ))}
           </div>
@@ -184,7 +188,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                 </div>
                 <div className="h-1 rounded-full overflow-hidden relative" style={{ background: "rgb(var(--divider) / 0.13)", boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.18)" }}>
                   <div
-                    className="h-full rounded-full"
+                    className="h-full rounded-full relative"
                     style={{
                       width: `${row.pct * 2.5}%`,
                       // R20-3b: gradient fill — solid red on the leading edge,
@@ -196,13 +200,52 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                       boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.20)",
                       transition: "width 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
-                  />
+                  >
+                    {/* R24-1c: bright leading-edge cap — a 2px solid pnl-neg
+                        pill at the right end of the fill so each bar reads as
+                        a meter with a clearly defined “current value” edge
+                        rather than a fading tint. Sits flush to the fill’s
+                        right edge via absolute right-0 top-0 bottom-0. */}
+                    <span
+                      aria-hidden
+                      className="absolute right-0 top-0 bottom-0"
+                      style={{
+                        width: 2,
+                        background: "rgb(var(--pnl-neg))",
+                        boxShadow: "0 0 6px rgb(var(--pnl-neg) / 0.55)",
+                      }}
+                    />
+                  </div>
                 </div>
               </li>
             ))}
           </ul>
-          <div className="flex items-center justify-between pt-3 border-t gap-2" style={{ borderColor: "rgb(var(--divider) / 0.06)" }}>
-            <span className="min-w-0 break-words" style={{ fontSize: 13, color: "var(--ink-2)" }}>{es ? "Total del mes" : "Month total"}</span>
+          <div className="flex items-center justify-between pt-3 border-t gap-2 relative" style={{ borderColor: "rgb(var(--divider) / 0.06)", marginTop: 4, paddingTop: 14, paddingBottom: 4, background: "color-mix(in oklab, rgb(var(--pnl-neg)) 4%, transparent)", borderRadius: 8, paddingLeft: 12, paddingRight: 12, marginLeft: -4, marginRight: -4 }}>
+            {/* R24-1c: total row now reads as a stamped footer — tinted
+                pnl-neg/4 backdrop + tiny accent-red TOTAL badge before the
+                label so the “Month total” row stands apart from the
+                invoice line items above. The negative margin + padding
+                lets the backdrop extend slightly past the line items’ left
+                edge so the total reads as a sibling-level summary. */}
+            <span className="inline-flex items-center gap-2 min-w-0">
+              <span
+                aria-hidden
+                className="tnum inline-flex items-center justify-center"
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  color: "rgb(var(--pnl-neg))",
+                  background: "color-mix(in oklab, rgb(var(--pnl-neg)) 14%, transparent)",
+                  border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 32%, transparent)",
+                  borderRadius: 4,
+                  padding: "2px 5px",
+                }}
+              >
+                {es ? "TOTAL" : "TOTAL"}
+              </span>
+              <span className="min-w-0 break-words" style={{ fontSize: 13, color: "var(--ink-2)" }}>{es ? "Total del mes" : "Month total"}</span>
+            </span>
             <span
               className="tnum font-serif shrink-0"
               style={{ fontSize: 28, fontWeight: 400, color: "rgb(var(--pnl-neg))" }}

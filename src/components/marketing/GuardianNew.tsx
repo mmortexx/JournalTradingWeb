@@ -67,8 +67,21 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               }}
             >
               <span
+                aria-hidden
                 className="inline-block rounded-full"
-                style={{ width: 5, height: 5, background: "rgb(var(--accent-base))" }}
+                style={{
+                  width: 5,
+                  height: 5,
+                  background: "rgb(var(--accent-base))",
+                  // R24-1c: animate the LIVE dot with tj-glow (keyframe in
+                  // globals.css — opacity 0.5 ↔ 0.85) so the "EN VIVO" /
+                  // "LIVE" badge actually reads as live rather than a
+                  // static green bead. The same keyframe is used by other
+                  // ambient-living elements across the site so the pulse
+                  // rhythm stays consistent.
+                  animation: "tj-glow 1.8s ease-in-out infinite",
+                  boxShadow: "0 0 6px rgb(var(--accent-base) / 0.6)",
+                }}
               />
               {es ? "EN VIVO" : "LIVE"}
             </span>
@@ -113,18 +126,26 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                 <span
                   className="inline-grid place-items-center rounded-full flex-none mt-px"
                   style={{
-                    width: 18,
-                    height: 18,
+                    width: 20,
+                    height: 20,
                     background: c.ok
                       ? "color-mix(in oklab, rgb(var(--pnl-pos)) 18%, transparent)"
                       : "color-mix(in oklab, rgb(var(--pnl-neg)) 18%, transparent)",
                     color: c.ok ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))",
+                    // R24-1c: swapped the inset-shadow-only ring for a
+                    // solid 1px border of the same pnl color so the ✓/✕
+                    // container reads as a stamped seal (inset shadow alone
+                    // was nearly imperceptible on the dark glass). Bumped
+                    // size 18→20 so the glyph + ring have room to breathe at
+                    // 11px/800. Added a 0 0 8px glow halo so the icons read
+                    // as luminous rather than pasted on.
+                    border: `1px solid ${c.ok ? "rgb(var(--pnl-pos) / 0.45)" : "rgb(var(--pnl-neg) / 0.50)"}`,
                     boxShadow: c.ok
-                      ? "inset 0 0 0 1px rgb(var(--pnl-pos) / 0.30)"
-                      : "inset 0 0 0 1px rgb(var(--pnl-neg) / 0.32)",
+                      ? "inset 0 0 0 1px rgb(var(--pnl-pos) / 0.18), 0 0 8px rgb(var(--pnl-pos) / 0.10)"
+                      : "inset 0 0 0 1px rgb(var(--pnl-neg) / 0.20), 0 0 8px rgb(var(--pnl-neg) / 0.12)",
                   }}
                 >
-                  <span style={{ fontSize: 11, fontWeight: 700, lineHeight: 1 }}>{c.ok ? "✓" : "✕"}</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, lineHeight: 1 }}>{c.ok ? "✓" : "✕"}</span>
                 </span>
                 <span style={{ fontSize: 13, lineHeight: 1.4, color: c.ok ? "var(--ink-2)" : "rgb(var(--pnl-neg))", fontWeight: c.ok ? 400 : 600 }}>{c.l}</span>
               </div>
@@ -134,14 +155,19 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               a “blocked / hard stop” signal even on a quick glance),
               asymmetric horizontal padding (12px / 14px) so the rail
               breathes against the icon, plus a soft inset highlight so
-              the box reads as a stamped alert rather than a flat tint. */}
+              the box reads as a stamped alert rather than a flat tint.
+              R24-1c: added an outer pnl-neg glow ring + AlertTriangle is
+              now wrapped in a stamped circular container so the icon +
+              the OPERACIÓN BLOQUEADA label read as a single stamped seal
+              rather than a floating icon + text. */}
           <div
             className="rounded-[10px] mb-3 relative overflow-hidden"
             style={{
               padding: "12px 14px 12px 16px",
               background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",
               border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 28%, transparent)",
-              boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06)",
+              boxShadow:
+                "inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 0 1px rgb(var(--pnl-neg) / 0.05), 0 10px 28px -12px rgb(var(--pnl-neg) / 0.30)",
             }}
           >
             <span
@@ -150,7 +176,20 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               style={{ width: 3, background: "rgb(var(--pnl-neg))" }}
             />
             <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle size={14} style={{ color: "rgb(var(--pnl-neg))" }} />
+              <span
+                aria-hidden
+                className="inline-grid place-items-center rounded-full"
+                style={{
+                  width: 20,
+                  height: 20,
+                  background: "color-mix(in oklab, rgb(var(--pnl-neg)) 18%, transparent)",
+                  color: "rgb(var(--pnl-neg))",
+                  border: "1px solid rgb(var(--pnl-neg) / 0.45)",
+                  boxShadow: "inset 0 0 0 1px rgb(var(--pnl-neg) / 0.18), 0 0 8px rgb(var(--pnl-neg) / 0.12)",
+                }}
+              >
+                <AlertTriangle size={12} strokeWidth={2.4} style={{ color: "rgb(var(--pnl-neg))" }} />
+              </span>
               <span
                 className="tnum"
                 style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgb(var(--pnl-neg))", fontWeight: 700 }}

@@ -60,10 +60,14 @@ export function DownloadCTA() {
           whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
           className="relative liquid-glass depth-3 rounded-card p-6 sm:p-8 md:p-12 max-w-3xl mx-auto overflow-hidden transition-shadow duration-300"
         >
-          {/* Top accent sweep — same motif as GuaranteeBanner. */}
+          {/* Top accent sweep — same motif as GuaranteeBanner. R24-1d
+              bumps h-px → h-[2px] so the sweep reads as a deliberate
+              premium top-edge marker (matching the GuaranteeBanner +
+              Pro pricing-card rails) rather than a hairline that
+              vanishes on light theme. */}
           <motion.div
             aria-hidden="true"
-            className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+            className="absolute top-0 left-0 right-0 h-[2px] pointer-events-none"
             style={{
               background:
                 "linear-gradient(90deg, transparent 0%, rgb(var(--accent-base)) 50%, transparent 100%)",
@@ -151,11 +155,18 @@ export function DownloadCTA() {
                 whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
                 className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-5 sm:px-8 py-3 rounded-lg bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] font-medium transition-all duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-4px_rgb(var(--accent-base)/0.50)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
-                <WindowsIcon className="shrink-0" />
+                <WindowsIcon className="shrink-0 transition-transform duration-200 group-hover:scale-105 group-hover:brightness-110" />
                 <span className="break-words">{es ? "Descargar para Windows" : "Download for Windows"}</span>
               </motion.a>
-              <span className="text-xs text-tertiary tnum text-center md:text-right break-words">
-                {es ? "Instalador offline · sin conexión tras instalar" : "Offline installer · no connection after install"}
+              {/* R24-1d — promotes the offline-installer subtext from bare
+                  fine print to a trust badge with a small lock icon prefix
+                  (matches the spec-pill row above) so the "no connection
+                  after install" promise reads as a deliberate credential
+                  rather than a stray caption. inline-flex + gap-1.5 keep
+                  the icon + text aligned on the caption baseline. */}
+              <span className="inline-flex items-center justify-center md:justify-end gap-1.5 text-xs text-tertiary tnum text-center md:text-right break-words">
+                <LockIconMini />
+                <span>{es ? "Instalador offline · sin conexión tras instalar" : "Offline installer · no connection after install"}</span>
               </span>
             </div>
           </div>
@@ -194,6 +205,20 @@ function CheckSmall() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+/* R24-1d — small 12×12 lock icon prefixing the "Instalador offline"
+   subtext so it reads as a trust badge rather than fine print.
+   Uses text-tertiary (inherits from the parent span) so the icon
+   tracks the caption color in both themes. */
+function LockIconMini() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="shrink-0 text-tertiary">
+      <rect x="3.5" y="7" width="9" height="6.5" rx="1.3" stroke="currentColor" strokeWidth="1.3" />
+      <path d="M5.5 7V5.2a2.5 2.5 0 0 1 5 0V7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <circle cx="8" cy="10.2" r="0.9" fill="currentColor" />
     </svg>
   );
 }

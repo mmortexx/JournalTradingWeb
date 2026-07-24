@@ -160,10 +160,10 @@ export function TestimonialsWall() {
                     </svg>
                   ))}
                 </div>
-                <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] flex items-center gap-1 text-[10px] transition-[border-color,color] duration-300 hover:border-[rgb(var(--accent-base)/0.35)] hover:text-secondary">
+                <span className="pill bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.15)] flex items-center gap-1 text-[11px]">
                   <svg
-                    width="9"
-                    height="9"
+                    width="10"
+                    height="10"
                     viewBox="0 0 12 12"
                     fill="none"
                     aria-hidden="true"
@@ -191,10 +191,13 @@ export function TestimonialsWall() {
                   uses #06130d (the brand's dark-on-accent ink, same as
                   Hero's primary CTA) so the initials read at WCAG AA on
                   all 3 hues (accent/pos green + warn amber) in both themes.
-                  `text-white` was failing at 1.7:1 / 2.4:1 on the same bg. */}
+                  `text-white` was failing at 1.7:1 / 2.4:1 on the same bg.
+                  Bumped to 40×40 (was 36×36) with text-xs initials (was
+                  11px) for parity with SocialProof's avatars — the wall
+                  and the three-up grid now share one avatar rhythm. */}
               <div className="relative mt-4 pt-4 flex items-center gap-3 border-t">
                 <span
-                  className="relative w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-[11px] font-bold text-[#06130d] shrink-0"
+                  className="relative w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-[#06130d] shrink-0"
                   style={{ background: t.hue }}
                   aria-hidden="true"
                 >
@@ -202,7 +205,7 @@ export function TestimonialsWall() {
                 </span>
                 <div className="flex flex-col min-w-0">
                   <span className="text-sm font-medium text-primary truncate">{t.name}</span>
-                  <span className="text-xs text-tertiary truncate">{es ? t.roleEs : t.roleEn}</span>
+                  <span className="text-xs text-tertiary truncate transition-colors duration-300 group-hover:text-secondary">{es ? t.roleEs : t.roleEn}</span>
                 </div>
               </div>
             </motion.article>

@@ -151,7 +151,26 @@ export function Milestones() {
                           }}
                         />
                       ) : (
-                        <span className="block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--divider)/0.20)] bg-background" />
+                        <span className="relative block w-3.5 h-3.5">
+                          {/* Pulsing halo — mirrors the Changelog future
+                              dot treatment so both timelines share one
+                              "in progress" vocabulary. Scales 1 → 1.8 and
+                              fades 0.5 → 0 over 1.6s on a 0.4s delay loop. */}
+                          <motion.span
+                            aria-hidden
+                            className="absolute inset-0 rounded-full bg-[rgb(var(--pnl-warn)/0.45)]"
+                            initial={{ scale: 1, opacity: 0.5 }}
+                            animate={{ scale: 1.8, opacity: 0 }}
+                            transition={{
+                              duration: 1.6,
+                              delay: 0.4,
+                              repeat: Infinity,
+                              repeatType: "loop",
+                              ease: "easeOut",
+                            }}
+                          />
+                          <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.55)] bg-background" />
+                        </span>
                       )}
                     </div>
 
@@ -166,7 +185,7 @@ export function Milestones() {
                           {m.date}
                         </span>
                         <span
-                          className={`pill text-[10px] uppercase tracking-[0.12em] tnum ${
+                          className={`pill text-[11px] uppercase tracking-[0.12em] tnum ${
                             isPast
                               ? "bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)]"
                               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border border-dashed border-[rgb(var(--divider)/0.22)]"
@@ -221,7 +240,7 @@ export function Milestones() {
             />
             <span className="flex items-center gap-2">
               <span
-                className="w-2 h-2 rounded-full border border-[rgb(var(--divider)/0.22)] bg-background"
+                className="w-2 h-2 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.55)] bg-background"
                 aria-hidden="true"
               />
               {es ? "En camino" : "On the way"}

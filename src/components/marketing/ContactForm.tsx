@@ -230,7 +230,7 @@ export function ContactForm() {
                       <motion.button
                         type="submit"
                         whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                        className="w-full sm:w-auto bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                        className="w-full sm:w-auto bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] px-6 py-2.5 rounded-lg text-sm font-semibold transition-[background-color,transform,box-shadow] duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
                         {es ? "Enviar" : "Send"}
                       </motion.button>
@@ -262,10 +262,10 @@ function Field({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="group flex flex-col gap-1.5">
       <label
         htmlFor={htmlFor}
-        className="text-[11px] uppercase tracking-[0.14em] text-tertiary font-semibold"
+        className="text-[11px] uppercase tracking-[0.14em] text-tertiary font-semibold transition-colors duration-200 group-focus-within:text-[rgb(var(--accent-base))]"
       >
         {label}
       </label>

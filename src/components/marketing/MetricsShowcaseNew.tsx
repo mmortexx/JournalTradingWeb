@@ -93,6 +93,9 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 // so the four KPIs read as tappable stat cards rather than
                 // inert table cells. Border + bg kept identical to before so
                 // the rest-state visual is unchanged.
+                // R24-1c: added a tiny color-coded 3×3 dot before each label
+                // so the metric direction reads at a glance (pos / neg /
+                // accent / ink) without needing to parse the value first.
                 className="group/metric relative flex min-w-0 items-center justify-between gap-2 sm:gap-3 transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
                 style={{
                   padding: "14px 16px",
@@ -104,7 +107,14 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 }}
               >
                 <span className="pointer-events-none absolute inset-0 rounded-[12px] opacity-0 group-hover/metric:opacity-100 transition-opacity duration-300" aria-hidden style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.35)" }} />
-                <span className="relative min-w-0 break-words text-[12px] sm:text-[13px]" style={{ color: "var(--ink-2)" }}>{m.l}</span>
+                <span className="relative inline-flex items-center gap-2 min-w-0 break-words">
+                  <span
+                    aria-hidden
+                    className="w-1.5 h-1.5 rounded-full flex-none"
+                    style={{ background: m.c }}
+                  />
+                  <span className="text-[12px] sm:text-[13px]" style={{ color: "var(--ink-2)" }}>{m.l}</span>
+                </span>
                 <span className="tnum relative shrink-0 text-[17px] sm:text-[19px]" style={{ fontWeight: 700, color: m.c }}>{m.v}</span>
               </li>
             ))}
@@ -154,7 +164,13 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               the 60-trades badge), plus a hover lift (translateY -3%) +
               brightness bump so the histogram reads as interactive rather
               than decorative. Bars remain aria-hidden (the labels row below
-              carries the semantics for AT). */}
+              carries the semantics for AT).
+              R24-1c: wrapped the bars in a relative container + added a
+              1px baseline divider beneath the bars so the chart reads as
+              having an axis; the MODA label now lives in a small accent-
+              tinted pill so it reads as a stamped marker rather than
+              floating text that visually merges with the chart card’s top. */}
+          <div className="relative">
           <div className="flex items-end gap-1.5" style={{ height: 160 }}>
             {[
               { h: 14, r: "−3R" },
@@ -187,15 +203,24 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 >
                   {i === 4 && (
                     <span
-                      className="tnum absolute -top-5 left-1/2 -translate-x-1/2"
-                      style={{ fontSize: 9, letterSpacing: "0.1em", color: "rgb(var(--accent-base))" }}
+                      className="tnum absolute -top-5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full"
+                      style={{
+                        fontSize: 9,
+                        letterSpacing: "0.1em",
+                        color: "rgb(var(--accent-base))",
+                        background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
+                        border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 32%, transparent)",
+                      }}
                     >
-                      MODA
+                      {es ? "MODA" : "MODE"}
                     </span>
                   )}
                 </div>
               );
             })}
+          </div>
+          {/* Baseline axis — 1px hairline beneath the bars. */}
+          <div aria-hidden className="h-px w-full" style={{ background: "rgb(var(--divider) / 0.13)" }} />
           </div>
           <div className="mt-2 flex items-center justify-between">
             {["−3R", "−2R", "−1R", "0R", "+1R", "+2R", "+3R", "+4R", "+5R"].map((b) => (
@@ -214,14 +239,18 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               { l: es ? "R medio" : "Avg R", v: "+0,32R" },
               { l: es ? "Payoff" : "Payoff", v: "1,59" },
             ].map((s) => (
-              <div key={s.l}>
+              <div key={s.l} className="relative">
                 <div
-                  className="tnum"
+                  className="tnum inline-flex items-center gap-1.5"
                   style={{ fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}
                 >
+                  {/* R24-1c: tiny accent dot before each stat label so the
+                      three stats read as a synchronized footer row rather
+                      than three floating micro-headers. */}
+                  <span aria-hidden className="w-1 h-1 rounded-full" style={{ background: "rgb(var(--accent-base))" }} />
                   {s.l}
                 </div>
-                <div className="tnum" style={{ fontSize: 17, fontWeight: 700, marginTop: 4, color: "var(--ink)" }}>{s.v}</div>
+                <div className="tnum" style={{ fontSize: 18, fontWeight: 700, marginTop: 4, color: "var(--ink)" }}>{s.v}</div>
               </div>
             ))}
           </div>

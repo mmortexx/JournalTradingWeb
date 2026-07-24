@@ -140,7 +140,7 @@ export function Gallery() {
                   aria-label={es
                     ? `Ver "${shot.title}" a tamaño completo (se abre en pestaña nueva)`
                     : `View "${shot.title}" at full size (opens in a new tab)`}
-                  className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1"
+                  className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent transition-transform duration-[380ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5"
                 >
                   <div className="relative">
                     <WindowFrame
@@ -159,10 +159,16 @@ export function Gallery() {
                     {/* Hover: subtle accent border glow scoped to the
                         frame only (absolute inset-0 of the `relative`
                         wrapper, NOT the figure). */}
+                    {/* R24-1c: deepened the accent-glow on hover (wider
+                        halo + a hairline outer ring at /0.06) so the frame
+                        reads as a luminous floating card, not a flat tint.
+                        The rest opacity stays 0 (six glowing frames at once
+                        would be noisy) — the lift + glow only fire when a
+                        single frame is actually being considered. */}
                     <div
                       aria-hidden
                       className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.4), 0 16px 40px -12px rgb(var(--accent-base) / 0.2)" }}
+                      style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.45), 0 20px 48px -14px rgb(var(--accent-base) / 0.32), 0 0 0 1px rgb(var(--accent-base) / 0.06)" }}
                     />
                     {/* "View full size" affordance — expand-icon chip at
                         the top-right of the frame. Always visible at 60%
@@ -188,14 +194,26 @@ export function Gallery() {
                 </a>
                 {/* Caption BENEATH the frame — never an overlay that
                     covers the screenshot. */}
+                {/* R24-1c: caption now carries the hover affordance down
+                    from the frame — the bullet dot scales 1→1.4 and the
+                    eyebrow title shifts tertiary → accent on group-hover so
+                    the reader's eye traces frame→caption as one composed
+                    unit. Added a tnum index (01 — 06) before the dot for
+                    editorial gallery rhythm + a hairline divider between
+                    index/dot/title so the three glyphs read as a masthead
+                    rather than three stacked labels. */}
                 <figcaption className="mt-3.5 px-1">
                   <div className="flex items-center gap-2 mb-1.5">
+                    <span className="tnum text-[10px] font-semibold text-tertiary tabular-nums">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span aria-hidden className="w-px h-3 bg-[rgb(var(--divider)/0.18)]" />
                     <span
-                      className="w-1.5 h-1.5 rounded-full"
+                      className="w-1.5 h-1.5 rounded-full transition-transform duration-300 group-hover:scale-[1.4]"
                       style={{ background: "rgb(var(--accent-base))" }}
                       aria-hidden
                     />
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary font-semibold">
+                    <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary group-hover:text-[rgb(var(--accent-base))] font-semibold transition-colors duration-300">
                       {shot.title}
                     </span>
                   </div>

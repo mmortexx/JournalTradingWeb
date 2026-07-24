@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, Play } from "lucide-react";
+import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 
 /**
@@ -21,6 +22,12 @@ import { useLang } from "@/lib/i18n";
  * Reemplaza al antiguo `HeroVideo.tsx`. Sin vídeo de fondo — el hero
  * respira sobre el fondo fijo del body (BackgroundFX) con un halo
  * radial verde sutil.
+ *
+ * R24-1b — the halo (decorative, NOT data-seq) gets its own subtle
+ * framer-motion entrance so the hero materializes as a whole on every
+ * mount, not just on first-visit IntroSequence reveals. Safe from the
+ * "two systems animating opacity" warning above — that rule is about
+ * data-seq elements; the halo is aria-hidden decoration.
  */
 export function Hero() {
   const { lang } = useLang();
@@ -31,17 +38,23 @@ export function Hero() {
       className="relative min-h-screen flex items-end overflow-hidden border-b"
       style={{ borderColor: "rgb(var(--divider) / 0.06)" }}
     >
-      {/* Halo verde superior */}
-      <div
+      {/* Halo verde superior — R24-1b: subtle entrance fade+scale on
+          every mount (the halo is decorative, NOT data-seq, so this
+          framer-motion entrance does not collide with IntroSequence's
+          staggered reveals). The hero breathes in even on repeat visits
+          where the loader / IntroSequence don't run. */}
+      <motion.div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-[6%] -translate-x-1/2"
+        initial={{ opacity: 0, scale: 0.88 }}
+        animate={{ opacity: 0.5, scale: 1 }}
+        transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
         style={{
           width: "min(1100px, 92%)",
           height: 360,
           background:
             "radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, rgb(var(--accent-base)) 24%, transparent), transparent 70%)",
           filter: "blur(64px)",
-          opacity: 0.5,
           zIndex: 1,
         }}
       />
@@ -183,14 +196,45 @@ export function Hero() {
             <>
               Opera como una
               <br />
-              mesa <span style={{ color: "rgb(var(--accent-base))" }}>institucional</span>
+              mesa{" "}
+              <span
+                style={{
+                  color: "rgb(var(--accent-base))",
+                  // R24-1b — italic + crisp accent underline on the
+                  // accent word. Italic gives an editorial flourish
+                  // against the rigid uppercase sans; the 1px underline
+                  // at 0.16em offset is theme-agnostic and stays crisp
+                  // at every DPR (text-decoration renders as a vector
+                  // hairline, not a rasterized stroke). 35% accent keeps
+                  // it from shouting next to the bright accent word.
+                  fontStyle: "italic",
+                  textDecoration: "underline",
+                  textDecorationColor: "rgb(var(--accent-base) / 0.35)",
+                  textDecorationThickness: "1px",
+                  textUnderlineOffset: "0.16em",
+                }}
+              >
+                institucional
+              </span>
               <span style={{ color: "rgb(var(--accent-base))" }}>.</span>
             </>
           ) : (
             <>
               Trade like an
               <br />
-              institutional <span style={{ color: "rgb(var(--accent-base))" }}>desk</span>
+              institutional{" "}
+              <span
+                style={{
+                  color: "rgb(var(--accent-base))",
+                  fontStyle: "italic",
+                  textDecoration: "underline",
+                  textDecorationColor: "rgb(var(--accent-base) / 0.35)",
+                  textDecorationThickness: "1px",
+                  textUnderlineOffset: "0.16em",
+                }}
+              >
+                desk
+              </span>
               <span style={{ color: "rgb(var(--accent-base))" }}>.</span>
             </>
           )}
@@ -228,8 +272,11 @@ export function Hero() {
         {/* R21-3a — CTA buttons stack vertically full-width on mobile
             (375px) so neither pill overflows nor wraps awkwardly; side
             by side on >= sm. `justify-center` centers content within
-            the full-width pill on mobile for a clean native CTA look. */}
-        <div data-seq className="flex flex-col sm:flex-row gap-3">
+            the full-width pill on mobile for a clean native CTA look.
+            R24-1b — gap bumped 3 → 4 (16 px) so the two 54-px-tall
+            pills breathe when stacked on mobile; 12 px felt tight for
+            chunky primary CTAs and read as a single dense block. */}
+        <div data-seq className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/pricing"
             className="inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full"
@@ -296,6 +343,13 @@ export function Hero() {
             {es ? "Ver la demo" : "See the demo"}
           </Link>
         </div>
+        {/* R24-1b — trust badge row alignment: the per-item span used
+            `gap-x-4` (16 px) between separator and its label while the
+            outer flex used `gap-x-5` (20 px) between items — so a label
+            sat 16 px from its leading separator but 20 px from the
+            previous label, an asymmetric rhythm. Aligned both to gap-x-5
+            so every gap (label↔separator, separator↔label) is a uniform
+            20 px and the row reads as a machined rule. */}
         <div data-seq className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2.5">
           {[
             es ? "100 % LOCAL" : "100% LOCAL",
@@ -303,7 +357,7 @@ export function Hero() {
             "ES · EN",
             es ? "GARANTÍA 30 DÍAS" : "30-DAY GUARANTEE",
           ].map((label, i) => (
-            <span key={label} className="flex items-center gap-x-4">
+            <span key={label} className="flex items-center gap-x-5">
               {i > 0 && (
                 <span
                   aria-hidden
@@ -330,10 +384,21 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Indicador Scroll */}
+      {/* Indicador Scroll — R24-1b polish:
+          • Visible on mobile too (was `hidden sm:flex`): the indicator
+            is small + pointer-events-none, and the hero's `pb-20` keeps
+            clear space above it on 375 px viewports.
+          • Theme-agnostic baseline: a 1-px hairline at `--divider / 0.28`
+            spans the full 30-px track so the line reads on the bright
+            light-theme surface where the accent gradient alone fades to
+            invisible before reaching the bottom.
+          • Animated traveling bead: a 2×6-px accent dot sweeps top→bottom
+            on a 2.2 s loop (`tj-scroll-bead` keyframe) so the indicator
+            feels alive rather than static — the bead is what reads as
+            "scroll" motion, the gradient is just the rail. */}
       <div
         aria-hidden
-        className="absolute left-1/2 bottom-5 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center gap-1.5 pointer-events-none"
+        className="absolute left-1/2 bottom-5 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none"
       >
         <span
           className="uppercase tnum"
@@ -341,13 +406,34 @@ export function Hero() {
         >
           Scroll
         </span>
-        <span
-          style={{
-            width: 1,
-            height: 30,
-            background: "linear-gradient(180deg, rgb(var(--accent-base)), transparent)",
-          }}
-        />
+        <span className="relative block" style={{ width: 1, height: 30 }}>
+          {/* Baseline rail — visible in both themes */}
+          <span
+            className="absolute inset-0 block"
+            style={{ background: "rgb(var(--divider) / 0.28)" }}
+          />
+          {/* Accent gradient overlay — green at top, fading down */}
+          <span
+            className="absolute inset-0 block"
+            style={{
+              background:
+                "linear-gradient(180deg, rgb(var(--accent-base)), transparent)",
+            }}
+          />
+          {/* Traveling bead — sweeps top→bottom on a 2.2 s loop */}
+          <span
+            className="absolute left-1/2 block rounded-full"
+            style={{
+              width: 2,
+              height: 6,
+              marginLeft: -1,
+              top: 0,
+              background: "rgb(var(--accent-base))",
+              boxShadow: "0 0 6px rgb(var(--accent-base))",
+              animation: "tj-scroll-bead 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite",
+            }}
+          />
+        </span>
       </div>
     </section>
   );

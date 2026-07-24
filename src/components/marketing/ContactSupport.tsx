@@ -146,9 +146,14 @@ export function ContactSupport() {
                         "lights up" in the brand green when the card is
                         hovered. Adds a soft accent drop-shadow on hover
                         to deepen the lift and tie the icon to the accent
-                        sweep on the top edge (R20-3c). */}
+                        sweep on the top edge (R20-3c). Base bg + border
+                        swapped from neutral divider tints to low-alpha
+                        accent tints (6 % / 15 %) so the icon reads as a
+                        branded mark at rest, not a neutral chip — the
+                        brand color is present before hover, then
+                        deepens to 12 % / 30 % on hover. */}
                     <span
-                      className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:border-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_1px_0_rgb(var(--divider)/0.10),0_4px_14px_-4px_rgb(var(--accent-base)/0.30)] transition-[background-color,border-color,box-shadow,color] duration-300"
+                      className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-lg bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.15)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] text-primary group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:border-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_1px_0_rgb(var(--divider)/0.10),0_4px_14px_-4px_rgb(var(--accent-base)/0.30)] transition-[background-color,border-color,box-shadow,color] duration-300"
                       aria-hidden="true"
                     >
                       <Icon className="size-5" />
@@ -170,7 +175,7 @@ export function ContactSupport() {
 
                   <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
                     {cta}
-                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="size-4 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1" />
                   </div>
                 </motion.a>
               </Reveal>

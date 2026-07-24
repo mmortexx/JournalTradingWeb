@@ -320,10 +320,15 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         <h3 className="text-xl md:text-2xl font-semibold text-primary tracking-tight min-w-0 break-words">
           {plan.name}
         </h3>
+        {/* "Para siempre" / "Forever" credential pill — Pro gets an
+            accent-tinted bg + accent border so its forever tag reads as
+            a premium credential distinct from Core's neutral pill
+            (R24-1d). text-primary kept for full WCAG-AA contrast on the
+            tinted backdrop in both themes. */}
         <span
           className={`pill border shrink-0 ${
             isPro
-              ? "bg-[rgb(var(--divider)/0.05)] text-primary border-[rgb(var(--divider)/0.20)]"
+              ? "bg-[rgb(var(--accent-base)/0.12)] text-primary border-[rgb(var(--accent-base)/0.32)]"
               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border-[rgb(var(--divider)/0.10)]"
           }`}
         >
@@ -343,9 +348,12 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           the visual anchor; the `/ pago único` suffix sits inline to the
           right at the baseline in a small tertiary label. Both cards share
           the exact same baseline grid so Core $29 and Pro $49 sit on
-          identical vertical lines — pixel-perfect parity. */}
+          identical vertical lines — pixel-perfect parity. The `$` uses
+          text-secondary (not the dimmest text-tertiary token) so the
+          currency mark reads as part of the price in both themes rather
+          than a stray dim glyph (R24-1d). */}
       <div className="mt-6 flex items-baseline gap-1 min-w-0">
-        <span className="text-2xl md:text-3xl font-semibold text-tertiary tnum">
+        <span className="text-2xl md:text-3xl font-semibold text-secondary tnum">
           $
         </span>
         <CountUp
@@ -379,9 +387,17 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
       <ul className="space-y-3.5 flex-1">
         {plan.features.map((f, i) => (
           <li key={f} className="flex items-start gap-3 text-sm">
+            {/* Pro feature checks get an accent-tinted circular badge —
+                a 20×20 rounded-full fill + inset accent ring around the
+                16×16 CheckIcon — so the Pro feature list reads as a
+                "ribbon of premium yes" distinct from Core's plain
+                outline checks (R24-1d). Core keeps the bare CheckIcon in
+                pnl-pos green for the standard positive treatment. */}
             <span
               className={`shrink-0 mt-0.5 ${
-                isPro ? "text-[rgb(var(--accent-base))]" : "text-pnl-pos"
+                isPro
+                  ? "inline-flex items-center justify-center w-5 h-5 rounded-full bg-[rgb(var(--accent-base)/0.14)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.26)] text-[rgb(var(--accent-base))]"
+                  : "text-pnl-pos"
               }`}
               aria-hidden="true"
             >

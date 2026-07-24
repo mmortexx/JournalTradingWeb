@@ -1754,6 +1754,34 @@ button.icon-btn:hover > svg,
   55%, 100% { transform: translateX(340%) skewX(-18deg); }
 }
 
+/* R24-1b — Scroll indicator traveling bead. Sweeps top→bottom of the
+   30-px rail on a 2.2 s loop, ease-in-out so it slows at the ends
+   (reads as a bead falling then settling). The 0→24-px range covers
+   the bead's 6-px height inside the 30-px track without clipping. */
+@keyframes tj-scroll-bead {
+  0%   { transform: translateY(0); opacity: 0; }
+  18%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { transform: translateY(24px); opacity: 0; }
+}
+
+/* R24-1b — pronounced "live" pulse for session / market-open dots
+   (UtcClock in the Navbar). tj-glow's 0.5→0.85 opacity swing is too
+   subtle for a status indicator that needs to read as "alive" at a
+   glance; this one swings 0.4→1.0 with a box-shadow bloom so the dot
+   visibly beats. Used only on small status dots, never on large
+   decorative glows. */
+@keyframes tj-pulse-dot {
+  0%, 100% {
+    opacity: 0.4;
+    box-shadow: 0 0 4px currentColor;
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 10px currentColor, 0 0 16px currentColor;
+  }
+}
+
 /* Intro — estado pre-hidratación: el script inline del <head> añade
    `.tj-preload` al <html> en la primera visita de la sesión, así los
    elementos [data-seq] del hero arrancan ocultos sin flash y el

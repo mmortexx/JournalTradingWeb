@@ -171,7 +171,11 @@ export function Newsletter() {
                             [rgb(var(--divider)/0.30)]` was overriding the
                             global input focus rule from globals.css (L467-474)
                             with a flat neutral border, stripping the accent
-                            affordance entirely. */}
+                            affordance entirely. Adds `hover:border-...0.25` to
+                            match the FAQ search + ContactForm inputs (a subtle
+                            pre-focus affordance) and `rounded-lg` to match the
+                            submit Button's radius for visual harmony when the
+                            two sit side-by-side on ≥sm. */}
                         <Input
                           type="email"
                           inputMode="email"
@@ -186,7 +190,7 @@ export function Newsletter() {
                           aria-invalid={status === "error"}
                           aria-describedby={status === "error" ? "newsletter-error" : undefined}
                           required
-                          className="h-12 bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)]"
+                          className="h-12 rounded-lg bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)]"
                         />
                         <AnimatePresence>
                           {status === "error" && (
@@ -232,7 +236,8 @@ export function Newsletter() {
                   The glyph uses --pnl-pos (the same green the success
                   checkmark uses) so the trust signal reads as a positive
                   reassurance, not a generic lock icon. Sits inline with the
-                  text so it doesn't break the centered rhythm. */}
+                  text so it doesn't break the centered rhythm. Stroke bumped
+                  1.4 → 1.5 so the lock body + shackle read crisper at 9px. */}
               <p className="mt-4 text-xs text-tertiary text-center flex items-center justify-center gap-1.5">
                 <svg
                   width="9"
@@ -242,8 +247,8 @@ export function Newsletter() {
                   aria-hidden="true"
                   className="shrink-0"
                 >
-                  <rect x="3" y="7" width="10" height="7" rx="1.4" stroke="rgb(var(--pnl-pos))" strokeWidth="1.4" />
-                  <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="rgb(var(--pnl-pos))" strokeWidth="1.4" strokeLinecap="round" />
+                  <rect x="3" y="7" width="10" height="7" rx="1.4" stroke="rgb(var(--pnl-pos))" strokeWidth="1.5" />
+                  <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="rgb(var(--pnl-pos))" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
                 {es
                   ? "Tu email nunca se comparte. Cancela cuando quieras."

@@ -113,19 +113,31 @@ export function Comparison() {
                     <col className="w-[17%]" />
                     <col className="w-[17%]" />
                   </colgroup>
-                {/* Header */}
-                <thead>
-                  <tr className="border-b">
-                    <th scope="col" className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom">
+                {/* Header — `sticky top-0` is a progressive enhancement:
+                    true viewport-sticky is blocked by the
+                    `overflow-hidden` + `overflow-x-auto` ancestors
+                    (needed for the rounded-card clip + horizontal
+                    scroll on mobile); a split-table or JS-synced
+                    header restructure would unlock it but is out of
+                    scope for this polish round. The strong backdrop bg
+                    (`bg-[rgb(var(--bg)/0.92)] backdrop-blur-md`) on
+                    every th makes the header read as a deliberate
+                    anchored row in both themes regardless of sticky,
+                    and is ready to obscure scrolling rows the moment a
+                    future refactor removes the overflow ancestors
+                    (R24-1d). */}
+                <thead className="sticky top-0 z-20">
+                  <tr className="border-b border-[rgb(var(--divider)/0.15)]">
+                    <th scope="col" className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom bg-[rgb(var(--bg)/0.92)] backdrop-blur-md">
                       {es ? "Característica" : "Feature"}
                     </th>
                     {cols.map((c) => (
                       <th
                         key={c.key}
                         scope="col"
-                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 ${
+                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 bg-[rgb(var(--bg)/0.92)] backdrop-blur-md ${
                           c.highlight
-                            ? "bg-[rgb(var(--divider)/0.08)] shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),inset_0_-1px_0_0_rgb(var(--accent-base)/0.18)]"
+                            ? "shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),inset_0_-1px_0_0_rgb(var(--accent-base)/0.18)]"
                             : ""
                         }`}
                       >
@@ -171,17 +183,18 @@ export function Comparison() {
                 {/* Body */}
                 <tbody>
                   {ROWS.map((row, i) => (
+                    /* R24-1d: `group` + bumped hover opacity (/0.05 → /0.07) on the tr so the lit row reads more deliberately; the row-label th picks up a 3px accent left inset rail on hover via `group-hover` for a "selected row" affordance that ties to the permanent accent rail on the TJ column. */
                     <motion.tr
                       key={row.labelEs}
                       initial={{ opacity: 0, y: 8 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-30px" }}
                       transition={{ duration: 0.45, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                      className={`border-b last:border-b-0 transition-colors hover:bg-[rgb(var(--divider)/0.05)] ${
+                      className={`group border-b last:border-b-0 transition-colors hover:bg-[rgb(var(--divider)/0.07)] ${
                         i % 2 === 1 ? "bg-[rgb(var(--divider)/0.015)]" : ""
                       }`}
                     >
-                      <th scope="row" className="text-left p-5 md:p-6 font-medium text-secondary text-[14px] h-16 md:h-[72px] align-middle">
+                      <th scope="row" className="text-left p-5 md:p-6 font-medium text-secondary text-[14px] h-16 md:h-[72px] align-middle transition-shadow duration-200 group-hover:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)/0.40)]">
                         {es ? row.labelEs : row.labelEn}
                       </th>
                       {row.cells.map((cell, j) => (
@@ -324,7 +337,11 @@ function CellRenderer({
 
 function CheckIcon() {
   return (
-    <span className="inline-flex w-5 h-5 rounded-full bg-pnl-pos/15 items-center justify-center">
+    /* R24-1d — bumped tinted bg /15 → /20 + inset ring so the icon
+       chips hold their definition in light theme (where /15 was
+       nearly invisible on the paper veil) without going garish in
+       dark theme. */
+    <span className="inline-flex w-5 h-5 rounded-full bg-pnl-pos/20 ring-1 ring-inset ring-pnl-pos/15 items-center justify-center">
       <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M2 6.5l2.5 2.5L10 3.5" stroke="rgb(var(--pnl-pos))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -334,7 +351,7 @@ function CheckIcon() {
 
 function CrossIcon() {
   return (
-    <span className="inline-flex w-5 h-5 rounded-full bg-pnl-neg/15 items-center justify-center">
+    <span className="inline-flex w-5 h-5 rounded-full bg-pnl-neg/20 ring-1 ring-inset ring-pnl-neg/15 items-center justify-center">
       <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M3 3l6 6M9 3l-6 6" stroke="rgb(var(--pnl-neg))" strokeWidth="2" strokeLinecap="round" />
       </svg>
@@ -344,7 +361,7 @@ function CrossIcon() {
 
 function PartialIcon() {
   return (
-    <span className="inline-flex w-5 h-5 rounded-full bg-pnl-warn/15 items-center justify-center">
+    <span className="inline-flex w-5 h-5 rounded-full bg-pnl-warn/20 ring-1 ring-inset ring-pnl-warn/15 items-center justify-center">
       <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
         <path d="M2 6h8" stroke="rgb(var(--pnl-warn))" strokeWidth="2" strokeLinecap="round" />
       </svg>

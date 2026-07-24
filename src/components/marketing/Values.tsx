@@ -121,12 +121,14 @@ export function Values() {
                 className="group relative liquid-glass depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               >
                 {/* Accent edge — grows on hover. Scaled up from 1.25 → 1.4
-                    for a more pronounced lift; the hover color shifts to a
-                    65 % accent tint so the rule reads as a deliberate accent
-                    stripe, not just a brighter neutral hairline. */}
+                    for a more pronounced lift; the base color is now a low
+                    alpha accent tint (20 %) instead of a neutral divider
+                    hairline so the brand reads through at rest and the rule
+                    reads as a deliberate accent stripe, not just a brighter
+                    neutral separator. Hover pushes to a 65 % accent tint. */}
                 <span
                   aria-hidden="true"
-                  className="absolute left-0 top-6 bottom-6 w-px bg-[rgb(var(--divider)/0.30)] origin-center transition-[transform,background-color] duration-300 group-hover:scale-y-[1.4] group-hover:bg-[rgb(var(--accent-base)/0.65)]"
+                  className="absolute left-0 top-6 bottom-6 w-px bg-[rgb(var(--accent-base)/0.20)] origin-center transition-[transform,background-color] duration-300 group-hover:scale-y-[1.4] group-hover:bg-[rgb(var(--accent-base)/0.65)]"
                 />
                 {/* Soft corner glow on hover */}
                 <div
@@ -144,16 +146,22 @@ export function Values() {
                         to mirror the card radius (8px / .rounded-card) for a
                         cohesive surface language. Hover tints the icon stroke
                         to the accent green so the affordance reads as a live
-                        accent, not a static mono glyph. The bg lifts from a
-                        flat fill to a subtle accent wash on hover too. */}
+                        accent, not a static mono glyph. Adds an inset accent
+                        ring at base (0.18 alpha) so the icon reads as a
+                        branded mark at rest, not a neutral chip — the brand
+                        color is present before hover. The base ring deepens
+                        to 0.30 on hover to match the existing hover shadow. */}
                     <span
-                      className="shrink-0 w-9 h-9 rounded-lg liquid-glass flex items-center justify-center text-tertiary transition-[color,background-color,box-shadow] duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_0_0_1px_rgb(var(--accent-base)/0.30)]"
+                      className="shrink-0 w-9 h-9 rounded-lg liquid-glass flex items-center justify-center text-tertiary shadow-[inset_0_0_0_1px_rgb(var(--accent-base)/0.18)] transition-[color,box-shadow] duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_0_0_1px_rgb(var(--accent-base)/0.30)]"
                       aria-hidden="true"
                     >
                       {v.icon}
                     </span>
                     <span className="text-xs uppercase tracking-[0.16em] font-semibold text-tertiary tnum transition-colors duration-300 group-hover:text-secondary">
-                      {v.num} / 04
+                      {/* Number split: current in secondary, total in tertiary
+                          — same editorial treatment as Story's phase index. */}
+                      <span className="text-secondary">{v.num}</span>
+                      {" / 04"}
                     </span>
                   </div>
                 </div>

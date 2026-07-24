@@ -38,6 +38,27 @@ import { useTheme } from "@/lib/theme";
  * El reloj arranca en "--:--:--" tanto en servidor como en el primer
  * render de cliente y solo empieza a tickear dentro de un efecto — así
  * la hidratación nunca ve horas distintas (cero mismatch).
+ *
+ * R24-1b polish round:
+ *  - Megamenu: Metrics icon stroke normalized 1.4 → 1.3 to match the
+ *    other three product icons (consistent stroke weight across the
+ *    grid).
+ *  - UtcClock: 10.5 → 11 px for legibility; live dot now uses the
+ *    pronounced `tj-pulse-dot` keyframe (0.4→1.0 opacity + glow bloom)
+ *    instead of the subtle `tj-glow` — a status dot must read as alive.
+ *  - Theme toggle: AnimatePresence cross-fade + rotate between sun /
+ *    moon icons (was an instant swap).
+ *  - Language toggle: shows "ES · EN" with the active language in
+ *    accent color so it's unambiguous which is live (was a single
+ *    ambiguous code with no indication of the other option).
+ *  - Buy button: hover now intensifies the shadow + adds a 1-px accent
+ *    ring, matching the Hero primary CTA's hover treatment so the two
+ *    read as a coordinated pair.
+ *  - Mobile drawer: link gap 1 → 1.5 (better breathing); active link
+ *    swaps the right-side dot for a 3-px left accent bar (the standard
+ *    active-row pattern, more visible than a 1.5-px dot).
+ *  - Scroll-state material transition: easing upgraded from `ease` to
+ *    cubic-bezier(0.22, 1, 0.36, 1) for a more premium deceleration.
  */
 export function Navbar() {
   const { t, lang, toggle } = useLang();
@@ -182,7 +203,7 @@ export function Navbar() {
       descEn: "Sharpe, profit factor, expectancy",
       icon: (
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-          <path d="M2 13V7M6 13V3M10 13V9M14 13V5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          <path d="M2 13V7M6 13V3M10 13V9M14 13V5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
         </svg>
       ),
     },
@@ -279,7 +300,7 @@ export function Navbar() {
           boxShadow: scrolled
             ? "inset 0 1px 0 rgb(var(--divider) / 0.16), 0 14px 40px -16px rgb(0 0 0 / 0.55)"
             : "inset 0 1px 0 rgb(var(--divider) / 0.14), 0 6px 20px -12px rgb(0 0 0 / 0.4)",
-          transition: "background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
+          transition: "background 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
         {/* Inner container — constrains content to the page max width
@@ -466,11 +487,29 @@ export function Navbar() {
             aria-label={es ? "Cambiar tema" : "Toggle theme"}
             title={es ? "Cambiar tema" : "Toggle theme"}
           >
-            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            {/* R24-1b — cross-fade + rotate between sun / moon on theme
+                change. `mode="wait"` ensures the exiting icon completes
+                before the entering one mounts so they don't overlap; the
+                ±90° rotation + 0.7→1 scale reads as the icon "flipping"
+                like a coin, premium toggle feel. `initial={false}` skips
+                the entrance animation on first mount (no flash). */}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={theme}
+                initial={{ opacity: 0, rotate: -90, scale: 0.7 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: 90, scale: 0.7 }}
+                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                className="grid place-items-center"
+                style={{ width: 15, height: 15 }}
+              >
+                {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+              </motion.span>
+            </AnimatePresence>
           </button>
           <button
             onClick={toggle}
-            className="grid flex-none cursor-pointer place-items-center rounded-full border bg-transparent text-[11px] font-semibold tracking-wide transition-colors duration-200"
+            className="grid flex-none cursor-pointer place-items-center rounded-full border bg-transparent text-[10.5px] font-semibold tracking-wide transition-colors duration-200"
             style={{
               width: 38,
               height: 38,
@@ -478,20 +517,41 @@ export function Navbar() {
               color: "var(--ink-2)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = "var(--ink)";
               e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.13)";
               e.currentTarget.style.background =
                 "color-mix(in srgb, var(--ink) 5%, transparent)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = "var(--ink-2)";
               e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.06)";
               e.currentTarget.style.background = "transparent";
             }}
             aria-label={es ? "Cambiar idioma" : "Toggle language"}
             title={es ? "Cambiar idioma" : "Toggle language"}
           >
-            {lang.toUpperCase()}
+            {/* R24-1b — show BOTH codes so it's unambiguous which language
+                is live. The active one is rendered in accent green at full
+                weight; the inactive one is dimmed to ink-3 at 60 % so the
+                toggle reads as a pair, not a single ambiguous code. The
+                middle dot is a hairline separator at the same weight. */}
+            <span className="flex items-center gap-[3px]">
+              <span
+                style={{
+                  color: es ? "rgb(var(--accent-base))" : "var(--ink-3)",
+                  opacity: es ? 1 : 0.6,
+                }}
+              >
+                ES
+              </span>
+              <span style={{ color: "var(--ink-3)", opacity: 0.4 }}>·</span>
+              <span
+                style={{
+                  color: !es ? "rgb(var(--accent-base))" : "var(--ink-3)",
+                  opacity: !es ? 1 : 0.6,
+                }}
+              >
+                EN
+              </span>
+            </span>
           </button>
           <motion.div
             whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
@@ -511,10 +571,18 @@ export function Navbar() {
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-1px)";
                 e.currentTarget.style.filter = "brightness(1.08)";
+                // R24-1b — intensify the accent glow + add a 1-px accent
+                // ring on hover so the Buy CTA's lift reads as deliberate
+                // (same treatment as the Hero primary CTA — the two CTAs
+                // lift + ring as a coordinated pair across the page).
+                e.currentTarget.style.boxShadow =
+                  "0 14px 32px -10px color-mix(in srgb, rgb(var(--accent-base)) 80%, #000), 0 0 0 1px rgb(var(--accent-base) / 0.30)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "";
                 e.currentTarget.style.filter = "";
+                e.currentTarget.style.boxShadow =
+                  "0 10px 26px -12px color-mix(in srgb, rgb(var(--accent-base)) 70%, #000)";
               }}
             >
               {es ? "Comprar" : "Buy"}
@@ -597,7 +665,7 @@ export function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-1" aria-label={es ? "Secciones" : "Sections"}>
+              <nav className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-1.5" aria-label={es ? "Secciones" : "Sections"}>
                 {drawerLinks.map((l) => {
                   const active = pathname === l.href;
                   return (
@@ -612,13 +680,22 @@ export function Navbar() {
                           : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[rgb(var(--divider)/0.05)]"
                       }`}
                     >
-                      <span className="flex-1">{es ? l.labelEs : l.labelEn}</span>
+                      {/* R24-1b — left accent bar replaces the right-side
+                          dot. The 3-px bar with rounded right corners is
+                          the standard iOS / Material active-row pattern;
+                          it reads as a clear "you are here" marker at a
+                          glance, where the 1.5-px dot on the right could
+                          be mistaken for a decorative bullet. The bar is
+                          inset 6 px from top / bottom so it doesn't kiss
+                          the rounded-lg corner of the row. */}
                       {active && (
                         <span
                           aria-hidden
-                          className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--accent-base))]"
+                          className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full"
+                          style={{ background: "rgb(var(--accent-base))" }}
                         />
                       )}
+                      <span className="flex-1">{es ? l.labelEs : l.labelEn}</span>
                     </Link>
                   );
                 })}
@@ -683,20 +760,27 @@ function UtcClock() {
       className="mr-0.5 hidden items-center gap-1.5 border-r pr-2 lg:inline-flex"
       style={{ borderColor: "rgb(var(--divider) / 0.13)" }}
     >
+      {/* R24-1b — pronounced live-dot pulse. `tj-pulse-dot` swings
+          opacity 0.4→1.0 with a box-shadow bloom so the status dot
+          reads as "market open / session live" at a glance (the prior
+          `tj-glow` was too subtle — 0.5→0.85 — and looked static). The
+          dot's `color` is set to the pnl-pos green so `currentColor` in
+          the keyframe's box-shadow resolves to the same green as the
+          background, giving a coordinated glow. */}
       <span
         aria-hidden
         className="rounded-full"
         style={{
           width: 5,
           height: 5,
-          background: "rgb(var(--pnl-pos, 62 207 142))",
-          boxShadow: "0 0 8px rgb(var(--pnl-pos, 62 207 142))",
-          animation: "tj-glow 2.4s ease-in-out infinite",
+          color: "rgb(var(--pnl-pos, 62 207 142))",
+          background: "currentColor",
+          animation: "tj-pulse-dot 2s ease-in-out infinite",
         }}
       />
       <span
         className="tnum whitespace-nowrap"
-        style={{ fontSize: 10.5, letterSpacing: "0.04em", color: "var(--ink-3)" }}
+        style={{ fontSize: 11, letterSpacing: "0.04em", color: "var(--ink-3)" }}
       >
         UTC <span style={{ color: "var(--ink-2)" }}>{time}</span>
       </span>
