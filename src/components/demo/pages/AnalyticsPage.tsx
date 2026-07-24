@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import {
@@ -26,13 +26,14 @@ import { CountUp } from "@/components/tj/CountUp";
 import { Reveal } from "@/components/tj/Reveal";
 import { Histogram } from "@/components/charts/Histogram";
 import { Heatmap } from "@/components/charts/Heatmap";
+import { EquityCurve } from "@/components/charts/EquityCurve";
 import { useDemo } from "@/components/demo/DemoContext";
 
 /* ============================================================
  * Small primitives
  * ============================================================ */
 
-type FilterGroup = "instrument" | "setup" | "direction" | "compliance";
+type FilterGroup = "direction" | "compliance";
 
 function FilterChip({
   active,
@@ -70,14 +71,18 @@ function FilterChip({
   );
 }
 
+/** Section card — premium card border with eyebrow header. Mirrors
+ *  AnalyticsPage.xaml's PremiumCardBorderStyle + EyebrowTextStyle. */
 function SectionCard({
+  eyebrow,
   title,
   hint,
   children,
   className = "",
   delay = 0,
 }: {
-  title: string;
+  eyebrow?: string;
+  title?: string;
   hint?: ReactNode;
   children: ReactNode;
   className?: string;
@@ -86,15 +91,78 @@ function SectionCard({
   return (
     <Reveal delay={delay} className={className}>
       <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em]">
-            {title}
-          </h3>
-          {hint}
-        </div>
+        {(eyebrow || title || hint) && (
+          <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+            {title && (
+              <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em]">
+                {title}
+              </h3>
+            )}
+            {hint}
+          </div>
+        )}
         {children}
       </div>
     </Reveal>
+  );
+}
+
+/** Compact ratio cell — label (xs uppercase tertiary) + value (lg semibold
+ *  tnum). No box, no border. Mirrors the inner StackPanel of the XAML
+ *  RatioTile / DataCaptionTextStyle + DataLargeTextStyle pairs. */
+function RatioCell({
+  label,
+  children,
+  hint,
+}: {
+  label: string;
+  children: ReactNode;
+  hint?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1 items-center text-center" title={hint}>
+      <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+        {label}
+      </span>
+      <span className="font-semibold tnum text-primary text-base md:text-lg leading-none">
+        {children}
+      </span>
+    </div>
+  );
+}
+
+/** KPI strip cell — loose on canvas, vertical hairline separator.
+ *  Mirrors AnalyticsPage.xaml lines 187-246 (summary strip with
+ *  VerticalHairlineStyle separators, no enclosing box). */
+function KpiStripCell({
+  label,
+  children,
+  showHairline,
+  reKey,
+}: {
+  label: string;
+  children: ReactNode;
+  showHairline: boolean;
+  reKey: string;
+}) {
+  return (
+    <div className="flex items-stretch flex-1 min-w-0">
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2 sm:px-3 items-center text-center">
+        <div className="text-[10px] uppercase tracking-[0.14em] text-tertiary truncate">
+          {label}
+        </div>
+        <div className="font-semibold tnum text-primary text-lg md:text-xl leading-none">
+          <span key={reKey}>{children}</span>
+        </div>
+      </div>
+      {showHairline && (
+        <div
+          className="w-px self-stretch my-1 bg-[rgb(var(--divider)/0.18)]"
+          aria-hidden="true"
+        />
+      )}
+    </div>
   );
 }
 
@@ -143,89 +211,6 @@ function Sparkline({
   );
 }
 
-/** Animated KPI tile. `reKey` forces re-mount (and re-animation) on filter change. */
-function KpiTile({
-  label,
-  children,
-  spark,
-  reKey,
-}: {
-  label: string;
-  children: ReactNode;
-  spark?: ReactNode;
-  reKey: string;
-}) {
-  return (
-    <motion.div
-      key={reKey}
-      whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-      transition={{ type: "spring", stiffness: 300, damping: 22 }}
-      className="relative rounded-card p-4 liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 overflow-hidden group h-full flex flex-col"
-    >
-      <div
-        className="absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent)",
-        }}
-      />
-      <div className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
-        {label}
-      </div>
-      <div className="mt-1.5 font-bold text-2xl tnum text-primary leading-none min-w-0 break-words pr-12 sm:pr-14">
-        {children}
-      </div>
-      {spark && <div className="absolute right-2 bottom-2 opacity-60">{spark}</div>}
-    </motion.div>
-  );
-}
-
-/** Refined ratio tile — institutional research feel.
- *  Label (xs uppercase tracking-wide tertiary) + big value (2xl bold tnum)
- *  + small description. No sparkline (keeps the math clean + readable). */
-function RatioTile({
-  label,
-  value,
-  desc,
-  reKey,
-  delay = 0,
-}: {
-  label: string;
-  value: ReactNode;
-  desc: string;
-  reKey: string;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      key={reKey}
-      initial={{ opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 22 } }}
-      className="relative rounded-card p-4 liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 h-full flex flex-col overflow-hidden group"
-    >
-      <div
-        className="absolute inset-x-0 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgb(255 255 255 / 0.45), transparent)",
-        }}
-      />
-      <div className="text-xs uppercase tracking-[0.14em] text-tertiary">
-        {label}
-      </div>
-      <div className="mt-1.5 font-bold text-2xl tnum text-primary leading-none">
-        {value}
-      </div>
-      <div className="mt-auto pt-3 text-[11px] text-tertiary/80 leading-snug">
-        {desc}
-      </div>
-    </motion.div>
-  );
-}
-
 /* ============================================================
  * Donut: winners vs losers — draw-in arc.
  * ============================================================ */
@@ -252,7 +237,6 @@ function WinnersDonut({
       style={{ width: 140, height: 140 }}
     >
       <svg viewBox="0 0 140 140" width={140} height={140} aria-hidden="true">
-        {/* loss background ring */}
         <circle
           cx={cx}
           cy={cy}
@@ -261,7 +245,6 @@ function WinnersDonut({
           stroke="rgb(var(--pnl-neg) / 0.22)"
           strokeWidth={12}
         />
-        {/* win arc — draws in on first scroll-into-view */}
         <motion.circle
           key={`donut-arc-${reKey}`}
           cx={cx}
@@ -297,7 +280,7 @@ function WinnersDonut({
 }
 
 /* ============================================================
- * R-multiple over time — animated scatter / bar
+ * R-multiple over time — animated bar chart.
  * ============================================================ */
 function ROverTimeChart({ trades }: { trades: Trade[] }) {
   const H = 150;
@@ -336,7 +319,6 @@ function ROverTimeChart({ trades }: { trades: Trade[] }) {
         role="img"
         aria-label="R-multiple over time chart"
       >
-        {/* baseline */}
         <line
           x1={0}
           x2={W}
@@ -609,14 +591,10 @@ function RankingCard({
 }
 
 /* ============================================================
- * Heatmap legend — diverging red→neutral→green color scale
- * with min/zero/max labels. Sits below the Heatmap inside the
- * SectionCard so the chart component stays self-contained.
+ * Heatmap legend
  * ============================================================ */
 function HeatmapLegend({ trades }: { trades: Trade[] }) {
   const { lang } = useLang();
-  // Mirror the Heatmap component's own per-cell maxAbs so the legend
-  // color scale stays visually consistent with the rendered cells.
   const maxAbs = useMemo(() => {
     const grid = heatmapGrid(trades);
     let m = 0;
@@ -629,10 +607,9 @@ function HeatmapLegend({ trades }: { trades: Trade[] }) {
       ? `$${(maxAbs / 1000).toFixed(1)}k`
       : `$${Math.round(maxAbs)}`;
 
-  // Build a 9-step diverging gradient swatch.
   const swatches = Array.from({ length: 9 }, (_, i) => {
-    const t = i / 8; // 0..1
-    const intensity = Math.abs(t - 0.5) * 2; // 0 at center, 1 at edges
+    const t = i / 8;
+    const intensity = Math.abs(t - 0.5) * 2;
     const pos = t >= 0.5;
     return pos
       ? `rgb(var(--pnl-pos) / ${0.12 + intensity * 0.6})`
@@ -676,13 +653,7 @@ function HeatmapLegend({ trades }: { trades: Trade[] }) {
 }
 
 /* ============================================================
- * Histogram legend — small inline key below each Histogram card.
- * Mirrors the HeatmapLegend pattern so every distribution card has
- * the same header + legend rhythm (per spec). Two modes:
- *   - "pos-neg": red swatch + "−X" label, green swatch + "+X" label
- *   - "accent":  single gold swatch + count-of-trades label
- * Sits inside the SectionCard after the Histogram component so the
- * chart itself stays self-contained.
+ * Histogram legend
  * ============================================================ */
 function HistogramLegend({
   kind,
@@ -727,13 +698,383 @@ function HistogramLegend({
 }
 
 /* ============================================================
+ * Period row — slice trades by time window and compute per-period
+ * summary metrics. Mirrors AnalyticsPage.xaml's PeriodRow grid
+ * (lines 133-184): Period | Count | Net | Win% | PF | MaxDD%.
+ * ============================================================ */
+interface PeriodRow {
+  label: string;
+  count: number;
+  netPnl: number;
+  winRate: number;
+  profitFactor: number;
+  maxDdPct: number;
+}
+
+function buildPeriodRows(trades: Trade[]): PeriodRow[] {
+  if (trades.length === 0) return [];
+  const now = Math.max(...trades.map((t) => t.closedAt.getTime()));
+  const dayMs = 86_400_000;
+  const windows: { label: string; days: number }[] = [
+    { label: "Mes", days: 30 },
+    { label: "Trimestre", days: 90 },
+    { label: "Año", days: 365 },
+    { label: "Histórico", days: Infinity },
+  ];
+  return windows.map(({ label, days }) => {
+    const slice =
+      days === Infinity
+        ? trades
+        : trades.filter((t) => now - t.closedAt.getTime() <= days * dayMs);
+    const n = slice.length;
+    const wins = slice.filter((t) => t.netPnl > 0);
+    const losses = slice.filter((t) => t.netPnl < 0);
+    const grossWin = wins.reduce((s, t) => s + t.netPnl, 0);
+    const grossLoss = Math.abs(losses.reduce((s, t) => s + t.netPnl, 0));
+    const netPnl = slice.reduce((s, t) => s + t.netPnl, 0);
+
+    // Max drawdown % over the slice's equity curve (starting at $10,000).
+    let peak = 10_000;
+    let bal = 10_000;
+    let maxDdPct = 0;
+    const chrono = [...slice].sort(
+      (a, b) => a.closedAt.getTime() - b.closedAt.getTime()
+    );
+    for (const t of chrono) {
+      bal += t.netPnl;
+      if (bal > peak) peak = bal;
+      const dd = peak > 0 ? (peak - bal) / peak : 0;
+      if (dd > maxDdPct) maxDdPct = dd;
+    }
+
+    return {
+      label,
+      count: n,
+      netPnl,
+      winRate: n ? wins.length / n : 0,
+      profitFactor: grossLoss > 0 ? grossWin / grossLoss : grossWin > 0 ? 99 : 0,
+      maxDdPct: maxDdPct * 100,
+    };
+  });
+}
+
+/* ============================================================
+ * Equity quality — R², K-Ratio, slope of the equity curve.
+ * Mirrors AnalyticsPage.xaml's EquityQualityCard (lines 560-591).
+ * ============================================================ */
+function computeEquityQuality(trades: Trade[]) {
+  if (trades.length < 3) {
+    return { r2: 0, kRatio: 0, slope: 0 };
+  }
+  const chrono = [...trades].sort(
+    (a, b) => a.closedAt.getTime() - b.closedAt.getTime()
+  );
+  let bal = 10_000;
+  const ys: number[] = [];
+  for (const t of chrono) {
+    bal += t.netPnl;
+    ys.push(bal);
+  }
+  const n = ys.length;
+  const xs = ys.map((_, i) => i);
+  const meanX = xs.reduce((s, v) => s + v, 0) / n;
+  const meanY = ys.reduce((s, v) => s + v, 0) / n;
+  let sxx = 0;
+  let sxy = 0;
+  let syy = 0;
+  for (let i = 0; i < n; i++) {
+    sxx += (xs[i] - meanX) ** 2;
+    sxy += (xs[i] - meanX) * (ys[i] - meanY);
+    syy += (ys[i] - meanY) ** 2;
+  }
+  const slope = sxx > 0 ? sxy / sxx : 0;
+  const ssRes = Math.max(0, syy - slope * sxy);
+  const r2 = syy > 0 ? 1 - ssRes / syy : 0;
+  // Residual stddev for K-Ratio approximation.
+  const residVar = ssRes / Math.max(1, n - 2);
+  const residStd = Math.sqrt(residVar);
+  const stderrSlope = residStd / Math.sqrt(sxx || 1);
+  const kRatio = stderrSlope > 0 ? slope / stderrSlope : 0;
+  return { r2, kRatio, slope };
+}
+
+/* ============================================================
+ * Edge verdict — bootstrap CI approximation. With <30 trades the
+ * verdict is "Inconclusive"; with 30-100 it's "Suggestive" if the
+ * CI excludes zero; with 100+ it's "Confirmed".
+ * ============================================================ */
+function computeEdge(trades: Trade[]) {
+  const n = trades.length;
+  if (n < 5) {
+    return {
+      verdict: "Inconclusive",
+      verdictTone: "neutral" as const,
+      hint: "Muy pocas operaciones para emitir veredicto.",
+      pValue: 1,
+      winRate: 0,
+      winRateCi: "—",
+      expectancyR: 0,
+      expectancyRCi: "—",
+      profitFactor: 0,
+      profitFactorCi: "—",
+      tradesNeeded: 100,
+    };
+  }
+  const rs = trades.map((t) => t.rMultiple);
+  const meanR = rs.reduce((s, v) => s + v, 0) / n;
+  const varR =
+    rs.reduce((s, v) => s + (v - meanR) ** 2, 0) / Math.max(1, n - 1);
+  const stdR = Math.sqrt(varR);
+  const seR = stdR / Math.sqrt(n);
+  // 95 % CI bounds.
+  const loR = meanR - 1.96 * seR;
+  const hiR = meanR + 1.96 * seR;
+  // Approximate two-sided p-value from z-score (normal approximation).
+  const z = seR > 0 ? Math.abs(meanR) / seR : 0;
+  // Survival function approximation: 2 * (1 - Φ(|z|)).
+  const pValue = z > 0 ? 2 * (1 - normCdf(z)) : 1;
+
+  const wins = trades.filter((t) => t.netPnl > 0).length;
+  const winRate = wins / n;
+  const seW = Math.sqrt((winRate * (1 - winRate)) / n);
+  const loW = Math.max(0, winRate - 1.96 * seW);
+  const hiW = Math.min(1, winRate + 1.96 * seW);
+
+  const grossWin = trades
+    .filter((t) => t.netPnl > 0)
+    .reduce((s, t) => s + t.netPnl, 0);
+  const grossLoss = Math.abs(
+    trades.filter((t) => t.netPnl < 0).reduce((s, t) => s + t.netPnl, 0)
+  );
+  const profitFactor = grossLoss > 0 ? grossWin / grossLoss : grossWin > 0 ? 99 : 0;
+
+  let verdict: string;
+  let verdictTone: "pos" | "warn" | "neutral";
+  let hint: string;
+  if (n < 30) {
+    verdict = "Inconclusive";
+    verdictTone = "neutral";
+    hint = "Necesitas al menos 30 operaciones para emitir un veredicto con confianza estadística.";
+  } else if (loR > 0) {
+    verdict = "Edge confirmado";
+    verdictTone = "pos";
+    hint = "El intervalo de confianza del 95 % de la expectativa R excluye al cero: tu ventaja es estadísticamente significativa.";
+  } else if (loR > -0.1) {
+    verdict = "Sugerente";
+    verdictTone = "warn";
+    hint = "La señal apunta en la dirección correcta pero el intervalo aún incluye al cero — sigue operando para estrecharlo.";
+  } else {
+    verdict = "Sin edge";
+    verdictTone = "neutral";
+    hint = "El intervalo de confianza incluye al cero y la media es cercana o negativa: no hay evidencia de ventaja real.";
+  }
+
+  const tradesNeeded = Math.max(0, Math.ceil(((1.96 * stdR) / Math.max(0.05, Math.abs(meanR) || 0.05)) ** 2) - n);
+
+  return {
+    verdict,
+    verdictTone,
+    hint,
+    pValue,
+    winRate,
+    winRateCi: `[${fmtPct(loW, "es", 0)}, ${fmtPct(hiW, "es", 0)}]`,
+    expectancyR: meanR,
+    expectancyRCi: `[${loR.toFixed(2)}, ${hiR.toFixed(2)}]`,
+    profitFactor,
+    profitFactorCi: `[${(profitFactor - 1.96 * seR).toFixed(2)}, ${(profitFactor + 1.96 * seR).toFixed(2)}]`,
+    tradesNeeded,
+  };
+}
+
+/** Standard-normal CDF approximation (Abramowitz & Stegun 26.2.17). */
+function normCdf(z: number): number {
+  const t = 1 / (1 + 0.2316419 * z);
+  const d = 0.3989423 * Math.exp(-z * z / 2);
+  const p =
+    d *
+    t *
+    (0.3193815 +
+      t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return 1 - p;
+}
+
+/* ============================================================
+ * Advanced metrics — SQN, Ulcer index, CAGR. Local computations
+ * (the demo Metrics object doesn't expose them).
+ * ============================================================ */
+function computeAdvanced(trades: Trade[]) {
+  const n = trades.length;
+  if (n < 2) return { sqn: 0, ulcer: 0, cagr: 0 };
+
+  // SQN = sqrt(n) * mean(R) / std(R).
+  const rs = trades.map((t) => t.rMultiple);
+  const meanR = rs.reduce((s, v) => s + v, 0) / n;
+  const varR = rs.reduce((s, v) => s + (v - meanR) ** 2, 0) / (n - 1);
+  const stdR = Math.sqrt(varR);
+  const sqn = stdR > 0 ? Math.sqrt(n) * meanR / stdR : 0;
+
+  // Ulcer index over the equity curve.
+  const chrono = [...trades].sort(
+    (a, b) => a.closedAt.getTime() - b.closedAt.getTime()
+  );
+  let peak = 10_000;
+  let bal = 10_000;
+  let sumSq = 0;
+  for (const t of chrono) {
+    bal += t.netPnl;
+    if (bal > peak) peak = bal;
+    const ddPct = peak > 0 ? ((peak - bal) / peak) * 100 : 0;
+    sumSq += ddPct * ddPct;
+  }
+  const ulcer = Math.sqrt(sumSq / n);
+
+  // CAGR — time-weighted, ~180 days of history.
+  const netPnl = trades.reduce((s, t) => s + t.netPnl, 0);
+  const final = 10_000 + netPnl;
+  const yearsSpan = Math.max(
+    1 / 365,
+    (chrono[chrono.length - 1]!.closedAt.getTime() - chrono[0]!.closedAt.getTime()) /
+      (365 * dayMs)
+  );
+  const cagr =
+    final > 0 && 10_000 > 0
+      ? (Math.pow(final / 10_000, 1 / yearsSpan) - 1) * 100
+      : 0;
+
+  return { sqn, ulcer, cagr };
+}
+
+const dayMs = 86_400_000;
+
+/* ============================================================
+ * Section nav — SelectorBar-style horizontal tab strip.
+ * Mirrors AnalyticsPage.xaml lines 50-62 (six SelectorBarItems).
+ * Visual-only: the demo doesn't actually swap content per tab,
+ * but the strip reads as the page's primary navigation.
+ * ============================================================ */
+const SECTIONS = [
+  { id: "summary", labelEs: "Resumen", labelEn: "Summary" },
+  { id: "risk", labelEs: "Riesgo", labelEn: "Risk" },
+  { id: "distributions", labelEs: "Distribuciones", labelEn: "Distributions" },
+  { id: "time", labelEs: "Tiempo", labelEn: "Time" },
+  { id: "attribution", labelEs: "Atribución", labelEn: "Attribution" },
+  { id: "behaviour", labelEs: "Conducta", labelEn: "Behaviour" },
+] as const;
+
+function SectionBar({
+  active,
+  onChange,
+  lang,
+}: {
+  active: string;
+  onChange: (id: string) => void;
+  lang: "es" | "en";
+}) {
+  return (
+    <div className="space-y-2">
+      <div
+        role="tablist"
+        aria-label={lang === "es" ? "Secciones" : "Sections"}
+        className="flex items-center gap-1 overflow-x-auto custom-scroll -mx-1 px-1"
+      >
+        {SECTIONS.map((s, i) => {
+          const isActive = s.id === active;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => onChange(s.id)}
+              className={`relative whitespace-nowrap px-3 py-1.5 text-xs font-medium transition-colors rounded-md ${
+                isActive
+                  ? "text-primary"
+                  : "text-tertiary hover:text-secondary hover:bg-white/5"
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                {lang === "es" ? s.labelEs : s.labelEn}
+                <span className="text-[9px] text-tertiary tnum">
+                  · {i + 1}
+                </span>
+              </span>
+              {isActive && (
+                <motion.span
+                  layoutId="analytics-section-underline"
+                  className="absolute left-2 right-2 -bottom-0.5 h-px bg-[rgb(var(--accent-base))]"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <div className="h-px bg-[rgb(var(--divider)/0.18)]" />
+    </div>
+  );
+}
+
+/* ============================================================
+ * ComboBox-style filter — small header label above a native select.
+ * Mirrors AnalyticsPage.xaml's ComboBox-with-Header filter row
+ * (lines 68-105).
+ * ============================================================ */
+function FilterSelect({
+  header,
+  value,
+  onChange,
+  children,
+  minWidth = 200,
+}: {
+  header: string;
+  value: string;
+  onChange: (v: string) => void;
+  children: ReactNode;
+  minWidth?: number;
+}) {
+  return (
+    <div className="flex flex-col gap-1" style={{ minWidth }}>
+      <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
+        {header}
+      </span>
+      <div className="relative">
+        <select
+          aria-label={header}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="bg-white/5 border border-white/10 rounded-md h-8 pl-2.5 pr-7 text-xs text-primary tnum focus:outline-none focus:border-white/30 transition-colors appearance-none cursor-pointer w-full"
+        >
+          {children}
+        </select>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 12 12"
+          width={10}
+          height={10}
+          className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-tertiary"
+        >
+          <path
+            d="M2.5 4 L6 7.5 L9.5 4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
  * Main page
  * ============================================================ */
 export function AnalyticsPage() {
   const { t, lang } = useLang();
   const { filters, setFilters, clearFilters } = useDemo();
+  const [activeSection, setActiveSection] = useState<string>("summary");
 
-  // Filtered trades — single source of truth for every metric below.
   const filteredTrades = useMemo(() => {
     return TRADES.filter((tr) => {
       if (filters.instrument !== "all" && tr.instrument !== filters.instrument)
@@ -754,7 +1095,6 @@ export function AnalyticsPage() {
 
   const m = useMemo(() => computeMetrics(filteredTrades), [filteredTrades]);
 
-  // Pre-compute all derived analytics once per filter change.
   const rHist = useMemo(() => rHistogram(filteredTrades), [filteredTrades]);
   const pnlHist = useMemo(() => pnlHistogram(filteredTrades), [filteredTrades]);
   const durHist = useMemo(() => durationHistogram(filteredTrades), [filteredTrades]);
@@ -766,25 +1106,25 @@ export function AnalyticsPage() {
     () => rankByExpectancy(filteredTrades, (tr) => tr.instrument),
     [filteredTrades]
   );
+  const periodRows = useMemo(() => buildPeriodRows(filteredTrades), [filteredTrades]);
+  const equityQ = useMemo(() => computeEquityQuality(filteredTrades), [filteredTrades]);
+  const edge = useMemo(() => computeEdge(filteredTrades), [filteredTrades]);
+  const adv = useMemo(() => computeAdvanced(filteredTrades), [filteredTrades]);
 
-  // Signature so CountUps / rankings re-animate on filter change.
   const filterSig = `${filters.instrument}|${filters.setup}|${filters.direction}|${filters.compliance}`;
 
-  // Sparkline source: last 8 trades' net P&L (chronological).
   const sparkPnl = useMemo(() => {
     return [...filteredTrades]
       .sort((a, b) => a.closedAt.getTime() - b.closedAt.getTime())
       .slice(-8)
       .map((tr) => tr.netPnl);
   }, [filteredTrades]);
-  // Sparkline source: last 8 R-multiples.
   const sparkR = useMemo(() => {
     return [...filteredTrades]
       .sort((a, b) => a.closedAt.getTime() - b.closedAt.getTime())
       .slice(-8)
       .map((tr) => tr.rMultiple);
   }, [filteredTrades]);
-  // Sparkline source: equity curve tail.
   const sparkEquity = useMemo(() => {
     return m.equityCurve.slice(-8).map((e) => e.balance);
   }, [m.equityCurve]);
@@ -797,178 +1137,28 @@ export function AnalyticsPage() {
 
   const shortSample = m.closedCount < 30;
 
-  // Compact money format for axis labels.
   const compactMoney = (v: number) =>
     fmtMoney(v, lang, { compact: true, decimals: 0 });
 
-  // Bilingual ratio descriptions.
   const desc = (es: string, en: string) => (lang === "es" ? es : en);
+
+  const verdictLedClass =
+    edge.verdictTone === "pos"
+      ? "bg-pnl-pos"
+      : edge.verdictTone === "warn"
+      ? "bg-pnl-warn"
+      : "bg-tertiary";
+  const verdictTextClass =
+    edge.verdictTone === "pos"
+      ? "text-pnl-pos"
+      : edge.verdictTone === "warn"
+      ? "text-pnl-warn"
+      : "text-secondary";
 
   return (
     <div className="p-5 md:p-6 space-y-5">
-      {/* ============ STICKY FILTER BAR ============ */}
-      <div
-        className="sticky top-0 z-10 -mx-5 md:-mx-6 -mt-5 md:-mt-6 px-5 md:px-6 pt-5 md:pt-6 pb-3 backdrop-blur-md bg-[rgb(var(--tint)/0.75)] border-b border-white/10"
-      >
-        <div className="liquid-glass depth-3 hover:depth-4 transition-shadow duration-300 rounded-card p-4">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-            {/* Instrument select */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
-                {t("colInstrument")}
-              </span>
-              <div className="relative">
-                <select
-                  aria-label={t("colInstrument")}
-                  value={filters.instrument}
-                  onChange={(e) => setFilters({ instrument: e.target.value })}
-                  className="bg-white/5 border border-white/10 rounded-md h-7 pl-2 pr-7 text-xs text-primary tnum focus:outline-none focus:border-white/30 transition-colors appearance-none cursor-pointer"
-                >
-                  <option value="all">{t("all")}</option>
-                  {INSTRUMENTS.map((inst) => (
-                    <option key={inst.symbol} value={inst.symbol}>
-                      {inst.symbol}
-                    </option>
-                  ))}
-                </select>
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 12 12"
-                  width={10}
-                  height={10}
-                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-tertiary"
-                >
-                  <path
-                    d="M2.5 4 L6 7.5 L9.5 4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            {/* Setup select */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
-                {t("colSetup")}
-              </span>
-              <div className="relative">
-                <select
-                  aria-label={t("colSetup")}
-                  value={filters.setup}
-                  onChange={(e) => setFilters({ setup: e.target.value })}
-                  className="bg-white/5 border border-white/10 rounded-md h-7 pl-2 pr-7 text-xs text-primary tnum focus:outline-none focus:border-white/30 transition-colors appearance-none cursor-pointer max-w-[120px]"
-                >
-                  <option value="all">{t("all")}</option>
-                  {SETUP_NAMES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 12 12"
-                  width={10}
-                  height={10}
-                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-tertiary"
-                >
-                  <path
-                    d="M2.5 4 L6 7.5 L9.5 4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            <span className="hidden md:inline w-px h-5 bg-white/10" aria-hidden="true" />
-
-            {/* Direction chips */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary mr-0.5">
-                {t("direction")}
-              </span>
-              {(["all", "long", "short"] as const).map((d) => (
-                <FilterChip
-                  key={d}
-                  active={filters.direction === d}
-                  onClick={() => setFilters({ direction: d })}
-                  group="direction"
-                  label={d === "all" ? t("all") : t(d)}
-                >
-                  {d === "all" ? t("all") : t(d)}
-                </FilterChip>
-              ))}
-            </div>
-
-            <span className="hidden md:inline w-px h-5 bg-white/10" aria-hidden="true" />
-
-            {/* Compliance chips */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary mr-0.5">
-                {t("compliance")}
-              </span>
-              <FilterChip
-                active={filters.compliance === "all"}
-                onClick={() => setFilters({ compliance: "all" })}
-                group="compliance"
-                label={t("all")}
-              >
-                {t("all")}
-              </FilterChip>
-              <FilterChip
-                active={filters.compliance === "yes"}
-                onClick={() => setFilters({ compliance: "yes" })}
-                group="compliance"
-                label={t("complied")}
-              >
-                {t("complied")}
-              </FilterChip>
-              <FilterChip
-                active={filters.compliance === "no"}
-                onClick={() => setFilters({ compliance: "no" })}
-                group="compliance"
-                label={t("notComplied")}
-              >
-                {t("notComplied")}
-              </FilterChip>
-            </div>
-
-            <div className="ml-auto flex items-center gap-3">
-              <div className="text-[11px] text-tertiary tnum hidden sm:block">
-                {t("operations")}:{" "}
-                <span className="text-secondary font-medium">
-                  {fmtInt(m.closedCount, lang)}
-                </span>
-              </div>
-              {filterActive && (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="text-xs text-tertiary hover:text-secondary transition-colors px-2 py-1 rounded-md hover:bg-white/5"
-                  aria-label={t("clearFilters")}
-                >
-                  ✕ {t("clearFilters")}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ============ HEADER ============ */}
       <section className="relative overflow-hidden rounded-card">
-        {/* Soft static accent halo behind the eyebrow — a whisper of
-            gold that anchors the section without competing with the
-            title. Sits under the Reveal so it doesn't move with the
-            scroll-in animation. */}
         <div
           aria-hidden
           className="pointer-events-none absolute -top-16 -left-10 w-56 h-32 rounded-full opacity-50"
@@ -988,368 +1178,631 @@ export function AnalyticsPage() {
         </Reveal>
       </section>
 
-      {/* ============ KPI GRID — RISK & QUALITY ============ */}
-      <Reveal>
-        <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5">
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em]">
-              {t("riskQuality")}
-            </h3>
-            {shortSample && (
-              <Chip variant="warn" className="text-[10px]">
-                ⚠ {t("sampleShort")}
-              </Chip>
-            )}
+      {/* ============ SECTION NAV (SelectorBar) ============ */}
+      <SectionBar
+        active={activeSection}
+        onChange={setActiveSection}
+        lang={lang}
+      />
+
+      {/* ============ FILTER BAR — ComboBox-with-header style ============ */}
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-end gap-3">
+          <FilterSelect
+            header={t("colInstrument")}
+            value={filters.instrument}
+            onChange={(v) => setFilters({ instrument: v })}
+          >
+            <option value="all">{t("all")}</option>
+            {INSTRUMENTS.map((inst) => (
+              <option key={inst.symbol} value={inst.symbol}>
+                {inst.symbol}
+              </option>
+            ))}
+          </FilterSelect>
+
+          <FilterSelect
+            header={t("colSetup")}
+            value={filters.setup}
+            onChange={(v) => setFilters({ setup: v })}
+            minWidth={180}
+          >
+            <option value="all">{t("all")}</option>
+            {SETUP_NAMES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </FilterSelect>
+
+          <FilterSelect
+            header={t("direction")}
+            value={filters.direction}
+            onChange={(v) => setFilters({ direction: v as typeof filters.direction })}
+            minWidth={140}
+          >
+            <option value="all">{t("all")}</option>
+            <option value="long">{t("long")}</option>
+            <option value="short">{t("short")}</option>
+          </FilterSelect>
+
+          <FilterSelect
+            header={t("compliance")}
+            value={filters.compliance}
+            onChange={(v) => setFilters({ compliance: v as typeof filters.compliance })}
+            minWidth={170}
+          >
+            <option value="all">{t("all")}</option>
+            <option value="yes">{t("complied")}</option>
+            <option value="no">{t("notComplied")}</option>
+          </FilterSelect>
+
+          {filterActive && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="text-xs text-tertiary hover:text-secondary transition-colors px-2 py-1 rounded-md hover:bg-white/5 mb-0.5"
+              aria-label={t("clearFilters")}
+            >
+              ✕ {t("clearFilters")}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ============ EMPTY STATE ============ */}
+      {filteredTrades.length === 0 && (
+        <SectionCard>
+          <div className="flex flex-col items-center gap-3 py-8 text-center">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-tertiary"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <p className="text-secondary text-sm">
+              {lang === "es"
+                ? "Sin operaciones con esos filtros."
+                : "No trades match these filters."}
+            </p>
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="px-3 py-1.5 rounded-md text-xs font-medium border border-white/10 hover:bg-white/5 transition-colors text-secondary"
+            >
+              {t("clearFilters")}
+            </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-fr">
-            <KpiTile
-              label={t("avgWin")}
-              reKey={`avgWin-${filterSig}`}
-              spark={<Sparkline values={sparkPnl.filter((v) => v > 0)} tone="pos" />}
-            >
-              <Money value={m.avgWin} colorizeSign tone="pos" decimals={0} />
-            </KpiTile>
-            <KpiTile
-              label={t("avgLoss")}
-              reKey={`avgLoss-${filterSig}`}
-              spark={
-                <Sparkline
-                  values={sparkPnl.filter((v) => v < 0).map((v) => -v)}
-                  tone="neg"
-                />
-              }
-            >
-              <Money value={m.avgLoss} colorizeSign tone="neg" decimals={0} />
-            </KpiTile>
-            <KpiTile
-              label={t("payoff")}
-              reKey={`payoff-${filterSig}`}
-              spark={<Sparkline values={[1, 1.2, 1.1, 1.4, 1.3, m.payoff]} tone="neutral" />}
-            >
-              <span className={`tnum ${m.payoff >= 1 ? "text-pnl-pos" : "text-pnl-warn"}`}>
-                {fmtNum(m.payoff, lang, 2)}
-              </span>
-            </KpiTile>
-            <KpiTile
-              label={t("expectancyR")}
-              reKey={`expR-${filterSig}`}
-              spark={<Sparkline values={sparkR} tone={m.expectancyR >= 0 ? "pos" : "neg"} />}
-            >
-              <span
-                className={`tnum ${
-                  m.expectancyR >= 0 ? "text-pnl-pos" : "text-pnl-neg"
-                }`}
+        </SectionCard>
+      )}
+
+      {filteredTrades.length > 0 && (
+        <>
+          {/* ============ PERIOD COMPARISON CARD ============ */}
+          <SectionCard
+            eyebrow={lang === "es" ? "De un vistazo" : "At a glance"}
+          >
+            <div className="overflow-x-auto custom-scroll -mx-1">
+              <table className="w-full text-sm min-w-[560px]">
+                <thead>
+                  <tr className="text-left">
+                    <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium">
+                      {lang === "es" ? "Periodo" : "Period"}
+                    </th>
+                    <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
+                      {lang === "es" ? "Ops" : "Trades"}
+                    </th>
+                    <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
+                      {lang === "es" ? "P&L neto" : "Net P&L"}
+                    </th>
+                    <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
+                      {t("winRate")}
+                    </th>
+                    <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
+                      {t("profitFactor")}
+                    </th>
+                    <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
+                      {lang === "es" ? "Max DD" : "Max DD"}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {periodRows.map((row, i) => (
+                    <tr
+                      key={row.label}
+                      className={`border-t border-white/[0.06] ${
+                        i === periodRows.length - 1 ? "bg-white/[0.02]" : ""
+                      }`}
+                    >
+                      <td className="px-2 py-2.5 font-medium text-primary text-sm">
+                        {row.label === "Mes"
+                          ? lang === "es" ? "Mes" : "Month"
+                          : row.label === "Trimestre"
+                          ? lang === "es" ? "Trimestre" : "Quarter"
+                          : row.label === "Año"
+                          ? lang === "es" ? "Año" : "Year"
+                          : lang === "es" ? "Histórico" : "All-time"}
+                      </td>
+                      <td className="px-2 py-2.5 tnum text-tertiary text-xs text-right">
+                        {fmtInt(row.count, lang)}
+                      </td>
+                      <td className="px-2 py-2.5 text-right">
+                        <Money value={row.netPnl} sign colorizeSign decimals={0} className="text-sm font-semibold" />
+                      </td>
+                      <td className="px-2 py-2.5 tnum text-secondary text-xs text-right">
+                        {fmtPct(row.winRate, lang, 0)}
+                      </td>
+                      <td className="px-2 py-2.5 tnum text-secondary text-xs text-right">
+                        {fmtNum(row.profitFactor, lang, 2)}
+                      </td>
+                      <td className="px-2 py-2.5 tnum text-pnl-neg text-xs text-right">
+                        −{fmtNum(row.maxDdPct, lang, 1)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SectionCard>
+
+          {/* ============ KPI STRIP — loose, vertical hairlines ============ */}
+          <div className="space-y-2">
+            <Eyebrow>
+              {lang === "es" ? "Resumen del universo filtrado" : "Filtered universe summary"}
+            </Eyebrow>
+            <div className="flex items-stretch rounded-card liquid-glass depth-1 p-4">
+              <KpiStripCell
+                label={lang === "es" ? "Operaciones" : "Trades"}
+                showHairline
+                reKey={`count-${filterSig}`}
               >
-                {m.expectancyR >= 0 ? "+" : "−"}
-                {fmtNum(Math.abs(m.expectancyR), lang, 2)}R
-              </span>
-            </KpiTile>
-
-            <KpiTile
-              label={t("largestWin")}
-              reKey={`lw-${filterSig}`}
-              spark={<Sparkline values={sparkEquity} tone="pos" />}
-            >
-              <Money value={m.largestWin} colorizeSign tone="pos" decimals={0} />
-            </KpiTile>
-            <KpiTile
-              label={t("largestLoss")}
-              reKey={`ll-${filterSig}`}
-              spark={<Sparkline values={sparkEquity} tone="neg" />}
-            >
-              <Money value={m.largestLoss} colorizeSign tone="neg" decimals={0} />
-            </KpiTile>
-            <KpiTile
-              label={t("maxDrawdown")}
-              reKey={`mdd-${filterSig}`}
-              spark={
-                <Sparkline
-                  values={[0, -0.2, -0.4, -0.3, -0.5, -Math.min(0, m.maxDrawdown / 1000)]}
-                  tone="neg"
-                />
-              }
-            >
-              <Money value={m.maxDrawdown} colorizeSign tone="neg" decimals={0} />
-            </KpiTile>
-            <KpiTile
-              label={t("recoveryFactor")}
-              reKey={`rf-${filterSig}`}
-              spark={
-                <Sparkline
-                  values={[0.5, 1.0, 1.5, 2.0, 2.5, m.recoveryFactor]}
-                  tone={m.recoveryFactor >= 1 ? "pos" : "neg"}
-                />
-              }
-            >
-              <CountUp
-                to={m.recoveryFactor}
-                decimals={2}
-                className={m.recoveryFactor >= 1 ? "text-pnl-pos" : "text-pnl-warn"}
-              />
-            </KpiTile>
+                <CountUp to={m.closedCount} decimals={0} />
+              </KpiStripCell>
+              <KpiStripCell
+                label={t("pnlTotal")}
+                showHairline
+                reKey={`net-${filterSig}`}
+              >
+                <Money value={m.netPnl} sign colorizeSign decimals={0} className="text-base md:text-lg" />
+              </KpiStripCell>
+              <KpiStripCell
+                label={t("winRate")}
+                showHairline
+                reKey={`wr-${filterSig}`}
+              >
+                <CountUp to={m.winRate * 100} decimals={1} suffix="%" />
+              </KpiStripCell>
+              <KpiStripCell
+                label={t("expectancy")}
+                showHairline
+                reKey={`exp-${filterSig}`}
+              >
+                <Money value={m.expectancy} sign colorizeSign decimals={0} className="text-base md:text-lg" />
+              </KpiStripCell>
+              <KpiStripCell
+                label={t("profitFactor")}
+                showHairline={false}
+                reKey={`pf-${filterSig}`}
+              >
+                <CountUp to={m.profitFactor} decimals={2} />
+              </KpiStripCell>
+            </div>
           </div>
-        </div>
-      </Reveal>
 
-      {/* ============ RATIOS CARD — REFINED INSTITUTIONAL GRID ============ */}
-      <Reveal delay={0.04}>
-        <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5">
-          <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-            <div>
-              <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em]">
-                {lang === "es" ? "Ratios de rendimiento" : "Performance ratios"}
-              </h3>
-              <p className="text-[11px] text-tertiary mt-0.5">
-                {lang === "es"
-                  ? "Ratios sin dimensión para comparar estrategias"
-                  : "Dimensionless ratios for strategy comparison"}
+          {/* ============ WIN/LOSS + RISK/QUALITY 2-CARD ROW (3:4 ratio) ============ */}
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-5">
+            {/* Win/loss card — 3×2 grid. */}
+            <SectionCard
+              eyebrow={lang === "es" ? "Ganadoras vs perdedoras" : "Winners vs losers"}
+              className="lg:col-span-3"
+            >
+              <div className="grid grid-cols-3 gap-x-4 gap-y-5">
+                <RatioCell label={t("avgWin")}>
+                  <Money value={m.avgWin} sign colorizeSign tone="pos" decimals={0} />
+                </RatioCell>
+                <RatioCell label={t("avgLoss")}>
+                  <Money value={m.avgLoss} sign colorizeSign tone="neg" decimals={0} />
+                </RatioCell>
+                <RatioCell
+                  label={t("payoff")}
+                  hint={desc("Ganancia media / pérdida media", "Avg win / avg loss")}
+                >
+                  <span className={m.payoff >= 1 ? "text-pnl-pos" : "text-pnl-warn"}>
+                    {fmtNum(m.payoff, lang, 2)}
+                  </span>
+                </RatioCell>
+
+                <RatioCell label={t("largestWin")}>
+                  <Money value={m.largestWin} sign colorizeSign tone="pos" decimals={0} />
+                </RatioCell>
+                <RatioCell label={t("largestLoss")}>
+                  <Money value={m.largestLoss} sign colorizeSign tone="neg" decimals={0} />
+                </RatioCell>
+                <RatioCell label={t("expectancyR")}>
+                  <span className={m.expectancyR >= 0 ? "text-pnl-pos" : "text-pnl-neg"}>
+                    {m.expectancyR >= 0 ? "+" : "−"}
+                    {fmtNum(Math.abs(m.expectancyR), lang, 2)}R
+                  </span>
+                </RatioCell>
+              </div>
+            </SectionCard>
+
+            {/* Risk/quality card — 4×3 grid. */}
+            <SectionCard
+              eyebrow={lang === "es" ? "Riesgo, calidad y rachas" : "Risk, quality & streaks"}
+              className="lg:col-span-4"
+              hint={
+                shortSample ? (
+                  <Chip variant="warn" className="text-[10px]">
+                    ⚠ {t("sampleShort")}
+                  </Chip>
+                ) : null
+              }
+            >
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5">
+                <RatioCell label={t("maxDrawdown")}>
+                  <Money value={m.maxDrawdown} sign colorizeSign tone="neg" decimals={0} />
+                </RatioCell>
+                <RatioCell label={t("maxDrawdownPct")}>
+                  <span className="text-pnl-warn">
+                    {fmtPct(m.maxDrawdownPct, lang, 1)}
+                  </span>
+                </RatioCell>
+                <RatioCell
+                  label={t("sharpe")}
+                  hint={desc("Retorno medio / desviación estándar", "Mean return / std dev")}
+                >
+                  <span className={m.sharpe >= 0 ? "text-pnl-pos" : "text-pnl-neg"}>
+                    {fmtNum(m.sharpe, lang, 2)}
+                  </span>
+                </RatioCell>
+                <RatioCell
+                  label={t("sortino")}
+                  hint={desc("Sharpe pero solo penaliza la baja", "Sharpe but only downside")}
+                >
+                  <span className={m.sortino >= 0 ? "text-pnl-pos" : "text-pnl-neg"}>
+                    {fmtNum(m.sortino, lang, 2)}
+                  </span>
+                </RatioCell>
+
+                <RatioCell
+                  label={t("calmar")}
+                  hint={desc("Retorno anualizado / max DD", "Annual return / max DD")}
+                >
+                  <span className={m.calmar >= 0 ? "text-pnl-pos" : "text-pnl-neg"}>
+                    {fmtNum(m.calmar, lang, 2)}
+                  </span>
+                </RatioCell>
+                <RatioCell
+                  label={t("recoveryFactor")}
+                  hint={desc("P&L neto / max DD", "Net P&L / max DD")}
+                >
+                  <span className={m.recoveryFactor >= 1 ? "text-pnl-pos" : "text-pnl-warn"}>
+                    {fmtNum(m.recoveryFactor, lang, 2)}
+                  </span>
+                </RatioCell>
+                <RatioCell
+                  label="SQN"
+                  hint={desc("System Quality Number", "System Quality Number")}
+                >
+                  <span className={adv.sqn >= 1.6 ? "text-pnl-pos" : "text-pnl-warn"}>
+                    {fmtNum(adv.sqn, lang, 2)}
+                  </span>
+                </RatioCell>
+                <RatioCell label={lang === "es" ? "Racha" : "Streak"}>
+                  <span className="tnum">
+                    <span className="text-pnl-pos">{m.maxWinStreak}</span>
+                    <span className="text-tertiary"> / </span>
+                    <span className="text-pnl-neg">{m.maxLossStreak}</span>
+                  </span>
+                </RatioCell>
+
+                <RatioCell
+                  label={lang === "es" ? "Úlcer" : "Ulcer"}
+                  hint={desc("Índice de Úlcera (Peter Martin)", "Ulcer Index (Peter Martin)")}
+                >
+                  <span className="text-pnl-warn">
+                    {fmtNum(adv.ulcer, lang, 2)}
+                  </span>
+                </RatioCell>
+                <RatioCell
+                  label="CAGR"
+                  hint={desc("Tasa anualizada time-weighted", "Time-weighted annualized return")}
+                >
+                  <span className={adv.cagr >= 0 ? "text-pnl-pos" : "text-pnl-neg"}>
+                    {adv.cagr >= 0 ? "+" : "−"}
+                    {fmtNum(Math.abs(adv.cagr), lang, 1)}%
+                  </span>
+                </RatioCell>
+              </div>
+            </SectionCard>
+          </div>
+
+          {/* ============ EDGE CARD — verdict + CI intervals ============ */}
+          <SectionCard
+            eyebrow={lang === "es" ? "¿Ventaja real o suerte?" : "Real edge or luck?"}
+          >
+            <div className="space-y-4">
+              {/* Verdict row — LED + label + p-value pill. */}
+              <div className="flex flex-wrap items-center gap-3">
+                <span
+                  className={`inline-block w-3 h-3 rounded-full ${verdictLedClass}`}
+                  aria-hidden="true"
+                />
+                <span className={`text-base font-medium ${verdictTextClass}`}>
+                  {lang === "es" && edge.verdict === "Edge confirmado"
+                    ? "Edge confirmado"
+                    : lang === "es" && edge.verdict === "Sugerente"
+                    ? "Sugerente"
+                    : lang === "es" && edge.verdict === "Sin edge"
+                    ? "Sin edge"
+                    : lang === "es"
+                    ? "Inconcluso"
+                    : edge.verdict}
+                </span>
+                <span className="pill text-[11px] bg-[rgb(var(--divider)/0.08)] text-tertiary border border-[rgb(var(--divider)/0.12)]">
+                  <span>p =</span>
+                  <span className="tnum">{fmtNum(edge.pValue, lang, 3)}</span>
+                </span>
+              </div>
+
+              {/* Hint sentence. */}
+              <p className="text-sm text-secondary leading-relaxed max-w-3xl">
+                {edge.verdict === "Inconclusive"
+                  ? lang === "es"
+                    ? "Necesitas al menos 30 operaciones para emitir un veredicto con confianza estadística."
+                    : "You need at least 30 trades to issue a statistically confident verdict."
+                  : edge.hint}
               </p>
-            </div>
-            {shortSample && (
-              <Chip variant="warn" className="text-[10px]">
-                ⚠ {t("sampleShort")}
-              </Chip>
-            )}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 auto-rows-fr">
-            <RatioTile
-              label={t("sharpe")}
-              reKey={`sharpe-${filterSig}`}
-              delay={0}
-              value={
-                <CountUp
-                  to={m.sharpe}
-                  decimals={2}
-                  className={m.sharpe >= 0 ? "text-pnl-pos" : "text-pnl-neg"}
-                />
-              }
-              desc={desc(
-                "Retorno medio / desviación estándar",
-                "Mean return / standard deviation"
-              )}
-            />
-            <RatioTile
-              label={t("sortino")}
-              reKey={`sortino-${filterSig}`}
-              delay={0.04}
-              value={
-                <CountUp
-                  to={m.sortino}
-                  decimals={2}
-                  className={m.sortino >= 0 ? "text-pnl-pos" : "text-pnl-neg"}
-                />
-              }
-              desc={desc(
-                "Como Sharpe pero solo penaliza la volatilidad a la baja",
-                "Sharpe but only penalizes downside volatility"
-              )}
-            />
-            <RatioTile
-              label={t("calmar")}
-              reKey={`calmar-${filterSig}`}
-              delay={0.08}
-              value={
-                <CountUp
-                  to={m.calmar}
-                  decimals={2}
-                  className={m.calmar >= 0 ? "text-pnl-pos" : "text-pnl-neg"}
-                />
-              }
-              desc={desc(
-                "Retorno anualizado / max drawdown",
-                "Annualized return / max drawdown"
-              )}
-            />
-            <RatioTile
-              label={t("profitFactor")}
-              reKey={`pf-${filterSig}`}
-              delay={0.12}
-              value={
-                <CountUp
-                  to={m.profitFactor}
-                  decimals={2}
-                  className={m.profitFactor >= 1 ? "text-pnl-pos" : "text-pnl-neg"}
-                />
-              }
-              desc={desc(
-                "Ganancias brutas / pérdidas brutas",
-                "Gross profit / gross loss"
-              )}
-            />
-            <RatioTile
-              label={t("expectancy")}
-              reKey={`exp-${filterSig}`}
-              delay={0.16}
-              value={
-                <Money
-                  value={m.expectancy}
-                  sign
-                  colorizeSign
-                  decimals={0}
-                />
-              }
-              desc={desc(
-                "P&L neto medio por operación",
-                "Average net P&L per trade"
-              )}
-            />
-            <RatioTile
-              label={t("maxDrawdownPct")}
-              reKey={`mddpct-${filterSig}`}
-              delay={0.2}
-              value={
-                <span className="text-pnl-warn">
-                  {fmtPct(m.maxDrawdownPct, lang, 1)}
-                </span>
-              }
-              desc={desc(
-                "Caída máxima desde el pico",
-                "Largest drop from peak"
-              )}
-            />
-          </div>
-        </div>
-      </Reveal>
 
-      {/* ============ WINNERS vs LOSERS ============ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <SectionCard title={t("winnersVsLosers")} className="lg:col-span-1">
-          <div className="flex flex-col items-center gap-4 py-2">
-            <WinnersDonut wins={m.wins} losses={m.losses} reKey={filterSig} />
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span
-                  className="w-2.5 h-2.5 rounded-sm"
-                  style={{ backgroundColor: "rgb(var(--pnl-pos))" }}
-                  aria-hidden="true"
-                />
-                <span className="text-xs text-tertiary">
-                  {lang === "es" ? "Ganadoras" : "Winners"}{" "}
-                  <span className="text-secondary tnum font-medium">
-                    {fmtInt(m.wins, lang)}
+              {/* 4 intervals grid. */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-1">
+                <div className="flex flex-col gap-1 items-center text-center">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    {t("winRate")}
                   </span>
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="w-2.5 h-2.5 rounded-sm"
-                  style={{ backgroundColor: "rgb(var(--pnl-neg))" }}
-                  aria-hidden="true"
-                />
-                <span className="text-xs text-tertiary">
-                  {lang === "es" ? "Perdedoras" : "Losers"}{" "}
-                  <span className="text-secondary tnum font-medium">
-                    {fmtInt(m.losses, lang)}
+                  <span className="font-semibold tnum text-primary text-lg">
+                    {fmtPct(edge.winRate, lang, 0)}
                   </span>
-                </span>
+                  <span className="text-[10px] text-tertiary tnum">
+                    {edge.winRateCi}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1 items-center text-center">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    {t("expectancyR")}
+                  </span>
+                  <span className={`font-semibold tnum text-lg ${edge.expectancyR >= 0 ? "text-pnl-pos" : "text-pnl-neg"}`}>
+                    {edge.expectancyR >= 0 ? "+" : "−"}
+                    {fmtNum(Math.abs(edge.expectancyR), lang, 2)}R
+                  </span>
+                  <span className="text-[10px] text-tertiary tnum">
+                    {edge.expectancyRCi}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1 items-center text-center">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    {t("profitFactor")}
+                  </span>
+                  <span className={`font-semibold tnum text-lg ${edge.profitFactor >= 1 ? "text-pnl-pos" : "text-pnl-neg"}`}>
+                    {fmtNum(edge.profitFactor, lang, 2)}
+                  </span>
+                  <span className="text-[10px] text-tertiary tnum">
+                    {edge.profitFactorCi}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1 items-center text-center">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    {lang === "es" ? "Ops necesarias" : "Trades needed"}
+                  </span>
+                  <span className="font-semibold tnum text-primary text-lg">
+                    {edge.tradesNeeded > 0 ? fmtInt(edge.tradesNeeded, lang) : "—"}
+                  </span>
+                  <span className="text-[10px] text-tertiary">
+                    {lang === "es" ? "para estrechar el IC" : "to tighten CI"}
+                  </span>
+                </div>
               </div>
             </div>
+          </SectionCard>
+
+          {/* ============ EQUITY CURVE + EQUITY QUALITY (2:1) ============ */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <SectionCard
+              eyebrow={lang === "es" ? "Curva de rendimiento" : "Equity curve"}
+              className="lg:col-span-2"
+            >
+              <EquityCurve metrics={m} height={320} showDrawdown />
+            </SectionCard>
+            <SectionCard
+              eyebrow={lang === "es" ? "Calidad de la curva" : "Curve quality"}
+              className="lg:col-span-1"
+            >
+              <p className="text-[11px] text-tertiary leading-relaxed mb-4">
+                {desc(
+                  "R² = cuánta escalera hay en el dibujo; K-Ratio = pendiente alta y estable; pendiente = € por operación según el ajuste.",
+                  "R² = how much staircase is in the chart; K-Ratio = high & stable slope; slope = € per trade from the fit."
+                )}
+              </p>
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    R²
+                  </span>
+                  <div className="font-semibold tnum text-primary text-xl">
+                    {fmtNum(equityQ.r2, lang, 3)}
+                  </div>
+                </div>
+                <div className="h-px bg-[rgb(var(--divider)/0.18)]" />
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    K-Ratio
+                  </span>
+                  <div className="font-semibold tnum text-primary text-xl">
+                    {fmtNum(equityQ.kRatio, lang, 2)}
+                  </div>
+                </div>
+                <div className="h-px bg-[rgb(var(--divider)/0.18)]" />
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    {lang === "es" ? "Pendiente" : "Slope"}
+                  </span>
+                  <div className="font-semibold tnum text-primary text-xl">
+                    <Money value={equityQ.slope} sign colorizeSign decimals={0} />
+                  </div>
+                </div>
+              </div>
+            </SectionCard>
           </div>
-        </SectionCard>
 
-        {/* R-over-time chart spans 2 cols */}
-        <SectionCard
-          title={t("rOverTime")}
-          className="lg:col-span-2"
-          delay={0.04}
-        >
-          <ROverTimeChart trades={filteredTrades} />
-          <div className="flex items-center justify-between mt-2 text-[10px] text-tertiary">
-            <span>
-              {lang === "es" ? "Primera operación" : "First trade"} →{" "}
-              {lang === "es" ? "Última" : "Last"}
-            </span>
-            <span>
-              {lang === "es" ? "Cada barra = R de una operación" : "Each bar = one trade R"}
-            </span>
+          {/* ============ WINNERS DONUT + R-OVER-TIME ============ */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <SectionCard
+              eyebrow={t("winnersVsLosers")}
+              className="lg:col-span-1"
+            >
+              <div className="flex flex-col items-center gap-4 py-2">
+                <WinnersDonut wins={m.wins} losses={m.losses} reKey={filterSig} />
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-sm"
+                      style={{ backgroundColor: "rgb(var(--pnl-pos))" }}
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs text-tertiary">
+                      {lang === "es" ? "Ganadoras" : "Winners"}{" "}
+                      <span className="text-secondary tnum font-medium">
+                        {fmtInt(m.wins, lang)}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-sm"
+                      style={{ backgroundColor: "rgb(var(--pnl-neg))" }}
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs text-tertiary">
+                      {lang === "es" ? "Perdedoras" : "Losers"}{" "}
+                      <span className="text-secondary tnum font-medium">
+                        {fmtInt(m.losses, lang)}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard
+              eyebrow={t("rOverTime")}
+              className="lg:col-span-2"
+            >
+              <ROverTimeChart trades={filteredTrades} />
+              <div className="flex items-center justify-between mt-2 text-[10px] text-tertiary">
+                <span>
+                  {lang === "es" ? "Primera operación" : "First trade"} →{" "}
+                  {lang === "es" ? "Última" : "Last"}
+                </span>
+                <span>
+                  {lang === "es" ? "Cada barra = R de una operación" : "Each bar = one trade R"}
+                </span>
+              </div>
+            </SectionCard>
           </div>
-        </SectionCard>
-      </div>
 
-      {/* ============ DISTRIBUTIONS (3 cards) ============ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <SectionCard title={t("rDistribution")}>
-          <Histogram
-            data={rHist}
-            height={140}
-            colorize="pos-neg"
-            formatX={(x) => `${x}R`}
-          />
-          <HistogramLegend
-            kind="pos-neg"
-            total={filteredTrades.length}
-            symbol="R"
-          />
-        </SectionCard>
-        <SectionCard title={t("pnlDistribution")} delay={0.04}>
-          <Histogram
-            data={pnlHist}
-            height={140}
-            colorize="pos-neg"
-            formatX={(x) => compactMoney(Number(x))}
-          />
-          <HistogramLegend
-            kind="pos-neg"
-            total={filteredTrades.length}
-            symbol="$"
-          />
-        </SectionCard>
-        <SectionCard title={t("durationDistribution")} delay={0.08}>
-          <Histogram
-            data={durHist.map((d) => ({ x: d.label, count: d.count }))}
-            height={140}
-            colorize="accent"
-            formatX={(x) => String(x)}
-          />
-          <HistogramLegend
-            kind="accent"
-            total={filteredTrades.length}
-            symbol=""
-          />
-        </SectionCard>
-      </div>
+          {/* ============ DISTRIBUTIONS (3 cards) ============ */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <SectionCard eyebrow={t("rDistribution")}>
+              <Histogram
+                data={rHist}
+                height={140}
+                colorize="pos-neg"
+                formatX={(x) => `${x}R`}
+              />
+              <HistogramLegend
+                kind="pos-neg"
+                total={filteredTrades.length}
+                symbol="R"
+              />
+            </SectionCard>
+            <SectionCard eyebrow={t("pnlDistribution")}>
+              <Histogram
+                data={pnlHist}
+                height={140}
+                colorize="pos-neg"
+                formatX={(x) => compactMoney(Number(x))}
+              />
+              <HistogramLegend
+                kind="pos-neg"
+                total={filteredTrades.length}
+                symbol="$"
+              />
+            </SectionCard>
+            <SectionCard eyebrow={t("durationDistribution")}>
+              <Histogram
+                data={durHist.map((d) => ({ x: d.label, count: d.count }))}
+                height={140}
+                colorize="accent"
+                formatX={(x) => String(x)}
+              />
+              <HistogramLegend
+                kind="accent"
+                total={filteredTrades.length}
+                symbol=""
+              />
+            </SectionCard>
+          </div>
 
-      {/* ============ WEEKDAY + MONTH ============ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <SectionCard title={t("pnlByWeekday")}>
-          <WeekdayBars trades={filteredTrades} />
-        </SectionCard>
-        <SectionCard title={t("pnlByMonth")} delay={0.04}>
-          <MonthlyBars trades={filteredTrades} />
-        </SectionCard>
-      </div>
+          {/* ============ WEEKDAY + MONTH ============ */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <SectionCard eyebrow={t("pnlByWeekday")}>
+              <WeekdayBars trades={filteredTrades} />
+            </SectionCard>
+            <SectionCard eyebrow={t("pnlByMonth")}>
+              <MonthlyBars trades={filteredTrades} />
+            </SectionCard>
+          </div>
 
-      {/* ============ HEATMAP + LEGEND ============ */}
-      <SectionCard
-        title={t("heatmapTitle")}
-        hint={
-          <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary tnum">
-            {lang === "es" ? "Lun–Vie × 4h" : "Mon–Fri × 4h"}
-          </span>
-        }
-      >
-        <Heatmap trades={filteredTrades} />
-        <HeatmapLegend trades={filteredTrades} />
-      </SectionCard>
+          {/* ============ HEATMAP + LEGEND ============ */}
+          <SectionCard
+            eyebrow={t("heatmapTitle")}
+            hint={
+              <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary tnum">
+                {lang === "es" ? "Lun–Vie × 4h" : "Mon–Fri × 4h"}
+              </span>
+            }
+          >
+            <Heatmap trades={filteredTrades} />
+            <HeatmapLegend trades={filteredTrades} />
+          </SectionCard>
 
-      {/* ============ RANKINGS ============ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <RankingCard
-          title={t("setupsByExpectancy")}
-          rows={setupRanks}
-          reKey={`setup-${filterSig}`}
-        />
-        <RankingCard
-          title={t("instrumentsByExpectancy")}
-          rows={instRanks}
-          reKey={`inst-${filterSig}`}
-        />
-      </div>
+          {/* ============ RANKINGS ============ */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <RankingCard
+              title={t("setupsByExpectancy")}
+              rows={setupRanks}
+              reKey={`setup-${filterSig}`}
+            />
+            <RankingCard
+              title={t("instrumentsByExpectancy")}
+              rows={instRanks}
+              reKey={`inst-${filterSig}`}
+            />
+          </div>
+        </>
+      )}
 
-      {/* Footer spacer so last card breathes inside the scroll
-          container. Two-pixel tail keeps the final card's depth-3
-          hover shadow from being clipped by the demo window's
-          bottom edge. */}
+      {/* Footer spacer. */}
       <div className="h-2" aria-hidden="true" />
     </div>
   );

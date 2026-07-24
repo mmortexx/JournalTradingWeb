@@ -76,7 +76,21 @@ export const STR = {
   pageAnalytics: { es: "Analítica", en: "Analytics" },
   pageJournal: { es: "Diario", en: "Journal" },
   pagePlaybook: { es: "Playbook", en: "Playbook" },
+  // R25-1a: 3 missing tabs from the real app's NavigationView
+  // (MainWindow.xaml L205-214) — Experimentos, Fiscal, Negocio.
+  pageExperiments: { es: "Experimentos", en: "Experiments" },
+  pageFiscal: { es: "Fiscal", en: "Fiscal" },
+  pageBusiness: { es: "Negocio", en: "Business" },
   pageSettings: { es: "Ajustes", en: "Settings" },
+
+  // ---- Title bar (demo) — matches the real app's TitleBar_* strings
+  // (Strings/{es-ES,en-GB}/Resources.resw L11-12). The LED's aria-label /
+  // tooltip is "Local-first · sin nube" — slightly longer than the
+  // visible "Local-first" text, mirrors the native WinUI tooltip.
+  titleLocalFirstLed: {
+    es: "Local-first · sin nube",
+    en: "Local-first · no cloud",
+  },
 
   // ---- Dashboard ----
   captureHeadline: { es: "¿Qué has operado hoy?", en: "What did you trade today?" },
@@ -170,6 +184,9 @@ export const STR = {
   colClosed: { es: "Cierre", en: "Closed" },
   colNetPnl: { es: "P&L neto", en: "Net P&L" },
   colR: { es: "R", en: "R" },
+  summary: { es: "Resumen del filtro", en: "Filter summary" },
+  selectTrade: { es: "Seleccionar operación", en: "Select trade" },
+  selectAll: { es: "Seleccionar todas las visibles", en: "Select all visible" },
 
   // ---- Trade detail ----
   execution: { es: "Ejecución", en: "Execution" },

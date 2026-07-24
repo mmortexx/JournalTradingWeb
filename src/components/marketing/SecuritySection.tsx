@@ -108,6 +108,13 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
                     height: 38,
                     background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
                     color: "rgb(var(--accent-base))",
+                    // R25-1e — inset accent ring gives the icon container
+                    // a machined "double-edge" look: outer border (none
+                    // here, the bg-tint is the edge) + inner accent ring.
+                    // Same vocabulary as the GuaranteeBanner shield crest
+                    // + FeaturesBento icon containers (also polished in
+                    // this round). Holds definition in both themes.
+                    boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)",
                   }}
                 >
                   <Icon size={18} aria-hidden />
@@ -150,7 +157,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
             </span>
             <span
               className="tnum"
-              style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgb(var(--accent-base))", fontWeight: 600 }}
+              style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgb(var(--accent-base))", fontWeight: 600, boxShadow: "inset 2px 0 0 rgb(var(--accent-base) / 0.30)" }}
             >
               Trading Journal
             </span>
@@ -174,13 +181,17 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
               <span style={{ fontSize: 13, color: "var(--ink-2)" }}>{row.l}</span>
               <span
                 className="flex items-center gap-2"
-                style={{ fontSize: 13, color: "var(--ink)" }}
+                style={{ fontSize: 13, color: "var(--ink)", boxShadow: "inset 2px 0 0 rgb(var(--accent-base) / 0.30)" }}
               >
                 {typeof row.tj === "boolean" ? (
                   row.tj ? (
-                    <Check size={14} style={{ color: "rgb(var(--pnl-pos))" }} />
+                    <span className="inline-flex items-center justify-center rounded-full" style={{ width: 20, height: 20, background: "rgb(var(--pnl-pos) / 0.15)" }}>
+                      <Check size={12} style={{ color: "rgb(var(--pnl-pos))" }} />
+                    </span>
                   ) : (
-                    <X size={14} style={{ color: "rgb(var(--pnl-neg))" }} />
+                    <span className="inline-flex items-center justify-center rounded-full" style={{ width: 20, height: 20, background: "rgb(var(--pnl-neg) / 0.15)" }}>
+                      <X size={12} style={{ color: "rgb(var(--pnl-neg))" }} />
+                    </span>
                   )
                 ) : (
                   row.tj
@@ -192,9 +203,13 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
               >
                 {typeof row.cloud === "boolean" ? (
                   row.cloud ? (
-                    <X size={14} style={{ color: "rgb(var(--pnl-neg))" }} />
+                    <span className="inline-flex items-center justify-center rounded-full" style={{ width: 20, height: 20, background: "rgb(var(--pnl-neg) / 0.15)" }}>
+                      <X size={12} style={{ color: "rgb(var(--pnl-neg))" }} />
+                    </span>
                   ) : (
-                    <Check size={14} style={{ color: "rgb(var(--pnl-pos))" }} />
+                    <span className="inline-flex items-center justify-center rounded-full" style={{ width: 20, height: 20, background: "rgb(var(--pnl-pos) / 0.15)" }}>
+                      <Check size={12} style={{ color: "rgb(var(--pnl-pos))" }} />
+                    </span>
                   )
                 ) : (
                   row.cloud

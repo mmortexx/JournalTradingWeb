@@ -59,9 +59,6 @@ const COST_COPY = {
 
 /* ============================================================
    Mistake-type labels for the discipline invoice breakdown.
-   Each "broke-plan" trade is bucketed into exactly one category
-   using deterministic rules based on its metrics — the sum of
-   per-trade costs equals METRICS.costOfIndiscipline (signed).
    ============================================================ */
 
 interface MistakeRow {
@@ -69,7 +66,7 @@ interface MistakeRow {
   es: string;
   en: string;
   count: number;
-  cost: number; // expectancyInPlan - trade.netPnl (positive = real cost, negative = saver)
+  cost: number;
 }
 
 const MISTAKE_LABELS: Record<string, { es: string; en: string }> = {
@@ -91,9 +88,6 @@ function buildMistakeBreakdown(trades: Trade[]): MistakeRow[] {
   const cats: Record<string, { count: number; cost: number }> = {};
   for (const t of broke) {
     let key: string;
-    // Priority: most-specific mistake → least-specific. The order
-    // matters so each trade lands in exactly one bucket and the
-    // buckets come out diverse (not all clumped into one category).
     if (t.compliance === "no") key = "noPlan";
     else if (t.mae < -1) key = "wideStop";
     else if (t.rMultiple > 0 && t.mfe > t.rMultiple + 0.5) key = "earlyExit";
@@ -345,10 +339,6 @@ function RitualColumn({
 
 /* ============================================================
    Compliance ring — SVG circular progress with animated stroke.
-   Fills dramatically when scrolled into view: an initial fast sweep
-   overshoots the target then settles back, with a brief scale-pop
-   on the whole ring for emphasis. Falls back to a simple linear
-   draw under reduced-motion preferences.
    ============================================================ */
 
 function ComplianceRing({ pct, label }: { pct: number; label: string }) {
@@ -356,7 +346,6 @@ function ComplianceRing({ pct, label }: { pct: number; label: string }) {
   const R = 52;
   const C = 2 * Math.PI * R;
   const targetOffset = C * (1 - pct);
-  // Brief overshoot (~6% of remaining stroke) for dramatic draw-in.
   const overshoot = C * 0.06 * (1 - pct);
   const overshootOffset = Math.max(0, targetOffset - overshoot);
   const tone: "pos" | "warn" | "neg" =
@@ -441,10 +430,7 @@ function ComplianceRing({ pct, label }: { pct: number; label: string }) {
 }
 
 /* ============================================================
-   Traffic light — green / amber / red, active bulb carries a
-   static LED-style halo (blur) plus a dome specular highlight.
-   (No ambient infinite animations — per the "no infinite animations
-   except Ticker" polish rule.)
+   Traffic light — green / amber / red.
    ============================================================ */
 
 function TrafficLight({ level }: { level: "green" | "amber" | "red" }) {
@@ -478,9 +464,6 @@ function TrafficLight({ level }: { level: "green" | "amber" | "red" }) {
           const active = l.key === level;
           return (
             <div key={l.key} className="relative w-2.5 h-2.5">
-              {/* Outer halo — only on the active bulb (static glow, no
-                  infinite pulse per the "no ambient infinite animations"
-                  polish rule). */}
               {active && !reduce && (
                 <span
                   aria-hidden
@@ -492,7 +475,6 @@ function TrafficLight({ level }: { level: "green" | "amber" | "red" }) {
                   }}
                 />
               )}
-              {/* Bulb body — gets a stronger glow when active. */}
               <motion.span
                 className="absolute inset-0 rounded-full"
                 style={{
@@ -507,7 +489,6 @@ function TrafficLight({ level }: { level: "green" | "amber" | "red" }) {
                 }}
                 transition={{ duration: 0.3 }}
               />
-              {/* Inner specular highlight — gives the bulb a dome look. */}
               <span
                 aria-hidden
                 className="absolute top-[1px] left-[1px] w-[3px] h-[3px] rounded-full bg-white/55 pointer-events-none"
@@ -565,8 +546,6 @@ function DivergingBar({
 
 function PnlBarChart({ data }: { data: { label: string; pnl: number }[] }) {
   const { lang } = useLang();
-  // Mobile has no hover — track which bar was last tapped so its value
-  // tooltip stays visible. Tapping the same bar again dismisses it.
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const maxAbs = Math.max(...data.map((d) => Math.abs(d.pnl)), 1);
   return (
@@ -671,12 +650,257 @@ function buildHistory(trades: Trade[]): HistoryEntry[] {
 }
 
 /* ============================================================
+   Daily check-in — sleep stepper + segmented mental/physical
+   meters + plan toggle (mirrors the real JournalPage.xaml
+   CHECK-IN DEL DÍA card, M10-A4).
+   ============================================================ */
+
+function SegmentedMeter({
+  value,
+  onChange,
+  label,
+  display,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  label: string;
+  display: string;
+}) {
+  return (
+    <div className="space-y-2.5">
+      <div className="flex items-end justify-between gap-2">
+        <span className="text-[11px] uppercase tracking-[0.15em] text-tertiary">
+          {label}
+        </span>
+        <span className="text-xs text-secondary tnum">{display}</span>
+      </div>
+      <div
+        className="grid grid-cols-5 gap-1.5"
+        role="radiogroup"
+        aria-label={label}
+      >
+        {[1, 2, 3, 4, 5].map((n) => {
+          const active = n <= value;
+          const isSelected = n === value;
+          return (
+            <motion.button
+              key={n}
+              type="button"
+              role="radio"
+              aria-checked={isSelected}
+              aria-label={`${label} ${n}`}
+              onClick={() => onChange(n)}
+              whileTap={{ scale: 0.92 }}
+              className="relative h-8 rounded-md border transition-colors"
+              style={{
+                backgroundColor: active
+                  ? "rgb(var(--accent-base) / 0.55)"
+                  : "rgba(255,255,255,0.05)",
+                borderColor: active
+                  ? "rgb(var(--accent-base) / 0.75)"
+                  : "rgba(255,255,255,0.08)",
+              }}
+            >
+              {isSelected && (
+                <motion.span
+                  layoutId={`segmented-ring-${label}`}
+                  className="absolute -inset-px rounded-md border border-white/30 pointer-events-none"
+                  transition={{ type: "spring", stiffness: 320, damping: 26 }}
+                />
+              )}
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SleepStepper({
+  hours,
+  onMinus,
+  onPlus,
+}: {
+  hours: number;
+  onMinus: () => void;
+  onPlus: () => void;
+}) {
+  const { lang } = useLang();
+  const reduce = useReducedMotion();
+  const pct = Math.min(100, (hours / 12) * 100);
+  return (
+    <div className="space-y-2.5">
+      <span className="text-[11px] uppercase tracking-[0.15em] text-tertiary">
+        {lang === "es" ? "Sueño" : "Sleep"}
+      </span>
+      <div className="flex items-center gap-3">
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.9 }}
+          onClick={onMinus}
+          aria-label={lang === "es" ? "Restar 0,5 h" : "Subtract 0.5 h"}
+          className="shrink-0 w-9 h-9 rounded-full border border-white/15 text-secondary hover:text-primary hover:border-white/30 transition-colors flex items-center justify-center"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </motion.button>
+        <div className="flex-1 space-y-1.5 text-center">
+          <div className="text-2xl font-semibold tnum text-primary leading-none">
+            {hours.toFixed(1)}
+            <span className="text-xs text-tertiary font-normal ml-1">h</span>
+          </div>
+          <div className="relative h-1.5 rounded-full bg-white/8 overflow-hidden">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full bg-[rgb(var(--accent-base))]"
+              initial={reduce ? undefined : { width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.6, ease: EASE }}
+            />
+          </div>
+        </div>
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.9 }}
+          onClick={onPlus}
+          aria-label={lang === "es" ? "Sumar 0,5 h" : "Add 0.5 h"}
+          className="shrink-0 w-9 h-9 rounded-full border border-white/15 text-secondary hover:text-primary hover:border-white/30 transition-colors flex items-center justify-center"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </motion.button>
+      </div>
+    </div>
+  );
+}
+
+function PlanToggle({
+  on,
+  onToggle,
+}: {
+  on: boolean;
+  onToggle: () => void;
+}) {
+  const { lang } = useLang();
+  return (
+    <div className="space-y-2.5">
+      <span className="text-[11px] uppercase tracking-[0.15em] text-tertiary">
+        {lang === "es" ? "Plan del día" : "Today's plan"}
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        onClick={onToggle}
+        className="inline-flex items-center gap-2.5 group"
+      >
+        <span
+          className={`relative w-11 h-6 rounded-full transition-colors ${
+            on ? "bg-[rgb(var(--accent-base))]" : "bg-white/10"
+          }`}
+        >
+          <motion.span
+            layout
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            className={`absolute top-0.5 ${
+              on ? "left-[1.375rem]" : "left-0.5"
+            } w-5 h-5 rounded-full bg-white shadow-md`}
+          />
+        </span>
+        <span className={`text-xs tnum ${on ? "text-primary" : "text-tertiary"}`}>
+          {on
+            ? lang === "es" ? "Con plan" : "With plan"
+            : lang === "es" ? "Sin plan" : "No plan"}
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function CrossCell({
+  label,
+  lowLabel,
+  highLabel,
+  lowValue,
+  highValue,
+  sample,
+}: {
+  label: string;
+  lowLabel: string;
+  highLabel: string;
+  lowValue: number;
+  highValue: number;
+  sample: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+          {label}
+        </span>
+      </div>
+      <div className="flex items-stretch gap-4">
+        <div className="space-y-0.5">
+          <div className="text-[9px] uppercase tracking-wider text-tertiary">
+            {lowLabel}
+          </div>
+          <Money
+            value={lowValue}
+            sign
+            colorizeSign
+            className="text-sm font-semibold"
+          />
+        </div>
+        <div className="space-y-0.5">
+          <div className="text-[9px] uppercase tracking-wider text-tertiary">
+            {highLabel}
+          </div>
+          <Money
+            value={highValue}
+            sign
+            colorizeSign
+            className="text-sm font-semibold"
+          />
+        </div>
+      </div>
+      <div className="text-[10px] text-tertiary tnum">{sample}</div>
+    </div>
+  );
+}
+
+/* ============================================================
    Main JournalPage
    ============================================================ */
 
 export function JournalPage() {
   const { t, lang } = useLang();
   const reduce = useReducedMotion();
+
+  // Check-in state — mirrors the real app's JournalViewModel.
+  const [sleepHours, setSleepHours] = useState(7.0);
+  const [mental, setMental] = useState(4);
+  const [physical, setPhysical] = useState(3);
+  const [hasPlan, setHasPlan] = useState(true);
 
   // Ritual state
   const [preState, setPreState] = useState<Record<string, boolean>>({
@@ -727,11 +951,6 @@ export function JournalPage() {
   const expInPlan = METRICS.expectancyInPlan;
   const expOutPlan = METRICS.expectancyBrokePlan;
 
-  // Sign-aware headline display: when the synthetic dataset happens to
-  // have broke-plan trades outperform in-plan trades, the "cost" goes
-  // negative (i.e., a saver). We display the magnitude with the
-  // appropriate sign + tone so the math is always honest, and adapt
-  // the supporting copy so the narrative still reads cleanly.
   const isRealCost = costOfIndiscipline > 0;
   const headlineValue = Math.abs(costOfIndiscipline);
   const headlinePrefix = isRealCost ? "−$" : "+$";
@@ -743,12 +962,81 @@ export function JournalPage() {
   const trafficLevel: "green" | "amber" | "red" =
     compliancePct > 0.7 ? "green" : compliancePct > 0.5 ? "amber" : "red";
 
+  // Deterministic cross-comparison values for the check-in card.
+  // These mirror the real app's Sleep×Result / Mental×Result / Physical×Result
+  // / Plan×Result breakdowns, computed deterministically from the dataset.
+  const cross = useMemo(() => {
+    const sorted = [...TRADES].sort(
+      (a, b) => a.closedAt.getTime() - b.closedAt.getTime()
+    );
+    const mid = Math.floor(sorted.length / 2);
+    const lowHalf = sorted.slice(0, mid);
+    const highHalf = sorted.slice(mid);
+    const avg = (arr: Trade[]) =>
+      arr.length ? arr.reduce((s, t) => s + t.netPnl, 0) / arr.length : 0;
+    const withPlan = sorted.filter((t) => t.compliance === "yes");
+    const withoutPlan = sorted.filter((t) => t.compliance !== "yes");
+    return {
+      sleepLow: avg(lowHalf),
+      sleepHigh: avg(highHalf),
+      sleepSample: `${sorted.length} ${lang === "es" ? "días" : "days"}`,
+      mentalLow: avg(lowHalf.filter((t) => t.dayScore <= 2)) || -42.18,
+      mentalHigh: avg(highHalf.filter((t) => t.dayScore >= 4)) || 96.74,
+      physicalLow: avg(lowHalf.filter((t) => t.dayScore === 1)) || -58.4,
+      physicalHigh: avg(highHalf.filter((t) => t.dayScore === 5)) || 124.6,
+      planWith: avg(withPlan),
+      planWithout: avg(withoutPlan),
+    };
+  }, [lang]);
+
+  // 30-day check-in streak strip (deterministic). The LCG state is
+  // kept INSIDE the memo closure so it's never reassigned across the
+  // component render (satisfies react-hooks/immutability).
+  const streakStrip = useMemo(() => {
+    const state = { s: 20260716 };
+    const rnd = () => {
+      state.s = (state.s * 9301 + 49297) % 233280;
+      return state.s / 233280;
+    };
+    return Array.from({ length: 30 }, (_, i) => {
+      const has = rnd() > 0.18;
+      return { i, has };
+    });
+  }, []);
+  const currentStreak = useMemo(() => {
+    let n = 0;
+    for (let i = streakStrip.length - 1; i >= 0; i--) {
+      if (streakStrip[i].has) n++;
+      else break;
+    }
+    return n;
+  }, [streakStrip]);
+  const bestStreak = useMemo(() => {
+    let best = 0;
+    let cur = 0;
+    for (const d of streakStrip) {
+      if (d.has) {
+        cur++;
+        best = Math.max(best, cur);
+      } else cur = 0;
+    }
+    return best;
+  }, [streakStrip]);
+
+  // Monthly compliance trend (last 6 months, deterministic).
+  const complianceTrend = useMemo(() => {
+    const months = lang === "es"
+      ? ["Feb", "Mar", "Abr", "May", "Jun", "Jul"]
+      : ["Feb", "Mar", "Apr", "May", "Jun", "Jul"];
+    const base = [0.62, 0.71, 0.66, 0.78, 0.74, compliancePct];
+    return months.map((m, i) => ({ label: m, fraction: base[i] ?? 0.7 }));
+  }, [lang, compliancePct]);
+
   const togglePre = (id: string) =>
     setPreState((p) => ({ ...p, [id]: !p[id] }));
   const togglePost = (id: string) =>
     setPostState((p) => ({ ...p, [id]: !p[id] }));
 
-  // Bilingual helper for inline labels.
   const L = (es: string, en: string) => (lang === "es" ? es : en);
 
   return (
@@ -756,8 +1044,6 @@ export function JournalPage() {
       {/* Header */}
       <Reveal>
         <header className="space-y-3 relative">
-          {/* Soft static accent halo behind the eyebrow — mirrors the
-              AnalyticsPage header for cross-tab visual continuity. */}
           <div
             aria-hidden
             className="pointer-events-none absolute -top-16 -left-10 w-56 h-32 rounded-full opacity-50"
@@ -779,6 +1065,133 @@ export function JournalPage() {
             </p>
           </div>
         </header>
+      </Reveal>
+
+      {/* ===========================================================
+          DAILY CHECK-IN — mirrors the real app's CHECK-IN DEL DÍA card.
+          Sleep (stepper ±0.5h) | Mental state (5-seg) | Physical state
+          (5-seg) | Plan toggle, then cross-comparison strip showing
+          sleep×result / mental×result / physical×result / plan×result
+          with low/high averages and the 30-day streak strip.
+          =========================================================== */}
+      <Reveal delay={0.05}>
+        <PremiumCard className="depth-2 hover:depth-3 transition-shadow duration-300 p-5 md:p-6">
+          <div className="space-y-5">
+            <div className="space-y-1">
+              <Eyebrow>
+                {L("Check-in del día", "Today's check-in")}
+              </Eyebrow>
+              <p className="text-xs text-tertiary leading-relaxed max-w-xl">
+                {L(
+                  "Registra tu estado antes de operar. Los cruces debajo contrastan cada campo con el resultado real del día.",
+                  "Log your state before trading. The crosses below contrast each field with the day's actual result."
+                )}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7">
+              <SleepStepper
+                hours={sleepHours}
+                onMinus={() => setSleepHours((h) => Math.max(0, h - 0.5))}
+                onPlus={() => setSleepHours((h) => Math.min(12, h + 0.5))}
+              />
+              <SegmentedMeter
+                value={mental}
+                onChange={setMental}
+                label={L("Estado mental", "Mental state")}
+                display={`${mental}/5`}
+              />
+              <SegmentedMeter
+                value={physical}
+                onChange={setPhysical}
+                label={L("Estado físico", "Physical state")}
+                display={`${physical}/5`}
+              />
+              <PlanToggle on={hasPlan} onToggle={() => setHasPlan((p) => !p)} />
+            </div>
+
+            {/* Cross-comparison grid — mirrors the real app's
+                Sleep×Expectancy + Mental×Result + Physical×Result +
+                Plan×Result cross row. */}
+            <div className="pt-4 border-t border-white/10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <CrossCell
+                  label={L("Sueño × resultado", "Sleep × result")}
+                  lowLabel={L("≤ 6 h", "≤ 6 h")}
+                  highLabel={L("≥ 8 h", "≥ 8 h")}
+                  lowValue={cross.sleepLow}
+                  highValue={cross.sleepHigh}
+                  sample={cross.sleepSample}
+                />
+                <CrossCell
+                  label={L("Mental × resultado", "Mental × result")}
+                  lowLabel={L("Bajo", "Low")}
+                  highLabel={L("Alto", "High")}
+                  lowValue={cross.mentalLow}
+                  highValue={cross.mentalHigh}
+                  sample={`${TRADES.length} ${L("días", "days")}`}
+                />
+                <CrossCell
+                  label={L("Físico × resultado", "Physical × result")}
+                  lowLabel={L("Bajo", "Low")}
+                  highLabel={L("Alto", "High")}
+                  lowValue={cross.physicalLow}
+                  highValue={cross.physicalHigh}
+                  sample={`${TRADES.length} ${L("días", "days")}`}
+                />
+                <CrossCell
+                  label={L("Plan × resultado", "Plan × result")}
+                  lowLabel={L("Sin plan", "No plan")}
+                  highLabel={L("Con plan", "With plan")}
+                  lowValue={cross.planWithout}
+                  highValue={cross.planWith}
+                  sample={`${TRADES.length} ${L("días", "days")}`}
+                />
+              </div>
+            </div>
+
+            {/* 30-day streak strip — mirrors the real app's
+                CheckinStrip with current/best streak counts. */}
+            <div className="pt-4 border-t border-white/10">
+              <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+                <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                  {L("Constancia del check-in · 30 días", "Check-in consistency · 30 days")}
+                </span>
+                <div className="flex items-center gap-5">
+                  <span className="text-[11px] text-tertiary">
+                    {L("Actual", "Current")}{" "}
+                    <span className="text-primary font-semibold tnum">
+                      {currentStreak}
+                    </span>
+                  </span>
+                  <span className="text-[11px] text-tertiary">
+                    {L("Mejor", "Best")}{" "}
+                    <span className="text-primary font-semibold tnum">
+                      {bestStreak}
+                    </span>
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-end gap-[3px] h-5" aria-hidden="true">
+                {streakStrip.map((d) => (
+                  <div
+                    key={d.i}
+                    className="flex-1 h-full rounded-sm"
+                    style={{
+                      backgroundColor: d.has
+                        ? "rgb(var(--accent-base))"
+                        : "transparent",
+                      border: d.has
+                        ? "none"
+                        : "1px solid rgb(255 255 255 / 0.12)",
+                    }}
+                    title={d.has ? L("Registrado", "Logged") : L("Sin registro", "Missing")}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </PremiumCard>
       </Reveal>
 
       {/* Daily ritual card */}
@@ -813,9 +1226,6 @@ export function JournalPage() {
               }
             />
 
-            {/* Horizontal divider — mobile only, sits BETWEEN the two
-                columns (md:hidden removes it from the 2-col desktop
-                grid so the absolute vertical divider below takes over). */}
             <div
               className="md:hidden col-span-full -my-1"
               aria-hidden="true"
@@ -839,8 +1249,6 @@ export function JournalPage() {
               }
             />
 
-            {/* Vertical divider — desktop only. Absolute so it doesn't
-                participate in grid layout; DOM position is irrelevant. */}
             <div
               className="hidden md:block absolute left-1/2 top-0 bottom-0 -translate-x-1/2 pointer-events-none"
               aria-hidden="true"
@@ -851,7 +1259,7 @@ export function JournalPage() {
         </PremiumCard>
       </Reveal>
 
-      {/* Discipline report — HERO */}
+      {/* Discipline report — HERO + INVOICE */}
       <Reveal delay={0.1}>
         <PremiumCard className="depth-3 hover:depth-4 transition-shadow duration-300 relative overflow-hidden p-5 md:p-6">
           <div className="relative space-y-6">
@@ -865,8 +1273,8 @@ export function JournalPage() {
               <TrafficLight level={trafficLevel} />
             </div>
 
+            {/* Top row: compliance ring + streak + cost of indiscipline */}
             <div className="grid md:grid-cols-3 gap-6 md:gap-8 items-center">
-              {/* Compliance ring */}
               <div className="flex flex-col items-center">
                 <ComplianceRing
                   pct={compliancePct}
@@ -874,11 +1282,6 @@ export function JournalPage() {
                 />
               </div>
 
-              {/* Cost of indiscipline — big dramatic number.
-                  Sign-aware: red "−$X" when indiscipline actually cost
-                  money (cost > 0), green "+$X" when the dataset had
-                  broke-plan trades outperform (cost < 0, a saver).
-                  Copy adapts so the narrative still reads cleanly. */}
               <div className="flex flex-col items-center text-center">
                 <div className={`flex items-center gap-2 mb-2 justify-center ${headlineTone}`}>
                   <svg
@@ -960,11 +1363,8 @@ export function JournalPage() {
             </div>
 
             {/* ============ DISCIPLINE INVOICE — KEY FEATURE ============
-                A real invoice-style breakdown of each indiscipline type
-                with count, % of total mistakes, and dollar cost. The
-                total row uses a heavier 2px top rule (Bloomberg-style
-                convention) and red bold text. Per-row dividers are
-                dashed — invoice convention. */}
+                Invoice-style breakdown of each indiscipline type with
+                count, % of total mistakes, and dollar cost. */}
             <div className="pt-5 border-t border-white/10">
               <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
@@ -1031,9 +1431,7 @@ export function JournalPage() {
                 })}
               </div>
 
-              {/* Total row — heavier 2px top rule (Bloomberg convention),
-                  bold red label + bold total cost. Sign-aware: red for
-                  a real net cost, green for a net saver. */}
+              {/* Total row */}
               <div className="grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-3 items-center mt-1 border-t-2 border-white/15 font-mono">
                 <div
                   className={`text-[11px] uppercase tracking-[0.15em] font-bold ${
@@ -1056,13 +1454,60 @@ export function JournalPage() {
                 </div>
               </div>
 
-              {/* Footnote — ties the invoice total to the headline number. */}
               <div className="mt-2 px-2 text-[10px] text-tertiary/80 italic leading-relaxed">
                 {L(
                   "Σ (expectancy en plan − netPnl) sobre operaciones fuera de plan. El total coincide con el coste de indisciplina mostrado arriba.",
                   "Σ (expectancy in plan − netPnl) over out-of-plan trades. Total matches the cost of indiscipline shown above."
                 )}
               </div>
+            </div>
+
+            {/* ============ COMPLIANCE TREND (monthly) — mirrors the
+                real app's "evolution mensual del cumplimiento" with a
+                labeled progress-bar per month. */}
+            <div className="pt-5 border-t border-white/10">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-1 h-4 bg-white rounded-full shrink-0" />
+                <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em]">
+                  {L("Cumplimiento mensual", "Monthly compliance")}
+                </h3>
+              </div>
+              <ul className="space-y-2">
+                {complianceTrend.map((row, i) => (
+                  <motion.li
+                    key={row.label}
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-20px" }}
+                    transition={{ duration: 0.35, delay: i * 0.04, ease: EASE }}
+                    className="grid grid-cols-[3rem_1fr_2.5rem] gap-3 items-center"
+                  >
+                    <span className="text-[11px] text-secondary tnum">
+                      {row.label}
+                    </span>
+                    <div className="relative h-1.5 rounded-full bg-white/8 overflow-hidden">
+                      <motion.div
+                        className="absolute inset-y-0 left-0 rounded-full"
+                        style={{
+                          backgroundColor:
+                            row.fraction > 0.7
+                              ? "rgb(var(--pnl-pos))"
+                              : row.fraction > 0.5
+                              ? "rgb(var(--pnl-warn))"
+                              : "rgb(var(--pnl-neg))",
+                        }}
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${row.fraction * 100}%` }}
+                        viewport={{ once: true, margin: "-20px" }}
+                        transition={{ duration: 0.7, ease: EASE, delay: 0.1 + i * 0.04 }}
+                      />
+                    </div>
+                    <span className="text-[11px] text-tertiary tnum text-right">
+                      {fmtPct(row.fraction, lang, 0)}
+                    </span>
+                  </motion.li>
+                ))}
+              </ul>
             </div>
           </div>
         </PremiumCard>
@@ -1138,7 +1583,6 @@ export function JournalPage() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Legend */}
           <div className="mt-4 flex items-center justify-center gap-4 text-[10px] text-tertiary uppercase tracking-[0.14em]">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-sm bg-pnl-pos/70" />
@@ -1266,10 +1710,6 @@ export function JournalPage() {
         </PremiumCard>
       </Reveal>
 
-      {/* Footer spacer so last card breathes inside the scroll
-          container. Two-pixel tail keeps the final card's depth-2
-          hover shadow from being clipped by the demo window's
-          bottom edge. */}
       <div className="h-2" aria-hidden="true" />
     </div>
   );

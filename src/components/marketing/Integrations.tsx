@@ -80,20 +80,23 @@ export function Integrations() {
               {/* Row: monogram mark (left) + CSV chip (right). */}
               <div className="relative flex items-center justify-between">
                 <span
-                  className="w-9 h-9 rounded-md bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-primary text-[11px] font-bold tracking-tight"
+                  className="w-10 h-10 rounded-md bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-primary text-[12px] font-bold tracking-tight"
                   style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
                   aria-hidden="true"
                 >
                   {b.mark}
                 </span>
-                <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.10)] text-[10px] uppercase tracking-[0.14em]">
+                <span className="pill bg-[rgb(var(--accent-base)/0.08)] text-[rgb(var(--accent-base))] border border-[rgb(var(--accent-base)/0.20)] text-[10px] uppercase tracking-[0.14em]">
                   CSV
                 </span>
               </div>
 
               {/* Broker name. */}
               <div className="relative">
-                <p className="t-h4 text-secondary">{b.name}</p>
+                {/* R25-1e — broker name brightens on hover, coordinating
+                    with the card's accent border glow so the name reads
+                    as the card's "active" element on hover. */}
+                <p className="t-h4 text-secondary transition-colors duration-300 group-hover:text-primary">{b.name}</p>
               </div>
             </motion.div>
           ))}

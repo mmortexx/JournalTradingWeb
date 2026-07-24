@@ -159,7 +159,7 @@ const SHOTS: Shot[] = [
  *   │ │ │   ├─ Shot 1 (absolute, invisible)                       │ │ │
  *   │ │ │   ├─ …                                                  │ │ │
  *   │ │ │   └─ Shot 7 (absolute, invisible)                       │ │ │
- *   │ │ │ StatusBar (reset snaps to first tab)                    │ │ │
+ *   │ │ │ StatusBar (matches the real app's three-region status bar) │ │ │
  *   │ │ │ Top + bottom 1px key-light reflections                  │ │ │
  *   │ │ └─────────────────────────────────────────────────────────┘ │ │
  *   │ └─────────────────────────────────────────────────────────────┘ │
@@ -341,7 +341,7 @@ function RealScreenshotDemoInner() {
       >
         <div className="rounded-xl overflow-hidden border border-white/10 shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)]">
           <div className="liquid-glass rounded-xl overflow-hidden">
-            <WindowChrome viewLabel={activeLabel} />
+            <WindowChrome />
 
             {/* Tab strip — 8 tabs with the SAME styling as TopNav
                 (liquid-glass surface, h-11, animated accent underline
@@ -467,13 +467,14 @@ function RealScreenshotDemoInner() {
               ))}
             </div>
 
-            {/* StatusBar — `onReset` snaps the active tab back to the
-                first one (Resumen). `onOpenShortcuts` is omitted so the
-                keyboard-icon button is hidden (the interactive AppDemo's
-                shortcuts overlay doesn't apply to this screenshot demo).
-                The fullscreen button + share button + metrics ticker +
-                live clock + connection LED keep working as in AppDemo. */}
-            <StatusBar onReset={() => setActiveIndex(0)} />
+            {/* StatusBar — restructured in R25-1a to match the real
+                app's status bar (discipline LED + auto-saved note +
+                version). The pre-R25-1a `onReset` prop is removed; the
+                ResetButton that snapped the active tab back to the first
+                one is gone (matching the real app's status bar, which
+                has no reset affordance). To reset, the user just clicks
+                the first tab. */}
+            <StatusBar />
 
             {/* Window top reflection — 1px white-to-transparent gradient
                 at the very top of the window (matches AppDemo). */}

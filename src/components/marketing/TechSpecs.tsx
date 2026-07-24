@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Lock } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
@@ -136,10 +137,14 @@ export function TechSpecs() {
                     }}
                     className={cellClasses}
                   >
-                    <dt className="text-tertiary text-[11px] uppercase tracking-[0.14em] font-semibold">
+                    <dt className="text-tertiary text-[11px] uppercase tracking-[0.14em] font-semibold flex items-center gap-1.5">
+                      {/* R25-1e — accent dot prefix ties each spec row to
+                          the accent palette, matching the StatsBandNew
+                          accent-dot vocabulary. */}
+                      <span aria-hidden className="size-1 rounded-full bg-[rgb(var(--accent-base))]" />
                       {es ? r.labelEs : r.labelEn}
                     </dt>
-                    <dd className="text-primary text-sm font-medium leading-snug tnum">
+                    <dd className="text-primary text-sm font-medium leading-snug tnum tracking-[-0.005em]">
                       {es ? r.valueEs : r.valueEn}
                     </dd>
                   </motion.dl>
@@ -151,10 +156,16 @@ export function TechSpecs() {
 
         {/* Footnote */}
         <Reveal delay={0.2} className="mt-6">
-          <p className="text-xs text-tertiary leading-relaxed">
-            {es
-              ? "Sin requisitos de conexión. Funciona en tu equipo aunque mañana cierren internet."
-              : "No connection requirements. Runs on your machine even if the internet shuts down tomorrow."}
+          {/* R25-1e — Lock icon prefix promotes the footnote from fine
+              print to a deliberate "offline / privacy" callout. The
+              accent-tinted icon ties to the section's accent palette. */}
+          <p className="text-xs text-tertiary leading-relaxed flex items-start gap-1.5">
+            <Lock size={13} aria-hidden className="mt-0.5 shrink-0 text-[rgb(var(--accent-base)/0.70)]" />
+            <span>
+              {es
+                ? "Sin requisitos de conexión. Funciona en tu equipo aunque mañana cierren internet."
+                : "No connection requirements. Runs on your machine even if the internet shuts down tomorrow."}
+            </span>
           </p>
         </Reveal>
       </div>

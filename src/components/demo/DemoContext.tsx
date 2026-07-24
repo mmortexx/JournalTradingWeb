@@ -16,6 +16,9 @@ export type DemoPage =
   | "analytics"
   | "journal"
   | "playbook"
+  | "experiments"
+  | "fiscal"
+  | "business"
   | "settings";
 
 export interface DemoFilters {

@@ -82,6 +82,10 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            // R25-1e — snappy hover lift (separate transition from the
+            // entrance so hover doesn't feel laggy). All 5 bento cards
+            // share this treatment for a coordinated hover rhythm.
+            whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5 }}
             className="lg:col-span-7 relative overflow-hidden"
             style={{
@@ -94,10 +98,22 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               minHeight: 360,
             }}
           >
+            {/* R25-1e — premium top-edge accent sweep. The calendar is
+                the bento's anchor (span 7); a 2px accent gradient at the
+                top edge marks it as the lead card. Same vocabulary as the
+                GuaranteeBanner + DownloadCTA + Pro pricing-card top sweep. */}
+            <div
+              aria-hidden
+              className="absolute top-0 left-0 right-0"
+              style={{
+                height: 2,
+                background: "linear-gradient(90deg, transparent, rgb(var(--accent-base) / 0.55), transparent)",
+              }}
+            />
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
               >
                 <CalendarDays size={15} aria-hidden />
               </span>
@@ -165,6 +181,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.05 }}
             className="lg:col-span-5"
             style={{
@@ -180,7 +197,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
               >
                 <LineChart size={15} aria-hidden />
               </span>
@@ -246,6 +263,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:col-span-4"
             style={{
@@ -260,7 +278,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
               >
                 <BookOpen size={15} aria-hidden />
               </span>
@@ -305,6 +323,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.15 }}
             className="lg:col-span-4"
             style={{
@@ -319,7 +338,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
               >
                 <NotebookPen size={15} aria-hidden />
               </span>
@@ -364,6 +383,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="lg:col-span-4"
             style={{
@@ -378,7 +398,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             <div className="flex items-center gap-2 mb-2">
               <span
                 className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
               >
                 <Layers size={15} aria-hidden />
               </span>

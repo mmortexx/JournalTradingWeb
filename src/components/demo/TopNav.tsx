@@ -5,7 +5,42 @@ import { motion } from "framer-motion";
 import { useDemo, type DemoPage } from "./DemoContext";
 import { useLang } from "@/lib/i18n";
 
-const NAV_ITEMS: { key: DemoPage; icon: React.ReactNode; labelKey: "pageDashboard" | "pageTrades" | "pageAnalytics" | "pageJournal" | "pagePlaybook" | "pageSettings" }[] = [
+/*
+ * R25-1a: tabs now match the real app's NavigationView menu
+ * (MainWindow.xaml L182-214) — Dashboard, Trades, Analytics, Journal,
+ * Playbook, Experimentos, Fiscal, Negocio + Settings gear. The 3 tabs
+ * that were missing before (Experimentos, Fiscal, Negocio) are added
+ * between Playbook and Settings, matching the real app's order:
+ * Experimentos sits next to Playbook (both are "how you trade", not
+ * "how much you make" — see the XAML comment at L203-204), then Fiscal
+ * and Negocio. Settings stays last as a separate visual group (in the
+ * real app it's in PaneFooter via IsSettingsVisible="True"; here it's
+ * just the last tab in the same strip — same as before R25-1a).
+ *
+ * Icons are Lucide-style stroke paths tuned to read at 15px on the
+ * dark liquid-glass surface — same strokeWidth (1.8) + round caps as
+ * the existing 6 tabs. The 3 new glyphs mirror the WinUI FontIcon
+ * glyphs the real app uses (E80F, E8AB, E9D2, E70B, E736, EA80, E825,
+ * E821) — converted to SVG path equivalents rather than literal glyph
+ * codepoints (Segoe Fluent Icons isn't available cross-platform):
+ *   · Experimentos (EA80 = TestBeaker)  → conical-flask outline
+ *   · Fiscal       (E825 = CalendarDay) → calendar with header + grid
+ *   · Negocio      (E821 = Calculator)  → briefcase with handle + latch
+ */
+const NAV_ITEMS: {
+  key: DemoPage;
+  icon: React.ReactNode;
+  labelKey:
+    | "pageDashboard"
+    | "pageTrades"
+    | "pageAnalytics"
+    | "pageJournal"
+    | "pagePlaybook"
+    | "pageExperiments"
+    | "pageFiscal"
+    | "pageBusiness"
+    | "pageSettings";
+}[] = [
   {
     key: "dashboard",
     labelKey: "pageDashboard",
@@ -32,21 +67,40 @@ const NAV_ITEMS: { key: DemoPage; icon: React.ReactNode; labelKey: "pageDashboar
     icon: <path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM8 8h8M8 12h8M8 16h5" />,
   },
   {
+    key: "experiments",
+    labelKey: "pageExperiments",
+    icon: <path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3" />,
+  },
+  {
+    key: "fiscal",
+    labelKey: "pageFiscal",
+    icon: <path d="M5 4h14v16H5zM5 9h14M9 4v3M15 4v3M8 13h2M12 13h2M8 16h2M12 16h2" />,
+  },
+  {
+    key: "business",
+    labelKey: "pageBusiness",
+    icon: <path d="M3 8h18v12H3zM8 8V5a2 2 0 012-2h4a2 2 0 012 2v3M3 13h18" />,
+  },
+  {
     key: "settings",
     labelKey: "pageSettings",
     icon: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zM19.4 13a7.5 7.5 0 000-2l2-1.5-2-3.5-2.4 1a7.5 7.5 0 00-1.7-1l-.4-2.5h-4l-.4 2.5a7.5 7.5 0 00-1.7 1l-2.4-1-2 3.5L4.6 11a7.5 7.5 0 000 2l-2 1.5 2 3.5 2.4-1a7.5 7.5 0 001.7 1l.4 2.5h4l.4-2.5a7.5 7.5 0 001.7-1l2.4 1 2-3.5-2-1.5z" />,
   },
 ];
 
-/** App-style top navigation with 6 tabs + animated active indicator.
- * Sits below the WinUI 3 title bar; mirrors the in-app tab strip of a
- * real desktop app (Linear / VS Code / WinUI 3 NavigationView).
+/** App-style top navigation with 9 tabs (8 main + Settings) + animated
+ * active indicator. Sits below the WinUI 3 title bar; mirrors the in-app
+ * tab strip of a real desktop app (Linear / VS Code / WinUI 3
+ * NavigationView). R25-1a: the tab list now matches the real app's
+ * NavigationView (MainWindow.xaml L182-214) — Dashboard, Trades,
+ * Analytics, Journal, Playbook, Experimentos, Fiscal, Negocio + Settings.
  *
  * Layout:
  *   ┌──────────────────────────────────────────────────────────────────┐
- *   │ ▸ Resumen   Operaciones   Detalle   Analítica   ...    │ + Nueva │
+ *   │ ▸ Resumen  Operaciones  Analítica  Diario  Playbook  Experimentos  │
+ *   │   Fiscal  Negocio  Ajustes                                  │ + Nueva │
  *   └──────────────────────────────────────────────────────────────────┘
- *   • Left (flex-1, overflow-x-auto): the 6 nav tabs with animated accent
+ *   • Left (flex-1, overflow-x-auto): the 9 nav tabs with animated accent
  *     underline indicator. Scrolls horizontally on narrow viewports via
  *     `.no-scrollbar` (hidden scrollbar) so the strip stays clean.
  *   • Right (shrink-0): a "+ Nueva operación" / "+ New trade" button that
@@ -93,10 +147,11 @@ export function TopNav() {
     }
   };
 
-  // Global digit shortcuts: pressing 1–6 switches to the corresponding tab.
-  // Skipped while focus is inside an input/textarea/select/contentEditable so
-  // we don't hijack typing. Listener attaches on mount, reads `setPage` from
-  // the demo context (stable enough thanks to the context value memo).
+  // Global digit shortcuts: pressing 1–9 switches to the corresponding tab
+  // (R25-1a: was 1–6, now 1–9 after adding Experimentos/Fiscal/Negocio).
+  // Skipped while focus is inside an input/textarea/select/contentEditable
+  // so we don't hijack typing. Listener attaches on mount, reads `setPage`
+  // from the demo context (stable enough thanks to the context value memo).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;

@@ -15,6 +15,9 @@ import { TradeDetailPage } from "./pages/TradeDetailPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { JournalPage } from "./pages/JournalPage";
 import { PlaybookPage } from "./pages/PlaybookPage";
+import { ExperimentsPage } from "./pages/ExperimentsPage";
+import { FiscalPage } from "./pages/FiscalPage";
+import { BusinessPage } from "./pages/BusinessPage";
 import { SettingsPage } from "./pages/SettingsPage";
 
 /** The demo: a windowed recreation of the native app, fully interactive. */
@@ -31,9 +34,12 @@ function AppDemoInner() {
   const { page, fullscreen, setFullscreen, setPage, goBack } = useDemo();
 
   // Demo-scoped command palette + shortcuts-overlay open state. Lifted here
-  // so the capture-phase keydown listener (below) and the StatusBar's
-  // keyboard-icon button can both toggle them, and so the overlays render
-  // inside the demo window's positioning context.
+  // so the capture-phase keydown listener (below) can toggle them, and so
+  // the overlays render inside the demo window's positioning context.
+  // (R25-1a: the StatusBar's keyboard-icon button used to also toggle
+  // `shortcutsOpen` — that button was removed when the StatusBar was
+  // restructured to match the real app; the `?` key is now the only way
+  // to open the shortcuts overlay.)
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
@@ -45,6 +51,7 @@ function AppDemoInner() {
   const demoRootRef = useRef<HTMLDivElement>(null);
 
   // Label the scrollable panel with the active page name (used by role="tabpanel").
+  // R25-1a: includes the 3 new pages (experiments / fiscal / business).
   const panelLabelKey =
     page === "detail"
       ? "pageTrades"
@@ -54,6 +61,9 @@ function AppDemoInner() {
           | "pageAnalytics"
           | "pageJournal"
           | "pagePlaybook"
+          | "pageExperiments"
+          | "pageFiscal"
+          | "pageBusiness"
           | "pageSettings");
 
   // Exit fullscreen on Escape — listener attaches only while fullscreen is
@@ -178,7 +188,9 @@ function AppDemoInner() {
   /* ----------------------------------------------------------------
      Touch swipe — horizontal swipe on the demo content area advances
      to the next/previous page in the main navigation chain:
-       dashboard → trades → analytics → journal → playbook → settings
+       dashboard → trades → analytics → journal → playbook → experiments →
+       fiscal → business → settings
+     (R25-1a: was a 6-page chain, now 9 — matches the post-R25-1a TopNav.)
      The TradeDetailPage ("detail") is a drill-down from trades; a
      swipe-right there pops back to trades (matching the back button),
      a swipe-left jumps forward to analytics (the next main page).
@@ -194,6 +206,9 @@ function AppDemoInner() {
     "analytics",
     "journal",
     "playbook",
+    "experiments",
+    "fiscal",
+    "business",
     "settings",
   ] as const;
   const SWIPE_THRESHOLD = 50;
@@ -327,22 +342,25 @@ function AppDemoInner() {
                   {page === "analytics" && <AnalyticsPage />}
                   {page === "journal" && <JournalPage />}
                   {page === "playbook" && <PlaybookPage />}
+                  {page === "experiments" && <ExperimentsPage />}
+                  {page === "fiscal" && <FiscalPage />}
+                  {page === "business" && <BusinessPage />}
                   {page === "settings" && <SettingsPage />}
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
 
-          {/* Status bar — extracted into its own `StatusBar` component
-              (Feature 1) so the new live mini-metrics ticker + keyboard
-              icon button (Feature 3 trigger) live next to the bar they
-              decorate. Mirrors a real Windows 11 / WinUI 3 status bar
-              (Bloomberg Terminal / Linear desktop convention): left =
-              connection LED + "Conectado" + "Local-first", center = live
-              mini-metrics ticker (cycles every 4 s), right = HH:MM:SS
-              clock + "data: 72 trades" + keyboard / fullscreen / share /
-              reset icon buttons. */}
-          <StatusBar onOpenShortcuts={() => setShortcutsOpen(true)} />
+          {/* Status bar — restructured in R25-1a to match the real app's
+              status bar (MainWindow.xaml L286-331): left = discipline LED +
+              "Disciplina: NN %", center = "Guardado automático en tu equipo",
+              right = "v2.4.1". The pre-R25-1a metrics ticker + clock +
+              keyboard / fullscreen / share / reset icon buttons are gone
+              (the real app doesn't have them in the status bar —
+              fullscreen is via the title bar's Maximize button,
+              keyboard shortcuts via the `?` key, no share/reset in the
+              native chrome). */}
+          <StatusBar />
 
           {/* In-demo command palette (Feature 2) — Cmd+K when the demo is
               active. Rendered here so it sits inside the demo window's

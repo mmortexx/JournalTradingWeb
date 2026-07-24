@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import {
@@ -14,33 +14,17 @@ import {
 } from "@/lib/trading/data";
 import { addTrade, useAllTrades } from "@/lib/trading/demoStore";
 import { useToast } from "@/hooks/use-toast";
-import { fmtNum, fmtPct, fmtDate } from "@/lib/trading/format";
+import { fmtNum, fmtPct } from "@/lib/trading/format";
 import { Reveal } from "@/components/tj/Reveal";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Money } from "@/components/tj/Money";
 import { CountUp } from "@/components/tj/CountUp";
-import { Chip } from "@/components/tj/Chip";
 import { EquityCurve } from "@/components/charts/EquityCurve";
 import { MiniCalendar } from "@/components/charts/MiniCalendar";
-import { MarketClock } from "@/components/tj/MarketClock";
 import { useDemo } from "@/components/demo/DemoContext";
 
-type CalcMethod =
-  | "riskPercent"
-  | "fixedUsd"
-  | "forexLots"
-  | "futuresContracts"
-  | "entryStop";
-
-const SIZING_MODES: CalcMethod[] = [
-  "riskPercent",
-  "fixedUsd",
-  "forexLots",
-  "futuresContracts",
-  "entryStop",
-];
-
-// ES futures contract multiplier ($50 per point per contract).
+// ES futures contract multiplier ($50 per point per contract) — kept for
+// the demo's P&L computation parity with demoStore.ts.
 const FUTURES_MULTIPLIER = 50;
 
 // Equity-curve timeframe selector — filters the chart to the last N days
@@ -71,14 +55,6 @@ function sliceMetricsByDays(m: Metrics, days: number): Metrics {
   return { ...m, equityCurve, drawdownCeiling };
 }
 
-// Asset-class color dots — shared with TradesPage for visual consistency.
-const ASSET_DOT: Record<string, string> = {
-  crypto: "bg-amber-400",
-  forex: "bg-emerald-400",
-  stock: "bg-rose-400",
-  futures: "bg-teal-400",
-};
-
 const inputCls =
   "w-full bg-white/5 border border-white/10 rounded-md h-9 px-3 text-sm text-primary tnum placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors appearance-none";
 const labelCls =
@@ -86,9 +62,33 @@ const labelCls =
 
 /**
  * Dashboard / "Resumen" page of the native Trading Journal app,
- * recreated for the browser demo. Captures the live trade-entry composer,
- * sizing rail, session KPI strip, performance block with equity curve,
- * and P&L calendar.
+ * recreated for the browser demo. Mirrors the WinUI DashboardPage.xaml
+ * layout (post 17/07/2026 redesign):
+ *
+ *   ┌─ Section 1 — REGISTRAR OPERACIÓN (protagonist, full width) ────┐
+ *   │  Header: eyebrow + title (left) │ live Risk $ 28px (right)      │
+ *   │  Composer card ─ 2-col grid                                     │
+ *   │    ┌── Left col ──────────┐  ┌── Right col ──────────────────┐ │
+ *   │    │ Screenshot dropzone  │  │ Long/Short toggle              │ │
+ *   │    │ (380px fixed height) │  │ Instrument                     │ │
+ *   │    ├──────────────────────┤  │ Entry + Exit                   │ │
+ *   │    │ Risk $ │ R:R │ %     │  │ Quantity + calc                │ │
+ *   │    │ (hairline dividers)  │  │ Stop + Target                  │ │
+ *   │    └──────────────────────┘  │ Setup + Note                   │ │
+ *   │                              └────────────────────────────────┘ │
+ *   │  Footer: session count (left) │ Save draft + Register (right)   │
+ *   └──────────────────────────────────────────────────────────────────┘
+ *   ┌─ Section 2 — RENDIMIENTO (full width below) ──────────────────┐
+ *   │  Header: eyebrow + title                                       │
+ *   │  KPI strip — 7 cells with vertical hairline dividers (no card) │
+ *   │  Equity curve │ Calendar — 50/50 side-by-side                  │
+ *   └──────────────────────────────────────────────────────────────────┘
+ *
+ * The composer is the protagonist — full-width and centered, with a
+ * generous 2-column layout (image left, data right) so a pasted chart
+ * screenshot reads LARGE while the trader fills in the trade alongside.
+ * Performance (KPIs + equity + calendar) lives below, no longer
+ * competing for space with the composer.
  */
 export function DashboardPage() {
   const { t, lang } = useLang();
@@ -122,9 +122,10 @@ export function DashboardPage() {
   const [exitPrice, setExitPrice] = useState<string>(
     (INSTRUMENTS[0].basePrice * 1.018).toFixed(INSTRUMENTS[0].decimals)
   );
+  const [target, setTarget] = useState<string>(
+    (INSTRUMENTS[0].basePrice * 1.024).toFixed(INSTRUMENTS[0].decimals)
+  );
   const [quantity, setQuantity] = useState<string>("1");
-  const [calcMethod, setCalcMethod] = useState<CalcMethod>("riskPercent");
-  const [riskValue, setRiskValue] = useState<string>("1");
   const [note, setNote] = useState<string>("");
 
   const inst =
@@ -133,39 +134,43 @@ export function DashboardPage() {
   const entryNum = parseFloat(entry) || 0;
   const stopNum = parseFloat(stop) || 0;
   const exitNum = parseFloat(exitPrice) || 0;
+  const targetNum = parseFloat(target) || 0;
   const qtyNum = parseFloat(quantity) || 0;
-  const riskValNum = parseFloat(riskValue) || 0;
 
   const stopDist = Math.abs(entryNum - stopNum);
+  // planned R:R = |target - entry| / |entry - stop| (real app's TradeRrDisplay).
+  const plannedRr = stopDist > 0 ? Math.abs(targetNum - entryNum) / stopDist : 0;
   // realized R multiple = |exit - entry| / |entry - stop|
   const realizedR = stopDist > 0 ? Math.abs(exitNum - entryNum) / stopDist : 0;
 
-  // ----- risk-$ calculation per selected sizing mode -----
-  const riskUsd = useMemo(() => {
-    switch (calcMethod) {
-      case "riskPercent":
-        return INITIAL_BALANCE_CONST * (riskValNum / 100);
-      case "fixedUsd":
-        return riskValNum;
-      case "forexLots":
-        // 1 standard lot = 100,000 units; risk = lots * notional * stopDist.
-        return riskValNum * 100000 * stopDist;
-      case "futuresContracts":
-        // ES = $50/point per contract.
-        return riskValNum * FUTURES_MULTIPLIER * stopDist;
-      case "entryStop":
-        // Direct: risk = stopDist * qty (forex qty is in units, multiply by 100k if lots).
-        return stopDist * qtyNum * (inst.assetClass === "forex" ? 100000 : 1);
-      default:
-        return 0;
+  // ----- risk-$ calculation (real app: % of equity by default) -----
+  // The real app moved the sizing CALCULATOR into its own dialog — the
+  // composer itself just shows the resulting risk $/R:R/% derived from
+  // entry/stop/qty. The demo defaults to a 1% risk posture on the
+  // initial $10,000 balance; once entry/stop/qty are all set, the risk
+  // is computed directly from stop-distance × qty × multiplier so the
+  // footer reads a real number, not a placeholder.
+  const riskUsdLive = useMemo(() => {
+    // If we have a real stop + qty, compute risk from the trade itself
+    // (matches the real app's "Risk $" footer cell, which is derived
+    // from entry/stop/cantidad — not a separate sizing input).
+    if (stopDist > 0 && qtyNum > 0) {
+      const multiplier =
+        inst.assetClass === "forex"
+          ? 100_000
+          : inst.assetClass === "futures"
+          ? FUTURES_MULTIPLIER
+          : 1;
+      return stopDist * qtyNum * multiplier;
     }
-  }, [calcMethod, riskValNum, stopDist, qtyNum, inst.assetClass]);
+    // Fallback: 1% of the initial balance (the demo's default posture).
+    return INITIAL_BALANCE_CONST * 0.01;
+  }, [stopDist, qtyNum, inst.assetClass]);
+
+  const riskPct = INITIAL_BALANCE_CONST > 0 ? riskUsdLive / INITIAL_BALANCE_CONST : 0;
 
   // ----- handlers -----
   function handleRegister() {
-    // Validate required fields: instrument, setup, direction, entry, stop.
-    // (instrument/setup/direction are always set via dropdowns/toggles, so
-    // the real validation is on entry & stop being positive, distinct numbers.)
     const entryN = parseFloat(entry);
     const stopN = parseFloat(stop);
     const exitParsed = parseFloat(exitPrice);
@@ -191,10 +196,10 @@ export function DashboardPage() {
 
     // Calculate realized P&L and R-multiple.
     // priceDiff is signed: positive for a winning move, negative for a loser.
-    const stopDist = Math.abs(entryN - stopN);
+    const stopDistLocal = Math.abs(entryN - stopN);
     const priceDiff =
       direction === "long" ? exitN - entryN : entryN - exitN;
-    const rMultiple = stopDist > 0 ? +(priceDiff / stopDist).toFixed(2) : 0;
+    const rMultiple = stopDistLocal > 0 ? +(priceDiff / stopDistLocal).toFixed(2) : 0;
 
     // Position-value multiplier per asset class — matches demoStore.ts.
     const multiplier =
@@ -236,41 +241,19 @@ export function DashboardPage() {
     setEntry(next.basePrice.toFixed(next.decimals));
     setStop((next.basePrice * 0.992).toFixed(next.decimals));
     setExitPrice((next.basePrice * 1.018).toFixed(next.decimals));
+    setTarget((next.basePrice * 1.024).toFixed(next.decimals));
   }
 
-  // risk-value field label per calc method
-  const riskValueLabel =
-    calcMethod === "entryStop"
-      ? es
-        ? "Calculado"
-        : "Computed"
-      : t(calcMethod);
-
-  // ----- live "last updated" clock — signals real-time app -----
-  const [now, setNow] = useState<string>("");
-  useEffect(() => {
-    const tick = () => {
-      const d = new Date();
-      setNow(
-        d.toLocaleTimeString(es ? "es-ES" : "en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        })
-      );
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [es]);
+  // session count: trades logged "today" (demo: any custom trade this session).
+  const sessionCount = allTrades.length - TRADES.length;
 
   return (
-    <div className="p-5 md:p-6 space-y-5 relative">
-      {/* ============ 1. CAPTURE COMPOSER ============ */}
+    <div className="p-5 md:p-6 space-y-8 relative">
+      {/* ============ SECTION 1: REGISTRAR OPERACIÓN (protagonist) ============ */}
       <section className="relative">
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        {/* Cabecera: eyebrow + title (left) │ live Risk $ 28px (right) */}
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div className="min-w-0">
             <Reveal delay={0}>
               <Eyebrow>{t("captureEyebrow")}</Eyebrow>
             </Reveal>
@@ -280,46 +263,595 @@ export function DashboardPage() {
               </h1>
             </Reveal>
           </div>
-          {/* Live timestamp — signals "real-time app" like a Bloomberg terminal */}
-          <div className="hidden sm:flex items-center gap-2 text-[11px] text-tertiary tnum shrink-0 pt-1">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inset-0 rounded-full bg-pnl-pos/60 animate-ping" />
-              <span className="relative rounded-full h-1.5 w-1.5 bg-pnl-pos" />
-            </span>
-            <span className="uppercase tracking-[0.12em]">
-              {es ? "Actualizado" : "Updated"}
-            </span>
-            <span className="text-secondary font-medium">{now}</span>
-          </div>
+          {/* Riesgo en vivo: una sola cifra protagonista por pantalla.
+              Reads "Risk in $" eyebrow + 28px Money value, right-aligned.
+              The number animates softly when the value changes (entry/stop/qty
+              edits) — same live-readout language as the WinUI app. */}
+          <Reveal delay={0.08}>
+            <div className="text-right shrink-0">
+              <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary">
+                {t("riskUsd")}
+              </div>
+              <motion.div
+                key={`risk-${riskUsdLive.toFixed(2)}`}
+                initial={{ opacity: 0.55, y: 3 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 320, damping: 22 }}
+                aria-live="polite"
+                className="mt-1 text-[28px] font-bold tnum text-primary leading-none"
+              >
+                <Money value={riskUsdLive} />
+              </motion.div>
+            </div>
+          </Reveal>
         </div>
 
-        <Reveal delay={0.08}>
+        {/* Composer card — 2-col grid (image left, data right) */}
+        <Reveal delay={0.1}>
           <motion.div
-            className="liquid-glass depth-3 hover:shadow-[0_6px_14px_rgb(0_0_0_/_0.32),0_24px_56px_rgb(0_0_0_/_0.36),0_0_44px_rgb(255_255_255_/_0.08)] transition-shadow duration-300 rounded-card p-5 md:p-6 mt-4 relative overflow-hidden"
+            className="liquid-glass depth-3 hover:shadow-[0_6px_14px_rgb(0_0_0_/_0.32),0_24px_56px_rgb(0_0_0_/_0.36),0_0_44px_rgb(255_255_255_/_0.08)] transition-shadow duration-300 rounded-card p-5 md:p-6 relative overflow-hidden"
           >
             <div className="relative z-10">
-              {/* Top row: direction toggle + live risk readout */}
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5">
-                {/* Direction toggle with sliding pill */}
-                <div>
-                  <span className={labelCls}>
-                    {es ? "Dirección" : "Direction"}
-                  </span>
-                  <div
-                    className="relative inline-flex bg-white/5 border border-white/10 rounded-md p-0.5"
-                    role="radiogroup"
-                    aria-label={es ? "Dirección" : "Direction"}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* ============ LEFT COLUMN: image + risk footer ============ */}
+                <div className="flex flex-col">
+                  {/* Screenshot dropzone — 380px FIXED height (matches the
+                      WinUI RowDefinition Height="380"). Independent of the
+                      form column's height: never resizes when fields
+                      change. Empty-state shows a drop affordance; the demo
+                      doesn't actually paste images but the affordance
+                      communicates the workflow. */}
+                  <button
+                    type="button"
+                    aria-label={t("dropScreens")}
+                    className="w-full border border-dashed border-white/15 rounded-md flex flex-col items-center justify-center gap-2 text-tertiary hover:text-secondary hover:border-white/30 hover:bg-white/5 transition-colors group"
+                    style={{ height: 380 }}
                   >
-                    {(["long", "short"] as Direction[]).map((d) => {
-                      const active = direction === d;
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      className="group-hover:scale-110 transition-transform text-white/40"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <circle cx="9" cy="9" r="2" />
+                      <path d="M21 15l-5-5L5 21" />
+                    </svg>
+                    <span className="text-sm font-medium text-secondary text-center px-6">
+                      {t("dropScreens")}
+                    </span>
+                    <span className="text-[11px] text-tertiary text-center px-6">
+                      {es
+                        ? "Pega con Ctrl+V o arrastra una imagen del gráfico"
+                        : "Paste with Ctrl+V or drag a chart image"}
+                    </span>
+                  </button>
+
+                  {/* Risk footer — 3 cells (Risk $ / R:R / %) separated by
+                      vertical hairlines, anchored to the bottom of the
+                      left column. Top border = hairline divider. Mirrors
+                      the WinUI VerticalHairlineStyle strip. */}
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary mb-3">
+                      {es ? "Riesgo de esta operación" : "Trade risk"}
+                    </div>
+                    <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] gap-x-4">
+                      {/* Risk $ */}
+                      <div className="flex flex-col items-center gap-1 text-center">
+                        <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary">
+                          {t("riskUsd")}
+                        </div>
+                        <Money
+                          value={riskUsdLive}
+                          className="text-lg font-semibold text-primary"
+                        />
+                      </div>
+                      {/* Vertical hairline */}
+                      <div className="my-1 w-px bg-white/10" aria-hidden="true" />
+                      {/* R:R planned */}
+                      <div className="flex flex-col items-center gap-1 text-center">
+                        <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary">
+                          {t("rr")}
+                        </div>
+                        <span
+                          className={`text-lg font-semibold tnum ${
+                            plannedRr >= 2
+                              ? "text-pnl-pos"
+                              : plannedRr >= 1
+                              ? "text-pnl-warn"
+                              : "text-pnl-neg"
+                          }`}
+                        >
+                          {fmtNum(plannedRr, lang, 2)}R
+                        </span>
+                      </div>
+                      {/* Vertical hairline */}
+                      <div className="my-1 w-px bg-white/10" aria-hidden="true" />
+                      {/* % of account */}
+                      <div className="flex flex-col items-center gap-1 text-center">
+                        <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary">
+                          {es ? "% cuenta" : "% acct"}
+                        </div>
+                        <span
+                          className={`text-lg font-semibold tnum ${
+                            riskPct > 0.02
+                              ? "text-pnl-neg"
+                              : riskPct > 0.01
+                              ? "text-pnl-warn"
+                              : "text-pnl-pos"
+                          }`}
+                        >
+                          {fmtPct(riskPct, lang, 2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ============ RIGHT COLUMN: trade data form ============ */}
+                <div className="flex flex-col gap-3">
+                  {/* Long/Short toggle — 2-col grid with semantic P&L dots.
+                      Sliding pill animates between Long (green) and Short
+                      (red) via shared layoutId. */}
+                  <div>
+                    <span className={labelCls}>
+                      {es ? "Dirección" : "Direction"}
+                    </span>
+                    <div
+                      className="grid grid-cols-2 gap-2"
+                      role="radiogroup"
+                      aria-label={es ? "Dirección" : "Direction"}
+                    >
+                      {(["long", "short"] as Direction[]).map((d) => {
+                        const active = direction === d;
+                        return (
+                          <button
+                            key={d}
+                            type="button"
+                            role="radio"
+                            aria-checked={active}
+                            onClick={() => setDirection(d)}
+                            className={`relative h-11 rounded-md border text-sm font-medium transition-colors ${
+                              active
+                                ? d === "long"
+                                  ? "bg-pnl-pos/15 border-pnl-pos/30 text-primary"
+                                  : "bg-pnl-neg/15 border-pnl-neg/30 text-primary"
+                                : "bg-white/5 border-white/10 text-tertiary hover:text-secondary hover:border-white/20"
+                            }`}
+                          >
+                            {active && (
+                              <motion.span
+                                layoutId="dir-pill"
+                                className={`absolute inset-0 rounded-md ${
+                                  d === "long"
+                                    ? "bg-pnl-pos/15 border border-pnl-pos/30"
+                                    : "bg-pnl-neg/15 border border-pnl-neg/30"
+                                }`}
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 400,
+                                  damping: 32,
+                                }}
+                              />
+                            )}
+                            <span className="relative flex items-center justify-center gap-2">
+                              <span
+                                className={`inline-block w-1.5 h-1.5 rounded-full ${
+                                  d === "long" ? "bg-pnl-pos" : "bg-pnl-neg"
+                                }`}
+                                aria-hidden="true"
+                              />
+                              {t(d)}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Instrument — full-width select */}
+                  <div>
+                    <label htmlFor="d-inst" className={labelCls}>
+                      {t("instrument")}
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="d-inst"
+                        value={instrumentSymbol}
+                        onChange={(e) => selectInstrument(e.target.value)}
+                        className={`${inputCls} pr-8 cursor-pointer`}
+                      >
+                        {INSTRUMENTS.map((i) => (
+                          <option key={i.symbol} value={i.symbol}>
+                            {i.symbol}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown />
+                    </div>
+                  </div>
+
+                  {/* Entry + Exit — 2-col grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="d-entry" className={labelCls}>
+                        {es ? "Entrada" : "Entry"}
+                      </label>
+                      <input
+                        id="d-entry"
+                        type="number"
+                        inputMode="decimal"
+                        step="any"
+                        value={entry}
+                        onChange={(e) => setEntry(e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="d-exit" className={labelCls}>
+                        {t("exit")}
+                      </label>
+                      <input
+                        id="d-exit"
+                        type="number"
+                        inputMode="decimal"
+                        step="any"
+                        value={exitPrice}
+                        onChange={(e) => setExitPrice(e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Quantity — full-width input with realized R readout on right */}
+                  <div className="grid grid-cols-[1fr_auto] gap-3">
+                    <div>
+                      <label htmlFor="d-qty" className={labelCls}>
+                        {t("quantity")}
+                      </label>
+                      <input
+                        id="d-qty"
+                        type="number"
+                        inputMode="decimal"
+                        step="any"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <span className={labelCls}>
+                        {es ? "R realizado" : "Realized R"}
+                      </span>
+                      <div className="h-9 px-3 flex items-center justify-center rounded-md bg-white/5 border border-white/10 min-w-[88px]">
+                        <span
+                          className={`text-sm font-medium tnum ${
+                            realizedR >= 2
+                              ? "text-pnl-pos"
+                              : realizedR >= 1
+                              ? "text-pnl-warn"
+                              : realizedR > 0
+                              ? "text-pnl-neg"
+                              : "text-tertiary"
+                          }`}
+                        >
+                          {fmtNum(realizedR, lang, 2)}R
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stop + Target — 2-col grid (InitialStop / InitialTarget
+                      in the real app — gives the planned R:R). */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="d-stop" className={labelCls}>
+                        {es ? "Stop" : "Stop"}
+                      </label>
+                      <input
+                        id="d-stop"
+                        type="number"
+                        inputMode="decimal"
+                        step="any"
+                        value={stop}
+                        onChange={(e) => setStop(e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="d-target" className={labelCls}>
+                        {es ? "Objetivo" : "Target"}
+                      </label>
+                      <input
+                        id="d-target"
+                        type="number"
+                        inputMode="decimal"
+                        step="any"
+                        value={target}
+                        onChange={(e) => setTarget(e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Setup — full-width select */}
+                  <div>
+                    <label htmlFor="d-setup" className={labelCls}>
+                      {t("setup")}
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="d-setup"
+                        value={setupName}
+                        onChange={(e) => setSetupName(e.target.value)}
+                        className={`${inputCls} pr-8 cursor-pointer`}
+                      >
+                        {SETUP_NAMES.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown />
+                    </div>
+                  </div>
+
+                  {/* Note — textarea */}
+                  <div className="flex-1 flex flex-col">
+                    <label htmlFor="d-note" className={labelCls}>
+                      {es ? "Nota" : "Note"}
+                    </label>
+                    <textarea
+                      id="d-note"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder={t("notePlaceholder")}
+                      rows={3}
+                      className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-primary placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors resize-none min-h-[88px] flex-1"
+                      aria-label={t("notePlaceholder")}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ============ FOOTER — session count + register ============
+                  Top-border hairline (mirrors the WinUI DividerStroke).
+                  Left: session count. Right: Save draft + Register
+                  (accent, min-width 200, Ctrl+Enter). */}
+              <div className="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3 justify-between">
+                {/* Session count */}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-sm font-semibold tnum text-primary">
+                    {sessionCount}
+                  </span>
+                  <span className="text-tertiary uppercase tracking-[0.1em]">
+                    {es ? "en la sesión" : "this session"}
+                  </span>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <motion.button
+                    type="button"
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                    className="h-11 px-4 rounded-md bg-white/5 border border-white/10 text-secondary font-medium text-sm flex items-center gap-2 hover:bg-white/8 hover:text-primary transition-colors"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 3h8l3 3v7a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1z" />
+                      <path d="M5 3v3h5V3M5 11h6V8H5z" />
+                    </svg>
+                    {t("saveDraft")}
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={handleRegister}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                    title={es ? "Ctrl+Enter" : "Ctrl+Enter"}
+                    className="h-11 min-w-[200px] px-4 rounded-md bg-white text-black font-medium text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 8h10M8 3v10" />
+                    </svg>
+                    {t("registerTrade")}
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </Reveal>
+      </section>
+
+      {/* ============ SECTION 2: RENDIMIENTO (full width below) ============ */}
+      <section className="space-y-5">
+        {/* Section header */}
+        <div>
+          <Reveal delay={0}>
+            <Eyebrow>{t("performance")}</Eyebrow>
+          </Reveal>
+          <Reveal delay={0.04}>
+            <h2 className="mt-2 font-medium tracking-[-0.02em] text-primary text-xl md:text-2xl leading-tight">
+              {t("performanceTitle")}
+            </h2>
+          </Reveal>
+        </div>
+
+        {/* KPI strip — 7 cells with vertical hairline dividers (no card).
+            Mirrors the WinUI Grid with VerticalHairlineStyle borders
+            between columns. Each cell: small caption + 18px tabular value. */}
+        <Reveal delay={0.08}>
+          <div className="grid grid-cols-[repeat(7,minmax(0,1fr))] gap-x-4 px-1 py-2 overflow-x-auto">
+            <KpiCell
+              label={t("pnlTotal")}
+              value={
+                <Money
+                  value={METRICS.netPnl}
+                  sign
+                  colorizeSign
+                  className="text-lg font-semibold"
+                />
+              }
+            />
+            <KpiDivider />
+            <KpiCell
+              label={t("winRate")}
+              value={
+                <span className="text-lg font-semibold tnum text-primary">
+                  {fmtPct(METRICS.winRate, lang, 1)}
+                </span>
+              }
+            />
+            <KpiDivider />
+            <KpiCell
+              label={t("expectancy")}
+              value={
+                <Money
+                  value={METRICS.expectancy}
+                  sign
+                  colorizeSign
+                  className="text-lg font-semibold"
+                />
+              }
+            />
+            <KpiDivider />
+            <KpiCell
+              label={t("profitFactor")}
+              value={
+                <span
+                  className={`text-lg font-semibold tnum ${
+                    METRICS.profitFactor >= 1 ? "text-pnl-pos" : "text-pnl-neg"
+                  }`}
+                >
+                  {fmtNum(METRICS.profitFactor, lang, 2)}
+                </span>
+              }
+            />
+            <KpiDivider />
+            <KpiCell
+              label={t("currentDd")}
+              value={
+                <span className="text-lg font-semibold tnum text-pnl-neg">
+                  {fmtPct(METRICS.currentDrawdown, lang, 1)}
+                </span>
+              }
+            />
+            <KpiDivider />
+            <KpiCell
+              label={t("streak")}
+              value={
+                <span
+                  className={`text-lg font-semibold tnum ${
+                    METRICS.currentStreak.kind === "win"
+                      ? "text-pnl-pos"
+                      : METRICS.currentStreak.kind === "loss"
+                      ? "text-pnl-neg"
+                      : "text-tertiary"
+                  }`}
+                >
+                  {METRICS.currentStreak.count > 0
+                    ? `${METRICS.currentStreak.count}${
+                        METRICS.currentStreak.kind === "win"
+                          ? es
+                            ? "G"
+                            : "W"
+                          : es
+                          ? "P"
+                          : "L"
+                      }`
+                    : "—"}
+                </span>
+              }
+            />
+            <KpiDivider />
+            <KpiCell
+              label={t("discipline")}
+              value={
+                <span
+                  className={`text-lg font-semibold tnum ${
+                    METRICS.compliancePct >= 0.7
+                      ? "text-pnl-pos"
+                      : METRICS.compliancePct >= 0.5
+                      ? "text-pnl-warn"
+                      : "text-pnl-neg"
+                  }`}
+                >
+                  {fmtPct(METRICS.compliancePct, lang, 0)}
+                </span>
+              }
+            />
+          </div>
+        </Reveal>
+
+        {/* Equity curve + Calendar — 50/50 side-by-side. The real app's
+            ColumnDefinition Width="*" / Width="*" — both halves equal.
+            (Previous demo was 2/3 + 1/3.) */}
+        <div className="grid lg:grid-cols-2 gap-4 md:gap-5">
+          {/* Equity curve card */}
+          <Reveal delay={0.1}>
+            <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 relative overflow-hidden h-full">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-20 -right-20 w-[320px] h-[320px] rounded-full blur-[120px] opacity-[0.12] bg-white"
+              />
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-3 gap-3 flex-wrap">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary">
+                      {es ? "Curva de capital" : "Equity curve"}
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+                      <Money
+                        value={METRICS.finalBalance}
+                        compact
+                        className="text-2xl font-bold text-primary"
+                      />
+                      <span
+                        className={`text-xs tnum ${
+                          METRICS.roiPct >= 0 ? "text-pnl-pos" : "text-pnl-neg"
+                        }`}
+                      >
+                        {fmtPct(METRICS.roiPct, lang, 1)}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Timeframe selector — 1M / 3M / 6M */}
+                  <div className="flex items-center gap-0.5 bg-white/5 border border-white/10 rounded-md p-0.5">
+                    {TIMEFRAMES.map((mode) => {
+                      const active = tfSel === mode;
                       return (
                         <button
-                          key={d}
+                          key={mode}
                           type="button"
-                          role="radio"
-                          aria-checked={active}
-                          onClick={() => setDirection(d)}
-                          className={`relative px-4 h-8 rounded text-sm font-medium transition-colors ${
+                          onClick={() => setTfSel(mode)}
+                          aria-pressed={active}
+                          className={`relative px-2.5 h-6 rounded text-[11px] font-medium tnum transition-colors ${
                             active
                               ? "text-primary"
                               : "text-tertiary hover:text-secondary"
@@ -327,585 +859,39 @@ export function DashboardPage() {
                         >
                           {active && (
                             <motion.span
-                              layoutId="dir-pill"
-                              className={`absolute inset-0 rounded ${
-                                d === "long"
-                                  ? "bg-pnl-pos/15 border border-pnl-pos/30"
-                                  : "bg-pnl-neg/15 border border-pnl-neg/30"
-                              }`}
+                              layoutId="tf-pill"
+                              className="absolute inset-0 rounded bg-white/10 border border-white/15"
                               transition={{
                                 type: "spring",
-                                stiffness: 400,
-                                damping: 32,
+                                stiffness: 380,
+                                damping: 30,
                               }}
                             />
                           )}
-                          <span className="relative flex items-center gap-1.5">
-                            <svg
-                              width="10"
-                              height="10"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                              aria-hidden="true"
-                            >
-                              {d === "long" ? (
-                                <path
-                                  d="M3 12L8 4l5 8"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              ) : (
-                                <path
-                                  d="M3 4l5 8 5-8"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              )}
-                            </svg>
-                            {t(d)}
-                          </span>
+                          <span className="relative">{mode}</span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
-
-                {/* Live risk-$ readout */}
-                <div className="md:text-right min-w-0 md:min-w-[160px]">
-                  <span className={labelCls}>
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="inline-flex w-1.5 h-1.5 rounded-full bg-white" />
-                      {t("riskUsd")}
-                    </span>
-                  </span>
-                  <motion.div
-                    key={`risk-${riskUsd.toFixed(2)}`}
-                    initial={{ opacity: 0.55, y: 3 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                    className="text-2xl sm:text-3xl md:text-4xl font-bold tnum text-primary leading-none min-w-0 break-words"
-                  >
-                    <Money value={riskUsd} />
-                  </motion.div>
-                  <div className="mt-1.5 md:flex md:justify-end">
-                    <span className="pill bg-white/5 text-tertiary border border-white/10">
-                      {t(calcMethod)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Form grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {/* Instrument */}
-                <div className="col-span-2 md:col-span-1">
-                  <label htmlFor="d-inst" className={labelCls}>
-                    {t("instrument")}
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="d-inst"
-                      value={instrumentSymbol}
-                      onChange={(e) => selectInstrument(e.target.value)}
-                      className={`${inputCls} pr-8 cursor-pointer`}
-                    >
-                      {INSTRUMENTS.map((i) => (
-                        <option key={i.symbol} value={i.symbol}>
-                          {i.symbol}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown />
-                  </div>
-                </div>
-
-                {/* Setup */}
-                <div className="col-span-2 md:col-span-2">
-                  <label htmlFor="d-setup" className={labelCls}>
-                    {t("setup")}
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="d-setup"
-                      value={setupName}
-                      onChange={(e) => setSetupName(e.target.value)}
-                      className={`${inputCls} pr-8 cursor-pointer`}
-                    >
-                      {SETUP_NAMES.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown />
-                  </div>
-                </div>
-
-                {/* Entry */}
-                <div>
-                  <label htmlFor="d-entry" className={labelCls}>
-                    {es ? "Entrada" : "Entry"}
-                  </label>
-                  <input
-                    id="d-entry"
-                    type="number"
-                    inputMode="decimal"
-                    step="any"
-                    value={entry}
-                    onChange={(e) => setEntry(e.target.value)}
-                    className={inputCls}
-                  />
-                </div>
-
-                {/* Stop */}
-                <div>
-                  <label htmlFor="d-stop" className={labelCls}>
-                    {es ? "Stop" : "Stop"}
-                  </label>
-                  <input
-                    id="d-stop"
-                    type="number"
-                    inputMode="decimal"
-                    step="any"
-                    value={stop}
-                    onChange={(e) => setStop(e.target.value)}
-                    className={inputCls}
-                  />
-                </div>
-
-                {/* Exit */}
-                <div>
-                  <label htmlFor="d-exit" className={labelCls}>
-                    {t("exit")}
-                  </label>
-                  <input
-                    id="d-exit"
-                    type="number"
-                    inputMode="decimal"
-                    step="any"
-                    value={exitPrice}
-                    onChange={(e) => setExitPrice(e.target.value)}
-                    className={inputCls}
-                  />
-                </div>
-
-                {/* Quantity */}
-                <div>
-                  <label htmlFor="d-qty" className={labelCls}>
-                    {t("quantity")}
-                  </label>
-                  <input
-                    id="d-qty"
-                    type="number"
-                    inputMode="decimal"
-                    step="any"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    className={inputCls}
-                  />
-                </div>
-
-                {/* Risk value (per calc method) */}
-                <div>
-                  <label htmlFor="d-risk" className={labelCls}>
-                    {riskValueLabel}
-                  </label>
-                  <input
-                    id="d-risk"
-                    type="number"
-                    inputMode="decimal"
-                    step="any"
-                    value={calcMethod === "entryStop" ? "—" : riskValue}
-                    disabled={calcMethod === "entryStop"}
-                    onChange={(e) => setRiskValue(e.target.value)}
-                    className={`${inputCls} disabled:opacity-50 disabled:cursor-not-allowed`}
-                  />
-                </div>
-
-                {/* RR (computed) */}
-                <div>
-                  <span className={labelCls}>{t("rr")}</span>
-                  <div className="h-9 px-3 flex items-center justify-between rounded-md bg-white/5 border border-white/10">
-                    <span
-                      className={`text-sm font-medium tnum ${
-                        realizedR >= 2
-                          ? "text-pnl-pos"
-                          : realizedR >= 1
-                          ? "text-pnl-warn"
-                          : "text-pnl-neg"
-                      }`}
-                    >
-                      {fmtNum(realizedR, lang, 2)}R
-                    </span>
-                    <span className="text-[10px] text-tertiary uppercase tracking-wider">
-                      {es ? "realizado" : "realized"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Calc method segmented control */}
-              <div className="mt-4">
-                <span className={labelCls}>{t("calcMethod")}</span>
-                <div className="flex flex-wrap gap-1 bg-white/5 border border-white/10 rounded-md p-1">
-                  {SIZING_MODES.map((m) => {
-                    const active = calcMethod === m;
-                    return (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => setCalcMethod(m)}
-                        aria-pressed={active}
-                        className={`relative px-3 h-7 rounded text-xs font-medium transition-colors ${
-                          active
-                            ? "text-primary"
-                            : "text-tertiary hover:text-secondary"
-                        }`}
-                      >
-                        {active && (
-                          <motion.span
-                            layoutId="calc-pill"
-                            className="absolute inset-0 rounded bg-white/10 border border-white/20"
-                            transition={{
-                              type: "spring",
-                              stiffness: 380,
-                              damping: 30,
-                            }}
-                          />
-                        )}
-                        <span className="relative">{t(m)}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Drop screenshots + note */}
-              <div className="mt-4 grid md:grid-cols-2 gap-3">
-                <div className="min-w-0 flex flex-col">
-                  <span className={labelCls}>
-                    {es ? "Capturas" : "Screenshots"}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label={t("dropScreens")}
-                    className="w-full border border-dashed border-white/10 rounded-md p-4 flex flex-col items-center justify-center gap-2 text-tertiary hover:text-secondary hover:border-white/25 hover:bg-white/5 transition-colors min-h-[96px] cursor-pointer group"
-                  >
-                    <svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                      className="group-hover:scale-110 transition-transform"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                      <circle cx="9" cy="9" r="2" />
-                      <path d="M21 15l-5-5L5 21" />
-                    </svg>
-                    <span className="text-xs text-center leading-snug">
-                      {t("dropScreens")}
-                    </span>
-                  </button>
-                </div>
-
-                <div className="min-w-0 flex flex-col">
-                  <label htmlFor="d-note" className={labelCls}>
-                    {es ? "Nota" : "Note"}
-                  </label>
-                  <textarea
-                    id="d-note"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    placeholder={t("notePlaceholder")}
-                    rows={3}
-                    className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-primary placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors resize-none min-h-[96px] flex-1"
-                    aria-label={t("notePlaceholder")}
-                  />
-                </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                <motion.button
-                  type="button"
-                  onClick={handleRegister}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                  className="h-9 px-4 rounded-md bg-white text-black font-medium text-sm flex items-center gap-2 hover:bg-gray-100 transition-colors"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M3 8h10M8 3v10" />
-                  </svg>
-                  {t("registerTrade")}
-                </motion.button>
-                <motion.button
-                  type="button"
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                  className="h-9 px-4 rounded-md bg-white/5 border border-white/10 text-secondary font-medium text-sm flex items-center gap-2 hover:bg-white/8 hover:text-primary transition-colors"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M3 3h8l3 3v7a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1z" />
-                    <path d="M5 3v3h5V3M5 11h6V8H5z" />
-                  </svg>
-                  {t("saveDraft")}
-                </motion.button>
+                <EquityCurve metrics={slicedMetrics} height={260} />
               </div>
             </div>
-          </motion.div>
-        </Reveal>
+          </Reveal>
+
+          {/* P&L calendar card — MiniCalendar renders its own
+              liquid-glass card with month header + nav arrows + daily
+              P&L heat-map cells. */}
+          <Reveal delay={0.14}>
+            <MiniCalendar trades={TRADES} className="h-full" />
+          </Reveal>
+        </div>
       </section>
 
-      {/* ============ 2. LIVE MARKET CLOCK ============ */}
-      <Reveal delay={0.05}>
-        <MarketClock compact />
-      </Reveal>
-
-      {/* ============ 3. KPI STRIP ============ */}
-      <section>
-        <Reveal delay={0.05}>
-          <Eyebrow>{t("performance")}</Eyebrow>
-        </Reveal>
-        <Reveal delay={0.08}>
-          <h2 className="mt-2 mb-4 font-medium tracking-[-0.02em] text-primary text-xl md:text-2xl leading-tight">
-            {t("performanceTitle")}
-          </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-            {/* Net P&L */}
-            <KpiTile
-              label={t("pnlTotal")}
-              delta={
-                <DeltaTone
-                  value={METRICS.roiPct}
-                  fmt={(v) => fmtPct(v, lang, 1)}
-                />
-              }
-            >
-              <Money
-                value={METRICS.netPnl}
-                sign
-                colorizeSign
-                compact
-                className="text-2xl md:text-3xl font-bold"
-              />
-            </KpiTile>
-            {/* Win Rate */}
-            <KpiTile
-              label={t("winRate")}
-              delta={
-                <DeltaTone
-                  value={METRICS.winRate - 0.5}
-                  fmt={(v) =>
-                    `${v >= 0 ? "+" : "−"}${fmtPct(Math.abs(v), lang, 1)} ${es ? "vs 50%" : "vs 50%"}`
-                  }
-                />
-              }
-            >
-              <CountUp
-                to={METRICS.winRate * 100}
-                decimals={1}
-                suffix="%"
-                tone={METRICS.winRate >= 0.5 ? "pos" : "neg"}
-                className="text-2xl md:text-3xl font-bold"
-              />
-            </KpiTile>
-            {/* Expectancy */}
-            <KpiTile
-              label={t("expectancy")}
-              delta={
-                <DeltaTone
-                  value={METRICS.expectancyR}
-                  fmt={(v) =>
-                    `${v >= 0 ? "+" : "−"}${fmtNum(Math.abs(v), lang, 2)}R / ${es ? "trade" : "trade"}`
-                  }
-                />
-              }
-            >
-              <Money
-                value={METRICS.expectancy}
-                sign
-                colorizeSign
-                className="text-2xl md:text-3xl font-bold"
-              />
-            </KpiTile>
-            {/* Profit Factor */}
-            <KpiTile
-              label={t("profitFactor")}
-              delta={
-                <DeltaTone
-                  value={METRICS.profitFactor - 1}
-                  fmt={(v) =>
-                    `${v >= 0 ? "+" : "−"}${fmtNum(Math.abs(v), lang, 2)} ${es ? "vs 1.0" : "vs 1.0"}`
-                  }
-                />
-              }
-            >
-              <CountUp
-                to={METRICS.profitFactor}
-                decimals={2}
-                tone={METRICS.profitFactor >= 1 ? "pos" : "neg"}
-                className="text-2xl md:text-3xl font-bold"
-              />
-            </KpiTile>
-            {/* Total Trades */}
-            <KpiTile
-              label={es ? "Operaciones" : "Trades"}
-              delta={
-                <span className="text-[10px] tnum text-tertiary">
-                  {METRICS.wins}{es ? "G" : "W"} · {METRICS.losses}{es ? "P" : "L"}
-                </span>
-              }
-            >
-              <CountUp
-                to={METRICS.closedCount}
-                decimals={0}
-                className="text-2xl md:text-3xl font-bold text-primary"
-              />
-            </KpiTile>
-            {/* Avg R */}
-            <KpiTile
-              label={es ? "R medio" : "Avg R"}
-              delta={
-                <DeltaTone
-                  value={METRICS.expectancyR}
-                  fmt={() =>
-                    METRICS.expectancyR > 0
-                      ? es ? "Positivo" : "Positive"
-                      : METRICS.expectancyR < 0
-                      ? es ? "Negativo" : "Negative"
-                      : "—"
-                  }
-                />
-              }
-            >
-              <CountUp
-                to={METRICS.expectancyR}
-                decimals={2}
-                suffix="R"
-                tone={METRICS.expectancyR >= 0 ? "pos" : "neg"}
-                className="text-2xl md:text-3xl font-bold"
-              />
-            </KpiTile>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* ============ 4. EQUITY CURVE + P&L CALENDAR ============ */}
-      <section className="grid lg:grid-cols-3 gap-4 md:gap-5">
-        {/* Equity curve card (2/3) */}
-        <Reveal delay={0.1} className="lg:col-span-2">
-          <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 relative overflow-hidden h-full">
-            {/* Soft accent wash — a single blurred radial behind the chart
-                so the card has depth without a second <canvas> (the
-                composer already runs MarketBackground; the "max 1 canvas
-                per demo page" polish rule is preserved). */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -top-20 -right-20 w-[320px] h-[320px] rounded-full blur-[120px] opacity-[0.12] bg-white"
-            />
-            <div className="relative z-10">
-              <div className="flex items-start justify-between mb-3 gap-3 flex-wrap">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary">
-                    {es ? "Curva de capital" : "Equity curve"}
-                  </div>
-                  <div className="mt-1 flex items-baseline gap-2 flex-wrap">
-                    <Money
-                      value={METRICS.finalBalance}
-                      compact
-                      className="text-2xl font-bold text-primary"
-                    />
-                    <span
-                      className={`text-xs tnum ${
-                        METRICS.roiPct >= 0 ? "text-pnl-pos" : "text-pnl-neg"
-                      }`}
-                    >
-                      {fmtPct(METRICS.roiPct, lang, 1)}
-                    </span>
-                  </div>
-                </div>
-                {/* Timeframe selector pills — 1M / 3M / 6M. Slices the
-                    equityCurve + drawdownCeiling arrays via
-                    sliceMetricsByDays so the chart redraws to the
-                    selected window. Shared-layout active pill animates
-                    between selections. */}
-                <div className="flex items-center gap-0.5 bg-white/5 border border-white/10 rounded-md p-0.5">
-                  {TIMEFRAMES.map((mode) => {
-                    const active = tfSel === mode;
-                    return (
-                      <button
-                        key={mode}
-                        type="button"
-                        onClick={() => setTfSel(mode)}
-                        aria-pressed={active}
-                        className={`relative px-2.5 h-6 rounded text-[11px] font-medium tnum transition-colors ${
-                          active
-                            ? "text-primary"
-                            : "text-tertiary hover:text-secondary"
-                        }`}
-                      >
-                        {active && (
-                          <motion.span
-                            layoutId="tf-pill"
-                            className="absolute inset-0 rounded bg-white/10 border border-white/15"
-                            transition={{
-                              type: "spring",
-                              stiffness: 380,
-                              damping: 30,
-                            }}
-                          />
-                        )}
-                        <span className="relative">{mode}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <EquityCurve metrics={slicedMetrics} height={240} />
-            </div>
-          </div>
-        </Reveal>
-
-        {/* P&L calendar (1/3) — MiniCalendar renders its own
-            liquid-glass card with month header + nav arrows + daily
-            P&L heat-map cells. */}
-        <Reveal delay={0.14} className="lg:col-span-1">
-          <MiniCalendar trades={TRADES} className="h-full" />
-        </Reveal>
-      </section>
-
-      {/* ============ 5. RECENT TRADES ============ */}
+      {/* ============ RECENT TRADES — kept below performance ============
+          A thin "last 6 trades" list at the bottom: not in the WinUI
+          DashboardPage (it lives in Diario / Operaciones), but useful in
+          the demo so a logged trade is immediately visible. */}
       <Reveal delay={0.1}>
         <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 relative overflow-hidden">
           <div className="relative z-10">
@@ -931,8 +917,8 @@ export function DashboardPage() {
             </div>
             <div className="divide-y divide-white/5">
               {recentTrades.map((tr, i) => {
-                const inst = INSTRUMENTS.find((x) => x.symbol === tr.instrument);
-                const dotClass = ASSET_DOT[inst?.assetClass ?? "stock"] ?? "bg-white";
+                const trInst = INSTRUMENTS.find((x) => x.symbol === tr.instrument);
+                const dotClass = ASSET_DOT[trInst?.assetClass ?? "stock"] ?? "bg-white";
                 return (
                   <motion.button
                     key={tr.id}
@@ -947,7 +933,6 @@ export function DashboardPage() {
                     }}
                     className="group w-full flex items-center gap-3 py-2.5 hover:bg-white/5 -mx-2 px-2 rounded-md transition-colors text-left"
                   >
-                    {/* Instrument + asset-class dot */}
                     <div className="flex items-center gap-2 min-w-0 w-[80px] sm:w-[110px] shrink-0">
                       <span
                         className={`inline-block w-1.5 h-1.5 rounded-full ${dotClass}`}
@@ -957,21 +942,12 @@ export function DashboardPage() {
                         {tr.instrument}
                       </span>
                     </div>
-                    {/* Direction chip */}
                     <div className="shrink-0">
-                      <Chip variant={tr.direction === "long" ? "pos" : "neg"}>
-                        {tr.direction === "long" ? t("long") : t("short")}
-                      </Chip>
+                      <DirectionChip direction={tr.direction} t={t} />
                     </div>
-                    {/* Setup — hidden on mobile */}
                     <div className="hidden md:block text-xs text-tertiary truncate flex-1 min-w-0">
                       {tr.setup}
                     </div>
-                    {/* Closed date — hidden on mobile */}
-                    <div className="hidden sm:block text-xs tnum text-tertiary shrink-0">
-                      {fmtDate(tr.closedAt, lang)}
-                    </div>
-                    {/* R multiple */}
                     <div
                       className={`text-xs tnum font-medium shrink-0 w-12 text-right ${
                         tr.rMultiple > 0
@@ -983,7 +959,6 @@ export function DashboardPage() {
                     >
                       {fmtNum(tr.rMultiple, lang, 2)}R
                     </div>
-                    {/* Net P&L */}
                     <div className="shrink-0 w-20 sm:w-24 text-right">
                       <Money
                         value={tr.netPnl}
@@ -992,7 +967,6 @@ export function DashboardPage() {
                         className="text-sm font-medium"
                       />
                     </div>
-                    {/* Chevron — desktop only */}
                     <svg
                       className="hidden md:block text-tertiary opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0"
                       width="12"
@@ -1020,71 +994,73 @@ export function DashboardPage() {
   );
 }
 
-/** Compact KPI tile with label, big value, and delta indicator.
- *  Liquid-glass surface with depth-1 → depth-2 hover lift. The delta
- *  row (optional) sits at the bottom via mt-auto so all tiles in a row
- *  align their deltas on the same baseline regardless of value height. */
-function KpiTile({
+/** Single KPI cell — small caption above + 18px tabular value below.
+ *  No card, no hover lift: the strip is a flat band of statistics with
+ *  hairline dividers, mirroring the WinUI strip. */
+function KpiCell({
   label,
-  children,
-  delta,
+  value,
 }: {
   label: string;
-  children: ReactNode;
-  delta?: ReactNode;
+  value: ReactNode;
 }) {
   return (
-    <motion.div
-      whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-      className="liquid-glass depth-1 hover:depth-2 hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.10)] transition-shadow duration-300 rounded-card p-4 flex flex-col gap-1.5 h-full relative"
-    >
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.15em] text-tertiary truncate min-w-0">
-        {/* Live pulse dot — signals "real-time data" */}
-        <span className="relative flex h-1 w-1 shrink-0" aria-hidden="true">
-          <span className="absolute inset-0 rounded-full bg-pnl-pos/50 animate-ping" style={{ animationDuration: "2s" }} />
-          <span className="relative rounded-full h-1 w-1 bg-pnl-pos" />
-        </span>
-        <span className="truncate min-w-0">{label}</span>
+    <div className="flex flex-col items-center gap-1 text-center min-w-0">
+      <div className="text-[10px] uppercase tracking-[0.1em] text-tertiary truncate max-w-full">
+        {label}
       </div>
-      <div className="min-w-0 break-words tnum">{children}</div>
-      {delta && <div className="mt-auto pt-1 text-[10px] tnum">{delta}</div>}
-    </motion.div>
+      <div className="tnum min-w-0 break-words">{value}</div>
+    </div>
   );
 }
 
-/** Delta indicator — colors green/red based on the sign of `value` and
- *  renders a small up/down triangle arrow alongside the formatted text.
- *  Used in the KPI strip to show ROI %, vs-50% delta, vs-1.0 delta, etc. */
-function DeltaTone({
-  value,
-  fmt,
-}: {
-  value: number;
-  fmt: (v: number) => string;
-}) {
-  const tone = value > 0 ? "pos" : value < 0 ? "neg" : "neutral";
-  const cls =
-    tone === "pos"
-      ? "text-pnl-pos"
-      : tone === "neg"
-      ? "text-pnl-neg"
-      : "text-tertiary";
+/** Vertical hairline divider between KPI cells — matches the WinUI
+ *  VerticalHairlineStyle (1px column, full height, low-opacity stroke). */
+function KpiDivider() {
   return (
-    <span className={`inline-flex items-center gap-1 ${cls}`}>
-      {tone === "pos" && (
-        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-          <path d="M5 2l3 4H2l3-4z" fill="currentColor" />
-        </svg>
-      )}
-      {tone === "neg" && (
-        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-          <path d="M5 8l3-4H2l3 4z" fill="currentColor" />
-        </svg>
-      )}
-      <span>{fmt(value)}</span>
+    <div
+      className="my-1 w-px bg-white/10 justify-self-center"
+      aria-hidden="true"
+    />
+  );
+}
+
+/** Tiny direction chip — pos/neg colored pill with the long/short label.
+ *  Kept inline (not importing Chip) so this file stays self-contained. */
+function DirectionChip({
+  direction,
+  t,
+}: {
+  direction: Direction;
+  t: (k: "long" | "short") => string;
+}) {
+  const isLong = direction === "long";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-1.5 h-5 rounded text-[10px] font-medium uppercase tracking-wider ${
+        isLong
+          ? "bg-pnl-pos/15 text-pnl-pos"
+          : "bg-pnl-neg/15 text-pnl-neg"
+      }`}
+    >
+      <span
+        className={`inline-block w-1 h-1 rounded-full ${
+          isLong ? "bg-pnl-pos" : "bg-pnl-neg"
+        }`}
+        aria-hidden="true"
+      />
+      {t(direction)}
     </span>
   );
 }
+
+// Asset-class color dots — shared with TradesPage for visual consistency.
+const ASSET_DOT: Record<string, string> = {
+  crypto: "bg-amber-400",
+  forex: "bg-emerald-400",
+  stock: "bg-rose-400",
+  futures: "bg-teal-400",
+};
 
 /** Native-select chevron overlay (since appearance-none strips it). */
 function ChevronDown() {

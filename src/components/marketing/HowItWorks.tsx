@@ -68,6 +68,20 @@ export function HowItWorks() {
 
         {/* Steps */}
         <div className="mt-16 relative">
+          {/* R25-1e — connector line on md+: a subtle horizontal accent
+              hairline runs between the centers of the 3 step circles,
+              visually linking them as a sequence. Hidden on mobile where
+              steps stack vertically. The gradient fades at both edges so
+              the exact start/end positions are irrelevant — the line is
+              fully visible only in the middle 70% (between col1's circle
+              and col3's circle). top-[72px] = vertical center of the
+              144px circle. The ol paints on top (later in DOM + relative
+              stacking) so the line passes behind the circles. */}
+          <div
+            aria-hidden
+            className="hidden md:block absolute top-[72px] left-0 right-0 h-px pointer-events-none"
+            style={{ background: "linear-gradient(90deg, transparent, rgb(var(--accent-base) / 0.30) 15%, rgb(var(--accent-base) / 0.30) 85%, transparent)" }}
+          />
           <ol className="grid md:grid-cols-3 gap-6">
             {steps.map((s, i) => (
               <motion.li
@@ -101,7 +115,7 @@ export function HowItWorks() {
                       duration: 0.5,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="absolute -top-2 -right-2 w-9 h-9 rounded-full bg-[rgb(var(--accent-base))] text-[#06130d] text-xs font-bold tnum flex items-center justify-center shadow-[0_4px_14px_-2px_rgb(var(--accent-base)/0.7)] z-10"
+                    className="absolute -top-2 -right-2 w-9 h-9 rounded-full bg-[rgb(var(--accent-base))] text-[#06130d] text-xs font-bold tnum flex items-center justify-center shadow-[0_4px_14px_-2px_rgb(var(--accent-base)/0.7)] ring-2 ring-[rgb(var(--bg))] z-10"
                   >
                     {s.n}
                   </motion.span>
@@ -110,7 +124,7 @@ export function HowItWorks() {
                 {/* Title + kbd */}
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="t-h3 text-primary">{s.title}</h3>
-                  <kbd className="hidden md:inline-flex items-center px-1.5 h-5 rounded text-[10px] font-mono text-tertiary bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)]">
+                  <kbd className="hidden md:inline-flex items-center px-1.5 h-5 rounded text-[10px] font-mono text-[rgb(var(--accent-base)/0.85)] bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.20)]">
                     {s.kbd}
                   </kbd>
                 </div>

@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { motion } from "framer-motion";
-import { Plus, Check, Sparkles } from "lucide-react";
+import { Plus, Check, Sparkles, ChevronRight, AlertTriangle } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import {
   TRADES,
@@ -16,7 +16,7 @@ import {
   type SetupName,
   type Trade,
 } from "@/lib/trading/data";
-import { fmtInt } from "@/lib/trading/format";
+import { fmtInt, fmtPct } from "@/lib/trading/format";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Money } from "@/components/tj/Money";
 import { CountUp } from "@/components/tj/CountUp";
@@ -35,8 +35,6 @@ import {
 /* ============================================================
  * Setup metadata — distinct hue (NO indigo / blue), bilingual
  * description and 3–4 checklist rules per setup.
- * hue is a CSS rgb-triple string so it can be substituted into
- * `rgb(<hue>)` and `rgb(<hue> / α)`.
  * ============================================================ */
 interface SetupMeta {
   hue: string;
@@ -113,8 +111,7 @@ const SETUP_META: Record<SetupName, SetupMeta> = {
 };
 
 /* ============================================================
- * Small per-setup SVG glyph — 16×16, stroke=currentColor so it
- * inherits the setup hue via inline `color` style.
+ * Small per-setup SVG glyph — 16×16.
  * ============================================================ */
 function SetupGlyph({
   name,
@@ -174,8 +171,6 @@ function SetupGlyph({
 
 /* ============================================================
  * Sparkline — tiny equity-curve SVG with pathLength draw-in.
- * `replayKey` forces the motion.path to remount so it re-animates
- * on hover.
  * ============================================================ */
 function buildSparkPath(
   balances: number[],
@@ -184,7 +179,6 @@ function buildSparkPath(
   pad = 3
 ): string {
   if (balances.length < 2) {
-    // Flat line for empty / single-point samples.
     return `M ${pad} ${h / 2} L ${w - pad} ${h / 2}`;
   }
   const min = Math.min(...balances);
@@ -344,9 +338,89 @@ function NewSetupDialog({
 }
 
 /* ============================================================
+ * R-spread box plot — mirrors the real app's "Reparto de R" mini
+ * box-plot: P5–P95 rail with a P25–P75 box and a median tick.
+ * Two setups with the same expectancy can have opposite R
+ * distributions, which is what decides whether one can be scaled.
+ * ============================================================ */
+function RSpread({
+  trades,
+  hue,
+  label,
+}: {
+  trades: Trade[];
+  hue: string;
+  label: string;
+}) {
+  const { lang } = useLang();
+  const rs = trades.map((t) => t.rMultiple).filter(Number.isFinite);
+  if (rs.length < 4) return null;
+  const sorted = [...rs].sort((a, b) => a - b);
+  const pct = (p: number) => {
+    const idx = Math.min(sorted.length - 1, Math.max(0, Math.floor(p * (sorted.length - 1))));
+    return sorted[idx]!;
+  };
+  const p5 = pct(0.05);
+  const p25 = pct(0.25);
+  const p50 = pct(0.5);
+  const p75 = pct(0.75);
+  const p95 = pct(0.95);
+  const min = p5;
+  const max = p95;
+  const range = max - min || 1;
+  const leftPct = ((p25 - min) / range) * 100;
+  const boxPct = ((p75 - p25) / range) * 100;
+  const medianPct = ((p50 - min) / range) * 100;
+
+  return (
+    <div className="space-y-1.5">
+      <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
+        {label}
+      </span>
+      <div
+        className="relative h-2.5 rounded-sm"
+        role="img"
+        aria-label={`${label}: P25 ${p25.toFixed(2)}R · mediana ${p50.toFixed(2)}R · P75 ${p75.toFixed(2)}R`}
+      >
+        {/* P5–P95 rail */}
+        <div
+          className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2"
+          style={{ backgroundColor: "rgba(255,255,255,0.18)" }}
+          aria-hidden
+        />
+        {/* P25–P75 box */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 h-2.5 rounded-sm"
+          style={{
+            left: `${leftPct}%`,
+            width: `${boxPct}%`,
+            backgroundColor: `rgb(${hue} / 0.55)`,
+          }}
+          aria-hidden
+        />
+        {/* Median tick */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3 rounded-full bg-white"
+          style={{ left: `${medianPct}%` }}
+          aria-hidden
+        />
+      </div>
+      <div className="text-[10px] text-tertiary tnum">
+        {lang === "es" ? "P25" : "P25"} {p25.toFixed(2)}R ·{" "}
+        {lang === "es" ? "mediana" : "median"} {p50.toFixed(2)}R ·{" "}
+        P75 {p75.toFixed(2)}R
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
  * SetupCard — one liquid-glass card per setup with live stats.
- *
- * Polish: the sparkline re-draws on every hover via `replayKey`.
+ * Mirrors the real app's setup-card layout: header (name + desc
+ * + edit + chevron), accent bar, sparkline, 4-stat row with
+ * vertical hairlines (Sample | Expectancy | Win rate | Total),
+ * significance + best-session + compliance pills, R-spread box
+ * plot, win/loss bar, rules checklist.
  * ============================================================ */
 function SetupCard({
   name,
@@ -377,6 +451,39 @@ function SetupCard({
   const winPct = realWinPct;
   const lossPct = realLossPct;
 
+  // Compliance % for this setup — derives from the same field the
+  // global DisciplineCalculator uses.
+  const compliancePct = trades.length
+    ? trades.filter((tr) => tr.compliance === "yes").length / trades.length
+    : 0;
+  const isComplianceLow = compliancePct < 0.6;
+
+  // Significance verdict — mirrors the real app's edge-verdict pill.
+  // With ≥20 trades and positive expectancy, "Edge confirmado"; with
+  // 10-19 trades or marginal expectancy, "A revisar".
+  const sample = metrics.closedCount;
+  const hasEdgeVerdict = sample >= 10;
+  const isEdgeConfirmed = hasEdgeVerdict && metrics.expectancy > 0;
+
+  // Best session by expectancy for this setup.
+  const bestSession = useMemo(() => {
+    if (!trades.length) return null;
+    const bySession = new Map<string, Trade[]>();
+    for (const tr of trades) {
+      const arr = bySession.get(tr.session) ?? [];
+      arr.push(tr);
+      bySession.set(tr.session, arr);
+    }
+    let best: { name: string; expectancy: number } | null = null;
+    for (const [sname, ts] of bySession) {
+      const exp = ts.reduce((s, x) => s + x.netPnl, 0) / ts.length;
+      if (!best || exp > best.expectancy) {
+        best = { name: sname, expectancy: exp };
+      }
+    }
+    return best;
+  }, [trades]);
+
   const hue = meta.hue;
   const colorCss = `rgb(${hue})`;
   const tintCss = `rgb(${hue} / 0.14)`;
@@ -396,226 +503,320 @@ function SetupCard({
           className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full flex flex-col gap-4 relative overflow-hidden"
           aria-label={`${es ? "Setup" : "Setup"} ${name}`}
         >
-            {/* Accent top-edge tint */}
-            <div
-              aria-hidden
-              className="absolute inset-x-0 top-0 h-px opacity-70"
-              style={{
-                background: `linear-gradient(90deg, transparent, ${colorCss}, transparent)`,
-              }}
-            />
+          {/* Accent top-edge bar — mirrors the real app's `Border Height="3"`
+              accent strip atop each setup card. */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-[3px] rounded-t-card"
+            style={{ background: colorCss, opacity: 0.85 }}
+          />
 
-            {/* Header: glyph + name + sample */}
-            <header className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <span
-                  className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-md border"
-                  style={{
-                    color: colorCss,
-                    backgroundColor: tintCss,
-                    borderColor: `rgb(${hue} / 0.3)`,
-                  }}
-                  aria-hidden
-                >
-                  <SetupGlyph name={name} className="w-5 h-5" />
-                </span>
-                <div className="min-w-0">
-                  <h3 className="text-lg font-medium text-primary leading-tight truncate">
-                    {name}
-                  </h3>
-                  <p className="text-xs text-tertiary mt-0.5 line-clamp-1">
-                    {es ? meta.desc.es : meta.desc.en}
-                  </p>
-                </div>
-              </div>
-              <div className="flex-shrink-0 text-right">
-                {metrics.closedCount === 0 ? (
-                  <span className="text-[11px] uppercase tracking-[0.08em] text-tertiary/70">
-                    {t("noTradesYet")}
-                  </span>
-                ) : (
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
-                      {t("sample")}
-                    </span>
-                    <span className="tnum text-sm font-medium text-secondary">
-                      {fmtInt(metrics.closedCount, lang)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </header>
-
-            {/* Sparkline — colored by the setup hue; redraws on hover */}
-            <div
-              className="relative h-8 w-full"
-              style={{ color: colorCss }}
-              aria-hidden
-            >
-              <Sparkline
-                balances={balances}
-                replayKey={replayKey}
-                className="w-full h-8"
-              />
-            </div>
-
-            {/* Live stats row */}
-            <div className="grid grid-cols-3 gap-2">
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
-                  {t("expectancy")}
-                </span>
-                <Money
-                  value={metrics.expectancy}
-                  sign
-                  colorizeSign
-                  className="text-sm font-medium"
-                />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
-                  {t("winRate")}
-                </span>
-                <CountUp
-                  to={metrics.winRate * 100}
-                  decimals={1}
-                  suffix="%"
-                  tone={metrics.winRate >= 0.5 ? "pos" : "neg"}
-                  className="text-sm font-medium"
-                />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
-                  {t("pnlTotal")}
-                </span>
-                <Money
-                  value={metrics.netPnl}
-                  sign
-                  colorizeSign
-                  className="text-sm font-medium"
-                />
-              </div>
-            </div>
-
-            {/* Win / loss bar — animates to a randomized "what-if"
-                split on hover, then springs back on hover-end. */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
-                  {es ? "Ganadoras / Perdedoras" : "Winners / Losers"}
-                </span>
-                <span className="tnum text-[11px] text-tertiary">
-                  <span className="text-pnl-pos">
-                    {fmtInt(metrics.wins, lang)}
-                  </span>
-                  <span className="mx-1 opacity-50">/</span>
-                  <span className="text-pnl-neg">
-                    {fmtInt(metrics.losses, lang)}
-                  </span>
-                </span>
-              </div>
-              <div
-                className="flex h-1.5 rounded-full overflow-hidden bg-white/5"
-                role="img"
-                aria-label={
-                  es
-                    ? `${metrics.wins} ganadoras, ${metrics.losses} perdedoras`
-                    : `${metrics.wins} winners, ${metrics.losses} losers`
-                }
+          {/* Header: glyph + name + edit + chevron (mirrors the real
+              app's header row with name + edit + chevron affordance). */}
+          <header className="flex items-start justify-between gap-3 mt-1">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <span
+                className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-md border"
+                style={{
+                  color: colorCss,
+                  backgroundColor: tintCss,
+                  borderColor: `rgb(${hue} / 0.3)`,
+                }}
+                aria-hidden
               >
-                {total > 0 ? (
-                  <>
-                    <motion.div
-                      className="bg-pnl-pos"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${winPct}%` }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 220,
-                        damping: 22,
-                        delay: 0.35 + index * 0.06,
-                      }}
-                    />
-                    <motion.div
-                      className="bg-pnl-neg"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${lossPct}%` }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 220,
-                        damping: 22,
-                        delay: 0.5 + index * 0.06,
-                      }}
-                    />
-                  </>
-                ) : (
-                  <div className="bg-white/10 w-full" />
-                )}
+                <SetupGlyph name={name} className="w-5 h-5" />
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-lg font-medium text-primary leading-tight truncate">
+                  {name}
+                </h3>
+                <p className="text-xs text-tertiary mt-0.5 line-clamp-1">
+                  {es ? meta.desc.es : meta.desc.en}
+                </p>
               </div>
             </div>
+            <ChevronRight
+              className="w-4 h-4 text-tertiary flex-shrink-0 mt-2"
+              aria-hidden
+            />
+          </header>
 
-            {/* Divider */}
-            <div className="divider-grad" aria-hidden />
+          {/* Sparkline — colored by the setup hue; redraws on hover */}
+          <div
+            className="relative h-8 w-full"
+            style={{ color: colorCss }}
+            aria-hidden
+          >
+            <Sparkline
+              balances={balances}
+              replayKey={replayKey}
+              className="w-full h-8"
+            />
+          </div>
 
-            {/* Rules checklist */}
-            <div>
-              <div className="flex items-center gap-2 mb-2">
+          {/* Live stats row — 4 stats with vertical hairline dividers
+              (Sample | Expectancy | Win rate | Total), mirroring the
+              real app's setup-card Grid with VerticalHairlineStyle. */}
+          <div className="grid grid-cols-4 gap-0">
+            <StatCell label={t("sample")}>
+              <span className="text-base font-medium text-primary tnum">
+                {fmtInt(metrics.closedCount, lang)}
+              </span>
+            </StatCell>
+            <StatCell label={t("expectancy")} divider>
+              <Money
+                value={metrics.expectancy}
+                sign
+                colorizeSign
+                className="text-base font-semibold"
+              />
+            </StatCell>
+            <StatCell label={t("winRate")} divider>
+              <CountUp
+                to={metrics.winRate * 100}
+                decimals={1}
+                suffix="%"
+                tone={metrics.winRate >= 0.5 ? "pos" : "neg"}
+                className="text-base font-medium"
+              />
+            </StatCell>
+            <StatCell label={t("pnlTotal")} divider>
+              <Money
+                value={metrics.netPnl}
+                sign
+                colorizeSign
+                className="text-base font-semibold"
+              />
+            </StatCell>
+          </div>
+
+          {/* Significance + best-session + compliance pills (mirrors
+              the real app's verdict / best-session / compliance row). */}
+          {metrics.closedCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {hasEdgeVerdict && (
                 <span
-                  className="inline-block w-1 h-3 rounded-sm"
-                  style={{ backgroundColor: colorCss }}
-                  aria-hidden
-                />
-                <span className="text-[11px] uppercase tracking-[0.15em] text-tertiary font-semibold">
-                  {t("rules")}
+                  className="pill inline-flex items-center gap-1.5 text-[11px] border"
+                  style={{
+                    color: isEdgeConfirmed
+                      ? "rgb(var(--pnl-pos))"
+                      : "rgb(var(--pnl-warn))",
+                    borderColor: isEdgeConfirmed
+                      ? "rgb(var(--pnl-pos) / 0.3)"
+                      : "rgb(var(--pnl-warn) / 0.3)",
+                    backgroundColor: isEdgeConfirmed
+                      ? "rgb(var(--pnl-pos) / 0.08)"
+                      : "rgb(var(--pnl-warn) / 0.08)",
+                  }}
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{
+                      backgroundColor: isEdgeConfirmed
+                        ? "rgb(var(--pnl-pos))"
+                        : "rgb(var(--pnl-warn))",
+                    }}
+                    aria-hidden
+                  />
+                  {isEdgeConfirmed
+                    ? es ? "Edge confirmado" : "Edge confirmed"
+                    : es ? "A revisar" : "To review"}
                 </span>
-              </div>
-              <ul className="flex flex-col gap-1.5">
-                {meta.rules.map((rule, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2 text-xs text-secondary leading-snug"
-                  >
-                    <span
-                      className="mt-0.5 flex-shrink-0 w-3.5 h-3.5 rounded-sm border inline-flex items-center justify-center"
-                      style={{
-                        borderColor: `rgb(${hue} / 0.4)`,
-                        backgroundColor: `rgb(${hue} / 0.1)`,
-                        color: colorCss,
-                      }}
-                      aria-hidden
-                    >
-                      <Check className="w-2.5 h-2.5" />
-                    </span>
-                    <span>{es ? rule.es : rule.en}</span>
-                  </li>
-                ))}
-              </ul>
+              )}
+              {bestSession && (
+                <span className="pill inline-flex items-center gap-1.5 text-[11px] bg-white/5 text-secondary border border-white/10">
+                  <span className="text-tertiary">
+                    {es ? "Mejor sesión" : "Best session"}
+                  </span>
+                  <span className="text-primary">{bestSession.name}</span>
+                  <Money
+                    value={bestSession.expectancy}
+                    sign
+                    colorizeSign
+                    className="text-[11px] font-semibold"
+                  />
+                </span>
+              )}
+              <span
+                className={`pill inline-flex items-center gap-1.5 text-[11px] border ${
+                  isComplianceLow
+                    ? "text-pnl-warn border-pnl-warn/30 bg-pnl-warn/8"
+                    : "text-secondary border-white/10 bg-white/5"
+                }`}
+              >
+                {isComplianceLow && (
+                  <AlertTriangle className="w-3 h-3" aria-hidden />
+                )}
+                <span className="text-tertiary">
+                  {es ? "Cumplimiento" : "Compliance"}
+                </span>
+                <span className="font-semibold tnum">
+                  {fmtPct(compliancePct, lang, 0)}
+                </span>
+              </span>
             </div>
-          </article>
+          )}
+
+          {/* R distribution box plot — mirrors the real app's R-spread
+              P25–P75 over P5–P95 rail with a median tick. */}
+          {metrics.closedCount >= 4 && (
+            <RSpread
+              trades={trades}
+              hue={hue}
+              label={es ? "Reparto de R" : "R distribution"}
+            />
+          )}
+
+          {/* Win / loss bar */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] uppercase tracking-[0.08em] text-tertiary">
+                {es ? "Ganadoras / Perdedoras" : "Winners / Losers"}
+              </span>
+              <span className="tnum text-[11px] text-tertiary">
+                <span className="text-pnl-pos">
+                  {fmtInt(metrics.wins, lang)}
+                </span>
+                <span className="mx-1 opacity-50">/</span>
+                <span className="text-pnl-neg">
+                  {fmtInt(metrics.losses, lang)}
+                </span>
+              </span>
+            </div>
+            <div
+              className="flex h-1.5 rounded-full overflow-hidden bg-white/5"
+              role="img"
+              aria-label={
+                es
+                  ? `${metrics.wins} ganadoras, ${metrics.losses} perdedoras`
+                  : `${metrics.wins} winners, ${metrics.losses} losers`
+              }
+            >
+              {total > 0 ? (
+                <>
+                  <motion.div
+                    className="bg-pnl-pos"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${winPct}%` }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 220,
+                      damping: 22,
+                      delay: 0.35 + index * 0.06,
+                    }}
+                  />
+                  <motion.div
+                    className="bg-pnl-neg"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${lossPct}%` }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 220,
+                      damping: 22,
+                      delay: 0.5 + index * 0.06,
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="bg-white/10 w-full" />
+              )}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="divider-grad" aria-hidden />
+
+          {/* Rules checklist */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span
+                className="inline-block w-1 h-3 rounded-sm"
+                style={{ backgroundColor: colorCss }}
+                aria-hidden
+              />
+              <span className="text-[11px] uppercase tracking-[0.15em] text-tertiary font-semibold">
+                {t("rules")}
+              </span>
+            </div>
+            <ul className="flex flex-col gap-1.5">
+              {meta.rules.map((rule, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-xs text-secondary leading-snug"
+                >
+                  <span
+                    className="mt-0.5 flex-shrink-0 w-3.5 h-3.5 rounded-sm border inline-flex items-center justify-center"
+                    style={{
+                      borderColor: `rgb(${hue} / 0.4)`,
+                      backgroundColor: `rgb(${hue} / 0.1)`,
+                      color: colorCss,
+                    }}
+                    aria-hidden
+                  >
+                    <Check className="w-2.5 h-2.5" />
+                  </span>
+                  <span>{es ? rule.es : rule.en}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
       </motion.div>
     </Reveal>
   );
 }
 
 /* ============================================================
- * Summary band stat card.
+ * StatCell — single cell in the 4-stat row with optional left
+ * hairline divider (mirrors VerticalHairlineStyle in the XAML).
+ * ============================================================ */
+function StatCell({
+  label,
+  divider,
+  children,
+}: {
+  label: string;
+  divider?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={`relative px-3 first:pl-0 last:pr-0 ${
+        divider ? "before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-white/10" : ""
+      }`}
+    >
+      <div className="text-[10px] uppercase tracking-[0.08em] text-tertiary mb-1 text-center">
+        {label}
+      </div>
+      <div className="text-center">{children}</div>
+    </div>
+  );
+}
+
+/* ============================================================
+ * SummaryStat — single cell in the summary band, separated by
+ * vertical hairlines (mirrors the real app's summary-band Grid
+ * with VerticalHairlineStyle between best / most-traded / worst
+ * / total).
  * ============================================================ */
 function SummaryStat({
   label,
   delay,
+  divider,
   children,
 }: {
   label: string;
   delay: number;
+  divider?: boolean;
   children: ReactNode;
 }) {
   return (
     <Reveal delay={delay} y={18} className="h-full">
       <motion.div
         whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-        className="h-full"
+        className={`h-full relative ${divider ? "lg:before:absolute lg:before:left-0 lg:before:top-2 lg:before:bottom-2 lg:before:w-px lg:before:bg-white/10" : ""}`}
       >
-        <div className="liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 rounded-card p-4 h-full flex flex-col gap-1.5">
+        <div className="liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 rounded-card p-4 h-full flex flex-col gap-1.5 lg:mx-3">
           <div className="eyebrow text-[10px]">{label}</div>
           {children}
         </div>
@@ -640,6 +841,18 @@ export function PlaybookPage() {
     () => [...ranking].sort((a, b) => b.count - a.count)[0],
     [ranking]
   );
+  // Worst discipline — setup with the lowest compliance %. Mirrors
+  // the real app's "Más incumplido" stat (closes the question
+  // "where do I lose discipline even when expectancy is good?").
+  const worstDiscipline = useMemo(() => {
+    const rows = SETUP_NAMES.map((name) => {
+      const ts = TRADES.filter((tr) => tr.setup === name);
+      const complied = ts.filter((tr) => tr.compliance === "yes").length;
+      const pct = ts.length ? complied / ts.length : 1;
+      return { name, pct, count: ts.length };
+    }).filter((r) => r.count > 0);
+    return [...rows].sort((a, b) => a.pct - b.pct)[0];
+  }, []);
   const totalSetups = SETUP_NAMES.length;
 
   const bestMeta = best ? SETUP_META[best.name as SetupName] : null;
@@ -683,8 +896,11 @@ export function PlaybookPage() {
         </div>
       </section>
 
-      {/* ===== Summary band ===== */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* ===== Summary band — 4 cells with vertical hairlines =====
+          (best setup / most traded / worst discipline / total setups).
+          Mirrors the real app's "Cabecera de resumen" Grid with
+          VerticalHairlineStyle dividers. */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-0">
         <SummaryStat
           label={es ? "Mejor setup" : "Best setup"}
           delay={0.05}
@@ -694,12 +910,10 @@ export function PlaybookPage() {
               <div className="flex items-center gap-2">
                 <span
                   className="inline-block w-2 h-2 rounded-full"
-                  style={{
-                    backgroundColor: `rgb(${bestMeta.hue})`,
-                  }}
+                  style={{ backgroundColor: `rgb(${bestMeta.hue})` }}
                   aria-hidden
                 />
-                <span className="text-xl font-medium text-primary">
+                <span className="text-xl font-medium text-primary truncate">
                   {best.name}
                 </span>
               </div>
@@ -721,11 +935,12 @@ export function PlaybookPage() {
         <SummaryStat
           label={es ? "Más operado" : "Most traded"}
           delay={0.1}
+          divider
         >
           {mostTraded ? (
             <>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl font-medium text-primary">
+                <span className="text-xl font-medium text-primary truncate">
                   {mostTraded.name}
                 </span>
                 <CountUp
@@ -743,13 +958,38 @@ export function PlaybookPage() {
         </SummaryStat>
 
         <SummaryStat
-          label={es ? "Setups totales" : "Total setups"}
+          label={es ? "Más incumplido" : "Worst discipline"}
           delay={0.15}
+          divider
+        >
+          {worstDiscipline ? (
+            <>
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-medium text-primary truncate">
+                  {worstDiscipline.name}
+                </span>
+                <span className="text-sm font-medium text-pnl-warn tnum">
+                  {fmtPct(worstDiscipline.pct, lang, 0)}
+                </span>
+              </div>
+              <div className="text-xs text-tertiary">
+                {es ? "cumplimiento" : "compliance"}
+              </div>
+            </>
+          ) : (
+            <span className="text-sm text-tertiary">{t("noTradesYet")}</span>
+          )}
+        </SummaryStat>
+
+        <SummaryStat
+          label={es ? "Setups totales" : "Total setups"}
+          delay={0.2}
+          divider
         >
           <div className="flex items-baseline gap-2">
             <CountUp
               to={totalSetups}
-              className="text-xl font-medium text-primary"
+              className="text-2xl font-medium text-primary"
             />
             <span className="text-xs text-tertiary">
               {es ? "en tu playbook" : "in your playbook"}

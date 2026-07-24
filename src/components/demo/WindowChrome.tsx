@@ -1,74 +1,193 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { useDemo } from "./DemoContext";
 
-/**
- * Windows 11–style title bar.
- *
- * Layout (authentic Win32/WinUI caption button arrangement):
- *   ┌─────────────────────────────────────────────────────────────┐
- *   │ ◧ Trading Journal  [DEMO]   · Resumen ·       ─  ▢  ✕     │
- *   └─────────────────────────────────────────────────────────────┘
- *   • Left: 16×16 app icon + app name + static DEMO chip.
- *   • Center: current view name (WinUI 3 doc-title convention; hidden on
- *     narrow viewports so it never collides with the DEMO chip + caption
- *     buttons). pointer-events-none + absolute positioning so it never
- *     intercepts caption-button clicks.
- *   • Right: Minimize / Maximize / Close caption buttons (46×full-height).
- *
- * Caption-button styling mirrors Windows 11:
- *   • Each button is 46px wide and spans the full 36px title-bar height so
- *     the hover background reaches the top and bottom edges (signature look).
- *   • Minimize: a 10px horizontal stroke.
- *   • Maximize: a 10px square outline (flips to "Restore" two-overlapping-
- *     squares glyph when fullscreen is active).
- *   • Close: a 10px × glyph; hover background is the Win11 close-red
- *     #C42B1C with a white icon — non-negotiable for authenticity.
- *   • Hover background for Min/Max is `rgb(255 255 255 / 0.10)` (bumped
- *     from /8 for a more visible Win11 hover wash).
- *
- * Wiring:
- *   • Maximize toggles the demo's fullscreen state (closest web analog to
- *     the native Maximize/Restore behavior).
- *   • Close exits fullscreen when active; otherwise it's a visual control
- *     only (the demo can't be "closed" — there's no parent shell to return
- *     to). Minimize is visual-only with a proper aria-label.
- *
- * `viewLabel` prop: by default the centered doc-title is resolved from the
- * active `page` in the demo context (with the `detail` → trades special
- * case). Callers that drive the centered label from a different source of
- * truth (e.g. RealScreenshotDemo, which has 8 screenshot tabs that don't
- * map 1:1 to the 7-value DemoPage enum) can pass an explicit `viewLabel`
- * string to override the page-based resolution. Backward compatible — if
- * omitted, the page-based resolution is used.
+/* ------------------------------------------------------------------ */
+/* Compact MarketClock chip for the title bar                         */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The four major FX/equity trading sessions (UTC open/close minutes
+ * from midnight). Mirrors the SESSIONS array in
+ * @/components/tj/MarketClock (kept here as a private duplicate so the
+ * title bar doesn't pull the full MarketClock bundle — which renders
+ * a wide horizontal strip + SlowMoChart canvas — into the demo's
+ * always-mounted chrome).
  */
-interface WindowChromeProps {
-  /** Override the centered doc-title label. If omitted, the label is
-   *  resolved from the active `page` in the demo context. */
-  viewLabel?: string;
+const SESSIONS = [
+  { id: "sydney", name: "Sydney", open: 21 * 60, close: 6 * 60 },
+  { id: "tokyo", name: "Tokyo", open: 23 * 60, close: 8 * 60 },
+  { id: "london", name: "London", open: 8 * 60, close: 16 * 60 + 30 },
+  { id: "newyork", name: "New York", open: 13 * 60 + 30, close: 20 * 60 },
+] as const;
+
+function sessionIsOpen(
+  open: number,
+  close: number,
+  utcMin: number
+): boolean {
+  if (open < close) return utcMin >= open && utcMin < close;
+  // Overnight session (wraps midnight UTC).
+  return utcMin >= open || utcMin < close;
 }
 
-export function WindowChrome({ viewLabel }: WindowChromeProps = {}) {
+function pad2(n: number): string {
+  return n < 10 ? `0${n}` : String(n);
+}
+
+/**
+ * MarketClockChip — the title bar's compact market-clock indicator,
+ * mirroring the real app's `controls:MarketClock` control (XAML L117
+ * in MainWindow.xaml). The real app shows UTC time + the four sessions
+ * (Sydney / Tokyo / London / NY) with an open/closed dot, name, local
+ * time and progress bar — too wide for our 36px-tall title bar. This
+ * chip is the same idea, scaled down: UTC HH:MM + 4 small
+ * open/closed dots. Each dot carries a tooltip with the session name +
+ * status so the user can recover the full info on hover.
+ *
+ * Updates every 30 s (the title bar doesn't need second-resolution —
+ * the StatusBar's HH:MM:SS clock already shows the live time, and the
+ * session open/close transitions happen on the minute, not the
+ * second).
+ */
+function MarketClockChip() {
+  const { lang } = useLang();
+  const es = lang === "es";
+  const [now, setNow] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const utcTime = `${pad2(now.getUTCHours())}:${pad2(now.getUTCMinutes())}`;
+  const openCount = SESSIONS.filter((s) =>
+    sessionIsOpen(s.open, s.close, utcMin)
+  ).length;
+
+  return (
+    <div
+      className="hidden md:flex items-center gap-2"
+      role="status"
+      aria-label={
+        es
+          ? `Reloj de mercado · UTC ${utcTime} · ${openCount} sesiones abiertas`
+          : `Market clock · UTC ${utcTime} · ${openCount} sessions open`
+      }
+      title={
+        es
+          ? `UTC ${utcTime} · ${openCount} ${openCount === 1 ? "sesión abierta" : "sesiones abiertas"}`
+          : `UTC ${utcTime} · ${openCount} ${openCount === 1 ? "session open" : "sessions open"}`
+      }
+    >
+      <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
+        UTC
+      </span>
+      <span className="text-xs tnum tabular-nums text-secondary font-medium">
+        {utcTime}
+      </span>
+      <div className="flex items-center gap-1">
+        {SESSIONS.map((s) => {
+          const open = sessionIsOpen(s.open, s.close, utcMin);
+          return (
+            <span
+              key={s.id}
+              title={`${s.name} · ${open ? (es ? "Abierta" : "Open") : (es ? "Cerrada" : "Closed")}`}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                open
+                  ? "bg-pnl-pos shadow-[0_0_4px_rgb(var(--pnl-pos)/0.6)]"
+                  : "bg-pnl-neg/40"
+              }`}
+              aria-hidden="true"
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Local-first LED                                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * LocalFirstLED — green dot + "Local-first" label, mirroring the real
+ * app's LocalFirstPanel (XAML L120-128). The real app uses a solid
+ * Ellipse (no pulse) since the LED is a state indicator (always "on"
+ * in the local-first app), not a heartbeat. We match that — no
+ * animation, just a steady green dot. Tooltip carries the longer
+ * "Local-first · sin nube / no cloud" string from the real app's
+ * TitleBar_LocalFirstLed resource (Strings/{es-ES,en-GB}/Resources.resw
+ * L12).
+ */
+function LocalFirstLED() {
   const { t } = useLang();
-  const { page, fullscreen, setFullscreen } = useDemo();
+  return (
+    <div
+      className="hidden sm:flex items-center gap-1.5 px-3 h-full"
+      title={t("titleLocalFirstLed")}
+      aria-label={t("titleLocalFirstLed")}
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full bg-pnl-pos shadow-[0_0_5px_rgb(var(--pnl-pos)/0.55)]"
+        aria-hidden="true"
+      />
+      <span className="text-[11px] text-tertiary truncate">
+        {t("localFirst")}
+      </span>
+    </div>
+  );
+}
 
-  // Resolve the current view's i18n label key for the centered doc title.
-  // "detail" is a drill-down from trades, so it shows the trades label.
-  const viewLabelKey =
-    page === "detail"
-      ? "pageTrades"
-      : (`page${page.charAt(0).toUpperCase()}${page.slice(1)}` as
-          | "pageDashboard"
-          | "pageTrades"
-          | "pageAnalytics"
-          | "pageJournal"
-          | "pagePlaybook"
-          | "pageSettings");
+/* ------------------------------------------------------------------ */
+/* WindowChrome (Windows 11 title bar — restructured to match the     */
+/* real app's MainWindow.xaml L76-128)                                */
+/* ------------------------------------------------------------------ */
 
-  // Explicit `viewLabel` prop overrides the page-based resolution. Used by
-  // RealScreenshotDemo, where the active tab isn't one of the 7 DemoPages.
-  const resolvedLabel = viewLabel ?? t(viewLabelKey);
+/**
+ * Windows 11 / WinUI 3 title bar, restructured (R25-1a) to match the
+ * real app's title bar (MainWindow.xaml L76-128). The pre-R25-1a
+ * version had a Win11 doc-title centered between the app name + DEMO
+ * chip on the left and the caption buttons on the right — the real
+ * app's title bar is asymmetric and richer:
+ *
+ *   ┌──────────────────────────────────────────────────────────────────────┐
+ *   │ ◧ Trading Journal    [DEMO · 10.000 $]  UTC 14:32 ●●●○    ●  ⤢  ✕  │
+ *   │                                              Local-first             │
+ *   └──────────────────────────────────────────────────────────────────────┘
+ *
+ * Three regions (mirrors the real app's 4-column Grid):
+ *   • LEFT (col 0):   16×16 app icon + "Trading Journal" name. No
+ *                     DEMO chip — the DEMO marker lives in the account
+ *                     chip's text ("DEMO · 10.000 $") per the real app.
+ *   • CENTER (col 2): Account demo chip (terminal-style pill with a
+ *                     small account icon + monospace "DEMO · 10.000 $"
+ *                     text, left-aligned) + MarketClockChip (right-
+ *                     aligned: UTC time + 4 open/closed session dots).
+ *   • RIGHT (col 3):  Local-first LED + "Local-first" label, then the
+ *                     Win11 caption buttons (Min / Max / Close) at the
+ *                     far right.
+ *
+ * Caption-button styling is unchanged from pre-R25-1a — Windows 11
+ * authentic: each button 46px wide × full title-bar height so the hover
+ * wash reaches the top & bottom edges, Min = 10px stroke, Max = 10px
+ * square outline (flips to "Restore" two-overlapping-squares glyph in
+ * fullscreen), Close = 10px × glyph with the Win11 close-red #C42B1C
+ * on hover. Close exits fullscreen when active; otherwise visual-only
+ * (the demo can't be "closed" — there's no parent shell to return to).
+ *
+ * The `viewLabel` prop is removed (R25-1a) — the real app's title bar
+ * doesn't have a centered doc-title (it has the account chip +
+ * MarketClock instead). The pre-R25-1a caller `RealScreenshotDemo.tsx`
+ * was updated to stop passing it.
+ */
+export function WindowChrome() {
+  const { t } = useLang();
+  const { fullscreen, setFullscreen } = useDemo();
 
   return (
     <div className="liquid-glass border-b border-white/10 flex items-center justify-between h-9 text-xs shrink-0 relative cursor-default select-none">
@@ -81,38 +200,39 @@ export function WindowChrome({ viewLabel }: WindowChromeProps = {}) {
         className="absolute top-0 left-0 right-0 h-px bg-gradient-to-b from-white/10 to-transparent pointer-events-none"
       />
 
-      {/* ── Left: app icon + name + static DEMO chip ── */}
+      {/* ── LEFT: app icon + name ── */}
       <div className="flex items-center px-3 min-w-0 relative z-[1]">
         <AppIcon />
-        <span className="text-xs font-medium text-secondary ml-2 hidden sm:inline truncate" style={{ fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif' }}>
+        <span
+          className="text-xs font-medium text-secondary ml-2 hidden sm:inline truncate"
+          style={{
+            fontFamily:
+              '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
+          }}
+        >
           {t("appName")}
         </span>
-        {/* DEMO chip — static (no pulse). Sits immediately after the app
-            name so the demo nature is unmistakable, mirroring how the
-            native app shows its dev-build badge in the title bar. */}
-        <span className="pill bg-white/8 text-primary border border-white/20 ml-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--accent-base))]" />
-          DEMO
-        </span>
       </div>
 
-      {/* ── Center: current view name (WinUI 3 doc-title convention) ──
-          Absolutely centered so the layout doesn't shift when the view
-          changes. Hidden below md to avoid colliding with the DEMO chip +
-          caption buttons on narrow viewports. pointer-events-none so it
-          never intercepts the title-bar's hover texture or caption clicks. */}
-      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-[1]">
-        <span className="text-xs text-tertiary hidden md:inline truncate max-w-[220px]">
-          {resolvedLabel}
-        </span>
+      {/* ── CENTER: account demo chip + market clock ──
+          Absolutely centered so the layout doesn't shift when the account
+          text changes. The account chip is left-aligned within the center
+          cluster (per the real app's HorizontalAlignment="Left"), the
+          market clock right-aligned (HorizontalAlignment="Right") — both
+          pinned to the center axis so they don't drift toward the edges.
+          Hidden below md to avoid colliding with the icon/name + caption
+          buttons on narrow viewports. pointer-events-none on the cluster
+          wrapper so it never intercepts the title-bar's hover texture or
+          caption clicks (the chip itself is non-interactive, matching
+          the real app's IsHitTestVisible="False"). */}
+      <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-4 pointer-events-none z-[1]">
+        <AccountChip />
+        <MarketClockChip />
       </div>
 
-      {/* ── Right: Windows 11 caption buttons (Minimize / Maximize / Close) ──
-          Each button spans the full title-bar height so the hover wash
-          reaches the top & bottom edges, exactly like WinUI 3 caption
-          buttons. The Close button is rightmost and uses the Win11 close-red
-          #C42B1C on hover with a white glyph. */}
+      {/* ── RIGHT: Local-first LED + Windows 11 caption buttons ── */}
       <div className="flex items-stretch h-full relative z-[1]">
+        <LocalFirstLED />
         {/* Minimize — visual only (no web analog to "minimize window"). */}
         <button
           type="button"
@@ -161,6 +281,57 @@ export function WindowChrome({ viewLabel }: WindowChromeProps = {}) {
         </button>
       </div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* AccountChip — terminal-style DEMO account pill (center cluster)   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * AccountChip — the centered terminal-style account pill that mirrors
+ * the real app's title-bar account chip (XAML L102-113). The real app
+ * uses PillBorderStyle + a FontIcon (E8C7) + monospace "DEMO · 10.000 $"
+ * text. We replicate the same shape: a hairline-bordered pill with a
+ * small account/wallet icon + monospace tabular-figures text. The
+ * "DEMO" prefix in the text is what flags this as a demo account —
+ * the real app doesn't have a separate DEMO badge on the left of the
+ * title bar (the pre-R25-1a version did; that was wrong).
+ *
+ * Non-interactive (pointer-events-none on the parent cluster) so the
+ * title bar's drag texture and caption buttons stay clickable —
+ * matches the real app's IsHitTestVisible="False" on the chip.
+ */
+function AccountChip() {
+  const { t } = useLang();
+  return (
+    <span className="pill bg-white/5 border border-white/15 text-secondary flex items-center gap-1.5">
+      {/* Account/wallet icon — small (10px) so it reads as a leading
+          glyph, not a feature icon. Matches the real app's FontIcon
+          FontSize="12" E8C7. */}
+      <svg
+        width="10"
+        height="10"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="text-tertiary"
+        aria-hidden="true"
+      >
+        <path d="M2 5a1 1 0 011-1h10a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V5z" />
+        <path d="M2 7h12" />
+        <circle cx="11" cy="9.5" r="0.6" fill="currentColor" />
+      </svg>
+      <span
+        className="text-[11px] tabular-nums"
+        style={{ fontFamily: '"Cascadia Mono", Consolas, "Courier New", monospace' }}
+      >
+        {t("demoAccount")}
+      </span>
+    </span>
   );
 }
 

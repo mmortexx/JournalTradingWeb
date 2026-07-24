@@ -48,7 +48,11 @@ export function Hero() {
         className="pointer-events-none absolute left-1/2 top-[6%] -translate-x-1/2"
         initial={{ opacity: 0, scale: 0.88 }}
         animate={{ opacity: 0.5, scale: 1 }}
-        transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        // R25-1e — tightened from 1.6s/0.1d to 1.2s/0.05d so the halo
+        // leads the data-seq content reveals by a beat (was lagging
+        // them — the hero felt like it was "catching up" on repeat
+        // visits). 1.2s is still in the "subtle materialization" range.
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
         style={{
           width: "min(1100px, 92%)",
           height: 360,
@@ -361,15 +365,19 @@ export function Hero() {
               {i > 0 && (
                 <span
                   aria-hidden
-                  className="hidden sm:inline-block"
+                  className="hidden sm:inline-block rounded-full"
                   style={{
-                    width: 1,
-                    height: 12,
-                    // 0.20 (was 0.13) so the rule reads as a deliberate
-                    // machined hairline in both themes — the prior 0.13
-                    // faded too far on the dark glass and disappeared
-                    // entirely on the light theme's bright surface.
-                    background: "rgb(var(--divider) / 0.20)",
+                    width: 4,
+                    height: 4,
+                    // R25-1e — swapped the 1×12 neutral hairline for a
+                    // 4px round accent dot. Ties the hero trust row to the
+                    // accent palette used across the site's credential
+                    // markers (TrustStrip dots, PricingFAQ reassurance pills,
+                    // ValueTestimonials value chips, StatsBandNew stats).
+                    // 4px (vs 6px elsewhere) keeps a deliberate size
+                    // hierarchy: the eyebrow's pulsing 6px dot leads, the
+                    // trust row's 4px separator dots follow.
+                    background: "rgb(var(--accent-base) / 0.55)",
                   }}
                 />
               )}
@@ -402,7 +410,13 @@ export function Hero() {
       >
         <span
           className="uppercase tnum"
-          style={{ fontSize: 9, letterSpacing: "0.2em", color: "var(--ink-3)" }}
+          // R25-1e — paddingLeft matches letterSpacing so the text's
+          // bounding box is symmetric. Without it, the trailing
+          // letter-spacing on "Scroll" adds extra space to the right
+          // of the last glyph, making the visual glyph center sit ~1px
+          // left of the 1px rail center. The padding balances the box
+          // and the glyphs center perfectly on the rail.
+          style={{ fontSize: 9, letterSpacing: "0.2em", paddingLeft: "0.2em", color: "var(--ink-3)" }}
         >
           Scroll
         </span>

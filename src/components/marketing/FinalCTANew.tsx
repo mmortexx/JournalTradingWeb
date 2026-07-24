@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Play } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 
 /**
@@ -33,6 +33,23 @@ export function FinalCTANew() {
             "radial-gradient(60% 50% at 50% 50%, color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent), transparent 70%)",
           filter: "blur(40px)",
           opacity: 0.45,
+        }}
+      />
+      {/* R25-1e — layered halo: a second, smaller, brighter inner halo
+          sits on top of the outer halo for a "core + corona" effect
+          that reads more premium than a single flat glow. The inner
+          halo is 36%×30% (vs outer 60%×50%), 22% accent (vs 12%), and
+          blurred less (24px vs 40px) — so the center reads as a
+          brighter, tighter core while the outer halo provides the
+          wide corona. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(36% 30% at 50% 50%, color-mix(in oklab, rgb(var(--accent-base)) 22%, transparent), transparent 70%)",
+          filter: "blur(22px)",
+          opacity: 0.6,
         }}
       />
       <div
@@ -97,7 +114,7 @@ export function FinalCTANew() {
         >
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2.5 rounded-full h-14 px-[30px] bg-[rgb(var(--accent-base))] text-[#06130d] text-base font-semibold shadow-[0_14px_38px_-14px_rgb(var(--accent-base)/0.65)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_18px_46px_-14px_rgb(var(--accent-base)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="inline-flex items-center gap-2.5 rounded-full h-14 px-[30px] bg-[rgb(var(--accent-base))] text-[#06130d] text-base font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             {es ? "Empieza hoy — 29 $" : "Start today — $29"}
             <ArrowRight size={17} aria-hidden />
@@ -106,6 +123,11 @@ export function FinalCTANew() {
             href="/demo"
             className="inline-flex items-center gap-2.5 rounded-full h-14 px-7 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-base font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
+            {/* R25-1e — Play icon prefix matches the Hero's "Ver la demo"
+                button pattern so the two CTAs read as a coordinated pair
+                across the site (primary = ArrowRight suffix, secondary =
+                Play prefix). */}
+            <Play size={15} fill="currentColor" aria-hidden />
             {es ? "Ver la demo" : "See the demo"}
           </Link>
         </motion.div>

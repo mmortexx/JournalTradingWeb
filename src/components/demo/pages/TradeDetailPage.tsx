@@ -103,175 +103,117 @@ function MiniCandles({ seed, win }: { seed: number; win: boolean }) {
   );
 }
 
-/** The "trade journey" SVG: entry → MFE peak → MAE trough → exit, drawn in. */
-function TradeJourney({ trade, lang }: { trade: Trade; lang: Lang }) {
+/* ---------- Anatomy (executions table) ----------
+ * Mirrors the real app's "Anatomía: las ejecuciones reales" card —
+ * a compact fills table showing each entry/exit leg with time, qty,
+ * price, fee and running cumulative qty. Built deterministically
+ * from the trade's data so the same trade always shows the same
+ * shape (single-fill / 2-tranche scale-in / 3-tranche scale-out).
+ */
+interface FillRow {
+  dir: "ENTRY" | "EXIT";
+  side: "BUY" | "SELL";
+  time: string;
+  qty: string;
+  price: string;
+  fee: string;
+  cumulative: string;
+}
+
+function buildFills(trade: Trade, decimals: number, lang: Lang): FillRow[] {
   const isLong = trade.direction === "long";
-  const isWin = trade.netPnl >= 0;
-  const stopDist = Math.abs(trade.entry - trade.initialStop) || 1;
-
-  // R-multiples → actual price excursions (direction-aware).
-  const mfePrice = isLong
-    ? trade.entry + trade.mfe * stopDist
-    : trade.entry - trade.mfe * stopDist;
-  const maePrice = isLong
-    ? trade.entry + trade.mae * stopDist
-    : trade.entry - trade.mae * stopDist;
-
-  const prices = [
-    trade.entry,
-    trade.exit,
-    mfePrice,
-    maePrice,
-    trade.initialStop,
-    trade.target,
+  const entrySide = isLong ? "BUY" : "SELL";
+  const exitSide = isLong ? "SELL" : "BUY";
+  const opened = trade.openedAt;
+  const mid = new Date(opened.getTime() + trade.durationMin * 30000);
+  const closed = trade.closedAt;
+  const fmtT = (d: Date) =>
+    new Intl.DateTimeFormat(lang === "es" ? "es-ES" : "en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).format(d);
+  const totalQty = trade.qty;
+  // Split: 2 entries (60% + 40%) and 1 exit, OR 1 entry + 2 exits
+  // depending on which side has the larger excursion — keeps the
+  // table small and varied but always consistent.
+  const splitEntry = trade.mfe > 1.2;
+  if (splitEntry) {
+    const q1 = +(totalQty * 0.6).toFixed(3);
+    const q2 = +(totalQty * 0.4).toFixed(3);
+    return [
+      {
+        dir: "ENTRY",
+        side: entrySide,
+        time: fmtT(opened),
+        qty: fmtNum(q1, lang, 3),
+        price: fmtPrice(trade.entry, decimals, lang),
+        fee: "—",
+        cumulative: fmtNum(q1, lang, 3),
+      },
+      {
+        dir: "ENTRY",
+        side: entrySide,
+        time: fmtT(mid),
+        qty: fmtNum(q2, lang, 3),
+        price: fmtPrice(
+          +(trade.entry * (1 + (isLong ? 0.0008 : -0.0008))).toFixed(decimals),
+          decimals,
+          lang
+        ),
+        fee: "—",
+        cumulative: fmtNum(totalQty, lang, 3),
+      },
+      {
+        dir: "EXIT",
+        side: exitSide,
+        time: fmtT(closed),
+        qty: fmtNum(totalQty, lang, 3),
+        price: fmtPrice(trade.exit, decimals, lang),
+        fee: "—",
+        cumulative: "0",
+      },
+    ];
+  }
+  // 1 entry + 2 exits (scale-out).
+  const q1 = +(totalQty * 0.5).toFixed(3);
+  return [
+    {
+      dir: "ENTRY",
+      side: entrySide,
+      time: fmtT(opened),
+      qty: fmtNum(totalQty, lang, 3),
+      price: fmtPrice(trade.entry, decimals, lang),
+      fee: "—",
+      cumulative: fmtNum(totalQty, lang, 3),
+    },
+    {
+      dir: "EXIT",
+      side: exitSide,
+      time: fmtT(mid),
+      qty: fmtNum(q1, lang, 3),
+      price: fmtPrice(
+        +(trade.entry * (1 + (isLong ? 0.0008 : -0.0008))).toFixed(decimals),
+        decimals,
+        lang
+      ),
+      fee: "—",
+      cumulative: fmtNum(+(totalQty - q1).toFixed(3), lang, 3),
+      },
+    {
+      dir: "EXIT",
+      side: exitSide,
+      time: fmtT(closed),
+      qty: fmtNum(+(totalQty - q1).toFixed(3), lang, 3),
+      price: fmtPrice(trade.exit, decimals, lang),
+      fee: "—",
+      cumulative: "0",
+    },
   ];
-  const minP = Math.min(...prices);
-  const maxP = Math.max(...prices);
-  const range = maxP - minP || 1;
-
-  const W = 100;
-  const H = 30;
-  const pad = 3;
-  const yFor = (p: number) =>
-    pad + (1 - (p - minP) / range) * (H - pad * 2);
-
-  const xEntry = 6;
-  const xMfe = 33;
-  const xMae = 66;
-  const xExit = 94;
-
-  const yEntry = yFor(trade.entry);
-  const yMfe = yFor(mfePrice);
-  const yMae = yFor(maePrice);
-  const yExit = yFor(trade.exit);
-  const yStop = yFor(trade.initialStop);
-  const yTarget = yFor(trade.target);
-
-  const path = [
-    `M ${xEntry} ${yEntry}`,
-    `C ${xEntry + 10} ${yEntry}, ${xMfe - 10} ${yMfe}, ${xMfe} ${yMfe}`,
-    `C ${xMfe + 8} ${yMfe}, ${xMae - 8} ${yMae}, ${xMae} ${yMae}`,
-    `C ${xMae + 8} ${yMae}, ${xExit - 10} ${yExit}, ${xExit} ${yExit}`,
-  ].join(" ");
-
-  const lineColor = isWin
-    ? "rgb(var(--pnl-pos))"
-    : "rgb(var(--pnl-neg))";
-
-  const markers = [
-    { x: xEntry, y: yEntry, color: "rgb(255 255 255)", delay: 1.4 },
-    { x: xMfe, y: yMfe, color: "rgb(var(--pnl-pos))", delay: 1.65 },
-    { x: xMae, y: yMae, color: "rgb(var(--pnl-neg))", delay: 1.85 },
-    { x: xExit, y: yExit, color: lineColor, delay: 2.05 },
-  ];
-
-  return (
-    <div
-      className="relative w-full h-24 md:h-28"
-      role="img"
-      aria-label={
-        lang === "es"
-          ? "Recorrido de la operación: entrada, MFE, MAE y salida"
-          : "Trade journey: entry, MFE, MAE and exit"
-      }
-    >
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="none"
-        className="absolute inset-0 w-full h-full"
-      >
-        {/* Reference horizontal levels */}
-        <line
-          x1="0"
-          y1={yEntry}
-          x2={W}
-          y2={yEntry}
-          stroke="rgb(156 163 175)"
-          strokeWidth={0.5}
-          strokeDasharray="1.5 2"
-          vectorEffect="non-scaling-stroke"
-          opacity={0.5}
-        />
-        <line
-          x1="0"
-          y1={yStop}
-          x2={W}
-          y2={yStop}
-          stroke="rgb(var(--pnl-neg))"
-          strokeWidth={0.5}
-          strokeDasharray="1 2"
-          vectorEffect="non-scaling-stroke"
-          opacity={0.32}
-        />
-        <line
-          x1="0"
-          y1={yTarget}
-          x2={W}
-          y2={yTarget}
-          stroke="rgb(var(--pnl-pos))"
-          strokeWidth={0.5}
-          strokeDasharray="1 2"
-          vectorEffect="non-scaling-stroke"
-          opacity={0.32}
-        />
-
-        {/* The drawn-in path */}
-        <motion.path
-          d={path}
-          fill="none"
-          stroke={lineColor}
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
-        />
-      </svg>
-
-      {/* Markers as HTML for crisp, non-distorted dots */}
-      {markers.map((m, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            delay: m.delay,
-            type: "spring",
-            stiffness: 360,
-            damping: 18,
-          }}
-          className="absolute rounded-full"
-          style={{
-            left: `${(m.x / W) * 100}%`,
-            top: `${(m.y / H) * 100}%`,
-            width: 8,
-            height: 8,
-            marginLeft: -4,
-            marginTop: -4,
-            background: m.color,
-            boxShadow: `0 0 0 3px rgb(var(--card) / 0.7), 0 0 14px ${m.color}`,
-          }}
-        />
-      ))}
-    </div>
-  );
 }
 
-function LegendItem({ color, label }: { color: string; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <span
-        className="w-1.5 h-1.5 rounded-full"
-        style={{ background: color }}
-        aria-hidden="true"
-      />
-      {label}
-    </span>
-  );
-}
-
+/* ---------- Detail cell ---------- */
 function Detail({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
@@ -306,17 +248,151 @@ function SummaryRow({
   );
 }
 
+/* ---------- Hero stat (with optional left hairline) ---------- */
+function HeroStat({
+  label,
+  children,
+  divider,
+}: {
+  label: string;
+  children: ReactNode;
+  divider?: boolean;
+}) {
+  return (
+    <div
+      className={`relative px-5 first:pl-0 ${
+        divider
+          ? "before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-white/12"
+          : ""
+      }`}
+    >
+      <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1.5">
+        {label}
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
+
+/* ---------- MAE/MFE excursion diverging bar ----------
+ * Mirrors the real app's "Excursión MAE/MFE en R" diverging bar —
+ * red on the left (how far it went against you), green on the right
+ * (how far it went in your favour), both at the same R scale.
+ */
+function ExcursionBar({ mae, mfe }: { mae: number; mfe: number }) {
+  const maxAbs = Math.max(Math.abs(mae), Math.abs(mfe), 1);
+  const maePct = (Math.abs(mae) / maxAbs) * 50;
+  const mfePct = (Math.abs(mfe) / maxAbs) * 50;
+  return (
+    <div className="relative h-2 rounded-full bg-white/5 overflow-hidden">
+      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/25 z-10" />
+      <motion.div
+        className="absolute top-0 bottom-0 right-1/2 bg-pnl-neg/80"
+        initial={{ width: 0 }}
+        animate={{ width: `${maePct}%` }}
+        transition={{ duration: 0.9, ease: EASE, delay: 0.5 }}
+      />
+      <motion.div
+        className="absolute top-0 bottom-0 left-1/2 bg-pnl-pos/80"
+        initial={{ width: 0 }}
+        animate={{ width: `${mfePct}%` }}
+        transition={{ duration: 0.9, ease: EASE, delay: 0.65 }}
+      />
+    </div>
+  );
+}
+
+/* ---------- Risk:Reward planned bar ---------- */
+function RiskRewardBar({ plannedRr }: { plannedRr: number }) {
+  const riskFraction = 1 / (1 + plannedRr);
+  const rewardFraction = plannedRr / (1 + plannedRr);
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2 text-[10px] uppercase tracking-[0.15em] text-tertiary tnum">
+        <span>Risk · 1R</span>
+        <span>Reward · {plannedRr.toFixed(1)}R</span>
+      </div>
+      <div className="relative h-2.5 rounded-full bg-white/5 overflow-hidden flex">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${riskFraction * 100}%` }}
+          transition={{ duration: 0.9, delay: 0.7, ease: EASE }}
+          className="h-full bg-pnl-neg/80 shrink-0"
+        />
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${rewardFraction * 100}%` }}
+          transition={{ duration: 0.9, delay: 1.0, ease: EASE }}
+          className="h-full bg-pnl-pos/80 shrink-0"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Tag pill ---------- */
+type TagKind = "error" | "win" | "emotion" | "custom";
+function TagPill({
+  kind,
+  label,
+  onRemove,
+}: {
+  kind: TagKind;
+  label: string;
+  onRemove?: () => void;
+}) {
+  const colors: Record<TagKind, string> = {
+    error: "rgb(var(--pnl-neg))",
+    win: "rgb(var(--pnl-pos))",
+    emotion: "rgb(var(--accent-base))",
+    custom: "rgb(156 163 175)",
+  };
+  return (
+    <span
+      className="pill inline-flex items-center gap-1.5 text-[11px] border"
+      style={{
+        color: colors[kind],
+        borderColor: `${colors[kind]} / 0.3)`,
+        backgroundColor: `${colors[kind]} / 0.08)`,
+      }}
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ backgroundColor: colors[kind] }}
+        aria-hidden
+      />
+      {label}
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label="Remove tag"
+          className="ml-0.5 -mr-0.5 w-4 h-4 rounded-sm hover:bg-white/10 inline-flex items-center justify-center"
+        >
+          <svg
+            width="9"
+            height="9"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <line x1="5" y1="5" x2="19" y2="19" />
+            <line x1="19" y1="5" x2="5" y2="19" />
+          </svg>
+        </button>
+      )}
+    </span>
+  );
+}
+
 /* ---------- main component ---------- */
 
 export function TradeDetailPage() {
   const { t, lang } = useLang();
   const { selectedTradeId, goBack } = useDemo();
-  // Merge custom trades (added via the Dashboard composer) into the sample
-  // so a detail page can be opened for them too. Without this, clicking a
-  // custom-trade row in TradesPage would route here with a `selectedTradeId`
-  // that doesn't exist in the deterministic `TRADES` array (custom trade ids
-  // are Date.now() timestamps, not 1..72) and the page would render its
-  // empty state instead of the trade's details.
   const customTrades = useCustomTrades();
   const trade = useMemo(() => {
     const sample = TRADES.find((x) => x.id === selectedTradeId);
@@ -326,6 +402,28 @@ export function TradeDetailPage() {
   }, [selectedTradeId, customTrades]);
   const [review, setReview] = useState<Compliance>(
     trade?.compliance ?? "yes"
+  );
+
+  // Tags state (mirrors the real app's tags: error / acierto / emocion / libre).
+  const [tags, setTags] = useState<
+    { kind: TagKind; label: string }[]
+  >([
+    { kind: "win", label: lang === "es" ? "Buena entrada" : "Good entry" },
+    { kind: "emotion", label: lang === "es" ? "Calma" : "Calm" },
+  ]);
+
+  // Instrument decimals + fills table. Computed BEFORE the early
+  // return so the hook order is stable across renders (satisfies
+  // react-hooks/rules-of-hooks). When `trade` is undefined the fills
+  // memo returns an empty array.
+  const decimals = useMemo(() => {
+    if (!trade) return 2;
+    const instrument = INSTRUMENTS.find((i) => i.symbol === trade.instrument);
+    return instrument?.decimals ?? 2;
+  }, [trade]);
+  const fills = useMemo(
+    () => (trade ? buildFills(trade, decimals, lang) : []),
+    [trade, decimals, lang]
   );
 
   if (!trade) {
@@ -363,24 +461,26 @@ export function TradeDetailPage() {
   const isWin = trade.netPnl >= 0;
   const isLong = trade.direction === "long";
   const instrument = INSTRUMENTS.find((i) => i.symbol === trade.instrument);
-  const decimals = instrument?.decimals ?? 2;
   const tone = pnlTone(trade.netPnl);
 
-  // Generate a management note from trade data (bilingual).
-  const manageNote =
-    lang === "es"
-      ? trade.compliance === "yes"
-        ? `MFE alcanzó ${trade.mfe.toFixed(2)}R; gestioné hasta cerrar en ${trade.rMultiple.toFixed(2)}R.`
-        : trade.compliance === "partial"
-        ? `MFE fue ${trade.mfe.toFixed(2)}R; salí antes de objetivo, resultado final ${trade.rMultiple.toFixed(2)}R.`
-        : `Perseguí la entrada, MAE llegó a ${trade.mae.toFixed(2)}R; cerré en ${trade.rMultiple.toFixed(2)}R.`
-      : trade.compliance === "yes"
-      ? `MFE reached ${trade.mfe.toFixed(2)}R; managed to exit at ${trade.rMultiple.toFixed(2)}R.`
-      : trade.compliance === "partial"
-      ? `MFE was ${trade.mfe.toFixed(2)}R; exited before target, final ${trade.rMultiple.toFixed(2)}R.`
-      : `Chased entry, MAE hit ${trade.mae.toFixed(2)}R; closed at ${trade.rMultiple.toFixed(2)}R.`;
+  // Risk amount in $ = the 1R dollar amount (already in trade.riskUsd).
+  const riskAmount = trade.riskUsd;
+  const riskPct = (riskAmount / 10000) * 100;
 
-  // Risk:reward bar fractions (1 : plannedRr).
+  // Day-context data — deterministic placeholders that mirror the
+  // real app's "Dónde cayó dentro del día" card.
+  const dayOrdinal =
+    lang === "es"
+      ? `3ª operación del día`
+      : `3rd trade of the day`;
+  const sincePrevious =
+    lang === "es"
+      ? `8 min después de la operación anterior`
+      : `8 min after the previous trade`;
+  const dayPnlBefore = -84.6;
+  const isRevengeCandidate = dayPnlBefore < 0;
+
+  // Risk:reward planned fractions (1 : plannedRr).
   const riskFraction = 1 / (1 + trade.plannedRr);
   const rewardFraction = trade.plannedRr / (1 + trade.plannedRr);
 
@@ -393,294 +493,466 @@ export function TradeDetailPage() {
 
   return (
     <div className="relative p-5 md:p-6 space-y-5">
-      {/* ===== HERO BAND ===== */}
+      {/* ===== HEADER: back + symbol + direction + closed date ===== */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="flex items-center justify-between gap-3 flex-wrap"
+      >
+        <button
+          type="button"
+          onClick={goBack}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-secondary hover:text-primary liquid-glass border border-white/10 transition-colors"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          {t("back")}
+        </button>
+        <div className="flex items-center gap-3 flex-1 min-w-0 justify-center">
+          <h1
+            className="text-2xl md:text-3xl font-medium tracking-[-0.01em] text-primary tnum"
+            style={{ fontFamily: "'Cascadia Mono', Consolas, monospace" }}
+          >
+            {trade.instrument}
+          </h1>
+          <Chip variant={isLong ? "pos" : "neg"}>
+            {t(isLong ? "long" : "short")}
+          </Chip>
+          <span className="text-xs text-tertiary tnum hidden sm:inline">
+            {fmtDateTime(trade.closedAt, lang)}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-tertiary tnum">
+            #{trade.id.toString().padStart(3, "0")}
+          </span>
+          <button
+            type="button"
+            aria-label={t("back")}
+            className="w-8 h-8 rounded-md border border-white/10 text-tertiary hover:text-primary hover:border-white/25 transition-colors inline-flex items-center justify-center"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            aria-label={t("back")}
+            className="w-8 h-8 rounded-md border border-white/10 text-tertiary hover:text-primary hover:border-white/25 transition-colors inline-flex items-center justify-center"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+      </motion.section>
+
+      {/* ===== HERO: net P&L | R | risk amount | planned RR + MAE/MFE
+                excursion bar + planned risk:reward bar =====
+                Mirrors the real app's hero card layout. */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: EASE }}
         className="relative overflow-hidden liquid-glass depth-3 hover:depth-4 transition-shadow duration-300 rounded-card p-6"
       >
-        <div className="relative">
-          {/* Top row: back + meta */}
-          <div className="flex items-center justify-between gap-3 mb-5">
-            <button
-              type="button"
-              onClick={goBack}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-secondary hover:text-primary liquid-glass border border-white/10 transition-colors"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              {t("back")}
-            </button>
-            <div className="flex items-center gap-2 text-xs text-tertiary">
-              <span className="tnum">#{trade.id.toString().padStart(3, "0")}</span>
-              <span aria-hidden="true">·</span>
-              <span>{trade.session}</span>
-              <span aria-hidden="true" className="hidden sm:inline">
-                ·
-              </span>
-              <span className="tnum hidden sm:inline">
-                {fmtDateTime(trade.closedAt, lang)}
-              </span>
-            </div>
-          </div>
-
-          {/* Chips row */}
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15, ease: EASE }}
-            className="flex flex-wrap items-center gap-2 mb-3"
-          >
-            <Chip variant="accent">{trade.instrument}</Chip>
-            <Chip variant={isLong ? "pos" : "neg"}>
-              {t(isLong ? "long" : "short")}
-            </Chip>
-            <Chip variant="neutral">{trade.setup}</Chip>
-            <Chip variant={complianceVariant}>
-              {trade.compliance === "yes"
-                ? t("yes")
-                : trade.compliance === "no"
-                ? t("no")
-                : t("partial")}
-            </Chip>
-          </motion.div>
-
-          {/* Big P&L + R-multiple */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25, ease: EASE }}
-            className="flex flex-wrap items-baseline gap-x-4 gap-y-1"
-          >
-            <CountUp
-              key={trade.id}
-              to={Math.abs(trade.netPnl)}
-              from={0}
-              decimals={2}
-              prefix={trade.netPnl >= 0 ? "+$" : "−$"}
-              tone={tone}
-              duration={1.6}
-              className="text-4xl md:text-6xl font-bold tracking-tight"
-            />
-            <span
-              className={`tnum text-xl md:text-2xl font-bold ${
-                trade.rMultiple >= 0 ? "text-pnl-pos" : "text-pnl-neg"
-              }`}
-            >
-              {trade.rMultiple > 0 ? "+" : ""}
-              {trade.rMultiple.toFixed(2)}R
-            </span>
-          </motion.div>
-
-          {/* Trade journey SVG */}
-          <div className="mt-5">
-            <TradeJourney trade={trade} lang={lang} />
-            <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5 mt-3 text-xs text-tertiary">
-              <LegendItem
-                color="rgb(255 255 255)"
-                label={t("entry")}
-              />
-              <LegendItem color="rgb(var(--pnl-pos))" label="MFE" />
-              <LegendItem color="rgb(var(--pnl-neg))" label="MAE" />
-              <LegendItem
-                color={
-                  isWin
-                    ? "rgb(var(--pnl-pos))"
-                    : "rgb(var(--pnl-neg))"
-                }
-                label={t("exit")}
-              />
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* ===== EXECUTION + PLAN GRID ===== */}
-      <div className="grid md:grid-cols-2 gap-5">
-        {/* Execution card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35, ease: EASE }}
-          whileHover={{
-            y: -2,
-            transition: { type: "spring", stiffness: 300, damping: 24 },
-          }}
-          className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full flex flex-col"
-        >
-          <Eyebrow className="mb-4">{t("execution")}</Eyebrow>
-          <dl className="grid grid-cols-2 gap-y-3.5 gap-x-4">
-            <Detail label={t("entry")}>
-              <span className="tnum text-primary">
-                {fmtPrice(trade.entry, decimals, lang)}
-              </span>
-            </Detail>
-            <Detail label={t("exit")}>
-              <span className="tnum text-primary">
-                {fmtPrice(trade.exit, decimals, lang)}
-              </span>
-            </Detail>
-            <Detail label={t("quantity")}>
-              <span className="tnum text-primary">
-                {fmtNum(trade.qty, lang, 3)}
-              </span>
-            </Detail>
-            <Detail label={t("grossPnl")}>
-              <Money value={trade.grossPnl} sign colorizeSign />
-            </Detail>
-            <Detail label={t("fees")}>
-              <Money value={-trade.fees} />
-            </Detail>
-            <Detail label={t("colDuration")}>
-              <span className="tnum text-primary">
-                {fmtDuration(trade.durationMin, lang)}
-              </span>
-            </Detail>
-            <Detail label={lang === "es" ? "Apertura" : "Opened"}>
-              <span className="tnum text-primary text-xs">
-                {fmtDateTime(trade.openedAt, lang)}
-              </span>
-            </Detail>
-            <Detail label={t("colClosed")}>
-              <span className="tnum text-primary text-xs">
-                {fmtDateTime(trade.closedAt, lang)}
-              </span>
-            </Detail>
-            <Detail label={lang === "es" ? "Sesión" : "Session"}>
-              <span className="text-primary">{trade.session}</span>
-            </Detail>
-          </dl>
-        </motion.div>
-
-        {/* Plan card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45, ease: EASE }}
-          whileHover={{
-            y: -2,
-            transition: { type: "spring", stiffness: 300, damping: 24 },
-          }}
-          className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full flex flex-col"
-        >
-          <Eyebrow className="mb-4">{t("plan")}</Eyebrow>
-          <dl className="grid grid-cols-2 gap-y-3.5 gap-x-4">
-            <Detail label={t("initialStop")}>
-              <span className="tnum text-pnl-neg">
-                {fmtPrice(trade.initialStop, decimals, lang)}
-              </span>
-            </Detail>
-            <Detail label={t("target")}>
-              <span className="tnum text-pnl-pos">
-                {fmtPrice(trade.target, decimals, lang)}
-              </span>
-            </Detail>
-            <Detail label={t("plannedRr")}>
-              <span className="tnum text-primary">
-                {trade.plannedRr.toFixed(2)}R
-              </span>
-            </Detail>
-            <Detail label={t("rr")}>
+        <div className="relative space-y-6">
+          {/* Hero stat row: Net | R | Risk | Planned RR (with hairlines) */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-5">
+            <HeroStat label={t("colClosed")}>
+              <div className="flex items-baseline gap-2">
+                <CountUp
+                  key={trade.id}
+                  to={Math.abs(trade.netPnl)}
+                  from={0}
+                  decimals={2}
+                  prefix={trade.netPnl >= 0 ? "+$" : "−$"}
+                  tone={tone}
+                  duration={1.6}
+                  className="text-3xl md:text-4xl font-bold tracking-tight"
+                />
+              </div>
+            </HeroStat>
+            <HeroStat label="R" divider>
               <span
-                className={`tnum font-medium ${
-                  trade.rMultiple >= 0
-                    ? "text-pnl-pos"
-                    : "text-pnl-neg"
+                className={`text-2xl md:text-3xl font-bold tnum ${
+                  trade.rMultiple >= 0 ? "text-pnl-pos" : "text-pnl-neg"
                 }`}
               >
                 {trade.rMultiple > 0 ? "+" : ""}
                 {trade.rMultiple.toFixed(2)}R
               </span>
-            </Detail>
-          </dl>
-
-          {/* Risk:Reward bar */}
-          <div className="mt-auto pt-6">
-            <div className="flex items-center justify-between mb-2 text-[10px] uppercase tracking-[0.15em] text-tertiary tnum">
-              <span>
-                {lang === "es" ? "Riesgo" : "Risk"} · 1R
+            </HeroStat>
+            <HeroStat label={t("entryStop")} divider>
+              <div className="flex flex-col">
+                <Money
+                  value={riskAmount}
+                  className="text-2xl md:text-3xl font-semibold"
+                />
+                <span className="text-[10px] text-tertiary tnum">
+                  {riskPct.toFixed(2)}% {lang === "es" ? "del capital" : "of capital"}
+                </span>
+              </div>
+            </HeroStat>
+            <HeroStat label={t("plannedRr")} divider>
+              <span className="text-2xl md:text-3xl font-semibold tnum text-primary">
+                1:{trade.plannedRr.toFixed(2)}
               </span>
-              <span>
-                {lang === "es" ? "Recompensa" : "Reward"} ·{" "}
-                {trade.plannedRr.toFixed(1)}R
-              </span>
-            </div>
-            <div className="relative h-2.5 rounded-full bg-white/5 overflow-hidden flex">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${riskFraction * 100}%` }}
-                transition={{ duration: 0.9, delay: 0.7, ease: EASE }}
-                className="h-full bg-pnl-neg/80 shrink-0"
-              />
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${rewardFraction * 100}%` }}
-                transition={{ duration: 0.9, delay: 1.0, ease: EASE }}
-                className="h-full bg-pnl-pos/80 shrink-0"
-              />
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ===== CONTEXT + REVIEW GRID ===== */}
-      <div className="grid md:grid-cols-2 gap-5">
-        {/* Context card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55, ease: EASE }}
-          whileHover={{
-            y: -2,
-            transition: { type: "spring", stiffness: 300, damping: 24 },
-          }}
-          className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full flex flex-col"
-        >
-          <Eyebrow className="mb-4">{t("context")}</Eyebrow>
-          <div className="space-y-3.5">
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
-                {t("entryNote")}
-              </div>
-              <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
-                {trade.entryNote}
-              </blockquote>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
-                {t("manageNote")}
-              </div>
-              <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
-                {manageNote}
-              </blockquote>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
-                {t("closeNote")}
-              </div>
-              <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
-                {trade.closeNote}
-              </blockquote>
-            </div>
+            </HeroStat>
           </div>
 
-          {/* Screenshots */}
-          <div className="mt-5">
-            <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-2">
-              {t("screenshots")}
+          {/* MAE/MFE excursion diverging bar */}
+          <div className="space-y-2 pt-2 border-t border-white/10">
+            <div className="flex items-center justify-between">
+              <Eyebrow>
+                {lang === "es" ? "Recorrido de la operación" : "Trade journey"}
+              </Eyebrow>
+              <div className="flex items-center gap-5 text-xs">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    MAE
+                  </span>
+                  <span className="text-pnl-neg font-semibold tnum">
+                    {trade.mae.toFixed(2)}R
+                  </span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
+                    MFE
+                  </span>
+                  <span className="text-pnl-pos font-semibold tnum">
+                    +{trade.mfe.toFixed(2)}R
+                  </span>
+                </span>
+              </div>
             </div>
+            <ExcursionBar mae={trade.mae} mfe={trade.mfe} />
+          </div>
+
+          {/* Planned risk:reward bar */}
+          <div className="space-y-2 pt-2 border-t border-white/10">
+            <RiskRewardBar plannedRr={trade.plannedRr} />
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ===== 2-COLUMN GRID: left (5fr) | right (4fr) =====
+          Left: execution + anatomy + day-context + plan + context + dates.
+          Right: screenshots + tags + review. */}
+      <div className="grid lg:grid-cols-[5fr_4fr] gap-5">
+        {/* ===== LEFT COLUMN ===== */}
+        <div className="flex flex-col gap-5">
+          {/* Execution card */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35, ease: EASE }}
+            whileHover={{
+              y: -2,
+              transition: { type: "spring", stiffness: 300, damping: 24 },
+            }}
+            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+          >
+            <Eyebrow className="mb-4">{t("execution")}</Eyebrow>
+            <dl className="grid grid-cols-3 gap-y-3.5 gap-x-4">
+              <Detail label={t("entry")}>
+                <span className="tnum text-primary">
+                  {fmtPrice(trade.entry, decimals, lang)}
+                </span>
+              </Detail>
+              <Detail label={t("exit")}>
+                <span className="tnum text-primary">
+                  {fmtPrice(trade.exit, decimals, lang)}
+                </span>
+              </Detail>
+              <Detail label={t("quantity")}>
+                <span className="tnum text-primary">
+                  {fmtNum(trade.qty, lang, 3)}
+                </span>
+              </Detail>
+              <Detail label={t("grossPnl")}>
+                <Money value={trade.grossPnl} sign colorizeSign />
+              </Detail>
+              <Detail label={t("fees")}>
+                <Money value={-trade.fees} />
+              </Detail>
+              <Detail label={lang === "es" ? "Setup" : "Setup"}>
+                <span className="text-primary">{trade.setup}</span>
+              </Detail>
+            </dl>
+          </motion.div>
+
+          {/* Anatomy card — executions table (mirrors the real app's
+              "Anatomía: las ejecuciones reales" card). */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
+            whileHover={{
+              y: -2,
+              transition: { type: "spring", stiffness: 300, damping: 24 },
+            }}
+            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <Eyebrow>
+                {lang === "es" ? "Anatomía" : "Anatomy"}
+              </Eyebrow>
+              <span className="pill bg-white/5 text-tertiary border border-white/10 text-[10px] tnum">
+                {fills.length} {lang === "es" ? "fills" : "fills"}
+              </span>
+            </div>
+            {/* Table header */}
+            <div className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 pb-2 text-[10px] uppercase tracking-[0.14em] text-tertiary border-b border-white/10">
+              <div>{lang === "es" ? "Lado" : "Side"}</div>
+              <div>{lang === "es" ? "Hora" : "Time"}</div>
+              <div className="text-right">Qty</div>
+              <div className="text-right">{lang === "es" ? "Precio" : "Price"}</div>
+              <div className="text-right">{lang === "es" ? "Com." : "Fee"}</div>
+              <div className="text-right">{lang === "es" ? "Acum." : "Cum."}</div>
+            </div>
+            <ul className="divide-y divide-white/5">
+              {fills.map((f, i) => {
+                const isEntry = f.dir === "ENTRY";
+                return (
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.35, delay: 0.5 + i * 0.08, ease: EASE }}
+                    className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 py-2 items-center text-xs"
+                  >
+                    <div className="flex flex-col">
+                      <span
+                        className={`text-[11px] font-semibold ${
+                          isEntry
+                            ? trade.direction === "long"
+                              ? "text-pnl-pos"
+                              : "text-pnl-neg"
+                            : trade.direction === "long"
+                            ? "text-pnl-neg"
+                            : "text-pnl-pos"
+                        }`}
+                      >
+                        {f.dir}
+                      </span>
+                      <span className="text-[10px] text-tertiary">
+                        {f.side}
+                      </span>
+                    </div>
+                    <span className="tnum text-secondary">{f.time}</span>
+                    <span className="tnum text-secondary text-right">{f.qty}</span>
+                    <span className="tnum font-semibold text-primary text-right">
+                      {f.price}
+                    </span>
+                    <span className="tnum text-tertiary text-right">{f.fee}</span>
+                    <span className="tnum text-tertiary text-right">{f.cumulative}</span>
+                  </motion.li>
+                );
+              })}
+            </ul>
+          </motion.div>
+
+          {/* Day-context card — mirrors the real app's "Dónde cayó
+              dentro del día" card (revenge warning, ordinal, since
+              previous, P&L before). */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.45, ease: EASE }}
+            whileHover={{
+              y: -2,
+              transition: { type: "spring", stiffness: 300, damping: 24 },
+            }}
+            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+          >
+            <Eyebrow className="mb-4">
+              {lang === "es" ? "Dónde cayó dentro del día" : "Where it fell in the day"}
+            </Eyebrow>
+            <div className="space-y-3">
+              {isRevengeCandidate && (
+                <div className="flex items-start gap-2.5 text-pnl-warn">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mt-0.5 flex-shrink-0"
+                    aria-hidden
+                  >
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  <p className="text-xs leading-relaxed">
+                    {lang === "es"
+                      ? "Posible revancha: mismo instrumento, dentro de tu ventana de enfriamiento."
+                      : "Possible revenge: same instrument, inside your cooldown window."}
+                  </p>
+                </div>
+              )}
+              <p className="text-sm text-secondary">{dayOrdinal}</p>
+              <p className="text-sm text-secondary">{sincePrevious}</p>
+              <div className="flex items-center gap-2.5">
+                <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
+                  {lang === "es" ? "P&L previo" : "P&L before"}
+                </span>
+                <Money
+                  value={dayPnlBefore}
+                  sign
+                  colorizeSign
+                  className="text-sm font-semibold"
+                />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Plan card + Context card (compact 2-up) */}
+          <div className="grid sm:grid-cols-2 gap-5">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.55, ease: EASE }}
+              whileHover={{
+                y: -2,
+                transition: { type: "spring", stiffness: 300, damping: 24 },
+              }}
+              className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            >
+              <Eyebrow className="mb-4">{t("plan")}</Eyebrow>
+              <dl className="grid grid-cols-2 gap-y-3.5 gap-x-4">
+                <Detail label={t("initialStop")}>
+                  <span className="tnum text-pnl-neg">
+                    {fmtPrice(trade.initialStop, decimals, lang)}
+                  </span>
+                </Detail>
+                <Detail label={t("target")}>
+                  <span className="tnum text-pnl-pos">
+                    {fmtPrice(trade.target, decimals, lang)}
+                  </span>
+                </Detail>
+                <Detail label="MAE">
+                  <span className="tnum text-pnl-neg">
+                    {trade.mae.toFixed(2)}R
+                  </span>
+                </Detail>
+                <Detail label="MFE">
+                  <span className="tnum text-pnl-pos">
+                    +{trade.mfe.toFixed(2)}R
+                  </span>
+                </Detail>
+              </dl>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6, ease: EASE }}
+              whileHover={{
+                y: -2,
+                transition: { type: "spring", stiffness: 300, damping: 24 },
+              }}
+              className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            >
+              <Eyebrow className="mb-4">{t("context")}</Eyebrow>
+              <dl className="grid grid-cols-2 gap-y-3.5 gap-x-4">
+                <Detail label={lang === "es" ? "Temporalidad" : "Timeframe"}>
+                  <span className="text-primary">5m</span>
+                </Detail>
+                <Detail label={lang === "es" ? "Sesión" : "Session"}>
+                  <span className="text-primary">{trade.session}</span>
+                </Detail>
+                <Detail label={lang === "es" ? "Mercado" : "Market"}>
+                  <span className="text-primary">
+                    {lang === "es" ? "Tendencia" : "Trending"}
+                  </span>
+                </Detail>
+                <Detail label={lang === "es" ? "Ánimo pre" : "Mood pre"}>
+                  <span className="text-primary">3/5</span>
+                </Detail>
+              </dl>
+            </motion.div>
+          </div>
+
+          {/* Dates row */}
+          <div className="flex items-center gap-6 flex-wrap text-xs">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-0.5">
+                {lang === "es" ? "Apertura" : "Opened"}
+              </div>
+              <div className="tnum text-secondary">
+                {fmtDateTime(trade.openedAt, lang)}
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-0.5">
+                {t("colClosed")}
+              </div>
+              <div className="tnum text-secondary">
+                {fmtDateTime(trade.closedAt, lang)}
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-0.5">
+                {lang === "es" ? "Duración" : "Duration"}
+              </div>
+              <div className="tnum font-semibold text-primary">
+                {fmtDuration(trade.durationMin, lang)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== RIGHT COLUMN ===== */}
+        <div className="flex flex-col gap-5">
+          {/* Screenshots card */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
+            whileHover={{
+              y: -2,
+              transition: { type: "spring", stiffness: 300, damping: 24 },
+            }}
+            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+          >
+            <Eyebrow className="mb-4">{t("screenshots")}</Eyebrow>
             <div className="border-2 border-dashed border-white/10 rounded-md p-4 text-center text-xs text-tertiary mb-3 transition-colors hover:border-white/20 hover:bg-white/[0.02]">
               <svg
                 className="mx-auto mb-2 opacity-60"
@@ -706,97 +978,186 @@ export function TradeDetailPage() {
                 <MiniCandles seed={trade.id * 13 + 5} win={isWin} />
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Review card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.65, ease: EASE }}
-          whileHover={{
-            y: -2,
-            transition: { type: "spring", stiffness: 300, damping: 24 },
-          }}
-          className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full flex flex-col"
-        >
-          <Eyebrow className="mb-4">{t("review")}</Eyebrow>
-          <p className="text-sm text-secondary mb-4">{t("followedPlan")}</p>
-
-          {/* Toggle buttons */}
-          <div className="grid grid-cols-3 gap-2 mb-6">
-            {(["yes", "partial", "no"] as Compliance[]).map((opt) => {
-              const active = review === opt;
-              const optTone =
-                opt === "yes"
-                  ? "text-pnl-pos"
-                  : opt === "no"
-                  ? "text-pnl-neg"
-                  : "text-pnl-warn";
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setReview(opt)}
-                  aria-pressed={active}
-                  className={`relative h-10 rounded-md text-sm font-medium transition-colors ${
-                    active
-                      ? "text-primary"
-                      : "text-tertiary hover:text-secondary hover:bg-white/5"
-                  }`}
+          {/* Tags card — mirrors the real app's "Etiquetas" card
+              (error / acierto / emocion / libre, with remove buttons). */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.45, ease: EASE }}
+            whileHover={{
+              y: -2,
+              transition: { type: "spring", stiffness: 300, damping: 24 },
+            }}
+            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+          >
+            <Eyebrow className="mb-4">
+              {lang === "es" ? "Etiquetas" : "Tags"}
+            </Eyebrow>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, i) => (
+                <TagPill
+                  key={`${tag.kind}-${tag.label}-${i}`}
+                  kind={tag.kind}
+                  label={tag.label}
+                  onRemove={() =>
+                    setTags((prev) => prev.filter((_, j) => j !== i))
+                  }
+                />
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  setTags((prev) => [
+                    ...prev,
+                    {
+                      kind: "custom",
+                      label: lang === "es" ? "Nueva etiqueta" : "New tag",
+                    },
+                  ])
+                }
+                className="pill inline-flex items-center gap-1 text-[11px] border border-dashed border-white/15 text-tertiary hover:text-primary hover:border-white/30 transition-colors"
+                aria-label={lang === "es" ? "Añadir etiqueta" : "Add tag"}
+              >
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  aria-hidden
                 >
-                  {active && (
-                    <motion.span
-                      layoutId="review-pill"
-                      className="absolute inset-0 rounded-md bg-white/5 border border-white/20"
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                  <span className={`relative ${active ? optTone : ""}`}>
-                    {t(opt)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                {lang === "es" ? "Añadir" : "Add"}
+              </button>
+            </div>
+          </motion.div>
 
-          {/* Summary */}
-          <div className="space-y-2.5 border-t border-white/10 pt-4">
-            <SummaryRow
-              label={t("rr")}
-              tone={trade.rMultiple >= 0 ? "pos" : "neg"}
-              value={`${trade.rMultiple > 0 ? "+" : ""}${trade.rMultiple.toFixed(2)}R`}
-            />
-            <SummaryRow
-              label={t("grossPnl")}
-              value={<Money value={trade.grossPnl} sign colorizeSign />}
-            />
-            <SummaryRow
-              label={t("fees")}
-              value={<Money value={-trade.fees} />}
-            />
-            <SummaryRow
-              label={lang === "es" ? "P&L neto" : "Net P&L"}
-              tone={trade.netPnl >= 0 ? "pos" : "neg"}
-              value={<Money value={trade.netPnl} sign colorizeSign />}
-            />
-          </div>
+          {/* Review card */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
+            whileHover={{
+              y: -2,
+              transition: { type: "spring", stiffness: 300, damping: 24 },
+            }}
+            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+          >
+            <Eyebrow className="mb-4">{t("review")}</Eyebrow>
 
-          {/* Save button — MagneticButton for premium micro-interaction */}
-          <div className="mt-auto pt-5">
-            <MagneticButton
-              type="button"
-              strength={0.25}
-              className="w-full h-11 rounded-md bg-white text-black font-medium text-sm transition-colors hover:bg-gray-100 inline-flex items-center justify-center"
-            >
-              {t("saveChanges")}
-            </MagneticButton>
-          </div>
-        </motion.div>
+            {/* Notes — entry / management / close */}
+            <div className="space-y-3 mb-5">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
+                  {t("entryNote")}
+                </div>
+                <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
+                  {trade.entryNote}
+                </blockquote>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
+                  {t("manageNote")}
+                </div>
+                <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
+                  {lang === "es"
+                    ? `MFE alcanzó ${trade.mfe.toFixed(2)}R; salí en ${trade.rMultiple.toFixed(2)}R.`
+                    : `MFE reached ${trade.mfe.toFixed(2)}R; exited at ${trade.rMultiple.toFixed(2)}R.`}
+                </blockquote>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
+                  {t("closeNote")}
+                </div>
+                <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
+                  {trade.closeNote}
+                </blockquote>
+              </div>
+            </div>
+
+            <p className="text-sm text-secondary mb-3">{t("followedPlan")}</p>
+
+            {/* Compliance toggle */}
+            <div className="grid grid-cols-3 gap-2 mb-5">
+              {(["yes", "partial", "no"] as Compliance[]).map((opt) => {
+                const active = review === opt;
+                const optTone =
+                  opt === "yes"
+                    ? "text-pnl-pos"
+                    : opt === "no"
+                    ? "text-pnl-neg"
+                    : "text-pnl-warn";
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setReview(opt)}
+                    aria-pressed={active}
+                    className={`relative h-10 rounded-md text-sm font-medium transition-colors ${
+                      active
+                        ? "text-primary"
+                        : "text-tertiary hover:text-secondary hover:bg-white/5"
+                    }`}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="review-pill"
+                        className="absolute inset-0 rounded-md bg-white/5 border border-white/20"
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                    <span className={`relative ${active ? optTone : ""}`}>
+                      {t(opt)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Summary */}
+            <div className="space-y-2.5 border-t border-white/10 pt-4">
+              <SummaryRow
+                label={t("rr")}
+                tone={trade.rMultiple >= 0 ? "pos" : "neg"}
+                value={`${trade.rMultiple > 0 ? "+" : ""}${trade.rMultiple.toFixed(2)}R`}
+              />
+              <SummaryRow
+                label={t("grossPnl")}
+                value={<Money value={trade.grossPnl} sign colorizeSign />}
+              />
+              <SummaryRow
+                label={t("fees")}
+                value={<Money value={-trade.fees} />}
+              />
+              <SummaryRow
+                label={lang === "es" ? "P&L neto" : "Net P&L"}
+                tone={trade.netPnl >= 0 ? "pos" : "neg"}
+                value={<Money value={trade.netPnl} sign colorizeSign />}
+              />
+            </div>
+
+            {/* Save button */}
+            <div className="mt-5">
+              <MagneticButton
+                type="button"
+                strength={0.25}
+                className="w-full h-11 rounded-md bg-white text-black font-medium text-sm transition-colors hover:bg-gray-100 inline-flex items-center justify-center"
+              >
+                {t("saveChanges")}
+              </MagneticButton>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

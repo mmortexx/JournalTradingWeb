@@ -104,7 +104,7 @@ export function MoreFeatures() {
               viewport={{ once: true, margin: "-50px" }}
               transition={{
                 duration: 0.5,
-                delay: (i % 3) * 0.08,
+                delay: Math.min(i * 0.06, 0.3),
                 ease: [0.22, 1, 0.36, 1],
               }}
               className="h-full"
@@ -115,7 +115,7 @@ export function MoreFeatures() {
               >
                   {/* Icon */}
                   <div
-                    className="w-10 h-10 rounded-lg bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-primary mb-4 transition-colors group-hover:bg-[rgb(var(--divider)/0.08)] group-hover:border-[rgb(var(--divider)/0.20)]"
+                    className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.15)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-primary mb-4 transition-colors duration-300 group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:border-[rgb(var(--accent-base)/0.30)]"
                   >
                     {f.icon}
                   </div>
@@ -199,7 +199,6 @@ function MaeMfeIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M3 17h18" stroke="currentColor" strokeWidth="1.2" opacity="0.4" />
       <path d="M7 17V9M7 9l-2 2M7 9l2 2" stroke="rgb(var(--pnl-neg))" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M17 17v-8M17 9l-2-2M17 9l2-2" stroke="rgb(var(--pnl-pos))" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" opacity="0" />
       <path d="M17 17v6M17 23l-2-2M17 23l2-2" stroke="rgb(var(--pnl-pos))" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
