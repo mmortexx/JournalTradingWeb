@@ -397,12 +397,21 @@
     line-height: 1.15;
     letter-spacing: -0.02em;
     font-weight: 500;
+    /* Balance heading line breaks — parity with .t-h1 / .t-h2 so every
+       heading token avoids orphan words on the last line (per R22-1a
+       P0-1, extended to h3/h4 in R26-2b). */
+    text-wrap: balance;
   }
   .t-h4 {
     font-size: 1.125rem;
     line-height: 1.3;
     letter-spacing: -0.01em;
     font-weight: 600;
+    /* Balance heading line breaks — parity with .t-h1 / .t-h2 / .t-h3
+       so every heading token avoids orphan words on the last line.
+       h4 often wraps to two lines in card titles; balancing keeps
+       the second line optically even (R26-2b). */
+    text-wrap: balance;
   }
   .t-body {
     font-size: 1rem;
@@ -973,7 +982,6 @@
   }
 
   .max-w-page { max-width: 1200px; }
-  .max-w-form { max-width: 1100px; }
   .rounded-card { border-radius: 8px; }
   .rounded-pill { border-radius: 12px; }
 
@@ -1071,10 +1079,31 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Neutralize ALL animations + transitions site-wide (R26-2b):
+     - duration → 0.01ms  makes any animation/transition visually
+       instant (the W3C-recommended pattern; `animation: none` would
+       break state-change animations like dropdown open/close, which
+       still need to snap to the end state rather than freeze).
+     - delay → 0.01ms  cancels any startup delay so the end state
+       applies immediately (e.g. IntroSequence's 5s failsafe delay,
+       staggered ScrollReveal children).
+     - iteration-count → 1  stops infinite loops (tj-pulse-dot,
+       tj-glow, tj-float, tj-scroll-bead, tj-sheen) after a single
+       tick — combined with the 0.01ms duration the loop body is
+       invisible.
+     - scroll-behavior → auto  cancels the html { scroll-behavior:
+       smooth } rule so anchor jumps are instant.
+     The per-component overrides scattered below (.grain::after,
+     .page-enter, .link-underline::after, .icon_btn svg) are
+     belt-and-suspenders for cases where a component sets its own
+     animation/transition property and the universal selector's
+     `!important` is the only thing keeping it in check. */
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0.01ms !important;
     scroll-behavior: auto !important;
   }
 }
@@ -1131,22 +1160,19 @@ body::before {
   .grain::after { opacity: 0.02; }
 }
 
-/* Crisp, institutional-grade keyboard focus affordance — a 2px ring in
-   the accent color at 60% opacity, with a tight 2px offset so the ring
-   sits close to the focused element. The 60% opacity reads as a
-   deliberate, controlled indicator (Bloomberg / Stripe accessibility
-   pattern) rather than a hard 100%-opacity outline that can feel
-   aggressive on dense data UIs. The 4px box-shadow halo at 18%
-   extends the affordance for low-vision users without competing with
-   the ring itself. */
+/* ============================================================
+   FOCUS-VISIBLE — Crisp, institutional keyboard focus affordance.
+   A 2px solid accent ring at 70% opacity (high enough to read as
+   deliberate, low enough not to feel aggressive on dense data UIs)
+   with a tight 2px offset so the ring hugs the focused element.
+   The 4px box-shadow halo at 20% extends the affordance for
+   low-vision users without competing with the ring itself —
+   pattern matches Bloomberg / Stripe accessibility conventions.
+   R26-2b: collapsed the two stale duplicate comment blocks (the
+   first referenced outdated 60%/18% values; the second matched
+   the actual 70%/20% rule) into one accurate block.
+   ============================================================ */
 *:focus-visible {
-  /* Crisp, institutional keyboard focus affordance — a 2px solid
-     accent ring at 70% opacity (high enough to read as deliberate,
-     low enough not to feel aggressive on dense data UIs) with a
-     tight 2px offset so the ring hugs the focused element. The 4px
-     box-shadow halo at 20% extends the affordance for low-vision
-     users without competing with the ring itself. Pattern matches
-     Bloomberg / Stripe accessibility conventions. */
   outline: 2px solid rgb(var(--accent-base) / 0.7);
   outline-offset: 2px;
   border-radius: 4px;
@@ -1452,20 +1478,63 @@ button.icon-btn:hover > svg,
 }
 
 /* ============================================================
-   PRINT STYLES
-   Strip the dark theme, glass chrome, background animations and
-   floating overlays so the marketing content prints cleanly as
-   black text on white paper. Triggered by the browser's native
-   print dialog (Ctrl/Cmd+P).
+   PRINT STYLESHEET
+   Produces a clean, readable printout of marketing + feature pages:
+   - Forces light-theme CSS variables + white background / black text
+     (print is always light — overrides the dark theme baked into
+     <html data-theme="dark"> before paint).
+   - Switches body + headings to serif (Georgia) for paper legibility.
+   - Hides all interactive chrome: navbar, footer, side rail, TOC,
+     breadcrumb, cookie banner, back-to-top, command palette,
+     shortcuts help, intro overlay, scroll progress, modals,
+     popovers, canvas backgrounds.
+   - Strips glass / blur / shadow / borders so cards print flat.
+   - Neutralizes decorative ::before / ::after pseudo-elements
+     (refraction rim, grain, accent ring, link sweep, sheen, spot).
+   - Expands content to full width (no max-w-page constraint).
+   - Page breaks: sections kept together, headings not orphaned,
+     images not split across pages.
+   - Shows the URL in parentheses after external links.
+   - @page margins set for a clean institutional paper border.
+   Triggered by the browser's native print dialog (Ctrl/Cmd+P).
+
+   R26-2b — consolidated the two duplicate @media print blocks that
+   previously lived at line ~1461 (PRINT STYLES, dark-theme strip)
+   and line ~1882 (PRINT STYLESHEET, feature-subpage layout). They
+   had overlapping rules with no coordination — the second block's
+   `serif font` won by cascade, but its `border-color: #cccccc` on
+   .glass was overridden by the first block's `border: none`, etc.
+   The merged version below preserves every selector from both and
+   orders them so the cascade resolves to the intended print look.
    ============================================================ */
 @media print {
-  /* 1. Force a clean paper baseline — override the dark theme baked
-        into <html data-theme="dark"> and the SVG-noise overlay on
-        body::before. */
+  /* 1. Force light-theme CSS variables so any var()-based color
+        resolves to a paper-friendly value. Overrides the dark theme
+        baked into <html data-theme="dark"> by the no-FOUC script. */
+  :root,
+  :root[data-theme="dark"] {
+    --bg: 255 255 255;
+    --txt-primary: 17 17 17;
+    --txt-secondary: 51 51 51;
+    --txt-tertiary: 102 102 102;
+    --divider: 0 0 0;
+    --surface: #ffffff;
+    --surface-2: #f5f5f5;
+    --ink: #111111;
+    --ink-2: #333333;
+    --ink-3: #666666;
+  }
+
+  /* 2. White paper baseline — override the dark theme baked into
+        <html data-theme="dark"> and the SVG-noise overlay on
+        body::before. Neutralize backdrop-filter (printers can't
+        render blur + it causes blank patches in PDF export). */
   html,
   body {
     background: #ffffff !important;
     color: #000000 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
   body::before {
     display: none !important;
@@ -1476,59 +1545,101 @@ button.icon-btn:hover > svg,
     color: #000000 !important;
   }
 
-  /* 2. Hide top-level chrome and floating overlays.
-        - `body > div > header` → the Navbar (scoped to the page
-          wrapper so we don't also hide <header>s nested inside
-          marketing sections like Hero).
-        - `body > div > footer` → the Footer (same scoping; Story
-          uses a <footer> inside a card and must stay visible).
-        - `.fixed` → catches every fixed-position overlay in one
-          shot: Navbar header, CookieConsent, BackToTop,
-          ReadingProgress, CommandPalette modal, ThemeTransition
-          reveal, CursorGlow halo, and the Sonner toaster.
+  /* 3. Reset the <html> dark-class background that the no-FOUC
+        script applies before paint. */
+  html.dark,
+  html[class*="dark"] {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* 4. Hide all interactive chrome + floating overlays.
+        - `body > div > header` / `body > div > footer` → Navbar and
+          Footer scoped to the page wrapper so we don't also hide
+          <header>/<footer> nested inside marketing sections (Hero
+          uses a <header>; Story uses a <footer> inside a card).
+        - Generic `header` / `footer` / `nav` catch page-local chrome
+          on feature subpages (TOC side rail, breadcrumb bar) —
+          applied AFTER the scoped `body > div >` selectors so the
+          scoped ones win for the page-level chrome but the generic
+          ones catch anything page-local that wasn't already hidden.
+        - `.fixed` catches every fixed-position overlay in one shot:
+          Navbar, CookieConsent, BackToTop, ReadingProgress,
+          CommandPalette modal, ThemeTransition reveal, CursorGlow
+          halo, Sonner toaster.
         - `[role="dialog"]`, `[role="alertdialog"]` and
           `[data-radix-popper-content-wrapper]` → defensive cover
           for any future modal/popover/dropdown that ships without
-          `.fixed` (Radix portals default to position:absolute). All
-          current overlays use `.fixed` so these are belt-and-
-          suspenders for Cmd+P pressed while a modal is open.
-        - `canvas` → hides MarketBackground, ParticleField and
-          SlowMoChart (all three render a <canvas>).
+          `.fixed` (Radix portals default to position:absolute).
+        - `canvas` → hides MarketBackground, ParticleField, SlowMoChart.
+        - Class-attribute selectors catch components whose root
+          element is a <div> with no semantic role.
         - `.tj-no-print` → explicit opt-out hook for future use. */
   body > div > header,
   body > div > footer,
+  header,
+  footer,
+  nav,
+  [aria-label="Índice de la página"],
+  [aria-label="On this page"],
+  [aria-label="Índice de secciones"],
+  [aria-label="Migas de pan"],
+  [aria-label="Breadcrumb"],
   .fixed,
   [role="dialog"],
   [role="alertdialog"],
   [data-radix-popper-content-wrapper],
+  [class*="ReadingProgressIndicator"],
+  [class*="BackgroundFX"],
+  [class*="CookieConsent"],
+  [class*="BackToTop"],
+  [class*="ScrollToTop"],
+  [class*="CommandPalette"],
+  [class*="GlobalShortcuts"],
+  [class*="ShortcutsHelp"],
+  [class*="IntroSequence"],
+  [class*="ScrollProgress"],
+  #mobile-nav-drawer,
+  #tj-loader,
   canvas,
+  .aurora-bg,
+  .grain,
   .tj-no-print {
     display: none !important;
   }
 
-  /* 3. Let main content flow without overflow clipping (several
+  /* 5. Expand content to full width — strip every page-width
+        constraint so printed text uses the full paper width. */
+  .max-w-page,
+  .max-w-\[1240px\],
+  .max-w-\[820px\] {
+    max-width: 100% !important;
+  }
+
+  /* 6. Let main content flow without overflow clipping (several
         sections use overflow:hidden for decorative effects) and
         reset their background. */
   main,
   section,
-  article,
-  header,
-  footer {
+  article {
     overflow: visible !important;
     background: #ffffff !important;
     color: #000000 !important;
   }
 
-  /* 4. Strip glass surfaces, shadows and borders so cards read as
+  /* 7. Strip glass surfaces, shadows and borders so cards read as
         plain text blocks on white. Also neutralize the decorative
         ::before / ::after pseudo-elements that carry the gradient
         refraction border, film-grain texture, accent gradient ring,
-        .grain overlay and animated link underline — these are NOT
-        matched by the `*` universal rule below (pseudo-elements
-        need their own selector) and would otherwise print their
-        backgrounds if the user enables "Background graphics" in
-        the print dialog. */
-  .glass {
+        .grain overlay, link-underline sweep and sheen / spotlight
+        effects — these are NOT matched by the `*` universal rule
+        below (pseudo-elements need their own selector) and would
+        otherwise print their backgrounds if the user enables
+        "Background graphics" in the print dialog. */
+  .glass,
+  .glass-thin,
+  .liquid-glass,
+  .bg-veil {
     background: #ffffff !important;
     color: #000000 !important;
     border: none !important;
@@ -1538,24 +1649,27 @@ button.icon-btn:hover > svg,
   }
   .glass::before,
   .glass::after,
+  .liquid-glass::before,
+  .liquid-glass::after,
   .gradient-border::before,
   .link-underline::after,
-  .grain::after {
+  .grain::after,
+  .tj-cta-sheen::after,
+  .tj-spot::after {
     display: none !important;
   }
-  /* Decorative full-bleed background gradients (aurora wash behind
-     the hero, accent hairline dividers) collapse to plain white
-     so the underlying content reads cleanly on paper. */
-  .aurora-bg,
+  /* Decorative accent hairline dividers collapse to plain white so
+     the underlying content reads cleanly on paper. (aurora-bg is
+     already hidden by step 4.) */
   .divider-grad {
     background: #ffffff !important;
   }
 
-  /* 5. Universal reset: solid black text on transparent bg, no
+  /* 8. Universal reset: solid black text on transparent bg, no
         shadows or borders. Forces P&L colors (which would print
         poorly) to legible black. Extended to `*::before` /
         `*::after` so any decorative pseudo-element not enumerated
-        in step 4 is also neutralized (defence-in-depth — covers
+        in step 7 is also neutralized (defence-in-depth — covers
         future additions). `print-color-adjust: economy` is the
         browser default but is declared explicitly here so the
         rule survives any future `print-color-adjust: exact` on a
@@ -1575,7 +1689,7 @@ button.icon-btn:hover > svg,
     -webkit-print-color-adjust: economy !important;
   }
 
-  /* 6. Gradient-filled text (`.text-gradient`) relies on
+  /* 9. Gradient-filled text (`.text-gradient`) relies on
         background-clip: text which doesn't print — force solid
         black so headings stay readable. */
   .text-gradient,
@@ -1587,44 +1701,85 @@ button.icon-btn:hover > svg,
     -webkit-text-fill-color: #000000 !important;
   }
 
-  /* 7. Page breaks: keep each top-level section together so it
-        doesn't get sliced across two pages, and never orphan a
-        heading at the bottom of a page.
-
-        IMPORTANT — the selector targets `main > section` AND
-        `main > .page-enter > section`: every route is wrapped by
-        `template.tsx` in `<div class="page-enter">`, so the
-        actual DOM is `main > .page-enter > section`. The original
-        `main > section` selector matched nothing — `break-inside:
-        avoid` was silently a no-op. Both selectors are listed so
-        the rule still works if template.tsx is later removed. */
-  main > section,
-  main > .page-enter > section {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-  h1,
-  h2,
-  h3 {
-    break-after: avoid;
-    page-break-after: avoid;
-  }
-
-  /* 8. Reset the page wrapper backgrounds one more time so the
-        dark theme baked into `.min-h-screen` / `.flex-1` doesn't
-        bleed through. */
+  /* 10. Reset the page wrapper backgrounds one more time so the
+         dark theme baked into `.min-h-screen` / `.flex-1` doesn't
+         bleed through. */
   .min-h-screen,
   .flex-1 {
     background: #ffffff !important;
     color: #000000 !important;
   }
 
-  /* 9. Reset the <html> dark-class background that the no-FOUC
-        script applies before paint. */
-  html.dark,
-  html[class*="dark"] {
-    background: #ffffff !important;
-    color: #000000 !important;
+  /* 11. Page breaks: keep each top-level section together so it
+         doesn't get sliced across two pages, and never orphan a
+         heading at the bottom of a page.
+
+         IMPORTANT — the selector targets `main > section` AND
+         `main > .page-enter > section`: every route is wrapped by
+         `template.tsx` in `<div class="page-enter">`, so the
+         actual DOM is `main > .page-enter > section`. The original
+         `main > section` selector matched nothing — `break-inside:
+         avoid` was silently a no-op. Both selectors are listed so
+         the rule still works if template.tsx is later removed. */
+  main > section,
+  main > .page-enter > section,
+  section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  section + section {
+    page-break-before: auto;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* 12. Links: show the URL in parentheses after link text so the
+         printed copy retains clickable references. The 0.85em size
+         + #666 gray keeps the URL readable without competing with
+         the link text itself; word-break: break-all prevents long
+         URLs from overflowing the page. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #666666 !important;
+    word-break: break-all;
+  }
+
+  /* 13. Font: switch body + headings to serif (Georgia) for paper
+         legibility — serif reads more easily on paper than the
+         screen-tuned sans, and 11pt + 1.5 leading is the standard
+         book-print rhythm. Headings stay in the same serif so the
+         printed page has a coherent typographic voice. */
+  body {
+    font-family: Georgia, "Times New Roman", serif !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: Georgia, "Times New Roman", serif !important;
+    color: #111111 !important;
+  }
+
+  /* 14. Images: ensure they don't break across pages and stay
+         within the page width. */
+  img {
+    page-break-inside: avoid;
+    max-width: 100% !important;
+  }
+
+  /* 15. Page margins — 1.5cm top/bottom, 2cm left/right — gives
+         the printed page a clean institutional border that matches
+         letter / A4 paper conventions. */
+  @page {
+    margin: 1.5cm 2cm;
   }
 }
 
@@ -1645,8 +1800,16 @@ button.icon-btn:hover > svg,
      de sobra y competía con el contenido). */
   background: rgba(0, 0, 0, 0.92);
   background-blend-mode: luminosity;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  /* blur + saturate — the same material recipe .glass uses (R26-2b):
+     blur(4px) is lighter than .glass's 16px because liquid-glass sits
+     on brighter, busier backdrops (navbar over hero video, demo window
+     over screenshots) where heavier blur would smear content underneath.
+     saturate(150%) compensates for the diffuse desaturation blur
+     introduces — without it the material reads as flat gray rather
+     than the rich tinted glass the WinUI Acrylic/Mica reference shows.
+     Matches the .glass saturate value for material-system coherence. */
+  backdrop-filter: blur(4px) saturate(150%);
+  -webkit-backdrop-filter: blur(4px) saturate(150%);
   position: relative;
 }
 .liquid-glass::before {
@@ -1864,134 +2027,4 @@ button.icon-btn:hover > svg,
     rgb(var(--accent-base) / 0.16),
     transparent 62%
   );
-}
-
-/* ============================================================
-   PRINT STYLESHEET
-   Produces a clean, readable printout of feature subpages:
-   - Hides the WebGL background, navbar, footer, TOC, progress bar,
-     side rail, cookie banner, back-to-top, and all interactive chrome.
-   - Forces a white background + black text (print is always light).
-   - Expands the content to full width (no max-w-page constraint).
-   - Adds page breaks before each major section heading so each
-     section starts on a new page.
-   - Shows the URL + reading time in the print header (via :before).
-   - Removes blur/backdrop-filter (printers can't render them and
-     they cause blank patches in PDF export).
-   ============================================================ */
-@media print {
-  /* Force light theme variables for print */
-  :root,
-  :root[data-theme="dark"] {
-    --bg: 255 255 255;
-    --txt-primary: 17 17 17;
-    --txt-secondary: 51 51 51;
-    --txt-tertiary: 102 102 102;
-    --divider: 0 0 0;
-    --surface: #ffffff;
-    --surface-2: #f5f5f5;
-    --ink: #111111;
-    --ink-2: #333333;
-    --ink-3: #666666;
-  }
-
-  /* White background, black text, no blur */
-  html, body {
-    background: #ffffff !important;
-    color: #111111 !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  /* Hide all interactive chrome */
-  nav[aria-label="Índice de la página"],
-  nav[aria-label="On this page"],
-  nav[aria-label="Índice de secciones"],
-  nav[aria-label="Migas de pan"],
-  nav[aria-label="Breadcrumb"],
-  .fixed,
-  [class*="ReadingProgressIndicator"],
-  #mobile-nav-drawer,
-  .grain,
-  .aurora-bg,
-  [class*="BackgroundFX"],
-  [class*="CookieConsent"],
-  [class*="BackToTop"],
-  [class*="ScrollToTop"],
-  [class*="CommandPalette"],
-  [class*="GlobalShortcuts"],
-  [class*="ShortcutsHelp"],
-  [class*="IntroSequence"],
-  [class*="ScrollProgress"],
-  footer,
-  header {
-    display: none !important;
-  }
-
-  /* Expand content to full width */
-  .max-w-page,
-  .max-w-\[1240px\],
-  .max-w-\[820px\] {
-    max-width: 100% !important;
-  }
-
-  /* Remove veils, glass effects, shadows — print flat */
-  .bg-veil,
-  .liquid-glass,
-  .glass,
-  .glass-thin {
-    background: #ffffff !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-    border-color: #cccccc !important;
-  }
-
-  /* Section breaks: each major section starts on a new page */
-  section {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-  section + section {
-    page-break-before: auto;
-  }
-  h2 {
-    page-break-after: avoid;
-    break-after: avoid;
-  }
-
-  /* Links: show the URL in parentheses after link text (for print) */
-  a[href^="http"]::after {
-    content: " (" attr(href) ")";
-    font-size: 0.85em;
-    color: #666666;
-    word-break: break-all;
-  }
-
-  /* Accent divider under PageHeader: keep as a subtle gray rule */
-  .bg-veil + *,
-  section:first-of-type {
-    border-top: 1px solid #cccccc !important;
-  }
-
-  /* Font: use serif for body in print (more readable on paper) */
-  body {
-    font-family: Georgia, "Times New Roman", serif !important;
-    font-size: 11pt !important;
-    line-height: 1.5 !important;
-  }
-  h1, h2, h3, h4 {
-    font-family: Georgia, "Times New Roman", serif !important;
-    color: #111111 !important;
-  }
-
-  /* Images: ensure they don't break across pages */
-  img {
-    page-break-inside: avoid;
-    max-width: 100% !important;
-  }
-
-  /* Page margins */
-  @page {
-    margin: 1.5cm 2cm;
-  }
 }

@@ -15014,3 +15014,135 @@ Stage Summary:
   - **Border tokens**: all marketing borders use `rgb(var(--divider)/N)` (1 outlier fixed: Gallery expand-button overlay).
   - **Icon containers**: GuardianNew / MoreFeatures / Integrations / ContactSupport / SecuritySection all use 40px + 6% accent bg + 15% accent border + inset divider shadow (3 outliers fixed: GuardianNew 36px/14%/no-border, SecuritySection 38px/14%/inset-ring, ContactSupport 44px).
 - 16 files touched: globals.css (eyebrow token), Story.tsx, Milestones.tsx, Values.tsx, FeaturePageNav.tsx (×3 fixes), Gallery.tsx (×2 fixes), BeforeAfter.tsx, Hero.tsx (×2 fixes), TechSpecs.tsx, MoreFeatures.tsx, FeaturesBento.tsx (×6 fixes — section padding + 5 cards), SecuritySection.tsx (×3 fixes), DisciplineCost.tsx, GuardianNew.tsx (×2 fixes), RiskCalculator.tsx, MetricsShowcaseNew.tsx, FinalCTANew.tsx (×2 fixes), HomeDemo.tsx (×2 fixes), OverviewApp.tsx (×2 fixes), DownloadCTA.tsx, DemoReadyToBuy.tsx, ContactSupport.tsx.
+
+---
+Task ID: R26-2b
+Agent: edit-files (frontend-styling-expert — polish globals.css utilities + print stylesheet)
+Task: Polish src/app/globals.css to maximum professional detail. 15-point audit: typography tokens (.t-h1/.t-h2/.t-h3/.t-h4, .t-body family, .eyebrow), .liquid-glass material, .bg-veil, .divider-grad, .link-underline, .kbd, print stylesheet, focus-visible ring, ::selection, scrollbar, prefers-reduced-motion, dead-code cleanup, scroll-behavior: smooth.
+
+Work Log:
+
+Verified clean (no change needed) — 8 of 15 points passed audit:
+- #2 .t-body / .t-body-sm / .t-caption / .t-small / .t-mono: line-heights (1.6 → 1.55 → 1.5 → 1.5 → 1.5) and letter-spacings (-0.01 → -0.005 → 0 → -0.01) follow the canonical "tighten tracking as size grows, widen leading as size shrinks" scale. ✓
+- #3 .eyebrow: 0.14em tracking, 600 weight, uppercase, 0.625rem size — matches spec. ✓
+- #5 .bg-veil: color-mix(in srgb, var(--bg) 74%, transparent) dark / 82% light — matches spec. ✓
+- #6 .divider-grad: 1px height, 90deg gradient fading to transparent at both edges with 12% divider color in the middle 20–80% range — matches spec. ✓
+- #7 .link-underline: scaleX(0) → scaleX(1) sweep with transform-origin: left + 0.3s cubic-bezier(0.22, 1, 0.36, 1) + focus-visible parity + reduced-motion override. Smooth. ✓
+- #8 .kbd: white/10 bg + white/15 border + Geist Mono + tnum/zero features + inset bottom shadow (engraved key) + 1px outer shadow (key lift) + light-theme override. Reads as a real key cap. ✓
+- #11 ::selection: accent/0.9 + #000 dark, accent/0.85 + #fff light — accent-colored in both themes. ✓
+- #12 Scrollbar: Firefox scrollbar-color + WebKit 8px track/thumb with hover state, light-theme override (track black/4, thumb black/18, hover black/28). Subtle but functional. ✓
+- #15 scroll-behavior: smooth already on html (line 272, @layer base) with the prefers-reduced-motion override at line 1108 setting scroll-behavior: auto. ✓
+
+Fixed — 7 of 15 points needed changes:
+
+#1 — Typography tokens (.t-h1 / .t-h2 / .t-h3 / .t-h4 text-wrap + weights + tracking + leading):
+- .t-h1, .t-h2: already had text-wrap: balance + 500 weight + correct tracking (-0.035em / -0.03em) + correct leading (1.05 / 1.1). ✓ no change.
+- .t-h3: was missing `text-wrap: balance` (only h1/h2 had it; the global `h1, h2, h3 { text-wrap: balance }` rule covers the HTML elements but NOT the .t-h3 class when applied to non-h3 elements like <p class="t-h3">). Added `text-wrap: balance` + R26-2b comment explaining the parity rationale.
+- .t-h4: same gap — added `text-wrap: balance` + comment noting h4 often wraps to two lines in card titles where balancing keeps the second line optically even.
+- Weights confirmed: 500 for h1/h2/h3, 600 for h4. ✓
+
+#4 — .liquid-glass material (0.92 dark / 0.94 light opacity + blur + saturate + inset highlight + machined rim):
+- Opacity: rgba(0,0,0,0.92) dark / rgba(255,255,255,0.94) light. ✓
+- Blur: blur(4px). ✓
+- **saturate: MISSING** — the backdrop-filter was `blur(4px)` only. The task spec requires "blur, saturate, inset highlight, machined rim" — saturate was the one missing piece. Without it, the 4px blur desaturates the backdrop content and the material reads as flat gray rather than the rich tinted glass the WinUI Acrylic/Mica reference shows. Added `saturate(150%)` (matching .glass's saturate value for material-system coherence) to both `backdrop-filter` and `-webkit-backdrop-filter`, plus a comment explaining why liquid-glass uses 4px blur (vs .glass's 16px) and why saturate(150%) compensates for the diffuse desaturation.
+- Inset highlight: ::after box-shadow inset 0 1px 0 / inset 0 -1px 0. ✓
+- Machined rim: ::before linear-gradient(180deg, 6 stops) + mask-composite: exclude. ✓
+
+#9 — Print stylesheet (interactive chrome hidden, full-width content, page breaks, serif font):
+- **CRITICAL FIX**: there were TWO duplicate `@media print` blocks in the file (lines ~1461 "PRINT STYLES" + lines ~1882 "PRINT STYLESHEET") with overlapping rules and no coordination — the second block's `serif font` won by cascade, but its `border-color: #cccccc` on .glass was silently overridden by the first block's `border: none`, etc. The first block didn't expand content to full width or switch the font to serif; the second block didn't strip body::before grain or hide ::before/::after on .glass / .gradient-border / .link-underline / .grain, didn't reset html.dark, didn't have the universal print-color-adjust: economy reset.
+- Consolidated into ONE comprehensive `@media print` block (275 lines) that preserves every selector from both blocks, ordered so the cascade resolves to the intended print look. 15 numbered sections:
+  1. Force light-theme CSS variables (--bg / --txt-* / --divider / --surface / --ink).
+  2. White paper baseline (html, body bg + color + no backdrop-filter) + hide body::before grain.
+  3. Reset html.dark / html[class*="dark"] backgrounds.
+  4. Hide all interactive chrome: scoped `body > div > header/footer` (Navbar/Footer), generic `header/footer/nav` (page-local TOC / breadcrumb), `.fixed`, `[role="dialog"]`, `[role="alertdialog"]`, `[data-radix-popper-content-wrapper]`, `canvas`, all `[class*="..."]` selectors for ReadingProgressIndicator / BackgroundFX / CookieConsent / BackToTop / ScrollToTop / CommandPalette / GlobalShortcuts / ShortcutsHelp / IntroSequence / ScrollProgress, `#mobile-nav-drawer`, `#tj-loader`, `.aurora-bg`, `.grain`, `.tj-no-print`.
+  5. Expand content to full width (.max-w-page, .max-w-[1240px], .max-w-[820px] → max-width: 100%).
+  6. Reset overflow on main/section/article so decorative overflow:hidden doesn't clip printed content.
+  7. Strip .glass / .glass-thin / .liquid-glass / .bg-veil (bg + color + border + box-shadow + backdrop-filter all to flat white/none) + hide ::before/::after on .glass, .liquid-glass, .gradient-border, .link-underline, .grain, .tj-cta-sheen, .tj-spot.
+  8. Universal reset (*, *::before, *::after): black text, transparent bg, no shadows/borders, no backdrop-filter, print-color-adjust: economy (so decorative backgrounds stay stripped even if "Background graphics" is toggled on).
+  9. Force solid black on .text-gradient (background-clip: text doesn't print).
+  10. Reset .min-h-screen / .flex-1 backgrounds (dark theme bleeds through otherwise).
+  11. Page breaks: `main > section`, `main > .page-enter > section`, `section` → break-inside: avoid; `section + section` → page-break-before: auto; `h1, h2, h3, h4` → break-after: avoid. (Both `main > section` AND `main > .page-enter > section` selectors listed because every route is wrapped by template.tsx in `<div class="page-enter">` — without the second selector the rule was silently a no-op.)
+  12. Links: show URL in parentheses after link text (a[href^="http"]::after { content: " (" attr(href) ")"; ... }).
+  13. Font: switch body + h1-h4 to Georgia serif + 11pt + 1.5 leading for paper legibility.
+  14. Images: page-break-inside: avoid + max-width: 100%.
+  15. @page margin: 1.5cm 2cm (institutional paper border for letter / A4).
+- Deleted the second duplicate @media print block (130 lines) — net file change: -130 + ~100 = -30 lines after consolidation (file went 1997 → 2030 lines because the new consolidated block is more thorough than either original).
+
+#10 — Focus-visible ring (2px accent + 4px glow):
+- The actual rule was already correct: `outline: 2px solid rgb(var(--accent-base) / 0.7); outline-offset: 2px; box-shadow: 0 0 0 4px rgb(var(--accent-base) / 0.2);` — 2px accent ring + 4px accent glow halo. ✓
+- BUT there were TWO stale duplicate comment blocks above it: the first said "2px ring at 60% opacity, 4px halo at 18%" (outdated values from an earlier iteration); the second said "2px ring at 70% opacity, 4px halo at 20%" (matches the actual rule). Collapsed both into one accurate comment block under a new FOCUS-VISIBLE section header, with a note that R26-2b collapsed the stale duplicate.
+
+#13 — prefers-reduced-motion (neutralizes ALL animations):
+- The existing rule (animation-duration: 0.01ms + iteration-count: 1 + transition-duration: 0.01ms + scroll-behavior: auto) was the W3C-recommended pattern and effectively neutralizes everything. ✓
+- Strengthened by adding `animation-delay: 0.01ms` and `transition-delay: 0.01ms` — cancels any startup delay (IntroSequence's 5s failsafe delay, staggered ScrollReveal children) so the end state applies immediately rather than after the delay. Added a thorough comment explaining each property's role (duration → instant, delay → no startup wait, iteration-count → stops infinite loops like tj-pulse-dot / tj-glow / tj-float / tj-scroll-bead / tj-sheen, scroll-behavior → cancels smooth anchor jumps) and noting the per-component overrides (.grain::after, .page-enter, .link-underline::after, .icon-btn svg) are belt-and-suspenders.
+
+#14 — Orphaned/dead CSS rules cleanup:
+- Removed `.max-w-form { max-width: 1100px; }` from the utilities layer — confirmed unused across the entire codebase (no className reference anywhere in src/). The two other max-width utilities (.max-w-page = 1200px, used 40+ times; .max-w-[1240px] / .max-w-[820px] Tailwind arbitrary values, used in Hero / FinalCTANew / MetricsShowcaseNew / DisciplineCost / GuardianNew / RiskCalculator / SecuritySection) cover every page-width constraint actually in use.
+- Investigated `.snap-container` / `.snap-section` (no className references): LEFT AS-IS — they're documented as "Optional scroll-snap helpers — NOT applied globally. Apply .snap-container on the scroll parent and .snap-section on each child to opt in." Intentional opt-in utilities for future use, not dead code.
+- Investigated `.bg-tint` (no className references): LEFT AS-IS — small one-line generic tint utility that could be useful for future theming work; not worth removing.
+- The big dead-code find was the duplicate `@media print` block (handled in #9 above).
+
+Verification:
+- `npx tsc --noEmit` → 0 errors in `src/`. The only 4 remaining tsc errors are all in `examples/websocket/` + `skills/stock-analysis-skill/` + `skills/image-edit/` — pre-existing, out of scope, not part of the Next.js project src tree. ✓
+- `npx eslint src/` → 0 errors, 0 warnings. ✓
+- `npx next build` → ✓ Compiled successfully in 21.8s, all 15 routes prerendered as static content. CSS compiles cleanly with no syntax errors. ✓
+
+Stage Summary:
+- globals.css polished to maximum professional detail. 8 of 15 audit points passed clean; 7 needed fixes.
+- **Typography**: all 4 heading tokens (.t-h1 / .t-h2 / .t-h3 / .t-h4) now carry `text-wrap: balance` for orphan-word control. Body family tokens (.t-body / .t-body-sm / .t-small / .t-caption / .t-mono) confirmed consistent on the canonical line-height + letter-spacing scale.
+- **Materials**: .liquid-glass now matches .glass's material recipe (blur + saturate) — the missing `saturate(150%)` was the one gap in the premium-glass material system. .bg-veil opacity (74% / 82%) and .divider-grad gradient confirmed correct.
+- **Focus + selection + scrollbar**: 2px accent + 4px glow focus ring verified; ::selection accent-colored in both themes; scrollbar subtle but functional in both themes. Stale duplicate comment block on focus-visible collapsed into one accurate block.
+- **Reduced motion**: prefers-reduced-motion rule now cancels animation/transition delays in addition to durations + iteration counts + scroll-behavior — fully neutralizes every animation site-wide (tj-pulse-dot, tj-glow, tj-float, tj-scroll-bead, tj-sheen, page-enter, IntroSequence failsafe, staggered ScrollReveal).
+- **Print stylesheet**: consolidated from two uncoordinated duplicate @media print blocks into ONE 275-line stylesheet with 15 numbered sections covering light-theme variable forcing, white paper baseline, full chrome hiding (Navbar / Footer / TOC / breadcrumb / fixed overlays / dialogs / canvas / 9 component-name selectors / #tj-loader / #mobile-nav-drawer / .aurora-bg / .grain / .tj-no-print), full-width content expansion, glass material stripping, decorative pseudo-element hiding, universal reset with print-color-adjust: economy, .text-gradient solid-black fallback, .min-h-screen / .flex-1 / html.dark background resets, comprehensive page-break rules (main > section + main > .page-enter > section + h1-h4 break-after: avoid), URL-after-links printing, serif font switch (Georgia 11pt + 1.5 leading), image page-break protection, @page 1.5cm×2cm margins.
+- **Dead code**: removed unused `.max-w-form` utility; removed 130-line duplicate print block. `.snap-container` / `.snap-section` / `.bg-tint` left as documented opt-in utilities.
+- 1 file touched: src/app/globals.css (1997 → 2030 lines; net +33 from added text-wrap on h3/h4 + saturate on liquid-glass + strengthened reduced-motion + expanded consolidated print block, minus removed .max-w-form + 130-line duplicate print block).
+
+---
+Task ID: R26-2a
+Agent: frontend-styling-expert
+Task: Polish SettingsPage demo + demo chrome (WindowChrome, TopNav, StatusBar, DemoCapabilities) to maximum professional detail. Demo is intentionally ALWAYS-DARK (kept text-white/bg-white).
+
+Work Log:
+- Read worklog.md, all 5 target files (SettingsPage 1023 lines, WindowChrome 364, TopNav 278, StatusBar 152, DemoCapabilities 217), globals.css design tokens (.eyebrow, .pill, .divider-grad, .liquid-glass, .depth-1/2/3, --pnl-pos/warn/neg, --accent-base/hover/foreground), and 3 reference demo pages (ExperimentsPage, FiscalPage, BusinessPage KPI cards) to confirm the canonical "accent top-edge bar on cards" visual language used elsewhere in the demo.
+
+- src/components/demo/pages/SettingsPage.tsx (5 polish fixes):
+  1. Section header hierarchy fix — SettingSection's eyebrow ("01"/"02"/…) was text-primary (bright white) while the section title was text-tertiary (dim), inverted from natural hierarchy. Swapped: the index is now a small dim pill chip (`.min-w-[1.5rem] h-6 px-1.5 rounded-md bg-white/[0.04] border border-white/10 text-tertiary tnum`), the title is now text-secondary (brighter). Also changed the row from `items-baseline` → `items-center` so the pill chip aligns cleanly with the title text.
+  2. Accent top-edge bars on all 3 major content cards — the live-preview card (Appearance section), the sample-data card, and the About card now each carry a 2px `bg-[rgb(var(--accent-base)/0.55-0.65)]` top-edge bar, mirroring the ExperimentsPage/FiscalPage/BusinessPage KPI card pattern. The live-preview card's bar sits at z-20 (above the shimmer/flash overlays) with `transition-colors duration-[400ms]` so palette switches recolor it in lockstep.
+  3. Palette swatch polish — the inner-highlight was a `-inset-1` child span whose inset box-shadow was clipped away by the parent's `overflow-hidden` (the span extended 4px beyond the swatch, so the 1px inset specular was outside the visible area). Refactored: the inset specular top-highlight (`inset 0 1px 1px rgb(255 255 255 / 0.42)`) and bottom-shadow (`inset 0 -3px 5px rgb(0 0 0 / 0.32)`) are now applied directly on the swatch div via inline `box-shadow`, so the highlights are actually visible at the swatch edge — reads as a polished physical paint chip. Also added a subtle `ring-1 ring-white/15` on the swatch so inactive swatches have presence without competing with the active accent ring.
+  4. Sample-data button hierarchy — the Load button (primary reset action) was styled as secondary (subtle `border-white/10 bg-white/5`), visually equivalent to the Download button. Promoted Load to accent-tinted primary: `border-[rgb(var(--accent-base)/0.35)] bg-[rgb(var(--accent-base)/0.10)] hover:bg-[rgb(var(--accent-base)/0.16)] hover:border-[rgb(var(--accent-base)/0.55)]`. Download stays as the secondary outline.
+  5. Build-info grid + About icon chip polish — each of the 4 build-info cells (Versión / Compilación / Plataforma / Idiomas) now carries a 1px `bg-[rgb(var(--accent-base)/0.35)]` top-edge hairline (mini KPI-card pattern) + the value bumped from `font-medium` → `font-semibold` + `tabular-nums` for cleaner digit alignment. The About card's info icon chip was `bg-white/8 text-primary` (neutral); converted to accent-tinted `bg-[rgb(var(--accent-base)/0.10)] text-[rgb(var(--accent-base))] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.25)]` so it reads as a polished accent chip, not a flat gray square. Also cleaned up 4 dead `active ? "text-primary" : "text-primary"` ternaries in the language + theme toggles (the ternary branches were identical — left over from an earlier accent-color iteration).
+
+- src/components/demo/WindowChrome.tsx (4 polish fixes):
+  1. Accent-tinted machined top edge — the title bar's top highlight was a 1px `bg-gradient-to-b from-white/10 to-transparent`. Upgraded to a 2px 3-stop gradient: `linear-gradient(to bottom, rgb(var(--accent-base) / 0.40) 0%, rgb(255 255 255 / 0.10) 50%, transparent 100%)`. The accent tint at the very top ties the chrome to the demo's accent identity; the white/10 below is the machined-edge specular. Subtle but reads as a deliberate top-rim finish.
+  2. Vertical hairline divider before caption buttons — added a 1px `bg-white/10 h-full` divider between the Local-first LED and the Min/Max/Close cluster, mirroring WinUI's visual grouping of the caption buttons as a distinct system cluster. Hidden on `<sm` alongside the LED so the divider never appears alone.
+  3. AppIcon keycap specular — the 16×16 app icon tile already had an outer 1px white/10 ring + inner 1px white/18 ring. Added `inset_0_1px_0_rgb(255_255_255_/_0.35)` (a 1px top-edge inset highlight) so the tile reads as a polished keycap with a machined top specular, not a flat colored square.
+  4. AccountChip live-terminal accent dot — added a tiny 4px accent-tinted LED (`w-1 h-1 rounded-full bg-[rgb(var(--accent-base))] shadow-[0_0_4px_rgb(var(--accent-base)/0.7)]`) before the wallet icon in the centered DEMO account pill. Reads as a "connected / live" status indicator, matching the Bloomberg/terminal aesthetic of the chip's monospace "DEMO · 10.000 $" text.
+
+- src/components/demo/TopNav.tsx (4 polish fixes):
+  1. Settings gear visual distinction — the Settings tab was visually identical to the other 8 tabs. Added a 1px `bg-white/10 h-5` vertical hairline divider before the Settings tab (via a Fragment-wrapped conditional render), mirroring WinUI NavigationView's PaneFooter placement where Settings sits in a separate visual group below the main nav items. The divider uses `self-center` so it's vertically centered despite the parent's `items-stretch`.
+  2. Active-tab accent halo — the active tab's layoutId pill (`bg-white/10`) now carries a soft `shadow-[0_0_14px_rgb(var(--accent-base)/0.18)]` accent halo so the active state reads as "elevated" without competing with the 2px accent underline. The halo + underline + pill compose into a richer active indicator.
+  3. Smooth horizontal scroll on mobile — the tab-strip scroll container gained `overscroll-x-contain` (prevents scroll chaining to the page when the strip reaches its edge) + `scroll-pl-2` (ensures arrow-key-navigated tabs aren't flush against the left edge after a scroll). The `no-scrollbar` class (already present) keeps the scrollbar hidden.
+  4. "+ New trade" button accent-on-hover — the right-side primary action was `text-secondary hover:text-primary hover:bg-white/5` (neutral). Upgraded to `text-secondary hover:text-[rgb(var(--accent-base))] hover:bg-[rgb(var(--accent-base)/0.10)]` so on hover it reads as the primary in-app action (accent-tinted), while at rest it stays subdued so it doesn't compete with the tab strip.
+
+- src/components/demo/StatusBar.tsx (3 polish fixes):
+  1. Discipline LED subtle pulse — the LED was a steady 6px dot (matching the real app's no-pulse Ellipse). Added a breathing halo: a `motion.span` ring that scales from 1 → 2.4 and fades from opacity 0.55 → 0 over 2s, looping with a 0.3s repeat-delay. The dot itself stays steady (so the "always on" state-indicator semantic is preserved); only the halo breathes. Respects `prefers-reduced-motion` via `useReducedMotion()` (halo hidden, dot only). The LED is now wrapped in a 12px container (`w-3 h-3`) to accommodate the halo's 2.4× scale without clipping.
+  2. Version text readability — the version was a flat `text-tertiary` "v2.4.1". Upgraded to a 2-tone treatment: a leading 4px accent dot + "v" prefix in `text-tertiary` (dim) + "2.4.1" digits in `text-secondary` (brighter). The version number now reads as the focal element, with the "v" as a quiet prefix. The accent dot ties the version badge to the demo's accent identity.
+  3. StatusBar imports + spacing — added `motion` + `useReducedMotion` imports from framer-motion. Spacing is already consistent with the title bar (both use `px-3`, h-9 title vs h-7 status — the standard WinUI title/status ratio). No spacing changes needed.
+
+- src/components/demo/DemoCapabilities.tsx (3 polish fixes):
+  1. Accent top-edge bar on feature cards — each of the 6 feature cards now carries a 2px `bg-[rgb(var(--accent-base)/0.45)]` top-edge bar, mirroring the ExperimentsPage/FiscalPage KPI card pattern and the SettingsPage cards polished above. Ties the marketing-section cards to the demo's accent identity. Card className gained `relative overflow-hidden` to anchor the bar.
+  2. Icon chip specular + card hover halo — the 9×9 icon chip gained `shadow-[inset_0_1px_0_rgb(255_255_255_/_0.10)]` (a 1px inset top specular) so it reads as a polished material chip, not a flat square. The card gained `hover:shadow-[0_8px_24px_-8px_rgb(var(--accent-base)/0.25)]` (a soft accent drop-shadow on hover) so the lift reads as "the card is now active/focused" — composes with the existing `hover:border-[rgb(var(--accent-base)/0.32)]` + `hover:bg-[rgb(var(--accent-base)/0.04)]` for a richer hover state.
+  3. Icon visual-weight consistency — standardized all 6 icons' strokeWidth: main outlines = 1.6, inner details = 1.5. Fixed 2 outliers: ShieldIcon's checkmark was 1.7 → 1.6; BookIcon's bottom-line was 1.4 → 1.5. All icons now share the same stroke vocabulary.
+
+Verification:
+- `bun run lint` → 0 errors, 0 warnings (exit 0). ✓
+- `bunx tsc --noEmit` → 0 errors in `src/` and in all 5 edited demo files. The only 4 remaining tsc errors are pre-existing in `examples/websocket/` + `skills/stock-analysis-skill/` + `skills/image-edit/` (unrelated to this task, not part of the Next.js src tree). ✓
+
+Stage Summary:
+- 5 files touched: src/components/demo/pages/SettingsPage.tsx, src/components/demo/WindowChrome.tsx, src/components/demo/TopNav.tsx, src/components/demo/StatusBar.tsx, src/components/demo/DemoCapabilities.tsx.
+- The SettingsPage now shares the same "accent top-edge bar on cards" visual language as ExperimentsPage / FiscalPage / BusinessPage. The section headers have a clearer hierarchy (dim numbered pill + brighter title). The palette swatches read as polished physical paint chips (inset specular now actually visible). The Load button is now accent-tinted primary (was visually equivalent to Download). Build-info cells + About icon chip are accent-tinted.
+- The WindowChrome title bar now carries a subtle accent-tinted machined top edge + a vertical hairline divider before the caption buttons + a keycap specular on the app icon + a live-terminal accent dot on the account chip. Logo / account chip / market clock / local-first LED remain perfectly aligned (existing `items-center` + absolute-center cluster layout unchanged).
+- The TopNav now has a Settings gear divider (visual distinction), an accent halo on the active tab, smoother mobile scroll (overscroll-contain + scroll-pl), and an accent-on-hover "+ New trade" button. The 9 tabs' icons already share strokeWidth 1.8 — no icon-weight change needed there.
+- The StatusBar discipline LED now breathes subtly (halo scales + fades over 2s, dot stays steady, reduced-motion respected). The version text is now a 2-tone accent-dotted badge (brighter digits). Spacing unchanged (already consistent with the title bar).
+- The DemoCapabilities feature cards now carry accent top-edge bars + inset-specular icon chips + accent hover halos. All 6 icons share strokeWidth 1.6/1.5 (was 1.4/1.5/1.6/1.7 across icons).
+- Demo remains INTENTIONALLY ALWAYS-DARK — all edits use text-white/bg-white via the existing token classes (text-primary/secondary/tertiary, bg-white/N, rgb(var(--accent-base)/N), rgb(var(--pnl-pos)/N)). No light-theme branches added.

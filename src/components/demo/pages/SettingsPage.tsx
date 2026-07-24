@@ -218,13 +218,16 @@ function SettingSection({
   return (
     <Reveal delay={delay} y={18}>
       <section>
-        <div className="flex items-baseline gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-4">
           {eyebrow && (
-            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">
+            <span
+              aria-hidden="true"
+              className="shrink-0 inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 rounded-md text-[10px] font-bold tnum tabular-nums text-tertiary bg-white/[0.04] border border-white/10"
+            >
               {eyebrow}
             </span>
           )}
-          <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-tertiary">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-secondary">
             {title}
           </h2>
           <div className="flex-1 divider-grad" />
@@ -433,9 +436,7 @@ export function SettingsPage() {
                     {opt.code2}
                   </span>
                   <span
-                    className={`text-base font-semibold ${
-                      active ? "text-primary" : "text-primary"
-                    }`}
+                    className="text-base font-semibold text-primary"
                     style={
                       active
                         ? { color: "rgb(var(--accent-foreground))" }
@@ -497,15 +498,9 @@ export function SettingsPage() {
                   <span className="absolute inset-0 bg-transparent hover:bg-white/8 transition-colors duration-300" />
                 )}
                 <span className="relative z-10 h-full flex items-center justify-center gap-2.5">
-                  <Icon
-                    className={`w-[18px] h-[18px] ${
-                      active ? "text-primary" : "text-primary"
-                    }`}
-                  />
+                  <Icon className="w-[18px] h-[18px] text-primary" />
                   <span
-                    className={`text-sm font-semibold ${
-                      active ? "text-primary" : "text-primary"
-                    }`}
+                    className="text-sm font-semibold text-primary"
                     style={
                       active
                         ? { color: "rgb(var(--accent-foreground))" }
@@ -522,6 +517,14 @@ export function SettingsPage() {
 
         {/* Live preview card */}
         <div className="relative liquid-glass depth-3 hover:shadow-[0_6px_14px_rgb(0_0_0_/_0.32),0_24px_56px_rgb(0_0_0_/_0.36),0_0_44px_rgb(255_255_255_/_0.08)] transition-shadow duration-300 rounded-card p-5 overflow-hidden">
+          {/* Accent top-edge bar — ties this preview card to the demo's
+              accent identity (mirrors the ExperimentsPage / FiscalPage
+              KPI card pattern). Sits above the shimmer/flash overlays so
+              palette switches recolor it in lockstep. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-[2px] z-20 bg-[rgb(var(--accent-base)/0.65)] transition-colors duration-[400ms]"
+          />
           {/* Shimmer on theme switch (keyed on theme → remounts → animation replays) */}
           <motion.div
             key={`shimmer-${theme}`}
@@ -721,21 +724,23 @@ export function SettingsPage() {
                   transition={{ duration: 0.4 }}
                 />
 
-                {/* Swatch */}
+                {/* Swatch — polished physical paint-chip feel. The inset
+                    specular top-highlight + bottom-shadow are applied
+                    directly on the swatch div (not a child span) so the
+                    highlights are actually visible at the swatch edge
+                    (the previous `-inset-1` child span was clipped away
+                    by the parent's overflow-hidden, leaving the specular
+                    invisible). The 1px white/15 ring gives inactive
+                    swatches presence without competing with the active
+                    accent ring. */}
                 <div
-                  className="relative w-14 h-14 rounded-full overflow-hidden transition-transform duration-300 group-hover:scale-110"
+                  className="relative w-14 h-14 rounded-full overflow-hidden transition-transform duration-300 group-hover:scale-110 ring-1 ring-white/15"
                   style={{
                     background: `linear-gradient(135deg, ${p.dark} 0%, ${p.light} 100%)`,
+                    boxShadow:
+                      "inset 0 1px 1px rgb(255 255 255 / 0.42), inset 0 -3px 5px rgb(0 0 0 / 0.32)",
                   }}
                 >
-                  {/* Inner highlight */}
-                  <span
-                    className="absolute -inset-1 rounded-full pointer-events-none"
-                    style={{
-                      boxShadow:
-                        "inset 0 1px 1px rgb(255 255 255 / 0.35), inset 0 -2px 4px rgb(0 0 0 / 0.25)",
-                    }}
-                  />
                   {/* Active check */}
                   <AnimatePresence>
                     {active && (
@@ -778,7 +783,14 @@ export function SettingsPage() {
         title={t("sampleData")}
         delay={0.2}
       >
-        <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="relative liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 overflow-hidden">
+          {/* Accent top-edge bar — same visual language as the live-preview
+              card above. Subtle 2px accent strip ties this card to the
+              demo's accent identity. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-[2px] bg-[rgb(var(--accent-base)/0.55)]"
+          />
           <div className="flex-1">
             <p className="text-sm text-secondary leading-relaxed">
               {es
@@ -807,7 +819,7 @@ export function SettingsPage() {
               whileHover={{ scale: sampleState === "idle" ? 1.02 : 1 }}
               whileTap={{ scale: sampleState === "idle" ? 0.97 : 1, transition: { type: "spring", stiffness: 400, damping: 25 } }}
               aria-label={t("loadSample")}
-              className="relative shrink-0 h-11 px-5 rounded-card border border-white/10 bg-white/5 hover:bg-white/8 text-sm font-medium text-primary overflow-hidden min-w-[200px] transition-colors disabled:cursor-default"
+              className="relative shrink-0 h-11 px-5 rounded-card border border-[rgb(var(--accent-base)/0.35)] bg-[rgb(var(--accent-base)/0.10)] hover:bg-[rgb(var(--accent-base)/0.16)] hover:border-[rgb(var(--accent-base)/0.55)] text-sm font-medium text-primary overflow-hidden min-w-[200px] transition-colors disabled:cursor-default"
             >
               <AnimatePresence mode="wait" initial={false}>
                 {sampleState === "idle" && (
@@ -907,9 +919,15 @@ export function SettingsPage() {
         title={t("about")}
         delay={0.25}
       >
-        <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 md:p-6">
+        <div className="relative liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 md:p-6 overflow-hidden">
+          {/* Accent top-edge bar — same visual language as the other
+              Settings cards. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-[2px] bg-[rgb(var(--accent-base)/0.55)]"
+          />
           <div className="flex items-start gap-3 mb-4">
-            <div className="shrink-0 mt-0.5 w-9 h-9 rounded-card grid place-items-center bg-white/8 text-primary">
+            <div className="shrink-0 mt-0.5 w-9 h-9 rounded-card grid place-items-center bg-[rgb(var(--accent-base)/0.10)] text-[rgb(var(--accent-base))] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.25)]">
               <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
                 <path d="M12 11v5M12 7.5v.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -942,12 +960,19 @@ export function SettingsPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="bg-white/[0.04] border border-white/10 rounded-md p-3"
+                className="relative bg-white/[0.04] border border-white/10 rounded-md p-3 overflow-hidden"
               >
+                {/* Subtle accent top-edge hairline — mirrors the KPI
+                    card pattern at a smaller scale so each build-info
+                    cell reads as a tiny tagged chip. */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-px bg-[rgb(var(--accent-base)/0.35)]"
+                />
                 <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
                   {item.label}
                 </div>
-                <div className="text-sm font-medium text-primary tnum">
+                <div className="text-sm font-semibold text-primary tnum tabular-nums">
                   {item.value}
                 </div>
               </div>

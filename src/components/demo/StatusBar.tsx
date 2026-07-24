@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { METRICS } from "@/lib/trading/data";
 import { fmtPct } from "@/lib/trading/format";
@@ -70,7 +71,9 @@ export function StatusBar() {
       {/* LEFT — discipline LED + "Disciplina: NN %" text. Static
           (non-clickable) — matches the real app's DisciplineStatus
           StackPanel (XAML L313-318), which is a status indicator, not
-          a navigation affordance. */}
+          a navigation affordance. The LED carries a subtle breathing
+          halo so the bar feels alive without losing the steady-state
+          indicator semantic. */}
       <span
         className="flex items-center gap-2 min-w-0"
         title={`${t("discipline")}: ${complianceLabel}`}
@@ -116,11 +119,22 @@ export function StatusBar() {
       </div>
 
       {/* RIGHT — version text with tabular numerals (mirrors the real
-          app's VersionText). The version is a static literal here (the
-          web demo doesn't have an assembly version to read from); kept
-          in sync with the SettingsPage's "About" build info
-          ("Versión 2.4.1") so the two sources of truth never diverge. */}
-      <span className="tnum tabular-nums text-tertiary">v2.4.1</span>
+          app's VersionText). The leading accent dot ties the version
+          badge to the demo's accent identity; the "v" prefix is dimmer
+          than the digits so the version number reads as the focal
+          element. Kept in sync with the SettingsPage's "About" build
+          info ("Versión 2.4.1") so the two sources of truth never
+          diverge. */}
+      <span className="inline-flex items-center gap-1.5">
+        <span
+          aria-hidden="true"
+          className="w-1 h-1 rounded-full bg-[rgb(var(--accent-base))]"
+        />
+        <span className="tnum tabular-nums">
+          <span className="text-tertiary">v</span>
+          <span className="text-secondary">2.4.1</span>
+        </span>
+      </span>
     </div>
   );
 }
@@ -131,22 +145,46 @@ export function StatusBar() {
 
 /**
  * DisciplineLED — steady green dot (matches the real app's
- * DisciplineLed Ellipse, XAML L314-315). The real app uses a solid
- * Ellipse with no pulse — the LED is a state indicator (green = healthy
- * discipline), not a heartbeat. We match that: green when compliance
- * ≥ 70 %, amber/warn when below. No animation, just a soft accent halo
- * via the box-shadow so the dot reads as a real LED rather than a flat
- * speck.
+ * DisciplineLed Ellipse, XAML L314-315) with a subtle breathing halo
+ * so the status bar feels alive. The real app uses a solid Ellipse
+ * with no pulse — the LED is a state indicator (green = healthy
+ * discipline), not a heartbeat. We keep the dot steady (so the
+ * "always on" semantic is preserved) but add a soft accent halo that
+ * scales from 1 to 2.4 and fades over 2s, looping — a gentle
+ * "heartbeat" that doesn't compete with the dot's state-indicator
+ * role. Respects prefers-reduced-motion (halo hidden, dot only).
  */
 function DisciplineLED({ healthy }: { healthy: boolean }) {
+  const reduce = useReducedMotion();
+  const colorVar = healthy ? "--pnl-pos" : "--pnl-warn";
   return (
     <span
-      className={`relative inline-flex w-1.5 h-1.5 rounded-full shrink-0 ${
-        healthy
-          ? "bg-pnl-pos shadow-[0_0_5px_rgb(var(--pnl-pos)/0.55)]"
-          : "bg-pnl-warn shadow-[0_0_5px_rgb(var(--pnl-warn)/0.55)]"
-      }`}
+      className="relative inline-flex items-center justify-center w-3 h-3 shrink-0"
       aria-hidden="true"
-    />
+    >
+      {/* Breathing halo — soft ring that scales + fades over 2s. */}
+      {!reduce && (
+        <motion.span
+          className="absolute inset-0 rounded-full"
+          style={{ backgroundColor: `rgb(var(${colorVar}))` }}
+          initial={{ scale: 1, opacity: 0.55 }}
+          animate={{ scale: 2.4, opacity: 0 }}
+          transition={{
+            duration: 2,
+            ease: "easeOut",
+            repeat: Infinity,
+            repeatDelay: 0.3,
+          }}
+        />
+      )}
+      {/* Steady dot — the state indicator (green = healthy, amber = warn). */}
+      <span
+        className="relative w-1.5 h-1.5 rounded-full"
+        style={{
+          backgroundColor: `rgb(var(${colorVar}))`,
+          boxShadow: `0 0 5px rgb(var(${colorVar}) / 0.6)`,
+        }}
+      />
+    </span>
   );
 }

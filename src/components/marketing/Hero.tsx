@@ -45,9 +45,15 @@ export function Hero() {
           where the loader / IntroSequence don't run. */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[6%] -translate-x-1/2"
-        initial={{ opacity: 0, scale: 0.88 }}
-        animate={{ opacity: 0.5, scale: 1 }}
+        // R26-2c — `-translate-x-1/2` removed from className: framer-motion
+        // sets `transform` via inline style when any transform prop (scale)
+        // is animated, which overrides the Tailwind class and left the halo
+        // offset to the right of center. `x: "-50%"` is now set in
+        // initial/animate so framer-motion composes `translateX(-50%)
+        // scale(...)` and the halo materializes centered above the headline.
+        className="pointer-events-none absolute left-1/2 top-[6%]"
+        initial={{ opacity: 0, scale: 0.88, x: "-50%" }}
+        animate={{ opacity: 0.5, scale: 1, x: "-50%" }}
         // R25-1e — tightened from 1.6s/0.1d to 1.2s/0.05d so the halo
         // leads the data-seq content reveals by a beat (was lagging
         // them — the hero felt like it was "catching up" on repeat
@@ -179,7 +185,13 @@ export function Hero() {
         </div>
         <h1
           data-seq
-          className="m-0 mb-2 font-sans uppercase break-words hyphens-auto"
+          // R26-2c — `hyphens-auto` removed: on 320px viewports the long
+          // ES word "institucional" would auto-hyphenate mid-glyph
+          // ("insti-tucional"), which reads as a typo on a display H1.
+          // `break-words` (overflow-wrap: break-word) still catches any
+          // overflow at the space, giving a clean "mesa\ninstitucional."
+          // wrap on the narrowest phones instead of an ugly hyphen.
+          className="m-0 mb-2 font-sans uppercase break-words"
           style={{
             fontSize: "clamp(2rem, 7.6vw, 5.8rem)",
             fontWeight: 600,
@@ -214,7 +226,15 @@ export function Hero() {
                   fontStyle: "italic",
                   textDecoration: "underline",
                   textDecorationColor: "rgb(var(--accent-base) / 0.35)",
-                  textDecorationThickness: "1px",
+                  // R26-2c — `1px` → `0.035em`: at the headline's max
+                  // (5.8rem ≈ 93px) the fixed 1px hairline was barely
+                  // perceptible against the heavy display weight; at the
+                  // mobile min (2rem ≈ 32px) it read as a confident rule.
+                  // Scaling with the font (0.035em matches the headline's
+                  // -0.035em letter-spacing for visual cohesion) keeps
+                  // the underline a deliberate accent hairline at every
+                  // breakpoint — ~1px on mobile, ~3.25px on wide desktop.
+                  textDecorationThickness: "0.035em",
                   textUnderlineOffset: "0.16em",
                 }}
               >
@@ -233,7 +253,7 @@ export function Hero() {
                   fontStyle: "italic",
                   textDecoration: "underline",
                   textDecorationColor: "rgb(var(--accent-base) / 0.35)",
-                  textDecorationThickness: "1px",
+                  textDecorationThickness: "0.035em",
                   textUnderlineOffset: "0.16em",
                 }}
               >
@@ -283,14 +303,21 @@ export function Hero() {
         <div data-seq className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/pricing"
-            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-7 bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            // R26-2c — hover shadow layered with a 4px accent halo
+            // (`0_0_0_4px_rgb(var(--accent-base)/0.12)`) so the lift +
+            // brightness + drop shadow is now joined by a subtle accent
+            // RING that blooms around the pill on hover — the "perfect
+            // hover state (lift + accent ring + shadow)" the polish
+            // brief calls for. The halo sits UNDER the drop shadow in
+            // the box-shadow stack so the drop shadow still leads.
+            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-7 bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.12),0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             {es ? "Comprar — desde 29 $" : "Buy — from $29"}
             <ArrowRight size={16} aria-hidden />
           </Link>
           <Link
             href="/demo"
-            className="liquid-glass inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-[26px] border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-[15px] font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="liquid-glass inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-[26px] border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-[15px] font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             <Play size={15} fill="currentColor" aria-hidden />
             {es ? "Ver la demo" : "See the demo"}
@@ -392,7 +419,12 @@ export function Hero() {
               marginLeft: -1,
               top: 0,
               background: "rgb(var(--accent-base))",
-              boxShadow: "0 0 6px rgb(var(--accent-base))",
+              // R26-2c — glow radius 6px → 8px: in light theme the
+              // rail's accent gradient fades to invisible before reaching
+              // the bottom, leaving the bead as the sole scroll cue. 8px
+              // bloom keeps the bead readable on the bright surface
+              // without oversaturating it in dark theme.
+              boxShadow: "0 0 8px rgb(var(--accent-base))",
               animation: "tj-scroll-bead 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite",
             }}
           />

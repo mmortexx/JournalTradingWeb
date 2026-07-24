@@ -114,7 +114,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
   };
 
   return (
-    <section className="section-tight bg-veil relative border-t border-[rgb(var(--divider)/0.06)]">
+    <section className="section-tight bg-veil relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)]">
       <div className="relative max-w-page mx-auto px-5 md:px-8">
         {/* Share button — top-right */}
         <Reveal className="flex justify-center mb-10">

@@ -56,7 +56,7 @@ function ShieldIcon() {
       <path
         d="m9 12 2 2 4-4"
         stroke="currentColor"
-        strokeWidth="1.7"
+        strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -74,7 +74,7 @@ function BookIcon() {
         strokeLinejoin="round"
       />
       <path d="M9 8h6M9 11h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M5 18.5h13" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M5 18.5h13" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }
@@ -187,14 +187,24 @@ export function DemoCapabilities() {
               <motion.div
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                 transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="group liquid-glass depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-4 h-full flex flex-col gap-3 border border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--accent-base)/0.32)] hover:bg-[rgb(var(--accent-base)/0.04)]"
+                className="group liquid-glass depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-4 h-full flex flex-col gap-3 border border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--accent-base)/0.32)] hover:bg-[rgb(var(--accent-base)/0.04)] hover:shadow-[0_8px_24px_-8px_rgb(var(--accent-base)/0.25)] relative overflow-hidden"
               >
+                {/* Accent top-edge bar — mirrors the ExperimentsPage /
+                    FiscalPage KPI card pattern, tying each feature card
+                    to the demo's accent identity. Subtle 2px strip at the
+                    card's top edge. */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-[2px] bg-[rgb(var(--accent-base)/0.45)]"
+                />
                 {/* Icon container — accent-tinted chip that deepens on hover.
                     Rings are theme-aware (white/8 dark → black/8 light via
                     --divider) so the chip reads cleanly over the eye without
-                    flattening into the glass surface. */}
+                    flattening into the glass surface. The inset top specular
+                    (shadow-[inset_0_1px_0...]) reads as a polished material
+                    chip, not a flat square. */}
                 <span
-                  className="relative w-9 h-9 rounded-md flex items-center justify-center text-primary transition-[background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-[rgb(var(--divider)/0.08)] ring-1 ring-inset ring-[rgb(var(--divider)/0.10)] group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:ring-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))]"
+                  className="relative w-9 h-9 rounded-md flex items-center justify-center text-primary transition-[background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-[rgb(var(--divider)/0.08)] ring-1 ring-inset ring-[rgb(var(--divider)/0.10)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.10)] group-hover:bg-[rgb(var(--accent-base)/0.12)] group-hover:ring-[rgb(var(--accent-base)/0.30)] group-hover:text-[rgb(var(--accent-base))]"
                   aria-hidden="true"
                 >
                   {c.icon}

@@ -191,13 +191,19 @@ export function WindowChrome() {
 
   return (
     <div className="liquid-glass border-b border-white/10 flex items-center justify-between h-9 text-xs shrink-0 relative cursor-default select-none">
-      {/* Subtle draggable-area texture — a 1px noise-free top highlight that
-          reads as the machined top edge of a real WinUI 3 title bar. Sits
-          under the caption buttons so they stay crisp. The texture is
-          pointer-events-none so it never blocks clicks. */}
+      {/* Subtle draggable-area texture — a 2px machined top edge that
+          reads as the top rim of a real WinUI 3 title bar. The accent
+          tint at the very top ties the chrome to the demo's accent
+          identity; the white/10 below it is the machined-edge specular.
+          Sits under the caption buttons so they stay crisp. The texture
+          is pointer-events-none so it never blocks clicks. */}
       <div
         aria-hidden="true"
-        className="absolute top-0 left-0 right-0 h-px bg-gradient-to-b from-white/10 to-transparent pointer-events-none"
+        className="absolute top-0 left-0 right-0 h-[2px] pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgb(var(--accent-base) / 0.40) 0%, rgb(255 255 255 / 0.10) 50%, transparent 100%)",
+        }}
       />
 
       {/* ── LEFT: app icon + name ── */}
@@ -233,6 +239,15 @@ export function WindowChrome() {
       {/* ── RIGHT: Local-first LED + Windows 11 caption buttons ── */}
       <div className="flex items-stretch h-full relative z-[1]">
         <LocalFirstLED />
+        {/* Vertical hairline divider — visual grouping so the Win11
+            caption buttons read as a distinct cluster. Mirrors the
+            subtle separator the real app shows between the title-bar
+            content and the caption buttons. Hidden on <sm alongside
+            the Local-first LED so the divider never appears alone. */}
+        <div
+          aria-hidden="true"
+          className="hidden sm:block w-px h-full bg-white/10"
+        />
         {/* Minimize — visual only (no web analog to "minimize window"). */}
         <button
           type="button"
@@ -306,6 +321,15 @@ function AccountChip() {
   const { t } = useLang();
   return (
     <span className="pill bg-white/5 border border-white/15 text-secondary flex items-center gap-1.5">
+      {/* Live-terminal accent dot — a tiny accent-tinted LED that reads
+          as a "connected / live" indicator, matching the Bloomberg /
+          terminal aesthetic of the chip's monospace text. Sits before
+          the wallet icon so the dot reads as the chip's status, not
+          part of the account icon. */}
+      <span
+        aria-hidden="true"
+        className="w-1 h-1 rounded-full bg-[rgb(var(--accent-base))] shadow-[0_0_4px_rgb(var(--accent-base)/0.7)]"
+      />
       {/* Account/wallet icon — small (10px) so it reads as a leading
           glyph, not a feature icon. Matches the real app's FontIcon
           FontSize="12" E8C7. */}
@@ -347,7 +371,7 @@ function AccountChip() {
 function AppIcon() {
   return (
     <span
-      className="w-4 h-4 rounded-[3px] flex items-center justify-center shrink-0 shadow-[0_0_0_1px_rgb(255_255_255_/_0.10),inset_0_0_0_1px_rgb(255_255_255_/_0.18)]"
+      className="w-4 h-4 rounded-[3px] flex items-center justify-center shrink-0 shadow-[0_0_0_1px_rgb(255_255_255_/_0.10),inset_0_0_0_1px_rgb(255_255_255_/_0.18),inset_0_1px_0_rgb(255_255_255_/_0.35)]"
       style={{
         background:
           "linear-gradient(135deg, rgb(var(--accent-base)) 0%, rgb(var(--accent-hover)) 100%)",

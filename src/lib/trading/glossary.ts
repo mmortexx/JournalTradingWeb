@@ -85,6 +85,36 @@ export const GLOSSARY: GlossaryTerm[] = [
     en: "The magnitude of an asset's price fluctuations over a period. High volatility means wide ranges and more risk per trade; low volatility means smaller moves and smaller trades.",
     category: "basics",
   },
+  {
+    term: "Pullback",
+    es: "Retroceso temporal del precio contra la tendencia principal antes de reanudar su dirección. Es uno de los setups más fiables: entras a favor de tendencia en un punto donde el precio «descansa» y los stops quedan ajustados.",
+    en: "A temporary price retracement against the prevailing trend before it resumes its direction. One of the most reliable setups: you enter with the trend at a point where price «rests» and stops stay tight.",
+    category: "basics",
+  },
+  {
+    term: "Reversal",
+    es: "Cambio de dirección del precio en el que una tendencia alcista pasa a bajista (o viceversa). Requiere confirmación (vela de cierre, rotura de estructura) para distinguirlo de un simple pullback.",
+    en: "A change in price direction where an uptrend flips to downtrend (or vice versa). Requires confirmation (closing candle, structure break) to distinguish it from a mere pullback.",
+    category: "basics",
+  },
+  {
+    term: "Trend",
+    es: "Dirección dominante del precio en un periodo: alcista (máximos y mínimos crecientes), bajista (decrecientes) o lateral. Operar a favor de la tendencia mejora la probabilidad de acierto.",
+    en: "The dominant price direction over a period: up (rising highs and lows), down (falling highs and lows), or sideways. Trading with the trend improves the probability of success.",
+    category: "basics",
+  },
+  {
+    term: "Range",
+    es: "Zona donde el precio oscila entre un soporte y una resistencia claros sin tendencia definida. Se opera comprando el soporte y vendiendo la resistencia hasta que el rango se rompe.",
+    en: "A zone where price oscillates between a clear support and resistance with no defined trend. Traded by buying support and selling resistance until the range breaks.",
+    category: "basics",
+  },
+  {
+    term: "Edge",
+    es: "Ventaja estadística demostrable: una estrategia con expectancy positiva sostenida en el tiempo y en distintos regímenes de mercado. Sin edge, operar es azar puro; con edge, el resultado a largo plazo es ganador.",
+    en: "A demonstrable statistical advantage: a strategy with sustained positive expectancy over time and across market regimes. Without an edge, trading is pure chance; with one, the long-run result is profitable.",
+    category: "basics",
+  },
 
   // ────────────────────────────── RISK ────────────────────────────────
   {
@@ -123,6 +153,18 @@ export const GLOSSARY: GlossaryTerm[] = [
     en: "A mathematical formula that calculates the optimal fraction of capital to risk per trade based on win rate and payoff. In practice a fraction (half Kelly or quarter Kelly) is used to reduce variance.",
     category: "risk",
   },
+  {
+    term: "Margin",
+    es: "Colateral que el broker retiene para cubrir la posición apalancada. Si el capital cae por debajo del margen de mantenimiento, el broker emite un margin call o cierra posiciones automáticamente.",
+    en: "Collateral the broker holds to cover a leveraged position. If equity falls below the maintenance margin, the broker issues a margin call or auto-liquidates positions.",
+    category: "risk",
+  },
+  {
+    term: "Max drawdown",
+    es: "Mayor caída porcentual del capital desde un máximo histórico hasta el mínimo siguiente dentro de un periodo. Es la métrica que mejor mide el sufrimiento real de un trader y la viabilidad psicológica de una estrategia.",
+    en: "The largest percentage drop in equity from a historical peak to the subsequent trough within a period. It is the metric that best measures a trader's real suffering and the psychological viability of a strategy.",
+    category: "risk",
+  },
 
   // ──────────────────────────── PSYCHOLOGY ────────────────────────────
   {
@@ -135,6 +177,18 @@ export const GLOSSARY: GlossaryTerm[] = [
     term: "Revenge trading",
     es: "Operar de forma impulsiva y con tamaño excesivo para recuperar una pérdida reciente. Casi siempre amplifica la pérdida inicial y rompe el plan de riesgo.",
     en: "Trading impulsively and with excessive size to recover a recent loss. It almost always amplifies the initial loss and breaks the risk plan.",
+    category: "psychology",
+  },
+  {
+    term: "Tilt",
+    es: "Estado emocional tras una pérdida o racha perdedora en el que el juicio se nubla y el trader abandona su plan. Suele llevar a sobreoperar, aumentar tamaño y forzar entradas. La mejor defensa es parar y desconectar.",
+    en: "An emotional state after a loss or losing streak where judgement clouds and the trader abandons their plan. Usually leads to overtrading, increased size and forced entries. The best defense is to stop and disconnect.",
+    category: "psychology",
+  },
+  {
+    term: "Discipline",
+    es: "Capacidad de seguir el plan de trading de forma consistente: entrar solo en setups definidos, respetar el stop y el objetivo, y no operar fuera del horario planificado. Es lo que separa al profesional del aficionado.",
+    en: "The ability to follow the trading plan consistently: entering only defined setups, respecting the stop and target, and not trading outside the planned hours. It is what separates the professional from the amateur.",
     category: "psychology",
   },
 
@@ -193,6 +247,30 @@ export const GLOSSARY: GlossaryTerm[] = [
     en: "A simulation that randomly reorders the historical sequence of your trades thousands of times to estimate the probable range of future drawdowns and returns. It reveals the risk tail.",
     category: "metrics",
   },
+  {
+    term: "Backtesting",
+    es: "Probar una estrategia sobre datos históricos para medir su rentabilidad y riesgo antes de arriesgar capital real. Útil solo si se evita el curve fitting y se valida después con forward testing.",
+    en: "Testing a strategy on historical data to measure its profitability and risk before risking real capital. Only useful if curve fitting is avoided and it is later validated with forward testing.",
+    category: "metrics",
+  },
+  {
+    term: "Forward testing",
+    es: "Validación de una estrategia en tiempo real (cuenta demo o tamaño mínimo) durante un periodo significativo. Confirma que el backtest no sobreajustó y que la estrategia sobrevive a condiciones de mercado no vistas.",
+    en: "Validating a strategy in real time (demo account or minimum size) over a meaningful period. Confirms the backtest wasn't overfit and that the strategy survives unseen market conditions.",
+    category: "metrics",
+  },
+  {
+    term: "Curve fitting",
+    es: "Sobreajuste de una estrategia a los datos históricos: tantos parámetros que el backtest parece perfecto pero la estrategia falla en tiempo real. Cuantos más grados de libertad, mayor el riesgo de curve fitting.",
+    en: "Overfitting a strategy to historical data: so many parameters that the backtest looks perfect but the strategy fails in real time. The more degrees of freedom, the higher the curve-fitting risk.",
+    category: "metrics",
+  },
+  {
+    term: "CAGR",
+    es: "Tasa de crecimiento anual compuesta (Compound Annual Growth Rate). Expresa la rentabilidad media anualizada que equivaldría al crecimiento total observado. Permite comparar estrategias con horizontes distintos.",
+    en: "Compound Annual Growth Rate. Expresses the annualized average return equivalent to the observed total growth. Lets you compare strategies with different horizons.",
+    category: "metrics",
+  },
 
   // ──────────────────────────── EXECUTION ─────────────────────────────
   {
@@ -223,6 +301,54 @@ export const GLOSSARY: GlossaryTerm[] = [
     term: "Slippage",
     es: "Diferencia entre el precio esperado de una orden y el precio al que realmente se ejecuta. Ocurre en mercados volátiles o ilíquidos y aumenta el coste real de operar más allá del spread.",
     en: "The difference between the expected price of an order and the price at which it actually fills. It occurs in volatile or illiquid markets and raises the real cost of trading beyond the spread.",
+    category: "execution",
+  },
+  {
+    term: "Limit order",
+    es: "Orden que especifica el precio exacto al que estás dispuesto a comprar o vender. Garantiza el precio pero no la ejecución: si el mercado no llega a tu nivel, la orden queda abierta.",
+    en: "An order specifying the exact price at which you're willing to buy or sell. Guarantees the price but not the fill: if the market never reaches your level, the order stays open.",
+    category: "execution",
+  },
+  {
+    term: "Market order",
+    es: "Orden que se ejecuta inmediatamente al mejor precio disponible. Garantiza la ejecución pero no el precio: en mercados poco líquidos puede sufrir slippage significativo.",
+    en: "An order that fills immediately at the best available price. Guarantees the fill but not the price: in illiquid markets it can suffer significant slippage.",
+    category: "execution",
+  },
+  {
+    term: "Leverage",
+    es: "Relación entre el tamaño de la posición y el capital depositado. Un apalancamiento 10:1 mueve $10 por cada $1 de margen: multiplica ganancias y pérdidas por igual y amplifica el riesgo de ruin.",
+    en: "The ratio between position size and deposited capital. 10:1 leverage moves $10 for every $1 of margin: it multiplies gains and losses equally and amplifies the risk of ruin.",
+    category: "execution",
+  },
+  {
+    term: "Margin call",
+    es: "Aviso del broker cuando el capital de la cuenta cae por debajo del margen de mantenimiento. Si no se depositan más fondos, el broker cierra posiciones automáticamente para limitar su propio riesgo.",
+    en: "A broker warning when account equity falls below the maintenance margin. If no additional funds are deposited, the broker auto-liquidates positions to limit its own risk.",
+    category: "execution",
+  },
+  {
+    term: "London session",
+    es: "Sesión europea: 07:00–16:00 UTC (open Londres). Concentra el mayor volumen institucional junto con NY, especialmente activa en FX y índices europeos (DAX, FTSE).",
+    en: "European session: 07:00–16:00 UTC (London open). Concentrates the largest institutional volume alongside NY, especially active in FX and European indices (DAX, FTSE).",
+    category: "execution",
+  },
+  {
+    term: "NY session",
+    es: "Sesión americana: 13:00–22:00 UTC (open Nueva York). La más líquida del día; coincide con Londres de 13:00 a 16:00 UTC, ventana donde se mueve la mayor parte del rango diario en ES, NQ y EURUSD.",
+    en: "American session: 13:00–22:00 UTC (New York open). The most liquid session of the day; overlaps with London from 13:00 to 16:00 UTC, the window where most of the daily range in ES, NQ and EURUSD is printed.",
+    category: "execution",
+  },
+  {
+    term: "Asia session",
+    es: "Sesión asiática: 23:00–08:00 UTC (open Tokio). Menor volatilidad y volumen que Londres/NY, pero suele definir el rango overnight que Londres rompe a la apertura.",
+    en: "Asian session: 23:00–08:00 UTC (Tokyo open). Lower volatility and volume than London/NY, but usually defines the overnight range that London breaks on its open.",
+    category: "execution",
+  },
+  {
+    term: "Kill zone",
+    es: "Ventana temporal de alta probabilidad dentro de una sesión donde los setups del trader históricamente funcionan mejor (p. ej. kill zone de apertura de Londres 08:00–10:00 UTC, kill zone AM de NY 13:30–15:30 UTC). Filtrar operaciones por kill zone suele elevar la expectancy de forma notable.",
+    en: "High-probability time window within a session where the trader's setups historically work best (e.g. London open kill zone 08:00–10:00 UTC, NY AM kill zone 13:30–15:30 UTC). Filtering trades by kill zone usually raises expectancy notably.",
     category: "execution",
   },
 ];

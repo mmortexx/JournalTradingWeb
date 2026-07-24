@@ -61,10 +61,54 @@ function sessionForHour(hour: number): Session {
 /** Convert a stored CustomTrade into a full Trade object so the existing
  *  table rows, charts, and metric calculators consume it without changes.
  *
- *  Fields the composer doesn't capture (fees, mae/mfe, planned RR, etc.)
- *  default to 0 / sensible values so downstream math stays well-defined. */
+ *  The composer only captures {instrument, setup, direction, entry, exit,
+ *  qty, netPnl, rMultiple, compliance, closedAt, note}. From those we
+ *  SYNTHESIZE sensible values for the rest so a custom trade participates
+ *  fully in every chart and metric (R-histogram, MAE/MFE scatter, duration
+ *  histogram, gross-vs-net column, etc.) instead of being a "blank" row
+ *  that breaks the analytics page.
+ *
+ *  Synthesis rules:
+ *   - riskUsd = |netPnl / rMultiple|  (the inverse of how netPnl was
+ *     derived from risk × R in the sample generator). Falls back to 0
+ *     when rMultiple is 0 or NaN.
+ *   - fees = ~3 % of |netPnl|  (typical broker commission + slippage
+ *     on a $100–500 P&L; matches the lower end of the sample range).
+ *   - grossPnl = netPnl + fees  (consistent with data.ts: fees are a
+ *     positive cost deducted from gross to get net).
+ *   - plannedRr: winners use max(r + 0.5, 1.5) (you typically plan a
+ *     target beyond where you actually exit), losers default to 1.5.
+ *   - mae / mfe: derived from rMultiple so the MAE/MFE scatter plot
+ *     gets a plausible point for every custom trade (winners dip
+ *     slightly negative before running to +R; losers spike slightly
+ *     positive before falling to -R).
+ *   - initialStop / target: synthesized from entry, direction, and a
+ *     1 % stop distance (matches the sample generator's mid-range).
+ *   - durationMin: 30–120 min so the duration histogram doesn't dump
+ *     every custom trade into the "<15m" bucket. */
 export function customTradeToTrade(c: CustomTrade): Trade {
   const closedAt = new Date(c.closedAt);
+  const isWin = c.netPnl > 0;
+  const r = Number.isFinite(c.rMultiple) ? c.rMultiple : 0;
+  const riskUsd = r !== 0 ? Math.abs(c.netPnl / r) : 0;
+  const fees = +(Math.abs(c.netPnl) * 0.03).toFixed(2);
+  const grossPnl = +(c.netPnl + fees).toFixed(2);
+  const plannedRr = isWin ? Math.max(r + 0.5, 1.5) : 1.5;
+  const mae = isWin ? -0.2 : Math.min(r - 0.3, -0.9);
+  const mfe = isWin ? r + 0.3 : 0.2;
+  // 1 % stop distance (mid-range of the sample generator's 0.4–1.6 %).
+  const stopDist = c.entry * 0.01;
+  const initialStop =
+    c.direction === "long"
+      ? +(c.entry - stopDist).toFixed(2)
+      : +(c.entry + stopDist).toFixed(2);
+  const target =
+    c.direction === "long"
+      ? +(c.entry + stopDist * plannedRr).toFixed(2)
+      : +(c.entry - stopDist * plannedRr).toFixed(2);
+  // 30–120 min pseudo-duration derived deterministically from the
+  // trade id so the same trade always shows the same duration.
+  const durationMin = 30 + (Math.abs(c.id) % 91);
   return {
     id: c.id,
     instrument: c.instrument,
@@ -74,20 +118,20 @@ export function customTradeToTrade(c: CustomTrade): Trade {
     entry: c.entry,
     exit: c.exit,
     qty: c.qty,
-    grossPnl: c.netPnl,
-    fees: 0,
+    grossPnl,
+    fees,
     netPnl: c.netPnl,
     rMultiple: c.rMultiple,
-    riskUsd: 0,
-    plannedRr: 0,
-    mae: 0,
-    mfe: 0,
-    initialStop: 0,
-    target: 0,
+    riskUsd,
+    plannedRr,
+    mae,
+    mfe,
+    initialStop,
+    target,
     compliance: c.compliance,
-    openedAt: closedAt,
+    openedAt: new Date(closedAt.getTime() - durationMin * 60000),
     closedAt,
-    durationMin: 0,
+    durationMin,
     dayScore: 0,
     entryNote: c.note,
     closeNote: c.note,

@@ -7,10 +7,14 @@
  * componentes de marketing (`Hero`, `OverviewApp`, `FeaturesBento`,
  * `MetricsShowcaseNew`, ...) los consuman.
  *
- * Los valores son los que el HTML renderizaba a 23 de julio de 2026 con
- * cuenta demo de 10.000 $: P&L total +5.732,24 $, win-rate 50 %,
- * expectancy +28,66 $, profit factor 1,56. La curva tiene 150 puntos
- * de balance simulados y el calendario cubre julio 2026.
+ * R26-2d — Los KPIs y la curva de rendimiento ahora se sincronizan
+ * con `METRICS` / `TRADES` de `data.ts` en vez de usar valores
+ * hardcodeados. Así el copy de marketing ("P&L +5.732 $", "Sharpe 3,34",
+ * "Max DD −8,0 %") y la demo real muestran exactamente los mismos
+ * números: el trader que entra a /demo tras leer la home ve la
+ * continuación coherente de lo que se le prometió. La semilla
+ * determinista (mulberry32 con seed 20260722) se mantiene para todo
+ * lo decorativo (filas de tabla, sparklines, etc.).
  *
  * Implementación:
  * - PRNG `mulberry32` con seed fija (20260722, como en el HTML).
@@ -22,6 +26,11 @@
 
 import { fmtMoney, fmtNum, fmtPct } from "./format";
 import type { Lang } from "@/lib/i18n";
+import {
+  METRICS,
+  TRADES,
+  dailyPnlForMonth,
+} from "./data";
 
 /* ---------- PRNG determinista ---------- */
 
@@ -84,26 +93,23 @@ function build() {
 function buildKpis() {
   return {
     pnl: {
-      v: `+${fmtNum(5732.24)} $`,
+      v: fmtMoney(METRICS.netPnl, "es", { sign: true }),
       color: "var(--pos)",
-      delta: "+57,3 % ROI",
+      delta: `${fmtPct(METRICS.roiPct, "es", 1)} ROI`,
       deltaColor: "var(--pos)",
     },
   };
 }
 
 function buildPerf() {
-  // 150 puntos, simulación de equity curve estable con ligera volatilidad.
-  const points = 150;
-  const start = 10000;
-  const endBalance = 15732.24;
-  const data: { x: number; y: number }[] = [];
-  for (let i = 0; i < points; i++) {
-    const t = i / (points - 1);
-    const base = start + (endBalance - start) * t;
-    const noise = (rng() - 0.5) * 80 * (1 - Math.abs(t - 0.5) * 2);
-    data.push({ x: t, y: base + noise });
-  }
+  // Pull the real equity curve from METRICS so the marketing curve's
+  // endpoint matches the demo's `finalBalance` and the shape reflects
+  // the actual trade sequence (not a synthetic noise line).
+  const curve = METRICS.equityCurve;
+  const data: { x: number; y: number }[] = curve.map((p, i) => ({
+    x: curve.length > 1 ? i / (curve.length - 1) : 0,
+    y: p.balance,
+  }));
   // Renderizamos a viewBox 640x220 con margen lateral de 46px y arriba/abajo 24px.
   const xMin = 46;
   const xMax = 632;
@@ -114,7 +120,7 @@ function buildPerf() {
   const hi = Math.max(...ys);
   const proj = (d: { x: number; y: number }) => ({
     x: xMin + (xMax - xMin) * d.x,
-    y: yMin + (yMax - yMin) * (1 - (d.y - lo) / (hi - lo)),
+    y: yMin + (yMax - yMin) * (1 - (d.y - lo) / (hi - lo || 1)),
   });
   const projected = data.map(proj);
   const line = projected
@@ -146,32 +152,36 @@ function buildPerf() {
 }
 
 function buildCal() {
+  // Pull actual July 2026 daily P&L from TRADES — keeps the marketing
+  // calendar's "Total mes" perfectly aligned with what the demo's
+  // monthlyBreakdown would show for July. Days without trades (early
+  // weekdays with no fills, or the not-yet-reached second half of the
+  // month) render as transparent cells with just the day number.
+  const dailyPnl = dailyPnlForMonth(TRADES, 2026, 6); // July = month index 6
   const cells = Array.from({ length: 35 }, (_, i) => {
     const dayNum = i - 4; // Empezamos en martes (offset 1) para alinear con julio 2026
     if (dayNum < 1 || dayNum > MONTH_DAYS) {
       return { day: "", val: "", style: "background:transparent" };
     }
-    // P&L determinista por día, +/- 50 $ con seed fija.
-    const seed = mulberry32(20260722 + dayNum)();
-    const pnl = (seed - 0.5) * 100;
+    const pnl = dailyPnl.get(String(dayNum)) ?? 0;
     const isPos = pnl >= 0;
-    const intensity = Math.min(1, Math.abs(pnl) / 60);
-    const opacity = 0.18 + intensity * 0.42;
+    // Intensity scaled to a $200 typical 1R win at the demo's risk
+    // profile (0.5–1.5 % of $10–15 k balance ≈ $75–225 per R).
+    const intensity = Math.min(1, Math.abs(pnl) / 200);
+    const opacity = pnl === 0 ? 0 : 0.18 + intensity * 0.42;
     const bg = isPos
       ? `rgb(var(--accent-base) / ${opacity.toFixed(2)})`
       : `rgb(var(--pnl-neg) / ${opacity.toFixed(2)})`;
     const style = `background:${bg};border-radius:5px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px`;
     return {
       day: String(dayNum),
-      val: pnl === 0 ? "·" : `${pnl >= 0 ? "+" : "−"}${Math.abs(pnl).toFixed(0)}`,
+      val: pnl === 0 ? "·" : `${pnl >= 0 ? "+" : "−"}${fmtNum(Math.abs(pnl), "es", 0)}`,
       style,
     };
   });
-  // Total del mes (suma determinista rápida sobre los días válidos).
+  // Total del mes: suma real del P&L de julio extraída de TRADES.
   let total = 0;
-  for (let d = 1; d <= MONTH_DAYS; d++) {
-    total += (mulberry32(20260722 + d)() - 0.5) * 100;
-  }
+  for (const v of dailyPnl.values()) total += v;
   return {
     label: "julio 2026",
     chip: "Mes en curso",
@@ -182,14 +192,55 @@ function buildCal() {
 }
 
 function buildKpiRow() {
+  // Sourced from METRICS so the marketing KPI strip stays in lock-step
+  // with the demo's dashboard. The descriptive `d` field is built from
+  // the same numbers (ROI %, W·L count, etc.) instead of being a
+  // hand-typed string that drifts as the underlying data evolves.
+  const wins = METRICS.wins;
+  const losses = METRICS.losses;
   return [
-    { l: "P&L total", v: `+${fmtNum(5732.24)} $`, c: "var(--pos)", d: "ROI 57,3 %" },
-    { l: "Win rate", v: "50 %", c: "var(--ink)", d: "30 W · 30 L" },
-    { l: "Expectancy", v: `+${fmtNum(28.66)} $`, c: "var(--pos)", d: "por operación" },
-    { l: "Profit factor", v: fmtNum(1.56, "es", 2), c: "var(--ink)", d: "Gross W / Gross L" },
-    { l: "Sharpe", v: fmtNum(3.34, "es", 2), c: "var(--ink)", d: "anualizado" },
-    { l: "Max DD", v: "−8,0 %", c: "var(--neg)", d: "peor racha" },
-    { l: "Operaciones", v: "60", c: "var(--ink)", d: "cerradas" },
+    {
+      l: "P&L total",
+      v: fmtMoney(METRICS.netPnl, "es", { sign: true }),
+      c: "var(--pos)",
+      d: `ROI ${fmtPct(METRICS.roiPct, "es", 1)}`,
+    },
+    {
+      l: "Win rate",
+      v: fmtPct(METRICS.winRate, "es", 0),
+      c: "var(--ink)",
+      d: `${wins} W · ${losses} L`,
+    },
+    {
+      l: "Expectancy",
+      v: fmtMoney(METRICS.expectancy, "es", { sign: true }),
+      c: "var(--pos)",
+      d: "por operación",
+    },
+    {
+      l: "Profit factor",
+      v: fmtNum(METRICS.profitFactor, "es", 2),
+      c: "var(--ink)",
+      d: "Gross W / Gross L",
+    },
+    {
+      l: "Sharpe",
+      v: fmtNum(METRICS.sharpe, "es", 2),
+      c: "var(--ink)",
+      d: "anualizado",
+    },
+    {
+      l: "Max DD",
+      v: `−${fmtPct(METRICS.maxDrawdownPct, "es", 1)}`,
+      c: "var(--neg)",
+      d: "peor racha",
+    },
+    {
+      l: "Operaciones",
+      v: String(METRICS.closedCount),
+      c: "var(--ink)",
+      d: "cerradas",
+    },
   ];
 }
 

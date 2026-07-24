@@ -178,7 +178,7 @@ export function Gallery() {
                         with the centered caption or left traffic lights. */}
                     <span
                       aria-hidden
-                      className="absolute top-2 right-2 z-10 inline-flex items-center justify-center w-7 h-7 rounded-md bg-black/45 backdrop-blur-sm border border-[rgb(var(--divider)/0.20)] text-white/85 opacity-60 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-[opacity,transform] duration-200"
+                      className="absolute top-2 right-2 z-10 inline-flex items-center justify-center w-7 h-7 rounded-md bg-black/45 backdrop-blur-sm border border-[rgb(var(--divider)/0.20)] text-[#fff]/85 opacity-60 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-[opacity,transform] duration-200"
                     >
                       <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
                         <path

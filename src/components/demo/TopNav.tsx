@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useDemo, type DemoPage } from "./DemoContext";
 import { useLang } from "@/lib/i18n";
@@ -183,78 +183,93 @@ export function TopNav() {
         role="tablist"
         aria-label={t("demoTitle")}
         onKeyDown={onKeyDown}
-        className="flex items-center gap-1 px-2 flex-1 min-w-0 overflow-x-auto no-scrollbar"
+        className="flex items-center gap-1 px-2 flex-1 min-w-0 overflow-x-auto no-scrollbar overscroll-x-contain scroll-pl-2"
       >
         {NAV_ITEMS.map((item) => {
           const active = page === item.key || (item.key === "trades" && page === "detail");
           const label = t(item.labelKey);
+          const isSettings = item.key === "settings";
           return (
-            <button
-              key={item.key}
-              role="tab"
-              aria-selected={active}
-              aria-label={label}
-              aria-controls="demo-tabpanel"
-              tabIndex={active ? 0 : -1}
-              onClick={() => setPage(item.key)}
-              className={`relative h-9 px-3 rounded-md flex items-center gap-2 text-[13px] font-medium transition-colors whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.45)] focus-visible:ring-offset-0 ${
-                active
-                  ? "text-primary"
-                  : "text-tertiary hover:text-secondary hover:bg-white/5"
-              }`}
-            >
-              {/* Active background pill — animated between tabs via layoutId. */}
-              {active && (
-                <motion.span
-                  layoutId="demo-tab"
-                  className="absolute inset-0 rounded-md bg-white/10"
-                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                />
-              )}
-              {/* Active accent underline — a 2px gold bar at the bottom of
-                  the tab. Animated separately via layoutId so it slides
-                  between tabs in sync with the background pill. Mirrors
-                  the Linear / VS Code active-tab indicator. */}
-              {active && (
-                <motion.span
-                  layoutId="demo-tab-underline"
+            <Fragment key={item.key}>
+              {/* Settings gear — visually distinct from the other tabs via
+                  a leading 1px hairline divider, mirroring WinUI
+                  NavigationView's PaneFooter placement (Settings sits in
+                  a separate visual group below the main nav items). */}
+              {isSettings && (
+                <div
                   aria-hidden="true"
-                  className="absolute bottom-[5px] left-3 right-3 h-0.5 rounded-full"
-                  style={{ background: "rgb(var(--accent-base))" }}
-                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  className="w-px h-5 bg-white/10 mx-1 shrink-0 self-center"
                 />
               )}
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="relative shrink-0"
-                aria-hidden="true"
+              <button
+                key={item.key}
+                role="tab"
+                aria-selected={active}
+                aria-label={label}
+                aria-controls="demo-tabpanel"
+                tabIndex={active ? 0 : -1}
+                onClick={() => setPage(item.key)}
+                className={`relative h-9 px-3 rounded-md flex items-center gap-2 text-[13px] font-medium transition-colors whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.45)] focus-visible:ring-offset-0 ${
+                  active
+                    ? "text-primary"
+                    : "text-tertiary hover:text-secondary hover:bg-white/5"
+                }`}
               >
-                {item.icon}
-              </svg>
-              <span className="relative hidden sm:inline">{t(item.labelKey)}</span>
-            </button>
+                {/* Active background pill — animated between tabs via layoutId.
+                    The soft accent halo (box-shadow) reads as "this tab is
+                    elevated" without competing with the underline. */}
+                {active && (
+                  <motion.span
+                    layoutId="demo-tab"
+                    className="absolute inset-0 rounded-md bg-white/10 shadow-[0_0_14px_rgb(var(--accent-base)/0.18)]"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                {/* Active accent underline — a 2px gold bar at the bottom of
+                    the tab. Animated separately via layoutId so it slides
+                    between tabs in sync with the background pill. Mirrors
+                    the Linear / VS Code active-tab indicator. */}
+                {active && (
+                  <motion.span
+                    layoutId="demo-tab-underline"
+                    aria-hidden="true"
+                    className="absolute bottom-[5px] left-3 right-3 h-0.5 rounded-full"
+                    style={{ background: "rgb(var(--accent-base))" }}
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="relative shrink-0"
+                  aria-hidden="true"
+                >
+                  {item.icon}
+                </svg>
+                <span className="relative hidden sm:inline">{t(item.labelKey)}</span>
+              </button>
+            </Fragment>
           );
         })}
       </div>
 
       {/* Right — "+ New trade" button. Jumps to the Dashboard page where
-          the trade-logging form lives. Accent-tinted at low opacity so it
-          reads as the primary in-app action without competing with the
-          tab strip. Hidden below md to keep the tab strip breathable on
+          the trade-logging form lives. Accent-tinted on hover so it reads
+          as the primary in-app action without competing with the tab strip
+          at rest. Hidden below md to keep the tab strip breathable on
           narrow viewports. */}
       <div className="flex items-center gap-2 px-2 shrink-0 border-l border-white/5">
         <button
           type="button"
           onClick={() => setPage("dashboard")}
           aria-label={lang === "es" ? "Nueva operación" : "New trade"}
-          className="h-8 px-2.5 rounded-md flex items-center gap-1.5 text-[12px] font-medium text-secondary hover:text-primary hover:bg-white/5 transition-colors"
+          className="h-8 px-2.5 rounded-md flex items-center gap-1.5 text-[12px] font-medium text-secondary hover:text-[rgb(var(--accent-base))] hover:bg-[rgb(var(--accent-base)/0.10)] transition-colors"
         >
           <svg
             width="12"

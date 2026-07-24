@@ -2,7 +2,19 @@ import type { Lang } from "@/lib/i18n";
 
 const LOCALE: Record<Lang, string> = { es: "es-ES", en: "en-US" };
 
-/** Format a USD money value with sign-aware coloring support. */
+/** Format a USD money value with sign-aware coloring support.
+ *
+ *  Locale rules (both produced by `Intl.NumberFormat` with `currency: USD`):
+ *   - es-ES → "1.234,56 $"  (number then currency, comma decimal, dot thousands)
+ *   - en-US → "$1,234.56"   (currency then number, dot decimal, comma thousands)
+ *
+ *  `sign: true` prefixes a `+` to positive values (winners) and a `−`
+ *  (U+2212 minus sign, matches the typographic convention used across
+ *  the demo) to negatives. Zero is rendered without a sign.
+ *
+ *  `compact: true` rounds to 0 decimals for $1k+ values (so the equity
+ *  curve endpoint shows "$15.000" instead of "$15.000,42") and switches
+ *  to short notation ("$1,2 M") above $1M. */
 export function fmtMoney(
   value: number,
   lang: Lang = "es",
@@ -34,8 +46,38 @@ export function fmtNum(
   }).format(value);
 }
 
+/** Format a percentage. `value` is a ratio (0.5 = 50 %).
+ *
+ *  Negative-zero guard: a value like -0.0001 that rounds to "0,0 %"
+ *  would otherwise render as "-0,0 %" — visually misleading. We strip
+ *  the sign when the rounded magnitude is 0. */
 export function fmtPct(value: number, lang: Lang = "es", decimals = 1): string {
-  return `${fmtNum(value * 100, lang, decimals)}%`;
+  const scaled = value * 100;
+  const rounded = Number(scaled.toFixed(decimals));
+  // Avoid "-0,0 %" / "-0.0%" when the actual magnitude rounds to zero.
+  if (Object.is(rounded, 0) || Object.is(rounded, -0)) {
+    return `${fmtNum(0, lang, decimals)}%`;
+  }
+  return `${fmtNum(scaled, lang, decimals)}%`;
+}
+
+/** Format an R-multiple ("+1,50 R" / "−0,80 R" / "+0,00 R").
+ *
+ *  Positive values are prefixed with `+`, negatives with `−` (U+2212,
+ *  matching the typographic convention used by `fmtMoney` / `fmtPct`).
+ *  Zero is rendered without a sign so the column doesn't flicker
+ *  between "+0,00 R" and "−0,00 R" on small floating-point noise. */
+export function fmtR(
+  value: number,
+  lang: Lang = "es",
+  decimals = 2
+): string {
+  const rounded = Number(value.toFixed(decimals));
+  if (Object.is(rounded, 0) || Object.is(rounded, -0)) {
+    return `${fmtNum(0, lang, decimals)}R`;
+  }
+  const sign = rounded > 0 ? "+" : "−";
+  return `${sign}${fmtNum(Math.abs(rounded), lang, decimals)}R`;
 }
 
 export function fmtInt(value: number, lang: Lang = "es"): string {

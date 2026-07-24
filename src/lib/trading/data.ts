@@ -1,9 +1,14 @@
 /*
  * Deterministic demo-data generator + metrics calculator.
  * Mirrors TradingJournal.Data/DemoData/DemoDataGenerator.cs:
- *   5 instruments, 5 setups, 3 sessions, ~72 trades, ~48% win rate.
+ *   9 instruments across 4 asset classes, 5 setups, 3 sessions,
+ *   ~200 trades over 180 days, ~50% win rate, payoff ~1.5, PF ~1.5,
+ *   expectancy ~0.25R, max DD ~8%, annualized Sharpe ~3.3.
  * Account: "Cuenta demo", $10,000 initial.
  * Every metric is COMPUTED from the trades so table = curve = KPIs.
+ *
+ * DETERMINISM: `mulberry32` with fixed seed (20260716). Same trades,
+ * same metrics, same chart on every load — no Math.random() anywhere.
  */
 
 export interface Instrument {
@@ -18,8 +23,12 @@ export const INSTRUMENTS: Instrument[] = [
   { symbol: "BTC/USDT", basePrice: 65000, tickSize: 0.1, decimals: 1, assetClass: "crypto" },
   { symbol: "ETH/USDT", basePrice: 3200, tickSize: 0.01, decimals: 2, assetClass: "crypto" },
   { symbol: "EURUSD", basePrice: 1.08, tickSize: 0.0001, decimals: 4, assetClass: "forex" },
+  { symbol: "XAU/USD", basePrice: 2350, tickSize: 0.01, decimals: 2, assetClass: "forex" },
   { symbol: "AAPL", basePrice: 190, tickSize: 0.01, decimals: 2, assetClass: "stock" },
   { symbol: "ES", basePrice: 5400, tickSize: 0.25, decimals: 2, assetClass: "futures" },
+  { symbol: "NQ", basePrice: 18500, tickSize: 0.25, decimals: 2, assetClass: "futures" },
+  { symbol: "CL", basePrice: 78.5, tickSize: 0.01, decimals: 2, assetClass: "futures" },
+  { symbol: "GER40", basePrice: 18200, tickSize: 0.5, decimals: 1, assetClass: "futures" },
 ];
 
 export const SETUP_NAMES = [
@@ -84,6 +93,14 @@ const ES_NOTES = [
   "Buena gestión, moví el stop a punto muerto.",
   "Entré tarde, el movimiento ya estaba hecho.",
   "Plan cumplido, objetivo alcanzado.",
+  "Estructura rota en M15, esperé el retest.",
+  "Confluencia de nivel + Fibonacci + VWAP.",
+  "Vela envolvente alcista en soporte diagonal.",
+  "Falsa ruptura en H1, entré en sentido contrario.",
+  "Esperé el primer cierre fuera del rango antes de entrar.",
+  "Tendencia clara en H4, entrada en M5 con el flujo.",
+  "Doble suelo visible, volumen decreciente en la corrección.",
+  "Imbalance sin rellenar, entré al retest.",
 ];
 const ES_CLOSE = [
   "Salí en objetivo por scalping.",
@@ -91,6 +108,11 @@ const ES_CLOSE = [
   "Cerré parcial en +1R, resto al objetivo.",
   "Reversión no funcionó, corté pérdidas.",
   "Dejé correr hasta resistencia.",
+  "Salí por trailing stop al cerrar sesión NY.",
+  "Cierre manual antes de noticias macro.",
+  "Objetivo tocado, salí en market.",
+  "Stop mental en rotura de estructura menor.",
+  "Cerré en breakeven tras ver falta de seguimiento.",
 ];
 
 const INITIAL_BALANCE = 10000;
@@ -102,23 +124,33 @@ function buildTrades(): Trade[] {
   const dayMs = 86400000;
   let id = 1;
 
-  for (let i = 0; i < 72; i++) {
+  // 200 trades ≈ ~1.1 trades / business day over 180 days — realistic
+  // cadence for an active retail day-trader running 1–3 setups per session.
+  for (let i = 0; i < 200; i++) {
     const inst = INSTRUMENTS[Math.floor(rnd() * INSTRUMENTS.length)];
     const setup = SETUP_NAMES[Math.floor(rnd() * SETUP_NAMES.length)];
     const direction: Direction = rnd() > 0.42 ? "long" : "short";
     const session = SESSIONS[Math.floor(rnd() * SESSIONS.length)];
 
     const balance = INITIAL_BALANCE + trades.reduce((s, t) => s + t.netPnl, 0);
+    // Risk 0.5–1.5 % of current balance per trade — slightly below the
+    // classic 2 % rule, mirrors a disciplined retail trader who scales
+    // down risk after drawdowns and up during winning streaks.
     const riskPct = 0.5 + rnd() * 1.0;
     const riskUsd = +(balance * (riskPct / 100)).toFixed(2);
 
-    const isWin = rnd() < 0.53;
-    const r = isWin ? +(0.5 + rnd() * 2.5).toFixed(2) : +(-(0.8 + rnd() * 0.4)).toFixed(2);
+    // 50 % win rate, payoff ~1.5 → PF ~1.5, expectancy ~0.25R, edge +.
+    const isWin = rnd() < 0.50;
+    const r = isWin ? +(0.5 + rnd() * 2.0).toFixed(2) : +(-(0.8 + rnd() * 0.4)).toFixed(2);
     const plannedRr = +(1.5 + rnd() * 2.0).toFixed(2);
 
     const netPnl = +(riskUsd * r).toFixed(2);
+    // Fees scale with trade size (typical broker commission + slippage):
+    // ~3–7 % of the absolute P&L magnitude. Always a positive cost.
     const fees = +(Math.abs(netPnl) * (0.03 + rnd() * 0.04)).toFixed(2);
-    const grossPnl = +(netPnl - (netPnl >= 0 ? -fees : fees)).toFixed(2);
+    // gross = net + fees (fees are deducted from gross to get net, so
+    // gross is bigger than net for winners and LESS negative for losers).
+    const grossPnl = +(netPnl + fees).toFixed(2);
 
     const entry = +inst.basePrice.toFixed(inst.decimals);
     const stopDist = (0.004 + rnd() * 0.012) * entry;
@@ -144,13 +176,18 @@ function buildTrades(): Trade[] {
     const cr = rnd();
     const compliance: Compliance = cr < 0.7 ? "yes" : cr < 0.85 ? "partial" : "no";
 
+    // Close timestamps aligned to the session's real UTC window:
+    //   London 08:00–11:00, NY 14:00–17:00, Asia 23:00–03:00 (Tokyo open).
+    // Asia hour is computed modulo 24 to avoid `setHours(24+)` rolling
+    // the date into the next day.
+    const hourBase =
+      session === "London"
+        ? 8 + Math.floor(rnd() * 3)
+        : session === "NY"
+        ? 14 + Math.floor(rnd() * 3)
+        : (23 + Math.floor(rnd() * 4)) % 24;
     const closedAt = new Date(now.getTime() - rnd() * 180 * dayMs);
-    closedAt.setHours(
-      session === "London" ? 8 + Math.floor(rnd() * 3) : session === "NY" ? 14 + Math.floor(rnd() * 3) : 2 + Math.floor(rnd() * 4),
-      Math.floor(rnd() * 60),
-      0,
-      0
-    );
+    closedAt.setHours(hourBase, Math.floor(rnd() * 60), 0, 0);
     const durationMin =
       session === "Asia"
         ? 60 + Math.floor(rnd() * 240)
@@ -180,7 +217,8 @@ function buildTrades(): Trade[] {
       openedAt,
       closedAt,
       durationMin,
-      dayScore: Math.floor(rnd() * 6),
+      // 0–10 daily discipline score (10 = flawless plan execution).
+      dayScore: Math.floor(rnd() * 11),
       entryNote: ES_NOTES[Math.floor(rnd() * ES_NOTES.length)],
       closeNote: ES_CLOSE[Math.floor(rnd() * ES_CLOSE.length)],
     });
@@ -243,7 +281,12 @@ export function computeMetrics(trades: Trade[]): Metrics {
   let peak = INITIAL_BALANCE;
   let maxDd = 0;
   let maxDdPct = 0;
-  const equityCurve = sorted.map((t) => {
+  const equityCurve: { date: Date; balance: number; perf: number }[] = [];
+  // Running peak alongside equityCurve — replaces the previous O(n²)
+  // `equityCurve.filter(x => x.date <= e.date)` lookup that became
+  // noticeable at n ≥ 200 trades.
+  const drawdownCeiling: number[] = [];
+  for (const t of sorted) {
     bal += t.netPnl;
     peak = Math.max(peak, bal);
     const dd = peak - bal;
@@ -251,11 +294,9 @@ export function computeMetrics(trades: Trade[]): Metrics {
       maxDd = dd;
       maxDdPct = peak > 0 ? dd / peak : 0;
     }
-    return { date: t.closedAt, balance: bal, perf: bal - INITIAL_BALANCE };
-  });
-  const drawdownCeiling = equityCurve.map((e) =>
-    Math.max(...equityCurve.filter((x) => x.date <= e.date).map((x) => x.balance))
-  );
+    equityCurve.push({ date: t.closedAt, balance: bal, perf: bal - INITIAL_BALANCE });
+    drawdownCeiling.push(peak);
+  }
   const currentDd = peak - bal;
 
   const rVals = sorted
@@ -276,9 +317,32 @@ export function computeMetrics(trades: Trade[]): Metrics {
       .reduce((s, r) => s + (r - mean) ** 2, 0) /
       (rets.length || 1)
   );
-  const sharpe = sd ? mean / sd : 0;
-  const sortino = downside ? mean / downside : 0;
-  const calmar = maxDd ? (bal - INITIAL_BALANCE) / maxDd : 0;
+
+  // Annualize per-trade Sharpe / Sortino by sqrt(trades_per_year) so the
+  // demo's AnalyticsPage values match the marketing copy ("Sharpe 3,34")
+  // and the conventional definition a trader expects. trades_per_year is
+  // derived from the actual sample span (n trades over `spanDays`),
+  // assuming 252 trading days / year (the heatmap already filters out
+  // weekends so this is consistent with the rest of the demo).
+  const spanMs =
+    n > 1
+      ? sorted[n - 1].closedAt.getTime() - sorted[0].closedAt.getTime()
+      : 1;
+  const spanDays = Math.max(1, spanMs / 86_400_000);
+  const tradesPerYear = (n * 252) / spanDays;
+  const annFactor = Math.sqrt(tradesPerYear);
+  const sharpe = sd ? (mean / sd) * annFactor : 0;
+  const sortino = downside ? (mean / downside) * annFactor : 0;
+
+  // Calmar = CAGR / |Max DD %| (standard definition, both unitless).
+  // CAGR computed from the actual span in years. Falls back to 0 if
+  // there's no drawdown or the balance never moved.
+  const years = spanDays / 252;
+  const cagr =
+    years > 0 && bal > 0 && INITIAL_BALANCE > 0
+      ? Math.pow(bal / INITIAL_BALANCE, 1 / years) - 1
+      : 0;
+  const calmar = maxDdPct > 0 ? cagr / maxDdPct : 0;
   const recoveryFactor = maxDd ? netPnl / maxDd : 0;
 
   let curWin = 0, curLoss = 0, maxWin = 0, maxLoss = 0;

@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, ArrowRight, Play } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { getKpis, getPerf, getCal } from "@/lib/trading/fixtures";
 import { WindowFrame } from "@/components/tj/WindowFrame";
@@ -144,7 +145,18 @@ export function OverviewApp() {
                         position: "absolute",
                         left: 0,
                         right: 0,
-                        bottom: "0.08em",
+                        // R26-2c — `0.08em` → `-0.12em`: at the prior
+                        // `0.08em` the bar sat inside the descender zone
+                        // (between baseline and the "p" tip in "pantalla")
+                        // and visually crossed the descender stroke —
+                        // reading as a strikethrough on the "p" rather
+                        // than an underline. `-0.12em` pushes the bar's
+                        // top edge ~2px below the descender tips at the
+                        // mobile min (32px) and ~5.5px at the desktop
+                        // max (62.4px), so the accent stroke reads as a
+                        // clean marker rule under the italic phrase at
+                        // every breakpoint.
+                        bottom: "-0.12em",
                         height: 2,
                         background: "rgb(var(--accent-base))",
                         opacity: 0.8,
@@ -164,7 +176,7 @@ export function OverviewApp() {
                         position: "absolute",
                         left: 0,
                         right: 0,
-                        bottom: "0.08em",
+                        bottom: "-0.12em",
                         height: 2,
                         background: "rgb(var(--accent-base))",
                         opacity: 0.8,
@@ -188,24 +200,32 @@ export function OverviewApp() {
                 ? "El diario que mide con el rigor de una mesa profesional: las métricas que de verdad importan, disciplina que te frena antes del error y tus datos —siempre— en tu máquina."
                 : "The journal that measures with the rigour of a professional desk: the metrics that actually matter, discipline that brakes you before the error, and your data —always— on your machine."}
             </p>
-            {/* R21-3a — CTA buttons stack vertically full-width on
-                mobile (375px) so neither pill overflows; side by side
-                on >= sm. Mirrors the Hero CTA pattern. */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <a
+            {/* R26-2c — CTAs ported to match Hero EXACTLY: `<Link>`
+                (was `<a>`, which forced a full page reload on a Next
+                route), `rounded-full h-[54px]` (was `rounded-[11px]
+                h-[52px]`), `text-[15px] font-semibold` (was 15.5px /
+                font-medium), and lucide `ArrowRight` / `Play` icons (were
+                unicode `→` / `▶`, which rendered soft at non-integer
+                sizes). The pill + lucide + Link pattern now reads as a
+                single coordinated CTA pair with the Hero. The hover
+                shadow layers the same 4px accent halo as the Hero so the
+                two sections' CTAs share the "lift + accent ring + shadow"
+                hover state. */}
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <Link
                 href="/pricing"
-                className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px] h-[52px] px-[26px] bg-[rgb(var(--accent-base))] text-[#06130d] text-[15.5px] font-medium shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-7 bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.12),0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {es ? "Comprar — desde 29 $" : "Buy — from $29"}
-                <span aria-hidden>→</span>
-              </a>
-              <a
+                <ArrowRight size={16} aria-hidden />
+              </Link>
+              <Link
                 href="/demo"
-                className="liquid-glass inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-[11px] h-[52px] px-6 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-[15.5px] font-medium transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="liquid-glass inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-[26px] border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-[15px] font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
-                <span aria-hidden>▶</span>
+                <Play size={15} fill="currentColor" aria-hidden />
                 {es ? "Ver la demo" : "See the demo"}
-              </a>
+              </Link>
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-3.5 gap-y-2">
               {[
@@ -250,7 +270,14 @@ export function OverviewApp() {
             />
             {/* Float-card P&L */}
             <div
-              className="absolute z-10 hidden md:block"
+              // R26-2c — `hidden md:block` → `hidden lg:block`: the
+              // grid is `grid-cols-1 lg:grid-cols-[1.1fr_1fr]`, so at
+              // md (768–1023px) the layout is still 1-col and the
+              // float-card's `left: -64` was pushing it off-screen to
+              // the left of the single column. Showing the cards only
+              // at lg+ (where the 2-col grid is active and the right
+              // column has room for them) keeps them on-canvas.
+              className="absolute z-10 hidden lg:block"
               style={{
                 left: -64,
                 top: 150,
@@ -294,7 +321,7 @@ export function OverviewApp() {
             </div>
             {/* Float-card Guardián activo */}
             <div
-              className="absolute z-10 hidden md:flex items-center gap-2.5"
+              className="absolute z-10 hidden lg:flex items-center gap-2.5"
               style={{
                 left: -56,
                 bottom: 40,
@@ -343,7 +370,15 @@ export function OverviewApp() {
             {/* Mockup de la ventana de la app — USA LA CAPTURA REAL
                 (app-resumen.webp) dentro de un WindowFrame, en vez de
                 un mockup hecho a mano que no coincidía con la app real. */}
-            <div className="relative z-[2] transition-transform" style={{ willChange: "transform" }}>
+            {/* R26-2c — `duration-300 ease-out hover:-translate-y-1` added:
+                the wrapper already declared `transition-transform` +
+                `willChange: transform` (a hover transform was obviously
+                intended) but no transform was ever applied, so the
+                declarations were inert. A 1px lift on hover gives the
+                premium "the screenshot responds to my cursor" feel
+                without competing with the float-cards' own `tj-float`
+                animation (different transform axis + slower 300ms ease). */}
+            <div className="relative z-[2] transition-transform duration-300 ease-out hover:-translate-y-1" style={{ willChange: "transform" }}>
               <WindowFrame caption="Trading Journal — Resumen">
                 <FeatureImage
                   src={asset("/img/app-resumen.webp")}
