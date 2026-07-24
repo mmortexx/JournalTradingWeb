@@ -768,16 +768,22 @@ export function BackgroundFX() {
       const dt = Math.min(64, now - last);
       last = now;
 
-      /* Calidad adaptativa: EMA del frame-time. */
+      /* Calidad adaptativa: EMA del frame-time.
+         Floor subido a 0.78 (era 0.55) — en móviles el GPU no mantenía
+         75fps y el shader bajaba a 0.55× resolution, causando que las
+         fibras del iris se vieran "stair-stepped" (pixeladas en bloques)
+         y el movimiento de la pupila se viera cortado. 0.78 mantiene
+         nitidez visual aun con frame drops; el threshold de degradación
+         sube a 15.5ms (~64fps) para ser más permisivo. */
       emaFrame = emaFrame * 0.94 + dt * 0.06;
       qCooldown -= dt;
       if (qCooldown <= 0) {
-        if (emaFrame > 13.2 && quality > 0.55) {
-          quality = Math.max(0.55, quality * 0.85);
+        if (emaFrame > 15.5 && quality > 0.78) {
+          quality = Math.max(0.78, quality * 0.88);
           qCooldown = 900;
           resize();
         } else if (emaFrame < 7.5 && quality < 1) {
-          quality = Math.min(1, quality / 0.85);
+          quality = Math.min(1, quality / 0.88);
           qCooldown = 1600;
           resize();
         }

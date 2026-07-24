@@ -13006,3 +13006,654 @@ Stage Summary:
 - Estado: producción verde. Los 2 problemas del dueño (overflow + secciones ilegibles) RESUELTOS en ambos temas, móvil y desktop.
 - Causa raíz del problema de legibilidad: los tokens de color P&L estaban calibrados solo para oscuro. Ahora tienen overrides de tema claro con colores más oscuros que pasan WCAG AA.
 - 0 overflow horizontal en cualquier breakpoint (375/768/1440/1600). 0 errores de consola. 15/15 rutas estáticas.
+
+---
+Task ID: R22-1c
+Agent: explore (image optimization audit — NO file edits)
+Task: Audit image optimization across the site (next/image usage, screenshot sizing, og.png, logo.svg, lazy/priority loading, alt text, WindowFrame DOM weight, favicon/icon setup).
+
+Work Log:
+- Read worklog.md (13 008 lines) for context. Identified the only next/image consumer is `src/components/tj/FeatureImage.tsx`; all other visuals are inline SVG or CSS.
+- Ran the requested greps:
+  - `rg -n "<Image" src/components/` → 3 hits, all in FeatureImage.tsx + WindowFrame.tsx (doc comment + the `<Image>` element + the `windowShot` helper).
+  - `rg -n "from ['\"]next/image['\"]"` → 1 hit (FeatureImage.tsx:3).
+  - `rg -n "alt=" src/components/` → 4 hits (FeatureImage.tsx, WindowFrame.tsx, Gallery.tsx, DemoGallery.tsx).
+  - `ls -la public/img/` → 9 webp files (8 app-* + 1 equity-curve), 37-64 KB each, ~443 KB total.
+  - `ls -la public/*.png public/*.svg` → og.png (26.7 KB), og.svg (4.9 KB), logo.svg (1.1 KB).
+- Verified screenshot dimensions via `file`: all 8 `app-*.webp` are 1500×856; `equity-curve.webp` is 1200×686; `og.png` is 1200×630 (8-bit colormap).
+- Cross-referenced every webp/png/svg path against src/ to find orphans: `equity-curve.webp` is referenced ZERO times in current code (only in historical worklog entries mentioning a removed `FeaturePreview.tsx`). It is a dead asset.
+- Verified next.config.ts already sets `images: { unoptimized: true }` globally (static export) — so FeatureImage's `unoptimized` prop is belt-and-suspenders (harmless, good for clarity).
+- Verified NO `priority={true}` anywhere — all 14 FeatureImage instances use the default `priority=false`.
+- Verified Hero.tsx has NO `<img>`/`<Image>` — it is text + CSS BackgroundFX only, so there is no LCP image to prioritize. The LCP element is the H1 text.
+- Read logo.svg + og.svg source. logo.svg carries a dead `@keyframes breathe` animation (logo.svg is only referenced in Organization JSON-LD `logo` field, never rendered as `<img>`), plus legacy `xmlns:xlink`, `xml:space="preserve"`, `enable-background` CSS. og.svg is clean and well-annotated.
+- Read `src/app/icon.svg` (374 B, 24×24 chart-line mark) and `src/app/manifest.ts`. Manifest icons array has ONE entry: an inline data-URI SVG duplicating icon.svg content. No apple-touch-icon, no 192/512 PNG, no legacy .ico.
+- Verified og.png is referenced in metadata.openGraph.images + twitter.images on every route (layout.tsx, page.tsx, demo, pricing, about, faq, features/*). Width/height/alt all set on the root layout entry.
+- Verified FeatureImage does NOT explicitly pass `loading="lazy"` — relies on next/image's default (lazy for non-priority). Functionally correct; the Gallery.tsx:24 comment claiming `loading="lazy"` is slightly misleading (implicit, not explicit).
+
+Findings — image optimization opportunities (audit only, no edits made):
+
+1. **[HIGH] Orphan asset — `public/img/equity-curve.webp` (40 KB, 1200×686).** Referenced zero times in src/ (only in historical worklog entries from a removed FeaturePreview component). Safe to delete → saves 40 KB from the repo + build output.
+
+2. **[MEDIUM] Screenshots are 1.5–2.7× overscaled for their display size.** All 8 `app-*.webp` are 1500×856 (37-64 KB each, ~403 KB total). They display at:
+   - Gallery (marketing `/`): 3-col at lg → ~400 CSS px per cell. Source is 1500 px = 1.875× even on 2× retina.
+   - DemoGallery (`/demo`): 4-col at lg → ~280 CSS px per cell. Source is 1500 px = 2.7× on retina.
+   Because `images.unoptimized: true` is set (static export), next/image emits NO srcset/responsive variants — the browser always downloads the full 1500 px file. Regenerating the screenshots at 1000 px wide would cover 2× retina for the 4-col gallery (560 device px) and cut file size ~40-50 % (~160-200 KB saved across the 8 files). 1200 px would cover the 3-col gallery at 2× retina too. Single-source resize is simplest; `<picture>`/srcset adds complexity for diminishing returns under `unoptimized`.
+
+3. **[MEDIUM] Missing apple-touch-icon + 192/512 PNG icons.** `src/app/manifest.ts` declares only one icon (inline data-URI SVG, `sizes: "any"`). No `apple-touch-icon.png` (180×180) → iOS "Add to Home Screen" falls back to a generic tile/screenshot. No `icon-192.png` / `icon-512.png` → Android Chrome PWA install prompt and home-screen icon are suboptimal. `sharp` is already a dependency (package.json:74) so the PNGs can be generated from `src/app/icon.svg` in a one-off script. Next.js supports the `apple-icon.png` file convention in `src/app/` for auto `<link rel="apple-touch-icon">` injection.
+
+4. **[LOW] Manifest icon is a duplicate of `src/app/icon.svg`.** `manifest.ts:5-6` inlines ~600 bytes of URL-encoded SVG that is byte-identical (same path `M5 16L9 10l3 4 2-3 4 5`) to `src/app/icon.svg`. Could reference `src: "/icon.svg"` (via the `asset()` helper) to DRY it up and keep a single source of truth. Saves ~500 bytes from the manifest JSON and avoids drift if the mark is ever redesigned.
+
+5. **[LOW] `logo.svg` carries dead code + legacy attributes.** The `@keyframes breathe` + `.z-breathe` CSS animation never runs (logo.svg is referenced only as `LOGO_URL` in the Organization JSON-LD schema, layout.tsx:79,151 — never rendered as a visible `<img>`). Also has legacy `xmlns:xlink`, `xml:space="preserve"`, and deprecated `enable-background:new 0 0 30 30;` CSS. An svgo pass would strip these → ~30 % smaller (~700 B vs 1065 B) and remove the dead animation. Low priority (already <1.1 KB).
+
+6. **[LOW] `og.png` has no regeneration script.** `layout.tsx:76` comments "generated from `public/og.svg` via sharp" but there is no `scripts/` dir and no `package.json` script to regenerate it. If `og.svg` is ever edited, `og.png` must be manually regenerated or it drifts. Adding a `scripts/gen-og.mjs` (sharp render of og.svg → og.png at 1200×630) + a `prebuild` npm script would make it reproducible. `sharp` is already installed.
+
+7. **[LOW] `WindowFrame` title bar DOM weight.** Each frame renders 8+ DOM nodes (outer div + title-bar div + 3 traffic-light spans each with inline `style` + caption span + spacer/LIVE span + body div). With 6-8 frames per gallery that is ~48-64 nodes of chrome. The 3 traffic-light spans could collapse to a single inline `<svg>` with 3 `<circle>`s (or one span with a 3-stop `radial-gradient`), and the balancing spacer span could be replaced by `justify-between` + auto-margins on the caption. Would cut ~6 nodes + ~15 lines of inline style per frame. Not a performance issue (below-the-fold, lazy) but a tidy-up opportunity.
+
+8. **[INFO, no action] FeatureImage `loading="lazy"` is implicit, not explicit.** next/image defaults to `loading="lazy"` for non-priority images, so behavior is correct. The `Gallery.tsx:24` comment "Lazy-loaded via next/image `loading="lazy"` (FeatureImage)" is technically describing the default, not an explicit prop. Optional: add `loading="lazy"` explicitly to FeatureImage's `<Image>` for self-documenting code (next/image allows it).
+
+9. **[INFO, no action] Alt text is comprehensive.** All 14 FeatureImage instances (6 Gallery + 8 DemoGallery) carry meaningful, descriptive, bilingual (es/en) alt text. `og.png` has alt in layout.tsx openGraph.images. All decorative inline SVGs use `aria-hidden`. `og.svg` has `<title>` + `<desc>` + `role="img"` + `aria-label`. No empty/generic alts found.
+
+10. **[INFO, no action] next/image hygiene is correct.** The single `<Image>` consumer (FeatureImage) uses `fill` (no width/height needed), `unoptimized` (required for static export, also enforced globally in next.config.ts), `sizes` (sensible default + per-gallery overrides), `priority` (defaults false, never set true), and a required `alt` prop. No `width`/`height` + `fill` conflicts, no missing `sizes` on `fill` images.
+
+Stage Summary:
+- Image pipeline is fundamentally sound: one next/image consumer with correct props, all screenshots are webp, all alt text is meaningful, og.png is properly wired into metadata, lazy loading works via next/image defaults.
+- Top 3 actionable opportunities: (1) delete orphan `equity-curve.webp` (40 KB, zero refs), (2) regenerate the 8 `app-*.webp` at 1000-1200 px wide to cut ~160-200 KB, (3) add `apple-touch-icon.png` + 192/512 PNG icons for proper iOS/Android home-screen support.
+- Lower-priority cleanups: DRY the manifest icon data-URI, svgo the logo.svg, add an og.png regen script, slim the WindowFrame title bar DOM.
+- No file edits were made (audit-only per task spec). All opportunities are listed above for a future fix round to pick up.
+
+---
+Task ID: R22-1a
+Agent: Explore (micro-typography audit)
+Task: Audit-only — micro-typography polish opportunities across the site. No file edits performed.
+
+Scope: src/components/{marketing,tj,demo,layout,charts,ui}, src/app/globals.css, src/lib/trading/format.ts
+
+Audit findings (organized by the 10 audit dimensions):
+
+1. FONT FEATURE SETTINGS — HEALTHY
+   - globals.css:285 sets `font-feature-settings: "tnum" 1` on `body` (default for all text).
+   - globals.css:318-320 defines `.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "zero" 1; }` — adds slashed zero for financial contexts.
+   - 287 `.tnum` occurrences across 59 files (charts/, marketing/, demo/, tj/) — broad consistent adoption.
+   - `Money.tsx` auto-wraps currency in `.tnum`, so every `<Money>` render is tabular by construction.
+   - ss01 / cv11 are NOT applied — DELIBERATE: globals.css:282-284 documents that these Inter-specific features were dropped when the font was switched to Instrument Sans (which doesn't support them). Not a defect.
+
+2. LETTER-SPACING / TOKEN ADOPTION — MOSTLY CONSISTENT, 2 BYPASSES
+   - Token system is well-tuned: `.t-display` -0.04em → `.t-h1` -0.035em → `.t-h2` -0.03em → `.t-h3` -0.02em → `.t-h4` -0.01em → `.t-body` -0.01em (progressive tight tracking ✓).
+   - 19 marketing `<h2>` use `mt-5 t-h2 text-primary` (token pattern ✓).
+   - BYPASS #1: `Pricing.tsx:123` and `PricingFAQ.tsx:137` use `text-3xl md:text-4xl font-semibold tracking-tight text-balance` — skips `.t-h2` token, weight is 600 (vs token's 500), tracking is -0.025em (vs token's -0.03em). Visually heavier than every other section h2.
+   - BYPASS #2: `Pricing.tsx:320` h3 uses `text-xl md:text-2xl font-semibold tracking-tight` — skips `.t-h3` token (which is 500 weight, -0.02em tracking, clamp(1.25rem, 2.5vw, 1.5rem)).
+   - BYPASS #3 (intentional): `Hero.tsx:163-180` h1 uses inline `fontWeight: 600, letterSpacing: -0.035em, lineHeight: 1.01, fontSize: clamp(2rem, 7.6vw, 5.8rem)` — bypasses `.t-display` token (which is 500 weight, -0.04em tracking, clamp(2.5rem, 7vw, 5.5rem)). The hero is intentionally heavier; if the institutional pattern is to be strictly enforced, this should be `.t-display` + overrides.
+   - DEMO BYPASSES (may be intentional — demo is its own app context): DashboardPage.tsx:278/699, AnalyticsPage.tsx:982, TradesPage.tsx:472, JournalPage.tsx:771, SettingsPage.tsx:369, PlaybookPage.tsx:657, DemoCapabilities.tsx:169, AppDemo.tsx:266, DemoGallery.tsx:127, DemoReadyToBuy.tsx:52 — all use `font-medium tracking-[-0.0Xem]` inline instead of `.t-h1`/`.t-h2` tokens. They DO follow the institutional 500-weight rule, just not via tokens.
+
+3. LINE-HEIGHT — HEALTHY
+   - `.t-body` token is `line-height: 1.6` ✓.
+   - Hero.tsx body paragraphs (lines 219, 207) use 1.6 / 1.25 — 1.25 on the lead is fine (one-line).
+   - PageHeader.tsx:167 subtitle uses `leading-relaxed` (1.625, Tailwind) — close but not equal to 1.6; no functional concern.
+   - 13 `leading-tight` (1.25) usages — all on short labels, KPI tile headers, h3 in feature cards. No walls of text with tight line-height found.
+   - No instances of `leading-none` on paragraphs.
+
+4. TEXT-WRAP: BALANCE — UNDER-APPLIED
+   - Only 8 files use `text-balance` / `textWrap: "balance"`: HomeDemo, MetricsShowcaseNew, Pricing (h2), PricingFAQ (h2), GuardianNew, SecuritySection, RiskCalculator, StillHaveQuestions, tooltip.tsx, DemoReadyToBuy.
+   - MISSING `text-balance` on long headings: PageHeader.tsx (AnimatedHeading h1 on every subpage — 6 pages affected), Values.tsx h2, Newsletter.tsx h2, TechSpecs.tsx h2, TestimonialsWall.tsx h2, DownloadCTA.tsx h2, ValueTestimonials.tsx h2, Comparison.tsx h2, MoreFeatures.tsx h2, SocialProof.tsx h2, Changelog.tsx h2, Story.tsx h2, HowItWorks.tsx h2, Wrapped.tsx h2, BeforeAfter.tsx h2, ComparisonSlider.tsx h2, Gallery.tsx h2, Milestones.tsx h2, Integrations.tsx h2, ContactSupport.tsx h2, ContactForm.tsx h2 — 21 headings.
+   - Easiest fix: add `text-wrap: balance` to the `.t-h1` and `.t-h2` tokens in globals.css (one-line edit, propagates to every heading using the token).
+
+5. FONT WEIGHTS — INSTITUTIONAL PATTERN MOSTLY ENFORCED, ROGUE BOLDS ON KPIs
+   - Token system: display/h1/h2/h3 = 500 (medium); h4 = 600 (small anchor label). ✓ matches "headings at 500 (medium, not bold)" spec.
+   - `font-semibold` (600) is correctly used on: `.eyebrow` token, `.pill` token, all `<Eyebrow>` instances, button labels (Navbar CTAs, ContactForm submit, Newsletter submit), comparison table headers, small section labels — these are the "small label anchor" exception the spec allows.
+   - ROGUE `font-semibold` BREAKING THE H2 PATTERN: Pricing.tsx:123, Pricing.tsx:320, PricingFAQ.tsx:137, GlossaryModal.tsx:229 — h2/h3 inline using 600 instead of token's 500.
+   - `font-bold` (700) on big numbers: AnalyticsPage.tsx:175 (KPI tile value), DashboardPage.tsx:390 (risk $ KPI), MarketClock.tsx:328 (clock display), JournalPage.tsx:913 (headline number), TradeDetailPage.tsx:475 (R-multiple), SettingsPage.tsx:577 (P&L total), Pricing.tsx:354 (price), Pricing.tsx:307 (rotated "BEST VALUE" decoration — intentional), GuaranteeBanner.tsx:117 ("30" days badge), HowItWorks.tsx:104 (numbered step circle), Integrations.tsx:83 (integration monogram), TestimonialsWall.tsx:197 (avatar initials), ValueTestimonials.tsx:215 (avatar initials), SocialProof.tsx:157 (avatar initials).
+   - The avatar-initials + monogram + numbered-circle `font-bold` are visually fine (small emphasis contexts). The KPI-tile `font-bold` (700) is the institutional-pattern violator — every other fintech publication (Stripe, Linear, FT) uses 500-600 on big KPI numbers, never 700. Recommend toning AnalyticsPage/DashboardPage/MarketClock/JournalPage/TradeDetailPage/SettingsPage big numbers to 600 (medium-bold) — same visual weight, less "demo-y".
+
+6. ORPHAN/WIDOW CONTROL — ABSENT
+   - Zero `orphans:` or `widows:` declarations anywhere in the codebase.
+   - Long marketing paragraphs in Hero, PageHeader subtitle, Story, FinalCTA, FAQ answers, feature page bodies — all vulnerable to single-word last lines on certain viewport widths.
+   - Easy fix: add `p { orphans: 2; widows: 2; }` to globals.css (or scope to long-form article paragraphs only).
+
+7. HYPHENATION — PARTIAL
+   - `hyphens-auto` + `break-words` applied on Hero.tsx:165 (h1) — good, handles long Spanish words like "institucional".
+   - `break-words` applied widely (28 occurrences across Hero, HomeDemo, MetricsShowcaseNew, DownloadCTA, Pricing, PricingFAQ, RiskCalculator, ContactSupport, FAQ, OverviewApp, Wrapped, DisciplineCost, DashboardPage, AnalyticsPage, breadcrumb) — broad protection against horizontal overflow.
+   - `break-all` only in globals.css:1921 (likely a utility class for very narrow cells).
+   - MISSING `hyphens-auto` on: PageHeader title (AnimatedHeading), section h2s in Spanish, feature page h2s. Spanish words like "institucional", "rendimiento", "configuración", "disciplina" can break awkwardly. Recommend `hyphens: auto` on `.t-h1` and `.t-h2` tokens (Tailwind `hyphens-auto` would conflict with English pages since auto-hyphenation works per `lang` attribute — needs `lang="es"` on `<html>` which is likely set).
+
+8. SELECTION STYLING — CORRECT
+   - globals.css:1163 `::selection { background: rgb(var(--accent-base) / 0.9); color: #000; text-shadow: none; }` — accent color ✓.
+   - globals.css:1175 `:root[data-theme="light"] ::selection { background: rgb(var(--accent-base) / 0.85); color: #fff; }` — light-theme override ✓ (inverts text color for contrast on the lighter accent wash).
+   - No issues.
+
+9. EYEBROWS — TOKEN EXISTS BUT INLINE DEVIATIONS
+   - `.eyebrow` token (globals.css:668): `text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.625rem; font-weight: 600; color: rgb(var(--txt-tertiary));` — 0.16em tracking, NOT 0.14em as the spec asks. (Spec deviation, but the deviation is at the token level, not scattered.)
+   - `<Eyebrow>` component used 30+ times across marketing/demo — consistent adoption of the token via the component.
+   - 87 INLINE `uppercase tracking-[0.1Xem]` instances across 26 files — these are one-off labels NOT using `<Eyebrow>` / `.eyebrow` token, with tracking values of 0.12em, 0.14em, 0.15em, 0.16em, 0.18em (5 distinct values). Breakdown:
+     • 0.12em: FeaturePageNav.tsx:239, Pricing.tsx:198, GuaranteeBanner.tsx:118, Comparison.tsx:119, Milestones.tsx:169, HowItWorks.tsx, MarketClock.tsx
+     • 0.14em: TechSpecs.tsx, GuaranteeBanner.tsx:90, Comparison.tsx:220, ContactSupport.tsx:164, ContactForm.tsx:256, Integrations.tsx:89
+     • 0.15em: FeaturePageNav.tsx:153, FeaturePageNav.tsx:176, Gallery.tsx:141
+     • 0.16em: Values.tsx:155, Milestones.tsx:165, Story.tsx:229, BeforeAfter.tsx:154
+     • 0.18em: ComparisonSlider.tsx:249, 309, 396; BeforeAfter.tsx:154
+   - Recommendation: standardize all inline eyebrows to ONE value (either the token's 0.16em, or change the token + all to 0.14em per spec). The 5-value scatter reads as "ad hoc per-section" rather than a single system.
+
+10. NUMBER FORMATTING — MOSTLY CONSISTENT, 2 RAW-STRING VIOLATIONS
+    - `src/lib/trading/format.ts` provides `fmtMoney`, `fmtNum`, `fmtPct`, `fmtInt`, `fmtPrice`, `fmtDate`, `fmtDateTime`, `fmtTime`, `fmtDuration` — all backed by `Intl.NumberFormat` / `Intl.DateTimeFormat` with `LOCALE: { es: "es-ES", en: "en-US" }` map. ✓
+    - `Money.tsx` component wraps `fmtMoney` and auto-applies `.tnum` + optional P&L tone coloring — recommended path for any currency render.
+    - VIOLATIONS (raw string concat, bypasses fmtMoney):
+      • `EquityCurve.tsx:159-160` — `$\${Math.round(minBal).toLocaleString()}` in axis aria-label template strings. Hardcoded "$" prefix + raw `toLocaleString()` (no locale arg → host default). Loses the es-ES / en-US locale map. Should use `fmtMoney(minBal, lang, { compact: true })` or `fmtInt`.
+      • `EquityCurve.tsx:301, 306, 313` — `${hoverPoint.balance.toLocaleString("en-US", ...)}` in tooltip. Hardcoded "en-US" locale regardless of current lang. Loses Spanish formatting.
+      • `AnalyticsPage.tsx:629-630` — `$\${(maxAbs / 1000).toFixed(1)}k` and `$\${Math.round(maxAbs)}` for axis labels. Hardcoded "$" + `toFixed` + "k" suffix — not locale-aware. Should use `fmtMoney(maxAbs, lang, { compact: true })`.
+    - Also note: `ui/chart.tsx:237` uses `item.value.toLocaleString()` (no locale arg) — minor, default locale.
+
+PRIORITIZED POLISH OPPORTUNITIES:
+
+P0 (high impact / low risk — recommend immediate fix):
+ 1. Standardize `text-wrap: balance` on long headings — add to `.t-h1` and `.t-h2` tokens in globals.css (1-line edit, fixes 21+ headings on PageHeader + every section).
+ 2. Add `orphans: 2; widows: 2;` to `p` in globals.css base layer (1-line edit, no visual change in most cases, prevents ugly single-word last lines on long paragraphs).
+ 3. Migrate `Pricing.tsx:123/320` + `PricingFAQ.tsx:137` + `GlossaryModal.tsx:229` from inline `text-3xl md:text-4xl font-semibold tracking-tight` to `.t-h2` / `.t-h3` tokens (5 edits, removes the only 2 marketing h2 outliers).
+
+P1 (medium impact — recommend next-round):
+ 4. Replace raw `$${...toLocaleString()}` / `$${...toFixed()}k` patterns in `EquityCurve.tsx:159-160, 301, 306, 313` and `AnalyticsPage.tsx:629-630` with `fmtMoney()` / `fmtInt()` from format.ts. Restores locale-aware formatting (currently hardcoded "en-US" / "$" prefix).
+ 5. Add `hyphens: auto` to `.t-h1` and `.t-h2` tokens (or scope to Spanish pages via `:lang(es) .t-h1`). Handles long Spanish words on long headings.
+ 6. Tone big KPI numbers from `font-bold` (700) to `font-semibold` (600) on AnalyticsPage.tsx:175, DashboardPage.tsx:390, MarketClock.tsx:328, JournalPage.tsx:913, TradeDetailPage.tsx:475, SettingsPage.tsx:577. Keeps emphasis, drops the "demo-y" 700. (Leave Pricing.tsx:354 price display + GuaranteeBanner "30" + avatar initials + monograms at 700 — those are intentional emphasis.)
+ 7. Standardize eyebrow tracking. Pick one value (recommend changing `.eyebrow` token from 0.16em to 0.14em per spec, or vice versa) and consolidate the 87 inline `tracking-[0.1Xem]` instances. Big-surface refactor.
+
+P2 (low impact / polish):
+ 8. Either migrate Hero.tsx:163-180 h1 to `.t-display` token with explicit overrides, or document the hero as a deliberate exception (currently inline-styled — bypasses the token system the rest of the site uses).
+ 9. Wrap inline `$29` / `29 $` references in body copy (Hero.tsx:226/264, StatsBandNew.tsx:17, Comparison.tsx:20, FinalCTANew.tsx:83/106, OverviewApp.tsx:229, ValueTestimonials.tsx:69) in `<span className="tnum">$29</span>` for tabular-figure consistency with DownloadCTA.tsx:101/106 pattern. Minor — these are mostly inside localized strings.
+ 10. Align demo pages' h1/h2/h3 to use `.t-h1` / `.t-h2` tokens instead of inline `tracking-[-0.0Xem]` — currently 10 inline overrides in DashboardPage, AnalyticsPage, TradesPage, JournalPage, SettingsPage, PlaybookPage, DemoCapabilities, AppDemo, DemoGallery, DemoReadyToBuy. May be intentional (demo is its own design context), so verify before reforing.
+ 11. Consider scoping `.tnum` to data/table contexts only and letting body prose use proportional figures (`font-variant-numeric: proportional-nums`) for a more editorial feel — matches FT/Bloomberg body-vs-data distinction. Out of current scope; flag for future typography round.
+
+Next actions (informational — none blocking, all are polish, not bugs):
+- The 3 P0 items together would take ~10 minutes and remove the visible inconsistencies (heading weight on Pricing/PricingFAQ, single-word last lines on long paragraphs, ragged h2 wrapping).
+- The P1 #4 (EquityCurve + AnalyticsPage raw string concat) is the only item that affects user-visible correctness (locale formatting) — the rest are polish.
+- This audit is READ-ONLY. No files were modified.
+
+---
+Task ID: R22-1e
+Agent: explore (audit only — NO file edits)
+Task: Audit FORMS + interactive elements across marketing + demo for a11y + UX.
+
+Scope (7 components):
+ 1. src/components/marketing/ContactForm.tsx
+ 2. src/components/marketing/Newsletter.tsx
+ 3. src/components/marketing/RiskCalculator.tsx (range input + chips)
+ 4. src/components/marketing/FAQ.tsx (search input)
+ 5. src/components/marketing/PricingFAQ.tsx (accordion)
+ 6. src/components/demo/pages/DashboardPage.tsx (new-trade composer)
+ 7. src/components/tj/CommandPalette.tsx (search input via shadcn CommandInput)
+   — Note: also read src/components/demo/DemoCommandPalette.tsx (raw <input>)
+     because rg found the raw input there, not in tj/CommandPalette.tsx
+     (which delegates to shadcn <CommandInput>).
+
+Re-verified (per task brief):
+ - ComparisonSlider handle (keyboard a11y)
+ - Demo TopNav tabs (role="tab" / aria-selected)
+ - Mobile drawer in marketing/Navbar.tsx (focus trap — no regression)
+
+Commands run:
+ - `rg -n "<input|<textarea|<select" src/components/` → 24 occurrences across
+   ui/input.tsx, marketing/{RiskCalculator,ContactForm,FAQ}, demo/DemoCommandPalette,
+   demo/pages/{Playbook,Dashboard,Trades,Journal,Analytics}, tj/GlossaryModal, ui/textarea.
+ - `rg -n "aria-label|aria-expanded|aria-pressed|aria-invalid" src/components/ | wc -l`
+   → 149 aria-* attribute usages across components (healthy coverage).
+
+Per-component findings:
+
+───────────────────────────────────────────────────────────────────
+1. ContactForm.tsx  (/faq)
+───────────────────────────────────────────────────────────────────
+ ✓ Visible <label htmlFor> on all 3 fields (name/email/message) + Field() helper
+ ✓ aria-label redundancy on each input (SR fallback)
+ ✓ autoComplete="name" / autoComplete="email" / inputMode="email" on email
+ ✓ <form noValidate onSubmit>  — proper form semantics, Enter-to-submit works
+ ✓ role="alert" on the error <p>
+ ✓ Focus-visible accent ring (focus-visible:ring-2 + border tint)
+ ✗ NO aria-invalid on any input when error is set (validation is post-submit only)
+ ✗ NO aria-describedby linking the error <p> to the offending inputs
+ ✗ NO `required` / `aria-required` on name/email/message despite onSubmit enforcing them
+ ✗ Submit button never enters a disabled state (no aria-disabled to assess — N/A)
+ ✗ Success state swap (form → checkmark) is visual only — no aria-live region,
+   so SR users get no confirmation that the form was sent
+
+───────────────────────────────────────────────────────────────────
+2. Newsletter.tsx  (/about)
+───────────────────────────────────────────────────────────────────
+ ✓ aria-label on the email Input (visible label is implicit — Eyebrow + h2
+   above; no per-field <label> element, but aria-label covers it)
+ ✓ autoComplete="email" + inputMode="email"
+ ✓ aria-invalid={status === "error"}  — conditional, correct
+ ✓ role="alert" on the error <p>
+ ✓ Focus-visible accent ring (explicit class overrides shadcn default)
+ ✓ <form noValidate onSubmit>
+ ✗ NO aria-describedby linking the error <p> to the email Input
+ ✗ NO `required` / `aria-required` on the email Input (regex enforced only)
+ ✗ Submit Button never disabled — no aria-disabled assessment (N/A)
+ ✗ Success-state swap is visual only — no aria-live region for SR confirmation
+
+───────────────────────────────────────────────────────────────────
+3. RiskCalculator.tsx  (/features/metricas)
+───────────────────────────────────────────────────────────────────
+ ✓ Range input: aria-label, aria-valuemin=0.25, aria-valuemax=3,
+   aria-valuenow=riskPct, aria-valuetext=`${fmtNum(riskPct)} %`  — fully compliant
+ ✓ .tj-range class drives focus-visible style from globals.css (L1232, L1258, L1287)
+   → thumb gets accent ring + glow on keyboard focus
+ ✓ Risk-preset chips: aria-pressed={riskPct === p.pct} + descriptive aria-label
+   with the numeric value baked in (`${label} preset, ${fmtNum(p.pct)} percent risk`)
+ ✓ Balance chips: aria-pressed={balance === b.v} + aria-label
+ ✓ Global `button:focus-visible` rule (globals.css:1145) gives chips a 2px accent
+   outline + 4px halo on keyboard focus
+ ✗ The "Risk per trade" label above the range input is a <span>, not a
+   <label htmlFor="…"> — relies on aria-label alone (acceptable, but native
+   association would be more robust for AT that prefers <label>)
+ ✗ Chips have no visible `:focus-visible` class on themselves — they inherit
+   the global `button:focus-visible` rule, which works, but the rounded-full
+   chip shape (borderRadius: 100) gets `border-radius: 4px` from the global
+   rule → focus ring looks square on round chips (minor visual mismatch)
+ ✗ No live region announces the recomputed Risk $ / Profit / Size / R:R when
+   the slider or chips change — SR users hear nothing on interaction
+
+───────────────────────────────────────────────────────────────────
+4. FAQ.tsx  (search input)
+───────────────────────────────────────────────────────────────────
+ ✓ type="search" on the input (browser-native clear button on some UAs)
+ ✓ aria-label={es ? "Buscar en las preguntas frecuentes" : "Search frequently asked questions"}
+ ✓ placeholder also set (ES/EN)
+ ✓ Focus-visible accent ring (explicit class on the input)
+ ✓ Accordion uses shadcn <Accordion> → Radix auto-applies aria-expanded +
+   aria-controls on each trigger, role="region" on each content panel
+ ✓ Tab order: search input → accordion triggers (logical)
+ ✓ "No results" panel: button to open GlossaryModal is a real <button type="button">
+ ✗ No `aria-controls` linking the search input to the accordion container
+   (the accordion doesn't have an id; typing filters but SR doesn't announce
+   "X results" — the accordion just re-renders)
+ ✗ No live region announcing result count when the query filters
+ ✗ The glossary trigger button at the bottom has no aria-label beyond its
+   visible text — fine, but the icon-arrow `→` is read aloud by some SR
+
+───────────────────────────────────────────────────────────────────
+5. PricingFAQ.tsx  (accordion)
+───────────────────────────────────────────────────────────────────
+ ✓ Section has aria-label
+ ✓ shadcn <Accordion type="single" collapsible> → Radix handles aria-expanded +
+   aria-controls on each AccordionTrigger, role="region" on each AccordionContent
+ ✓ defaultValue="item-0" (first item open by default — good UX)
+ ✓ Focus-visible on trigger via shadcn default class (focus-visible:ring-[3px])
+ ✗ Each AccordionTrigger's accessible name is the question text only — no
+   aria-label disambiguator (fine for 5 items, but in a long list SR users
+   tab through questions without hearing "FAQ item N of 5")
+ ✗ The reassurance pills row uses <motion.span> with no role — purely
+   decorative, but the dot inside has no aria-hidden (could be announced
+   as "bullet" by some SR)
+
+───────────────────────────────────────────────────────────────────
+6. DashboardPage.tsx  (new-trade composer — MOST GAPS)
+───────────────────────────────────────────────────────────────────
+ ✓ Visible <label htmlFor> on all 7 inputs (instrument, setup, entry, stop,
+   exit, qty, risk) + the note textarea (d-inst, d-setup, d-entry, d-stop,
+   d-exit, d-qty, d-risk, d-note)
+ ✓ Direction toggle: role="radiogroup" + aria-label on container, role="radio"
+   + aria-checked on each of the 2 buttons (long/short) — proper radiogroup
+ ✓ Calc-method segmented control: 5 buttons each with aria-pressed={active} —
+   proper toggle semantics
+ ✓ Screenshots "drop zone" is a <button type="button" aria-label={t("dropScreens")}>
+ ✓ Risk input disabled={calcMethod === "entryStop"} — native disabled attr (accessible)
+ ✓ Tab order: instrument → setup → entry → stop → exit → qty → risk → note →
+   register/cancel buttons (logical, left-to-right top-to-bottom)
+ ✗ NO <form> wrapper — the input grid is plain <div>s. Submit happens via
+   `onClick={handleRegister}` on a `type="button"` button, NOT via form
+   onSubmit. Consequences:
+     · Enter-to-submit does NOT work inside any of the inputs
+     · No form semantics for SR (no "form" landmark, no submit relationship)
+     · Browser autofill heuristic may misbehave (no form context)
+ ✗ NO `required` / `aria-required` markers on entry/stop (handleRegister
+   validates them but the field doesn't announce "required" to AT)
+ ✗ NO `aria-invalid` / `aria-describedby` for validation feedback —
+   handleRegister shows a toast on validation failure but doesn't flag the
+   offending field; the field looks identical whether valid or invalid
+ ✗ entry/stop/exit/qty/risk inputs have NO autoComplete attr → browser may
+   offer number autofill from prior form history (noise). Should be
+   autoComplete="off".
+ ✗ Note textarea has aria-label set to the *placeholder* text (duplicated)
+   — visible <label htmlFor="d-note"> is also present, so the aria-label
+   is redundant AND conflicts (SR will read the aria-label, not the <label>)
+ ✗ Direction radiogroup has no <fieldset>/<legend> — uses role="radiogroup"
+   + aria-label, which is equivalent, but the "Direction" label is a plain
+   <span> not associated via htmlFor (radiogroup isn't a labelable element
+   anyway, so aria-label is the right call — minor)
+ ✗ Calc-method segmented control has no role="group" + aria-label on the
+   container; the "Calc method" label is a plain <span> (no association)
+ ✗ handleRegister toast is the only feedback — no inline error message
+   near the failing field
+ ✗ Success state: the toast announces via role="status" (assumed — needs
+   verification in the toast component) but the form doesn't reset visibly
+   (entry/stop/exit values persist) — UX gap
+
+───────────────────────────────────────────────────────────────────
+7. CommandPalette.tsx  (tj — site-wide Cmd+K)
+───────────────────────────────────────────────────────────────────
+ ✓ Dialog: role="dialog" + aria-modal="true" + aria-labelledby="command-palette-title"
+ ✓ sr-only <h2 id="command-palette-title"> provides the accessible name
+ ✓ Focus trap (getFocusables + Tab/Shift+Tab cycle, mirrors Navbar pattern)
+ ✓ Focus restore on close (previouslyFocused?.focus())
+ ✓ Escape-to-close on capture phase (beats cmdk's internal Esc)
+ ✓ cmdk handles ↑/↓/Enter natively
+ ✗ CommandInput (shadcn) receives NO aria-label prop → the underlying
+   <input> (cmdk's CommandPrimitive.Input) has only a placeholder. cmdk
+   does NOT auto-set aria-label. SR users tabbing into the palette hear
+   "edit text" with no name. (Mitigated by the dialog's labelledby, but
+   the input itself is unnamed.)
+ ✗ CommandInput's SearchIcon (lucide) has NO aria-hidden="true" in the
+   shadcn default (command.tsx:72) — minor; lucide icons are decorative
+   here
+ ✗ CommandInput has no autoComplete="off" / spellCheck={false} — may
+   trigger browser autofill or spell-check underlines on the palette
+ ✗ type="text" (not type="search") — acceptable for a command palette,
+   but type="search" would give the browser-native clear button
+
+[DemoCommandPalette.tsx — the in-demo variant] — mostly compliant:
+ ✓ role="dialog" + aria-modal + aria-label on the motion.div
+ ✓ Input has aria-label={es ? "Buscar comando" : "Search command"}
+ ✓ autoComplete="off" + spellCheck={false}
+ ✓ Keyboard: ArrowUp/Down/Enter/Esc handled on capture phase
+ ✓ Active row: aria-current={isActive ? "true" : undefined} on the button
+ ✗ Input type="text" (not type="search") — minor
+ ✗ Input has NO explicit focus-visible class — relies on global input:focus
+   rule (globals.css:476) — OK but no accent ring (just border tint)
+
+───────────────────────────────────────────────────────────────────
+Re-verified (no regressions):
+───────────────────────────────────────────────────────────────────
+ • ComparisonSlider handle (ComparisonSlider.tsx:340-392):
+   - role="slider" + aria-label + aria-valuemin=0/max=100/now=ariaPct
+   - aria-valuetext + aria-orientation="horizontal"
+   - Keyboard: ArrowLeft/Down −8%, ArrowRight/Up +8%, Home=MIN, End=MAX
+   - focus-visible:ring-2 accent ring + ring-offset
+   - Pointer + keyboard both update aria-valuenow on interaction end
+   - NOTE: handle is <motion.button role="slider"> — semantically odd
+     (button+slider), works in practice because role="slider" overrides,
+     but stricter ARIA would use <div role="slider" tabIndex={0}>.
+     Non-blocking.
+
+ • Demo TopNav tabs (TopNav.tsx:124-190):
+   - Container: role="tablist" + aria-label={t("demoTitle")}
+   - Each tab: role="tab" + aria-selected + aria-controls="demo-tabpanel"
+   - Roving tabIndex (active=0, inactive=-1)
+   - Keyboard: ArrowLeft/Right/Home/End on the tablist
+   - focus-visible:ring-2 accent ring on each tab
+   - Tabpanel exists: AppDemo.tsx:307-308 (role="tabpanel" id="demo-tabpanel")
+   - Fully compliant — no action.
+
+ • Mobile drawer (Navbar.tsx:530-650):
+   - Trigger: aria-expanded + aria-haspopup="dialog" + aria-controls="mobile-nav-drawer"
+   - Drawer: role="dialog" + aria-modal="true" + aria-label + tabIndex=-1
+   - Focus trap: getFocusables + Tab/Shift+Tab cycle (L104-128)
+   - Focus restore: menuButtonRef.current?.focus() on close (L132)
+   - Scroll-lock: body overflow hidden while open (L138-144)
+   - Close on Escape + route change (L146-160)
+   - No regression detected — fully compliant.
+
+Global a11y infrastructure (verified in globals.css):
+ • *:focus-visible (L1124) — 2px accent outline + 4px halo on every focusable
+ • button/a/input/select/textarea/[role=button]/[role=tab]/[tabindex]:focus-visible
+   (L1145-1152) — explicit accent ring on all interactive elements
+ • .tj-range:focus-visible (L1232, L1258, L1287) — slider thumb accent ring
+ • input/textarea/select:focus (L476-478) — accent border tint on :focus
+   (light-theme override at L496-498)
+ • These global rules compensate for several per-component gaps above
+   (chips in RiskCalculator, inputs in DemoCommandPalette, etc.).
+
+───────────────────────────────────────────────────────────────────
+PRIORITIZED FORM A11Y FIXES (for a future fix round — NOT applied here)
+───────────────────────────────────────────────────────────────────
+
+P0 — Blocking (semantics/UX broken for keyboard + SR users):
+ 1. DashboardPage composer: wrap the input grid in <form onSubmit={handleRegister}>
+    and change the "Register trade" button from type="button" onClick to
+    type="submit". Restores Enter-to-submit, form landmark for SR, and
+    native form semantics. (~10 min)
+ 2. CommandPalette (tj): pass aria-label to <CommandInput> (e.g.
+    `aria-label={es ? "Buscar comando o página" : "Search command or page"}`)
+    + add autoComplete="off" + spellCheck={false}. (~5 min)
+
+P1 — Important (validation state not exposed to AT):
+ 3. ContactForm: add `aria-invalid={!!error}` to name/email/message inputs,
+    add id="cf-error" to the error <p>, add `aria-describedby="cf-error"` to
+    each input. Add `required` to name/email/message. (~10 min)
+ 4. Newsletter: add id="newsletter-error" to the error <p>, add
+    `aria-describedby="newsletter-error"` to the Input, add `required`. (~5 min)
+ 5. DashboardPage composer: mark entry + stop inputs `required` (or
+    aria-required); on validation failure set aria-invalid on the offending
+    field and show an inline error message (not just a toast). (~15 min)
+ 6. ContactForm + Newsletter: add `aria-live="polite"` region for the
+    success-state confirmation (currently SR users get no "message sent"
+    announcement). (~5 min each)
+
+P2 — Polish (improves AT experience, non-blocking):
+ 7. RiskCalculator: convert the "Risk per trade" <span> to <label htmlFor="rc-risk">
+    + add id="rc-risk" to the range input. (~3 min)
+ 8. RiskCalculator: add a visually-hidden live region announcing the recomputed
+    Risk $ / Profit / Size / R:R on slider/chip change. (~10 min)
+ 9. RiskCalculator: add a `:focus-visible` override on chips to use
+    border-radius: 100 (match the chip shape) instead of the global 4px.
+    (~3 min)
+10. FAQ: add id="faq-accordion" to the accordion container + aria-controls
+    on the search input + an aria-live region announcing
+    `${filtered.length} results`. (~10 min)
+11. DemoCommandPalette: change input type="text" → type="search". (~1 min)
+12. DashboardPage composer: add autoComplete="off" to entry/stop/exit/qty/risk
+    inputs to suppress browser number autofill. (~3 min)
+13. DashboardPage composer: remove the redundant aria-label on the note
+    textarea (the visible <label htmlFor="d-note"> already labels it).
+    (~1 min)
+14. DashboardPage composer: add role="group" + aria-label to the calc-method
+    segmented control container. (~3 min)
+15. CommandPalette (tj): add aria-hidden="true" to the shadcn SearchIcon
+    (command.tsx:72). (~1 min)
+16. ComparisonSlider: consider changing <motion.button role="slider"> to
+    <div role="slider" tabIndex={0}> for stricter slider semantics.
+    Non-blocking — current implementation works. (~10 min)
+
+Items needing NO action (verified compliant):
+ - Demo TopNav tabs (role="tab" / aria-selected / aria-controls / roving
+   tabIndex / keyboard nav) ✓
+ - Mobile drawer in Navbar (focus trap / aria-modal / focus restore /
+   scroll-lock / Escape / route-change close) ✓
+ - ComparisonSlider handle (aria-valuemin/max/now/text / orientation /
+   keyboard Arrow/Home/End / focus ring) ✓
+ - RiskCalculator range input aria-valuetext ✓
+ - RiskCalculator + DashboardPage chip aria-pressed ✓
+ - DashboardPage direction toggle radiogroup + aria-checked ✓
+ - ContactForm / Newsletter focus-visible accent rings ✓
+ - FAQ / PricingFAQ shadcn Accordions (Radix auto aria-expanded/controls) ✓
+
+Stage Summary:
+ - 149 aria-* attributes across components — healthy baseline coverage.
+ - Global focus-visible rule (globals.css:1124-1156) is the safety net that
+   keeps most components keyboard-accessible even when per-component
+   focus styles are sparse.
+ - 2 P0 issues (DashboardPage no <form>, CommandPalette input no aria-label)
+   are the only true blockers — both are 1-line / 1-element changes.
+ - 4 P1 issues (validation not exposed to AT) are the next priority — they
+   affect ContactForm, Newsletter, DashboardPage.
+ - 10 P2 polish items improve AT experience but don't block.
+ - No regressions in ComparisonSlider, TopNav tabs, or mobile drawer.
+
+Next actions (informational — not blocking; this was audit-only):
+ - A future "R22-1f (fix)" round should apply P0 + P1 items (≈1 hour total).
+ - The P2 items can be batched into a separate polish round.
+ - The DashboardPage <form> refactor (P0-1) is the highest-leverage single
+   change — it fixes Enter-to-submit, form semantics, AND opens the door
+   to proper aria-invalid/aria-describedby wiring in the same edit.
+
+
+---
+Task ID: R22-1d
+Agent: Explore (SEO META completeness audit — READ-ONLY, no edits)
+Task: Audit SEO meta completeness across all 9 routes + global layout. Verify title/description/canonical/OG/twitter/keywords per page, sitemap.ts, robots.ts, JSON-LD schemas (Organization, Article, Product+Offer+AggregateRating, FAQPage, BreadcrumbList), viewport/theme-color/charset, hreflang alternates.
+
+Work Log:
+- Read /home/z/my-project/worklog.md (13 008 lines, R21-FINAL state).
+- Read src/app/layout.tsx (304 lines) — global Metadata + Viewport + JSON-LD.
+- Read 9 page.tsx metadata exports: /, /features, /features/metricas, /features/disciplina, /features/seguridad, /pricing, /demo, /about, /faq.
+- Read src/app/sitemap.ts (47 lines) + src/app/robots.ts (13 lines) + src/app/manifest.ts (28 lines).
+- Read next.config.ts — confirmed `basePath: "/JournalTradingWeb"` + `output: "export"` + `trailingSlash: true` for production (GitHub Pages).
+- Ran `rg -n "export const metadata" src/app/` — found 10 exports (1 layout + 9 pages, expected).
+- Ran `rg -n "metadataBase|themeColor|viewport" src/app/` — confirmed single source in layout.tsx.
+- Verified built HTML in /home/z/my-project/out/ (production export already present):
+  - `<title>` tags for all 9 routes — found DOUBLE-BRANDING bug on 3 feature subpages.
+  - `<meta property="og:image">` / `<meta name="twitter:image">` MISSING on 3 feature subpages.
+  - `<link rel="alternate" hreflang="...">` MISSING on all routes (no hreflang declared).
+  - `<meta charSet="utf-8"/>` ✓ auto-emitted by Next.js on all routes.
+  - `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>` ✓ on all routes.
+  - `<meta name="theme-color" content="#B9B2A6"/>` ✓ on all routes (mismatch with manifest #34B476 — see G4).
+  - `<meta name="description">` ✓ on all routes.
+  - `<meta name="keywords">` ✓ inherited from layout (27 keys) on all routes.
+  - `<meta name="robots" content="index, follow">` ✓ on all routes.
+  - `<link rel="manifest" href="/JournalTradingWeb/manifest.webmanifest"/>` ✓ on all routes.
+  - `<link rel="icon" href="/JournalTradingWeb/icon.svg?icon.9fae4d04.svg" sizes="any" type="image/svg+xml"/>` ✓ — but NO apple-touch-icon, NO favicon.ico, NO PNG icons.
+- Verified sitemap.xml built — 9 URLs listed with priorities 1.0/0.9/0.85×3/0.9/0.8/0.6/0.7 and changeFrequencies weekly×5 + monthly×4. All correct.
+- Verified robots.txt built — `User-Agent: * / Allow: / / Sitemap: .../sitemap.xml`. NOTE: public/robots.txt also exists with per-bot rules (Googlebot/Bingbot/Twitterbot/facebookexternalhit) but is OVERRIDDEN by src/app/robots.ts at build time — the per-bot rules are silently dropped. Dead code (G6).
+- Counted JSON-LD blocks per file: layout=2 (SoftwareApplication + Organization), features=1 (BreadcrumbList), metricas=2 (BreadcrumbList + Article), disciplina=2 (BreadcrumbList + Article), seguridad=2 (BreadcrumbList + Article), pricing=3 (BreadcrumbList + Product+Offer+AggregateRating + FAQPage), demo=1 (BreadcrumbList), about=1 (BreadcrumbList), faq=2 (BreadcrumbList + FAQPage). Total = 16 JSON-LD blocks across 9 files. All schemas verified present and well-formed per R20-1d/R20-2d; no regressions detected.
+- Computed description and title character lengths via Python — 5 of 10 descriptions exceed 160 chars (layout 187, home 193, features 186, metricas 188, disciplina 169); all titles under 60 chars (even with the double-brand bug).
+
+Findings — SEO gaps (ordered by severity):
+
+G1 — HIGH — Feature subpages have DOUBLE-BRANDED <title> tags
+  Symptom (verified in built HTML):
+    /features/metricas   → <title>Métricas — Trading Journal · Trading Journal</title>
+    /features/disciplina → <title>Disciplina — Trading Journal · Trading Journal</title>
+    /features/seguridad  → <title>Seguridad — Trading Journal · Trading Journal</title>
+  Root cause: layout.tsx declares `title: { default: "...", template: "%s · Trading Journal" }`. The 3 feature subpages declare `title: "Métricas — Trading Journal"` (plain string), which Next.js wraps with the template → "Métricas — Trading Journal · Trading Journal". The other 5 child pages (features, pricing, demo, about, faq) declare plain `title: "Precios"` etc. → template produces "Precios · Trading Journal" (single brand, correct). Home uses `title: { absolute: "..." }` which bypasses the template (correct).
+  Fix: in src/app/features/{metricas,disciplina,seguridad}/page.tsx change `title: "Métricas — Trading Journal"` to EITHER:
+    (a) `title: { absolute: "Métricas — Trading Journal" }` (matches home page pattern; OG title stays as-is), OR
+    (b) `title: "Métricas"` (template appends " · Trading Journal" → "Métricas · Trading Journal"; consistent with /features, /pricing, etc.).
+  Recommended: (a) — preserves the em-dash brand style of the deep-dive subpages.
+  Files: src/app/features/metricas/page.tsx:63, src/app/features/disciplina/page.tsx:60, src/app/features/seguridad/page.tsx:60.
+
+G2 — MEDIUM — Feature subpages have NO og:image / twitter:image
+  Symptom (verified in built HTML): /features/metricas, /features/disciplina, /features/seguridad render NO `<meta property="og:image">` and NO `<meta name="twitter:image">`. All 6 other routes (home, features, pricing, demo, about, faq) emit `<meta property="og:image" content="https://mmortexx.github.io/JournalTradingWeb/og.png"/>` correctly.
+  Root cause: Next.js does shallow-merge of child `openGraph` over parent `openGraph` — the child's openGraph REPLACES the parent's, including images. The 3 feature subpages' `openGraph` blocks declare title/description/url/type/siteName/locale/alternateLocale but OMIT `images`. Same for `twitter` (omit `images`). Layout's default OG image is NOT inherited.
+  Impact: social shares of /features/metricas, /features/disciplina, /features/seguridad render as text-only cards (no preview image) on Twitter/X, Facebook, LinkedIn, Slack, Discord.
+  Fix: in each of the 3 feature subpages, add to openGraph:
+      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "<Page> — Trading Journal" }],
+  and to twitter:
+      images: [OG_IMAGE],
+  (Requires adding `const OG_IMAGE = \`${SITE_URL}/og.png\`;` at the top of each file — metricas/disciplina/seguridad currently DON'T declare it, unlike features/pricing/demo/about/faq which do.)
+  Files: src/app/features/metricas/page.tsx:67-75, src/app/features/disciplina/page.tsx:64-72, src/app/features/seguridad/page.tsx:64-72.
+
+G3 — MEDIUM — NO hreflang / alternate locales declared
+  Symptom: zero `<link rel="alternate" hreflang="...">` tags across all 9 routes (verified via `rg -c "hreflang" out/index.html out/pricing/index.html out/features/metricas/index.html` → 0/0/0).
+  Context: site is ES-default with a client-side i18n toggle to EN (single set of URLs, not separate /en/ routes). HTML lang="es" on <html>, openGraph declares `locale: es_ES` + `alternateLocale: ["en_US"]`. The layout's `alternates` field only has `canonical` — no `languages` field.
+  Google's guidance for "same URL, language toggle" pages: hreflang is OPTIONAL if the page auto-detects language client-side, but recommended self-referencing hreflang + x-default aids canonicalization. Since there are no separate /en/ URLs, only option (b) below applies.
+  Fix (optional, low priority unless targeting international SEO):
+    (a) Do nothing — current state is acceptable per Google's "single URL + lang attribute" guidance. <html lang="es"> + openGraph locale already communicate language. NO action needed.
+    (b) If hreflang is desired, add to layout.tsx metadata.alternates:
+         languages: {
+           es: `${SITE_URL}/`,
+           en: `${SITE_URL}/`,
+           "x-default": `${SITE_URL}/`,
+         },
+       This emits `<link rel="alternate" hreflang="es" href="..."/>` + hreflang="en" + hreflang="x-default" all pointing at the same URL (correct for single-URL i18n).
+  Recommendation: leave as-is (option a). Flag only for awareness — not a real gap given the single-URL architecture.
+
+G4 — LOW — themeColor mismatch between layout.tsx and manifest.ts
+  - layout.tsx viewport.themeColor = "#B9B2A6" (warm sage gray — colors Android Chrome tab bar + Safari status bar).
+  - manifest.ts theme_color = "#34B476" (emerald green — colors PWA install UI + splash screen).
+  - Both are valid colors but inconsistent — Android Chrome tab bar shows sage, PWA install prompt shows emerald.
+  Fix: pick one. Either change layout.tsx to `themeColor: "#34B476"` (matches brand accent, more visually distinct), or change manifest.ts to `theme_color: "#B9B2A6"` (matches the neutral chrome). Recommend layout → #34B476 (brand consistency).
+  Files: src/app/layout.tsx:34, src/app/manifest.ts:17.
+
+G5 — LOW — No PNG favicon / apple-touch-icon / PWA maskable icons
+  Current state: only `src/app/icon.svg` (single SVG favicon, auto-detected by Next.js). manifest.ts declares ONE inline-SVG-data-URL icon with `sizes: "any"` + `purpose: "any"`.
+  Missing:
+    - `src/app/apple-icon.png` (180×180) — iOS Safari "Add to Home Screen" uses a screenshot or generic Apple icon without it.
+    - `favicon.ico` (multi-resolution) — legacy IE/old Chrome fallback (low priority in 2025).
+    - PWA maskable icons (192×192 + 512×512 PNG with `purpose: "any maskable"`) — Android home-screen install renders the SVG, but maskable PNGs give safe-zone padding for adaptive icons.
+  Fix: generate `src/app/apple-icon.png` (180×180, opaque, no transparency) and `src/app/icon-192.png` + `src/app/icon-512.png` from the existing icon.svg (sharp or rsvg-convert), then add `icons: { icon: "/icon-192.png", apple: "/apple-icon.png" }` to layout metadata and update manifest.ts icons array.
+  Files: new assets + src/app/layout.tsx (add `icons` field to metadata) + src/app/manifest.ts (add PNG entries).
+
+G6 — LOW — Duplicate robots.txt source (dead code)
+  Both `public/robots.txt` (5 per-bot rules: Googlebot/Bingbot/Twitterbot/facebookexternalhit/*) and `src/app/robots.ts` (Next.js Metadata Route: single `User-Agent: * / Allow: / / Sitemap: ...`) exist. Next.js App Router's robots.ts takes precedence at build time — verified `out/robots.txt` contains ONLY the simplified robots.ts output; the per-bot rules in public/robots.txt are SILENTLY DROPPED.
+  Fix: delete `public/robots.txt` (it's dead code), OR merge the per-bot rules into robots.ts (using the `rules: Array<...>` form) if the per-bot treatment was intentional. Recommended: delete public/robots.txt — the simplified `User-Agent: * / Allow: /` is functionally equivalent (the per-bot rules were all `Allow: /` anyway, just redundant).
+  Files: public/robots.txt (delete).
+
+G7 — INFO — 5 page descriptions exceed 160 chars (Google truncates at ~155-160)
+  Verified character counts:
+    layout.default       187 chars  OVER
+    home.PAGE_DESCRIPTION 193 chars  OVER
+    features             186 chars  OVER
+    metricas             188 chars  OVER
+    disciplina           169 chars  OVER
+    seguridad            142 chars  OK
+    pricing              122 chars  OK
+    demo                 113 chars  OK
+    about                116 chars  OK
+    faq                  115 chars  OK
+  Impact: Google truncates descriptions >155-160 chars with ellipsis (…) in SERP. Suboptimal CTR, not a hard error. The 5 long descriptions all have meaningful content in the first 155 chars (cut points fall in the middle of phrases like "Métricas institucionales, disciplina que te frena antes del error y...").
+  Fix (optional polish): trim each of the 5 long descriptions to ≤160 chars. Suggested trims:
+    layout.default: "...Métricas institucionales, disciplina que frena la tontería. Datos 100% locales. Pago único, sin suscripciones." (~120 chars)
+    home: "...Métricas institucionales, disciplina que frena el error. Datos 100% locales. Pago único desde 29 $. Sin suscripciones." (~125 chars)
+    features: "Bento de características, galería, cómo funciona. Métricas, disciplina y seguridad en sus propias páginas." (~110 chars)
+    metricas: "40+ ratios institucionales (Sharpe, Sortino, profit factor, expectancy en R) y calculadora de riesgo interactiva." (~115 chars)
+    disciplina: "El Guardián frena antes del error: bloquea tamaños sobre tu riesgo y audita cada excepción. Disciplina que actúa." (~115 chars)
+  Files: src/app/layout.tsx:165, src/app/page.tsx:13-14, src/app/features/page.tsx:26-27, src/app/features/metricas/page.tsx:64-65, src/app/features/disciplina/page.tsx:61-62.
+
+G8 — INFO — Title lengths all PASS (≤60 chars), even with the G1 double-brand bug
+  Verified character counts of all 9 rendered <title> tags (from built HTML):
+    home                 52 chars  "Trading Journal — Opera como una mesa institucional."
+    features             33 chars  "Características · Trading Journal"
+    metricas (BUG)       44 chars  "Métricas — Trading Journal · Trading Journal"
+    disciplina (BUG)     46 chars  "Disciplina — Trading Journal · Trading Journal"
+    seguridad (BUG)      45 chars  "Seguridad — Trading Journal · Trading Journal"
+    pricing              25 chars  "Precios · Trading Journal"
+    demo                 30 chars  "Demo en vivo · Trading Journal"
+    about                27 chars  "Acerca de · Trading Journal"
+    faq                  21 chars  "FAQ · Trading Journal"
+  All under 60 chars — even with the G1 double-brand bug, no title is truncated. After G1 fix, the 3 feature subpages will be 26-28 chars (better, cleaner SERP).
+
+G9 — INFO — JSON-LD schemas: no regressions vs R20-1d / R20-2d
+  - Organization (layout.tsx:146-156): name, url, logo, description, foundingDate, sameAs. ✓
+  - SoftwareApplication (layout.tsx:81-139): name, applicationCategory, operatingSystem, url, description, inLanguage [es,en], offers [Core $29 / Pro $49], featureList (9 items), aggregateRating (4.8/47 — matches /pricing Product schema, conflict fixed per R20-1d E1), publisher. ✓
+  - Article ×3 (features/metricas, features/disciplina, features/seguridad): headline, description, url, mainEntityOfPage, author (Organization), publisher (Organization), inLanguage, timeRequired, datePublished "2025-01-01", dateModified "2025-01-01", image (og.png), about[] (5 Thing entries each). ✓ — Article-rich-result eligibility: datePublished ISO 8601 present (R20-1d E2 fix verified), image present (R20-1d E3 fix verified), about[] as canonical Thing objects (R20-1d E7 fix verified).
+  - Product + Offer + AggregateRating (pricing/page.tsx:111-156): name, description, brand, category, aggregateRating (4.8/47 — canonical value, matches layout SoftwareApplication), offers [Core $29 / Pro $49 with priceValidUntil 2026-12-31, availability InStock, url, description]. ✓
+  - FAQPage ×2 (faq/page.tsx:49-182 with 16 Q&A; pricing/page.tsx:56-101 with 5 Q&A). ✓ — both mirror visible ES Q&A (per R20-1d E5 sync requirement).
+  - BreadcrumbList ×8 (features, features/metricas, features/disciplina, features/seguridad, pricing, demo, about, faq). ✓ — home correctly has NO BreadcrumbList (root page, no parents). All use absolute URLs (SITE_URL-based).
+  - Total: 16 JSON-LD blocks across 9 files (layout=2, features=1, metricas=2, disciplina=2, seguridad=2, pricing=3, demo=1, about=1, faq=2). Matches R20-1d baseline. No regressions.
+
+G10 — INFO — sitemap.ts correct
+  All 9 routes listed: / (1.0, weekly), /features (0.9, weekly), /features/metricas (0.85, weekly), /features/disciplina (0.85, weekly), /features/seguridad (0.85, weekly), /pricing (0.9, monthly), /demo (0.8, monthly), /about (0.6, monthly), /faq (0.7, monthly). lastModified frozen at 2025-01-01 for deterministic builds (documented in code comment). ✓ — verified built sitemap.xml has 9 <url> entries with matching priorities + changeFrequencies + trailing-slash URLs.
+
+G11 — INFO — robots.ts correct
+  rules: { userAgent: "*", allow: "/" } + sitemap: SITE_URL + "/sitemap.xml". ✓ — verified built out/robots.txt renders correctly. NOTE: no `host` directive (optional, Bing-specific) and no `disallow` rules (intentional — full crawl allowed). Minimal and correct.
+
+G12 — INFO — charset ✓ viewport ✓ theme-color ✓
+  - charset: Next.js auto-emits `<meta charSet="utf-8"/>` (capital S in Next 16) as the FIRST child of <head>. Verified in built HTML. No action needed.
+  - viewport: `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>` emitted from `export const viewport: Viewport` in layout.tsx. ✓ — viewport-fit=cover enables safe-area-inset env() values per the code comment.
+  - theme-color: `<meta name="theme-color" content="#B9B2A6"/>` emitted from `viewport.themeColor`. ✓ (but see G4 for the manifest mismatch).
+
+G13 — INFO — Non-standard `category: "finance"` field in layout metadata
+  layout.tsx:230 sets `category: "finance"` in the Metadata export. Next.js's Metadata type doesn't document `category` — it's silently ignored (no `<meta name="category">` tag emitted in built HTML). Harmless code smell. Optional cleanup: remove the line. Not blocking.
+
+Stage Summary:
+- Audit complete. 9 routes + global layout fully inspected; 16 JSON-LD blocks verified; sitemap.xml + robots.txt + manifest.webmanifest verified in built output.
+- 1 HIGH gap (G1 — 3 feature subpages render double-branded <title>): visible SEO bug, easy 3-line fix.
+- 2 MEDIUM gaps (G2 — missing og:image/twitter:image on same 3 feature subpages; G3 — no hreflang, optional given single-URL i18n architecture).
+- 3 LOW gaps (G4 theme-color mismatch; G5 no PNG/apple-touch icons; G6 duplicate robots.txt source).
+- 5 INFO items (G7 5 long descriptions; G8 title lengths all PASS; G9 JSON-LD no regressions; G10/G11 sitemap/robots correct; G12 charset/viewport/theme-color present; G13 category field is a no-op).
+- The 3 feature subpages (metricas, disciplina, seguridad) account for ALL HIGH/MEDIUM gaps — they were the last routes added (per worklog R7-a) and missed the OG-image + title-template discipline that the other 6 routes follow.
+- No regressions detected vs R20-1d / R20-2d JSON-LD audit. All Article schemas have datePublished (E2 fix), image (E3 fix), about[] as Thing objects (E7 fix). Product + SoftwareApplication AggregateRating values both 4.8/47 (E1 conflict fix). FAQPage schemas on /faq + /pricing mirror visible Q&A (E5 fix).
+
+Recommended next-action priority (informational — not blocking; this was an audit-only task, no files edited):
+- P0 (HIGH, 3-line fix): G1 — change `title: "Métricas — Trading Journal"` → `title: { absolute: "Métricas — Trading Journal" }` on the 3 feature subpages. Eliminates double-branding in SERP. Files: src/app/features/{metricas,disciplina,seguridad}/page.tsx.
+- P1 (MEDIUM, ~10-line fix): G2 — add `OG_IMAGE` const + `images: [...]` to openGraph and `images: [OG_IMAGE]` to twitter on the 3 feature subpages. Restores social-card preview images. Same 3 files as P0.
+- P2 (LOW, optional): G4 — pick one theme-color value, apply to both layout.tsx + manifest.ts. G5 — generate PNG icons (apple-icon, 192, 512) for iOS/PWA. G6 — delete public/robots.txt (dead code). G7 — trim 5 long descriptions to ≤160 chars.
+- P3 (INFO): G3 hreflang — leave as-is (single-URL i18n doesn't require it). G13 `category: "finance"` — optional cleanup.
+
+Verification:
+- `rg -n "export const metadata" src/app/` → 10 hits (1 layout + 9 pages), matches expected route count.
+- `rg -n "metadataBase|themeColor|viewport" src/app/` → all 3 fields localized to layout.tsx only (no per-page overrides).
+- Built HTML inspection (`out/<route>/index.html`) confirmed:
+  - G1 bug: 3 feature subpages have `<title>... · Trading Journal · Trading Journal</title>`.
+  - G2 bug: 3 feature subpages have NO `<meta property="og:image">` and NO `<meta name="twitter:image">`.
+  - G3: zero `<link rel="alternate" hreflang>` across all 9 routes.
+  - G4: `<meta name="theme-color" content="#B9B2A6"/>` (layout) vs manifest `theme_color: #34B476` (manifest.webmanifest).
+  - G12: `<meta charSet="utf-8"/>`, `<meta name="viewport" ... viewport-fit=cover>`, `<meta name="theme-color" ...>` all present.
+  - G9: 16 JSON-LD `<script type="application/ld+json">` blocks across 9 files (counted via `rg -nc`).
+  - G10: out/sitemap.xml has 9 <url> entries with correct priorities + changeFrequencies.
+  - G11: out/robots.txt has User-Agent: * / Allow: / / Sitemap: ... (overrides public/robots.txt).
