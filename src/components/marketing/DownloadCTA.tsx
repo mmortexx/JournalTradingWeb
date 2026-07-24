@@ -108,23 +108,24 @@ export function DownloadCTA() {
                 )}
               </p>
 
-              {/* System requirements — refined spec sheet row. Each spec
-                  is a CheckSmall icon (pnl-pos green) + a tnum label, with
-                  refined middle separators that use the neutral divider token
-                  instead of `text-tertiary opacity-50` for a crisper, more
-                  institutional read (R20-3c). */}
-              <div className="mt-5 flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-2 text-xs text-tertiary">
-                <span className="inline-flex items-center gap-1.5">
+              {/* System requirements — refined spec-sheet row rendered as
+                  discrete pill badges (R23-2e). Each spec gets a hairline
+                  border + subtle divider backdrop so the row reads as a
+                  cluster of trust badges instead of floating text+icon
+                  pairs. `text-secondary` (was `text-tertiary`) lifts the
+                  labels out of the dim range so Windows version / arch /
+                  size are unambiguous at a glance. tnum keeps the version
+                  digits + size figure on the tabular baseline. */}
+              <div className="mt-5 flex flex-wrap items-center justify-center md:justify-start gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">Windows 10/11</span>
                 </span>
-                <span className="text-[rgb(var(--divider)/0.35)]" aria-hidden="true">·</span>
-                <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">64-bit</span>
                 </span>
-                <span className="text-[rgb(var(--divider)/0.35)]" aria-hidden="true">·</span>
-                <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">50 MB</span>
                 </span>
@@ -153,7 +154,7 @@ export function DownloadCTA() {
                 <WindowsIcon className="shrink-0" />
                 <span className="break-words">{es ? "Descargar para Windows" : "Download for Windows"}</span>
               </motion.a>
-              <span className="text-[11px] text-tertiary tnum text-center md:text-right break-words">
+              <span className="text-xs text-tertiary tnum text-center md:text-right break-words">
                 {es ? "Instalador offline · sin conexión tras instalar" : "Offline installer · no connection after install"}
               </span>
             </div>

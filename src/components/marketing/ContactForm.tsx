@@ -147,6 +147,8 @@ export function ContactForm() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.55 }}
                         className="text-base font-medium text-primary"
+                        aria-live="polite"
+                        role="status"
                       >
                         {es
                           ? "✓ Mensaje enviado. Te responderemos en 24h."
@@ -172,6 +174,9 @@ export function ContactForm() {
                           onChange={(e) => setName(e.target.value)}
                           placeholder={es ? "Tu nombre" : "Your name"}
                           aria-label={es ? "Nombre" : "Name"}
+                          aria-invalid={!!error}
+                          aria-describedby={error ? "cf-error" : undefined}
+                          required
                           className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
                         />
                       </Field>
@@ -185,6 +190,9 @@ export function ContactForm() {
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Email" : "Email"}
+                          aria-invalid={!!error}
+                          aria-describedby={error ? "cf-error" : undefined}
+                          required
                           className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 px-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
                         />
                       </Field>
@@ -195,6 +203,9 @@ export function ContactForm() {
                           onChange={(e) => setMessage(e.target.value)}
                           placeholder={es ? "¿En qué podemos ayudarte?" : "How can we help?"}
                           aria-label={es ? "Mensaje" : "Message"}
+                          aria-invalid={!!error}
+                          aria-describedby={error ? "cf-error" : undefined}
+                          required
                           rows={4}
                           className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md px-3 py-2.5 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0 resize-y min-h-[112px]"
                         />
@@ -203,6 +214,7 @@ export function ContactForm() {
                       <AnimatePresence>
                         {error && (
                           <motion.p
+                            id="cf-error"
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}

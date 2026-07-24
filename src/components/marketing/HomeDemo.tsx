@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowRight, Maximize2 } from "lucide-react";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
 import { useLang } from "@/lib/i18n";
 
@@ -9,6 +11,18 @@ import { useLang } from "@/lib/i18n";
  * /demo). Cabecera compacta con el eyebrow § 02 + titular serif, y
  * debajo la app recreada completa (AppDemoClient): pestañas, páginas
  * y datos de muestra clicables — el "pruébalo sin descargar nada".
+ *
+ * R23-2c (polish):
+ * - Mantiene el demo interactivo real (AppDemoClient) — no se sustituye
+ *   por una screenshot estática: el valor está en lo clicable.
+ * - Añade una fila CTA debajo del demo con un botón claro a /demo
+ *   (los usuarios que quieran la vista a página completa tienen un
+ *   siguiente paso explícito; antes no había CTA a /demo en esta
+ *   sección, aunque Hero/OverviewApp/FinalCTANew sí la tenían).
+ * - Ajusta el ritmo vertical móvil: el eyebrow reduce su margen
+ *   inferior en <380px para que la cabecera no ocupe media pantalla.
+ * - La fila CTA es full-width en móvil (375px) y auto en ≥sm, igual
+ *   que el patrón de OverviewApp — sin overflow horizontal.
  */
 export function HomeDemo() {
   const { lang } = useLang();
@@ -64,7 +78,14 @@ export function HomeDemo() {
       />
       <div className="relative z-10 mx-auto max-w-[1280px]">
         <div className="mb-10 max-w-[760px]">
-          <div className="mb-5 inline-flex items-center gap-3">
+          <div
+            className="mb-5 inline-flex items-center gap-3"
+            // On very narrow viewports (<380px) the eyebrow row can
+            // feel heavy with the default 20px bottom margin — pull it
+            // in to 16px so the heading lifts closer. Slight gain but
+            // keeps the heading above the fold on small phones.
+            style={{ marginBottom: "clamp(16px, 4vw, 20px)" }}
+          >
             <span
               className="tnum"
               style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
@@ -82,6 +103,11 @@ export function HomeDemo() {
           <h2
             className="font-serif m-0"
             style={{
+              // clamp(1.95rem, 3.5vw, 3.05rem): min ~31px so the
+              // heading reads as a section title even on a 320px phone
+              // (the long-form Spanish "La app, en tu navegador."
+              // wraps into a balanced 2 lines thanks to textWrap:
+              // balance; max ~49px caps it on ≥1280px desktops).
               fontSize: "clamp(1.95rem, 3.5vw, 3.05rem)",
               fontWeight: 400,
               letterSpacing: "-0.022em",
@@ -110,6 +136,67 @@ export function HomeDemo() {
           </p>
         </div>
         <AppDemoClient />
+
+        {/* CTA row — clear next step to the dedicated /demo route.
+            Before R23-2c this section had no link to /demo at all,
+            which was inconsistent with Hero/OverviewApp/FinalCTANew
+            (all of which link to /demo). The embedded demo here is
+            the same one that lives at /demo, but the dedicated route
+            gives a focused, full-viewport surface with its own URL
+            for sharing — worth signalling. The button mirrors the
+            dark-pill "See the demo" treatment from Hero so the two
+            CTAs read as a coordinated pair, and uses the
+            `tj-cta-sheen` class for the same animated sheen sweep.
+
+            Mobile (375px): button is full-width so it never overflows
+            and the tap target stays comfortable (52px tall). ≥sm:
+            shrinks to content, centered under the demo frame. The
+            secondary "no download" hint reinforces the value prop
+            without competing for the click. */}
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5">
+          <Link
+            href="/demo"
+            aria-label={es ? "Abrir la demo a página completa" : "Open the full-page demo"}
+            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center items-center gap-2.5 rounded-full"
+            style={{
+              height: 52,
+              padding: "0 26px",
+              background: "var(--ink)",
+              color: "var(--bg)",
+              fontSize: 15,
+              fontWeight: 600,
+              boxShadow: "0 12px 30px -14px rgb(0 0 0 / 0.6)",
+              transition: "transform 0.2s, filter 0.2s, box-shadow 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.filter = "brightness(0.94)";
+              // Accent ring on hover — pairs with Hero's dark-CTA
+              // hover ring so the two `/demo` buttons lift together
+              // and read as a coordinated pair rather than two
+              // unrelated hover treatments.
+              e.currentTarget.style.boxShadow =
+                "0 14px 34px -12px rgb(0 0 0 / 0.65), 0 0 0 1px rgb(var(--accent-base) / 0.30)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "";
+              e.currentTarget.style.filter = "";
+              e.currentTarget.style.boxShadow = "0 12px 30px -14px rgb(0 0 0 / 0.6)";
+            }}
+          >
+            <Maximize2 size={15} aria-hidden />
+            <span>{es ? "Abrir demo a página completa" : "Open full-page demo"}</span>
+            <ArrowRight size={16} aria-hidden />
+          </Link>
+          <span
+            className="text-center sm:text-left"
+            style={{ fontSize: 13, lineHeight: 1.5, color: "var(--ink-3)" }}
+          >
+            {es
+              ? "Sin descargar nada · 100 % en tu navegador"
+              : "No download · 100 % in your browser"}
+          </span>
+        </div>
       </div>
     </section>
   );

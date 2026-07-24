@@ -14,14 +14,24 @@ import { WindowFrame } from "@/components/tj/WindowFrame";
  * app, with a bilingual caption beneath the frame (never an overlay
  * that crops or covers the screenshot).
  *
- * Layout — responsive grid that respects the screenshots' ~16:10 aspect
- * without forcing recortes:
+ * Layout — responsive grid that respects the screenshots' natural
+ * 1500×856 aspect (ratio 1.7523, passed to WindowFrame as
+ * `bodyClassName="aspect-[1500/856]"` so the screenshot fills the
+ * frame body edge-to-edge with zero letterbox bars):
  *  - mobile: 1 column (full width)
  *  - md (768+): 2 columns
  *  - lg (1024+): 3 columns
- * Each cell = WindowFrame (title bar + 16:10 body with object-contain
+ * Each cell = WindowFrame (title bar + body with object-contain
  * screenshot) + caption block below. Lazy-loaded via next/image
  * `loading="lazy"` (FeatureImage), `sizes` tuned to the grid.
+ *
+ * "View full size" affordance — each frame is wrapped in an `<a
+ * target="_blank">` pointing at the raw 1500px webp, so a click/tap
+ * opens the full-resolution screenshot in a new tab. A subtle
+ * expand-icon chip (top-right of the frame) communicates the
+ * affordance: always visible at 60% opacity on touch (no hover),
+ * fades + lifts in on desktop hover. Keyboard users get a
+ * focus-visible accent ring on the anchor.
  */
 export function Gallery() {
   const { lang } = useLang();
@@ -117,18 +127,65 @@ export function Gallery() {
           {shots.map((shot, i) => (
             <Reveal key={shot.src} delay={i * 0.06}>
               <figure className="group relative">
-                <div className="transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1">
-                  <WindowFrame caption={shot.caption}>
-                    <FeatureImage
-                      src={asset(shot.src)}
-                      alt={shot.alt}
-                      fit="contain"
-                      className="absolute inset-0 h-full w-full"
-                      overlay={0}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                {/* Anchor wraps ONLY the WindowFrame (not the caption) so
+                    the focus ring + click target are scoped to the frame,
+                    and the accent glow below is also scoped to the frame
+                    (previously it spanned the whole figure including the
+                    caption, which anchored the drop shadow below the
+                    caption instead of the frame). */}
+                <a
+                  href={asset(shot.src)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={es
+                    ? `Ver "${shot.title}" a tamaño completo (se abre en pestaña nueva)`
+                    : `View "${shot.title}" at full size (opens in a new tab)`}
+                  className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1"
+                >
+                  <div className="relative">
+                    <WindowFrame
+                      caption={shot.caption}
+                      bodyClassName="aspect-[1500/856]"
+                    >
+                      <FeatureImage
+                        src={asset(shot.src)}
+                        alt={shot.alt}
+                        fit="contain"
+                        className="absolute inset-0 h-full w-full"
+                        overlay={0}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </WindowFrame>
+                    {/* Hover: subtle accent border glow scoped to the
+                        frame only (absolute inset-0 of the `relative`
+                        wrapper, NOT the figure). */}
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.4), 0 16px 40px -12px rgb(var(--accent-base) / 0.2)" }}
                     />
-                  </WindowFrame>
-                </div>
+                    {/* "View full size" affordance — expand-icon chip at
+                        the top-right of the frame. Always visible at 60%
+                        opacity on touch (no hover), fades + lifts in on
+                        desktop hover. Sits over the title bar's right
+                        spacer (empty, aria-hidden) so it never clashes
+                        with the centered caption or left traffic lights. */}
+                    <span
+                      aria-hidden
+                      className="absolute top-2 right-2 z-10 inline-flex items-center justify-center w-7 h-7 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 text-white/85 opacity-60 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-200"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                        <path
+                          d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13 3l-4.5 4.5M3 13l4.5-4.5"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </a>
                 {/* Caption BENEATH the frame — never an overlay that
                     covers the screenshot. */}
                 <figcaption className="mt-3.5 px-1">
@@ -146,12 +203,6 @@ export function Gallery() {
                     {shot.desc}
                   </p>
                 </figcaption>
-                {/* Hover: subtle accent border glow on the frame */}
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-[calc(100%-0px)] rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.4), 0 16px 40px -12px rgb(var(--accent-base) / 0.2)" }}
-                />
               </figure>
             </Reveal>
           ))}

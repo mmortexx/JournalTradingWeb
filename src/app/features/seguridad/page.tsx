@@ -11,6 +11,7 @@ import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 const READING_TIME_MIN = 3;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
+const OG_IMAGE = `${SITE_URL}/og.png`;
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -57,7 +58,10 @@ const articleSchema = {
 };
 
 export const metadata: Metadata = {
-  title: "Seguridad — Trading Journal",
+  // `absolute` bypasses layout.tsx's `title.template: "%s · Trading Journal"`
+  // — a plain string would render "Seguridad — Trading Journal · Trading Journal"
+  // (double-branded). See worklog Task R22-1d (G1) + R23-2a.
+  title: { absolute: "Seguridad — Trading Journal" },
   description:
     "Local-first: tus datos 100% en tu máquina, sin nube ni cuentas. Especificaciones técnicas, integraciones con tu flujo y privacidad por diseño.",
   alternates: { canonical: `${SITE_URL}/features/seguridad/` },
@@ -69,11 +73,16 @@ export const metadata: Metadata = {
     siteName: "Trading Journal",
     locale: "es_ES",
     alternateLocale: ["en_US"],
+    // Next.js shallow-merges child openGraph over layout's — layout's
+    // default OG image is NOT inherited when the child omits `images`.
+    // See worklog Task R22-1d (G2) + R23-2a.
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Seguridad — Trading Journal" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Seguridad — Trading Journal",
     description: "Local-first, sin nube ni cuentas. Tus datos 100% en tu máquina.",
+    images: [OG_IMAGE],
   },
 };
 

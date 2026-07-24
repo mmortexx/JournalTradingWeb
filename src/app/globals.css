@@ -311,6 +311,16 @@
     background-attachment: fixed;
     min-height: 100vh;
   }
+  /* Orphan/widow control on all paragraphs — prevents a single word
+     (or a single line) from sitting alone at the bottom of a column
+     (orphan) or top of the next page/column (widow) on long-form
+     marketing copy (Hero lead, PageHeader subtitle, Story, FinalCTA,
+     FAQ answers, feature-page bodies). No visual change in most cases;
+     pure typographic polish per R22-1a P0-2. */
+  p {
+    orphans: 2;
+    widows: 2;
+  }
   /* Tabular figures + slashed zeros for financial typography.
      `"zero" 1` enables the slashed-zero glyph (0 → 0̸) so numeric
      columns visually distinguish 0 from O — a small but important
@@ -367,12 +377,20 @@
     line-height: 1.05;
     letter-spacing: -0.035em;
     font-weight: 500;
+    /* Balance heading line breaks so the last line doesn't end on a
+       single word — propagates to every PageHeader h1 + section h1 on
+       the site via the token (per R22-1a P0-1). */
+    text-wrap: balance;
   }
   .t-h2 {
     font-size: clamp(1.75rem, 4vw, 2.75rem);
     line-height: 1.1;
     letter-spacing: -0.03em;
     font-weight: 500;
+    /* Balance heading line breaks — applies to every section h2 that
+       uses the `.t-h2` token (PageHeader subtitles, marketing section
+       titles). Per R22-1a P0-1. */
+    text-wrap: balance;
   }
   .t-h3 {
     font-size: clamp(1.25rem, 2.5vw, 1.5rem);

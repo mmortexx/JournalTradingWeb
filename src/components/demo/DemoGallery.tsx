@@ -13,15 +13,25 @@ import { WindowFrame } from "@/components/tj/WindowFrame";
  * inside a WindowFrame mockup with a bilingual caption label beneath.
  *
  * Grid: md:grid-cols-2 lg:grid-cols-4. Each cell keeps the screenshot's
- * ~16:10 aspect (no 4:3 crop) so the app reads whole and crisp.
+ * natural 1500×856 aspect (passed to WindowFrame as `bodyClassName=
+ * "aspect-[1500/856]"`) so the app reads whole and crisp with zero
+ * letterbox bars.
  *
  * Institutional polish:
  *  - WindowFrame (WinUI title bar + theme-aware body) wraps each
  *    FeatureImage fit="contain" — the screenshot is never cropped.
  *  - Caption is a LABEL beneath the frame (not an overlay that covers
  *    the screenshot), so titles stay legible without darkening pixels.
+ *    A centered 32px hairline between the frame and the caption anchors
+ *    the label to the shot so they read as a single composed unit.
+ *  - "View full size" affordance — each frame is wrapped in `<a
+ *    target="_blank">` pointing at the raw 1500px webp; an expand-icon
+ *    chip (top-right) is always visible at 60% on touch and fades +
+ *    lifts in on desktop hover.
  *  - Eyebrow + headline use `text-primary`; subtitle uses `text-secondary`.
- *  - Bottom CTA: primary `bg-white text-black` "Open the demo" + secondary
+ *  - Bottom CTA: primary `bg-white text-black` "Open the demo"
+ *    (anchor `#demo` → scrolls to the interactive AppDemoClient section
+ *    above, which carries `id="demo"` + `scroll-mt-16`) + secondary
  *    `liquid-glass` "See features" — mirrors FinalCTA's CTA pair.
  */
 
@@ -151,24 +161,66 @@ export function DemoGallery() {
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                 className="group relative"
               >
-                <div className="transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]">
-                  <WindowFrame caption={s.caption}>
-                    <FeatureImage
-                      src={asset(s.src)}
-                      alt={es ? s.altEs : s.altEn}
-                      fit="contain"
-                      className="absolute inset-0 h-full w-full"
-                      overlay={0}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                  </WindowFrame>
-                </div>
+                {/* Anchor wraps ONLY the WindowFrame so the click target +
+                    focus ring are scoped to the frame (not the caption).
+                    Opens the raw 1500px webp in a new tab — genuine "view
+                    full size" functionality, not just a visual affordance. */}
+                <a
+                  href={asset(s.src)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={es
+                    ? `Ver "${s.capEs}" a tamaño completo (se abre en pestaña nueva)`
+                    : `View "${s.capEn}" at full size (opens in a new tab)`}
+                  className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                >
+                  <div className="relative transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]">
+                    <WindowFrame
+                      caption={s.caption}
+                      bodyClassName="aspect-[1500/856]"
+                    >
+                      <FeatureImage
+                        src={asset(s.src)}
+                        alt={es ? s.altEs : s.altEn}
+                        fit="contain"
+                        className="absolute inset-0 h-full w-full"
+                        overlay={0}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                    </WindowFrame>
+                    {/* "View full size" affordance — expand-icon chip at
+                        the top-right of the frame. Always visible at 60%
+                        opacity on touch (no hover), fades + lifts in on
+                        desktop hover. Sits over the title bar's right
+                        spacer (empty, aria-hidden) so it never clashes
+                        with the centered caption or left traffic lights. */}
+                    <span
+                      aria-hidden
+                      className="absolute top-2 right-2 z-10 inline-flex items-center justify-center w-7 h-7 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 text-white/85 opacity-60 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-200"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                        <path
+                          d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13 3l-4.5 4.5M3 13l4.5-4.5"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </a>
+                {/* Hairline beneath the frame — a 32px centered rule that
+                    anchors the caption to the shot so they read as a single
+                    composed unit (editorial gallery rhythm). */}
+                <div
+                  aria-hidden
+                  className="mt-3 mx-auto h-px w-8 bg-[rgb(var(--divider)/0.25)]"
+                />
                 {/* Caption LABEL beneath the frame — not an overlay.
                     Two-line stack: a tiny muted index ("01 / 08") in tnum
-                    for an editorial gallery rhythm, then the screen name.
-                    A hairline beneath the frame anchors the caption to the
-                    shot so they read as a single composed unit. */}
-                <figcaption className="mt-3 flex flex-col items-center gap-1 text-center">
+                    for an editorial gallery rhythm, then the screen name. */}
+                <figcaption className="mt-2 flex flex-col items-center gap-1 text-center">
                   <span className="tnum text-[10px] tracking-[0.18em] uppercase text-tertiary">
                     {String(i + 1).padStart(2, "0")}
                     <span className="mx-1 opacity-50">/</span>
@@ -186,7 +238,7 @@ export function DemoGallery() {
         {/* CTA row — primary (accent-glow) + secondary (glass + accent-tinted hover) */}
         <Reveal delay={0.1} className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <motion.a
-            href={asset("/demo")}
+            href="#demo"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
             className="group inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-black text-sm font-medium hover:bg-gray-100 hover:-translate-y-0.5 transition-all duration-200 shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.30),0_1px_2px_rgb(0_0_0/0.20)] hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.50),0_2px_8px_rgb(0_0_0/0.25)]"

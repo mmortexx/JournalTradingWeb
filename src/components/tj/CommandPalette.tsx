@@ -245,6 +245,9 @@ export function CommandPalette() {
                     ? "Escribe un comando o búsqueda…"
                     : "Type a command or search…"
                 }
+                aria-label={es ? "Buscar comandos" : "Search commands"}
+                autoComplete="off"
+                spellCheck={false}
               />
               <CommandList className="max-h-[min(60vh,360px)] custom-scroll">
                 <CommandEmpty>

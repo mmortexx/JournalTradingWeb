@@ -19,8 +19,11 @@ import { asset } from "@/lib/asset";
  *    sombra suave. `rounded-xl` + `overflow-hidden`.
  *
  * El componente NO impone aspect ratio fijo: el cuerpo se adapta al
- * aspect natural de la captura (~16:9) vía un wrapper `aspect-[16/10]`
- * por defecto, sobreescribible con `bodyClassName`.
+ * aspect natural de la captura. El default `aspect-[1500/856]` coincide
+ * EXACTAMENTE con la resolution real de las capturas (1500×856, ratio
+ * 1.7523) para que la imagen llene el cuerpo del frame edge-to-edge
+ * SIN barras de letterbox. Sobreescribible con `bodyClassName` para
+ * otros usos (p.ej. un frame con contenido non-screenshot).
  *
  * Props:
  *  - `caption`: texto mono centrado en la barra de título (p.ej. "Resumen
@@ -72,7 +75,12 @@ export function WindowFrame({
         className="flex items-center gap-2 px-3 h-8 select-none border-b relative"
         style={{
           background: "color-mix(in srgb, var(--surface-2) 80%, transparent)",
-          borderColor: "rgb(var(--divider) / 0.08)",
+          // 0.12 (up from 0.08) — a clearer hairline between the title
+          // bar and the screenshot body in both themes. At 0.08 the rule
+          // was nearly invisible in light theme (where --divider is
+          // black at low alpha on a near-white surface-2), so the title
+          // bar read as floating rather than framing the body.
+          borderColor: "rgb(var(--divider) / 0.12)",
           boxShadow: "inset 0 1px 0 rgb(var(--divider) / 0.10)",
         }}
       >
@@ -84,8 +92,12 @@ export function WindowFrame({
             className="block w-2.5 h-2.5 rounded-full"
             style={{
               background: "rgb(var(--pnl-neg) / 0.7)",
+              // 0.14 ring (up from 0.08) — a slightly firmer bead edge
+              // so the dots read as discrete glassy beads against the
+              // title bar fill in both themes (at 0.08 the ring was
+              // imperceptible and the dots looked pasted on).
               boxShadow:
-                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.08)",
+                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.14)",
             }}
           />
           <span
@@ -93,7 +105,7 @@ export function WindowFrame({
             style={{
               background: "rgb(var(--pnl-warn) / 0.7)",
               boxShadow:
-                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.08)",
+                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.14)",
             }}
           />
           <span
@@ -101,7 +113,7 @@ export function WindowFrame({
             style={{
               background: "rgb(var(--pnl-pos) / 0.7)",
               boxShadow:
-                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.08)",
+                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.14)",
             }}
           />
         </span>
@@ -132,8 +144,11 @@ export function WindowFrame({
           <span className="block w-[42px]" aria-hidden="true" />
         )}
       </div>
-      {/* Body — the screenshot lives here, whole and crisp. */}
-      <div className={`relative w-full ${bodyClassName || "aspect-[16/10]"}`}>
+      {/* Body — the screenshot lives here, whole and crisp. Default
+          aspect-[1500/856] matches the screenshots' actual resolution
+          (1500×856) so object-contain fills edge-to-edge with zero
+          letterbox bars. */}
+      <div className={`relative w-full ${bodyClassName || "aspect-[1500/856]"}`}>
         {children}
       </div>
     </div>

@@ -12,6 +12,7 @@ import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 const READING_TIME_MIN = 3;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
+const OG_IMAGE = `${SITE_URL}/og.png`;
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -60,7 +61,10 @@ const articleSchema = {
 };
 
 export const metadata: Metadata = {
-  title: "Métricas — Trading Journal",
+  // `absolute` bypasses layout.tsx's `title.template: "%s · Trading Journal"`
+  // — a plain string would render "Métricas — Trading Journal · Trading Journal"
+  // (double-branded). See worklog Task R22-1d (G1) + R23-2a.
+  title: { absolute: "Métricas — Trading Journal" },
   description:
     "40+ ratios institucionales: Sharpe, Sortino, Calmar, profit factor, expectancy en R. Calculadora de riesgo interactiva. Métricas que correlacionan con la consistencia, no gráficos bonitos.",
   alternates: { canonical: `${SITE_URL}/features/metricas/` },
@@ -72,11 +76,16 @@ export const metadata: Metadata = {
     siteName: "Trading Journal",
     locale: "es_ES",
     alternateLocale: ["en_US"],
+    // Next.js shallow-merges child openGraph over layout's — layout's
+    // default OG image is NOT inherited when the child omits `images`.
+    // See worklog Task R22-1d (G2) + R23-2a.
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Métricas — Trading Journal" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Métricas — Trading Journal",
     description: "40+ ratios institucionales y calculadora de riesgo interactiva.",
+    images: [OG_IMAGE],
   },
 };
 

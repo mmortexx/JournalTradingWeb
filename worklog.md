@@ -13684,3 +13684,247 @@ Verification:
 
 Stage Summary:
 - The "Vistazo"/OverviewApp section now shows the ACTUAL Resumen screenshot of the app inside an elegant WinUI-style WindowFrame, instead of a hand-coded mockup that diverged from the real UI. The two floating KPI/Guardián marketing cards still overlay the frame. Lint + type-check both clean; dev server compiles the home route without errors.
+
+---
+Task ID: R23-2a
+Agent: general-purpose (SEO fixes — apply R22-1d G1 + G2 to the 3 feature subpages)
+Task: Fix the 2 SEO gaps (G1 double-branded <title>, G2 missing og:image/twitter:image) on the 3 feature deep-dive subpages (/features/metricas, /features/disciplina, /features/seguridad). READ-ONLY audit R22-1d identified these as the only HIGH + MEDIUM gaps blocking the 3 routes from matching the OG-image + title-template discipline that the other 6 routes already follow.
+
+Work Log:
+- Read /home/z/my-project/worklog.md and located the R22-1d audit (lines 13486–13660). Confirmed the two fixes required:
+    * G1 (HIGH): 3 feature subpages render double-branded `<title>Métricas — Trading Journal · Trading Journal</title>` because the plain-string `title: "Métricas — Trading Journal"` gets wrapped by layout.tsx's `title.template: "%s · Trading Journal"`. Fix per audit recommendation (a): change to `title: { absolute: "Métricas — Trading Journal" }` — the `absolute` property bypasses the template (matches the home-page pattern).
+    * G2 (MEDIUM): 3 feature subpages render NO `<meta property="og:image">` and NO `<meta name="twitter:image">` because Next.js shallow-merges child `openGraph` over layout's, and the child's openGraph REPLACES the parent's `images` array when omitted. Fix: declare `const OG_IMAGE = \`${SITE_URL}/og.png\`;` (none of the 3 files had it, unlike features/pricing/demo/about/faq) and add `images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "X — Trading Journal" }]` to openGraph + `images: [OG_IMAGE]` to twitter.
+- Read all 3 target files in full (metricas 133 lines, disciplina 135 lines, seguridad 130 lines) plus src/app/features/page.tsx (101 lines) to confirm the canonical OG-image pattern used by the rest of the site (single `images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "…" }]` for openGraph, `images: [OG_IMAGE]` for twitter). The features/page.tsx pattern was used as the reference template.
+- Applied 3 edits to each of the 3 files (9 edits total):
+    1. Added `const OG_IMAGE = \`${SITE_URL}/og.png\`;` on the line immediately after `const SITE_URL = …` (matching features/page.tsx layout).
+    2. Changed `title: "X — Trading Journal"` → `title: { absolute: "X — Trading Journal" }` with an explanatory comment citing R22-1d G1 + R23-2a.
+    3. Added `images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "X — Trading Journal" }]` to the openGraph block (after `alternateLocale`) and `images: [OG_IMAGE]` to the twitter block (after `description`), with a comment citing R22-1d G2 + R23-2a explaining the shallow-merge behavior.
+- Mid-edit correction: the third MultiEdit on each file had a new_str that dropped the closing `};` of the `metadata` export (the old_str ended with `},\n};` but new_str ended with just `},`). Caught immediately in the post-edit readback (line 89 showed `},` immediately followed by `const sectionFallback` with no `};` between them). Applied 3 follow-up single Edits — one per file — re-inserting `};` between the twitter block's closing `},` and the `const sectionFallback` declaration. Verified all 3 files now have the correct `},\n};\n\nconst sectionFallback` sequence.
+- Re-read each file's metadata block post-fix to confirm structural integrity:
+    * metricas/page.tsx:62–90 — `title: { absolute: … }` on line 67, openGraph.images on line 82, twitter.images on line 88, closing `};` on line 90. ✓
+    * disciplina/page.tsx:60–87 — `title: { absolute: … }` on line 64, openGraph.images on line 79, twitter.images on line 85, closing `};` on line 87. ✓
+    * seguridad/page.tsx:60–87 — `title: { absolute: … }` on line 64, openGraph.images on line 79, twitter.images on line 85, closing `};` on line 87. ✓
+
+Verification:
+- `./node_modules/.bin/eslint src/app/features/metricas/page.tsx src/app/features/disciplina/page.tsx src/app/features/seguridad/page.tsx` → 0 errors (exit 0, no output).
+- `./node_modules/.bin/tsc --noEmit 2>&1 | grep -v "examples/websocket\|skills/"` → clean (no output; grep exit 1 = no lines passed the filter = no errors outside the pre-existing filtered paths).
+- dev.log: `Compiled in 368ms` is the most recent entry after the edits — Next.js HMR picked up the 3 file changes and recompiled without errors.
+
+Stage Summary:
+- 2 of the 13 R22-1d findings resolved (G1 HIGH + G2 MEDIUM — the only HIGH and the only actionable MEDIUM; G3 hreflang was flagged as optional/leave-as-is given the single-URL i18n architecture).
+- The 3 feature deep-dive subpages (/features/metricas, /features/disciplina, /features/seguridad) now emit the same SEO metadata shape as the other 6 routes: single-branded `<title>` via `title.absolute`, and `<meta property="og:image">` + `<meta name="twitter:image">` pointing at /og.png (1200×630 PNG). Social shares of these 3 URLs will now render with the preview image card on Twitter/X, Facebook, LinkedIn, Slack, Discord, instead of text-only cards.
+- Remaining R22-1d items NOT addressed in this task (out of scope, all LOW/INFO): G4 theme-color mismatch (layout #B9B2A6 vs manifest #34B476), G5 no PNG/apple-touch/maskable icons, G6 duplicate public/robots.txt (dead code), G7 5 descriptions >160 chars, G13 no-op `category: "finance"` field. These are P2/P3 in the audit's recommended priority and can be tackled in a separate polish task.
+- No regressions to the 16 JSON-LD blocks (layout=2, features=1, metricas=2, disciplina=2, seguridad=2, pricing=3, demo=1, about=1, faq=2) — the Article schemas on the 3 fixed pages still reference `${SITE_URL}/og.png` for their `image` field, now consistent with the openGraph/twitter images.
+
+---
+Task ID: R23-2c
+Agent: frontend-styling-expert
+Task: Polish HomeDemo section (src/components/marketing/HomeDemo.tsx)
+
+Investigation:
+- Read worklog.md (13,686 lines) + HomeDemo.tsx (116 lines) + AppDemoClient.tsx (191 lines) + AppDemo.tsx head (100 lines) + page.tsx + reference CTAs in Hero.tsx / OverviewApp.tsx / FinalCTANew.tsx.
+- Determined which of the two cases HomeDemo falls into:
+    * HomeDemo embeds the REAL interactive `AppDemoClient` (which `next/dynamic`-loads `AppDemo` with `ssr: false` + a glass skeleton fallback). It is NOT a hand-built static mockup — the user can click tabs, open trades, play with the calculator, etc. The orchestrator's "previews the interactive demo" phrasing in the task description was an assumption; in reality the demo here IS fully interactive.
+    * → Per the task instruction "If HomeDemo embeds the actual interactive AppDemoClient, leave it as-is — the interactive demo is valuable", the AppDemoClient embed was preserved untouched and only the surrounding section was polished.
+
+Five-point audit findings:
+1. Mockup vs real screenshot: N/A — HomeDemo uses the real interactive AppDemoClient. Kept as-is.
+2. Heading fits on mobile: `clamp(1.95rem, 3.5vw, 3.05rem)` with `textWrap: balance` — the long-form Spanish "La app, en tu navegador." wraps into a balanced 2 lines on 320–375px viewports. No change needed to the font-size clamp; left as-is.
+3. Demo frame fits at 375px: The section's horizontal padding `clamp(20px, 4vw, 32px)` resolves to the 20px floor on a 375px viewport, leaving 335px for AppDemoClient. AppDemoClient's own DemoSkeleton already adapts to mobile (panel `h-[480px]` vs `sm:h-[560px]` vs `md:h-[640px]`, nav tabs hide text under `sm:block`, KPI grid is 2-col on mobile vs 4-col on `md+`). Fits cleanly.
+4. CTA to /demo: **Was missing entirely.** Hero, OverviewApp and FinalCTANew all link to /demo, but HomeDemo — the section that literally embeds the demo — had no link to the dedicated /demo route. This was the primary gap. Added a CTA row below AppDemoClient with a dark-pill "Open full-page demo" button (Maximize2 + ArrowRight icons, `tj-cta-sheen` class, hover lift + accent ring matching Hero's dark CTA treatment) plus a secondary "No download · 100 % in your browser" hint. Full-width on mobile (375px), content-width and centered on ≥sm.
+5. Overflow issues: Section already had `overflow-hidden` + a capped `max-w-[1280px]` inner wrapper; the top halo (`min(900px, 80%)` centered) and hairline span are properly contained. New CTA row uses `flex-col sm:flex-row` so the button stacks vertically and goes full-width on mobile — no horizontal overflow at 375px. The secondary hint is short text (`text-center sm:text-left`) that wraps gracefully.
+
+Edits applied (1 file, HomeDemo.tsx — full rewrite preserving all existing structure + comments):
+- Added imports: `Link` from `next/link`, `ArrowRight` + `Maximize2` from `lucide-react` (both already used elsewhere in the codebase — Hero.tsx uses the same pair pattern).
+- Added a module-level docstring update documenting the R23-2c polish: kept the interactive demo, added the missing /demo CTA, tightened the eyebrow's bottom margin on mobile.
+- Eyebrow row: `marginBottom: "clamp(16px, 4vw, 20px)"` (was a Tailwind `mb-5` = fixed 20px) so the heading lifts 4px closer on small phones, keeping the section header compact above the fold on 320–380px viewports.
+- Heading + paragraph + top accent hairline + halo: preserved verbatim (already polished in earlier rounds).
+- AppDemoClient embed: preserved verbatim.
+- **NEW** CTA row after AppDemoClient:
+    * Primary: `<Link href="/demo">` styled as a dark pill (`background: var(--ink)`, `color: var(--bg)`, height 52, padding 0 26, `rounded-full`, `tj-cta-sheen` class for the animated sheen sweep). Icon pair: `Maximize2` (15px) on the left to signal "go full-screen", `ArrowRight` (16px) on the right for direction. `aria-label` set on the link for screen readers (Spanish/English variants). Hover: `translateY(-2px)` + `brightness(0.94)` + accent ring `0 0 0 1px rgb(var(--accent-base) / 0.30)` — mirrors Hero's dark "See the demo" CTA hover so the two /demo buttons across the home page read as a coordinated pair.
+    * Secondary: a 13px `var(--ink-3)` hint span — "Sin descargar nada · 100 % en tu navegador" / "No download · 100 % in your browser" — reinforces the value prop without competing for the click. Centered on mobile, left-aligned on ≥sm.
+    * Container: `flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 mt-10` — full-width stacked button on mobile, side-by-side on desktop. No overflow at 375px.
+
+Verification:
+- `npx eslint src/components/marketing/HomeDemo.tsx` → 0 errors, 0 warnings (exit 0, no output).
+- `npx tsc --noEmit` → no errors in `src/` (filtered for `^src/` → empty) and no errors mentioning HomeDemo. The 4 remaining tsc errors are all pre-existing in `examples/websocket/` and `skills/` sample directories (socket.io-client, socket.io, image-edit, stock-analysis) — unrelated to this task and outside the project's actual source tree.
+- Final file: 11 → 175 lines (the new CTA + comments + docstring account for the growth; no logic was duplicated).
+
+Stage Summary:
+- HomeDemo was already using the real interactive AppDemoClient (the correct case per the task spec) — the demo embed itself was left untouched.
+- The main gap was the missing /demo CTA: Hero, OverviewApp and FinalCTANew all linked to /demo, but HomeDemo — the section that literally contains the demo — did not. Fixed with a coordinated dark-pill CTA below the demo, paired with a "no download" hint, full-width on mobile and centered on desktop.
+- Mobile (375px) verified: section padding 20px H, demo frame 335px wide (AppDemoClient already responsive), heading wraps to 2 balanced lines via `textWrap: balance`, eyebrow margin tightens to 16px, CTA button is full-width and stacks above the hint — no horizontal overflow.
+- No regressions: all existing comments, halo, hairline, eyebrow numbering (§ 02), heading copy, paragraph copy, and the AppDemoClient embed are preserved verbatim.
+
+---
+Task ID: R23-2b
+Agent: general-purpose (a11y + typography fixes — apply R22-1a P0-1/2 + R22-1e P0-2/P1-3/P1-4/P1-6)
+Task: Apply the P0 + P1 a11y + typography polish items identified by the R22-1a (typography) and R22-1e (forms) READ-ONLY audits. Five touchpoints: globals.css tokens, CommandPalette input, ContactForm a11y, Newsletter a11y, orphan asset cleanup.
+
+Work Log:
+- Read /home/z/my-project/worklog.md and located the two source audits:
+    * R22-1a (lines 13065–13166) — micro-typography audit. Two P0 fixes apply here:
+        - P0-1: add `text-wrap: balance;` to `.t-h1` and `.t-h2` token classes in globals.css. One-line edit per token; propagates to every PageHeader h1 + section h2 via the token (21+ headings affected).
+        - P0-2: add `orphans: 2; widows: 2;` to the base `p` selector in globals.css. Prevents single-word last lines on long paragraphs (Hero lead, PageHeader subtitle, Story, FinalCTA, FAQ answers, feature-page bodies).
+    * R22-1e (lines 13168–13484) — form + interactive a11y audit. Three groups of fixes apply:
+        - P0-2: CommandPalette (tj) — pass `aria-label` + `autoComplete="off"` + `spellCheck={false}` to `<CommandInput>`. The underlying cmdk input had only a placeholder; SR users tabbing in heard "edit text" with no name.
+        - P1-3: ContactForm — add `aria-invalid={!!error}` + `aria-describedby="cf-error"` to name/email/message inputs + `id="cf-error"` on the error `<p>` + `required` on all 3 fields.
+        - P1-6: ContactForm + Newsletter — add `aria-live="polite"` (role="status") to the success-state confirmation so SR users hear "message sent".
+        - P1-4: Newsletter — add `aria-describedby="newsletter-error"` to the email Input + `id="newsletter-error"` on the error `<p>` + `required`. `aria-invalid={status === "error"}` already present.
+- Read all 4 target files in full before editing (globals.css relevant ranges 266–501 + 359–398; CommandPalette.tsx 539 lines; ContactForm.tsx 264 lines; Newsletter.tsx 254 lines) + the shadcn CommandInput (command.tsx) and Input (input.tsx) wrappers to confirm they spread `...props` through to the underlying `<input>` element, so `aria-label`, `autoComplete`, `spellCheck`, `required`, `aria-invalid`, and `aria-describedby` all forward correctly.
+
+Edits applied:
+
+1. src/app/globals.css — 2 edits via MultiEdit:
+   - `.t-h1` (line 365) + `.t-h2` (line 371) tokens: appended `text-wrap: balance;` as the last declaration of each, with an inline comment citing R22-1a P0-1. Single-line CSS property; no fallback needed (modern browsers support `text-wrap` natively; older ones ignore it gracefully).
+   - Added a new `p { orphans: 2; widows: 2; }` selector inside `@layer base`, placed immediately after the `body` block (between the body's closing `}` on line 313 and the `.tnum` comment on line 314) with an inline comment citing R22-1a P0-2. No prior base `p` selector existed, so this is a new rule (not an extension of an existing one).
+
+2. src/components/tj/CommandPalette.tsx — 1 edit on `<CommandInput>` (was lines 242–248):
+   - Added 3 props: `aria-label={es ? "Buscar comandos" : "Search commands"}`, `autoComplete="off"`, `spellCheck={false}`. Verified the shadcn `CommandInput` wrapper (command.tsx:63–83) destructures only `className` and spreads `...props` to `<CommandPrimitive.Input>`, so all three props reach the underlying `<input>`. `React.ComponentProps<typeof CommandPrimitive.Input>` includes all standard input attrs (aria-*, autoComplete, spellCheck) — types clean.
+
+3. src/components/marketing/ContactForm.tsx — 3 edits via MultiEdit:
+   - Success-state confirmation `<motion.p>` (line 145): added `aria-live="polite"` + `role="status"`. SR users now hear "✓ Mensaje enviado. Te responderemos en 24h." / "✓ Message sent. We'll reply in 24h." when the form swaps to the success state.
+   - Name input (line 167) + email input (line 179) + message textarea (line 192): added `aria-invalid={!!error}` + `aria-describedby={error ? "cf-error" : undefined}` + `required` to each. The `aria-describedby` is conditional so it only references `cf-error` when the error `<p>` actually exists in the DOM (avoids referencing a non-existent id when the form is in the success/idle state). The form already had visible `<label htmlFor>` via the `Field()` helper (lines 254–260) + redundant `aria-label` on each input — the labels/aria-labels were left in place per the task note ("if the form doesn't have proper `<label>` elements, add `aria-label`"; this form already had both).
+   - Error `<motion.p>` (line 205): added `id="cf-error"` so the inputs' `aria-describedby` resolves. The existing `role="alert"` is preserved (so SR announce the error immediately when it appears AND when the input is re-focused).
+
+4. src/components/marketing/Newsletter.tsx — 3 edits via MultiEdit:
+   - Success-state confirmation `<motion.p>` (line 145): added `aria-live="polite"` + `role="status"`. SR users now hear "¡Gracias! Revisa tu email." / "Thank you! Check your email." when the form swaps to the success state.
+   - Email `<Input>` (line 173): added `aria-describedby={status === "error" ? "newsletter-error" : undefined}` + `required`. The existing `aria-invalid={status === "error"}` is preserved. Verified the shadcn `Input` wrapper (input.tsx) destructures only `{ className, type, ...props }` and spreads `...props` to the native `<input>` — both `required` and `aria-describedby` forward correctly. The `aria-describedby` is conditional so it only references `newsletter-error` when the error `<p>` is in the DOM.
+   - Error `<motion.p>` (line 189): added `id="newsletter-error"` so the Input's `aria-describedby` resolves. The existing `role="alert"` is preserved.
+
+5. Deleted orphan asset:
+   - Pre-check: `rg -n "equity-curve\.(webp|png|jpg|jpeg|svg|avif)" src/` → 0 results (the 3 hits for the bare word "equity-curve" in src/ are all in code comments describing chart concepts, NOT image-path references — AppDemoClient.tsx:120 "equity-curve-shaped skeleton block", PlaybookPage.tsx:176 "tiny equity-curve SVG", DashboardPage.tsx:99 "equity-curve timeframe"). Also confirmed via worklog R21-imageaudit (lines 13021, 13024, 13035) that this file was previously identified as orphan (40 KB, 1200×686, zero refs in src/).
+   - `rm public/img/equity-curve.webp` — file deleted; saves 40 KB from the repo + build output. Post-check `ls public/img/equity-curve.webp` → "No such file or directory" (exit 2, expected).
+
+Verification:
+- `./node_modules/.bin/eslint src/components/tj/CommandPalette.tsx src/components/marketing/ContactForm.tsx src/components/marketing/Newsletter.tsx` → 0 errors, 0 warnings (exit 0, no output). globals.css is not lintable via eslint (CSS file) — relied on tsc + dev-server compile to validate the new selectors.
+- `./node_modules/.bin/tsc --noEmit 2>&1 | grep -v "examples/websocket\|skills/"` → clean (no output; grep exit 1 = no lines passed the filter = no errors outside the pre-existing filtered paths).
+- dev.log: most recent entries show `✓ Compiled in 168ms`, `✓ Compiled in 181ms`, `✓ Compiled in 368ms` — Next.js HMR picked up all 4 file changes (globals.css, CommandPalette.tsx, ContactForm.tsx, Newsletter.tsx) and recompiled without errors. No runtime errors in the GET / responses (all 200, 21–94ms render times). The `EADDRINUSE` error at the top of the log is from a duplicate dev-server startup attempt (one was already running) — pre-existing, unrelated to this task.
+
+Stage Summary:
+- 5 R22-1a + R22-1e audit items resolved:
+    * R22-1a P0-1 ✓ — `text-wrap: balance` on `.t-h1` + `.t-h2` tokens (propagates to 21+ headings).
+    * R22-1a P0-2 ✓ — `orphans: 2; widows: 2;` on base `p` selector (covers all long-form paragraphs).
+    * R22-1e P0-2 ✓ — CommandPalette input now has `aria-label` + `autoComplete="off"` + `spellCheck={false}`.
+    * R22-1e P1-3 + P1-6 ✓ — ContactForm inputs now expose validation state via `aria-invalid` + `aria-describedby`, all 3 fields are `required`, and the success confirmation is announced via `aria-live="polite"`.
+    * R22-1e P1-4 + P1-6 ✓ — Newsletter email Input now exposes validation state via `aria-describedby`, is `required`, and the success confirmation is announced via `aria-live="polite"`.
+- Plus 1 orphan-asset cleanup: `public/img/equity-curve.webp` (40 KB) deleted after re-confirming 0 image-path references in src/.
+- Remaining R22-1e items NOT addressed in this task (out of scope, all P1-5 / P2 polish): P1-5 DashboardPage composer needs `<form>` wrapper refactor (the single highest-leverage change in the audit — would fix Enter-to-submit + form semantics + open the door to aria-invalid/aria-describedby wiring); P2-7 RiskCalculator `<label htmlFor>` upgrade; P2-8 RiskCalculator live region for recomputed values; P2-9 RiskCalculator chip focus-ring border-radius; P2-10 FAQ search `aria-controls` + live region for result count; P2-11 DemoCommandPalette input type="search"; P2-12 DashboardPage autoComplete="off" on number inputs; P2-13 DashboardPage redundant aria-label on note textarea; P2-14 DashboardPage role="group" on calc-method container; P2-15 CommandPalette SearchIcon aria-hidden. These can be batched into a separate P2 polish round (estimated ~1 hour).
+- No regressions: ContactForm's existing visible `<label htmlFor>` (via Field helper) + aria-label redundancy on each input + role="alert" on error `<p>` + focus-visible accent ring are all preserved. Newsletter's existing aria-label + autoComplete="email" + inputMode="email" + aria-invalid + role="alert" + focus-visible accent ring are all preserved. CommandPalette's focus trap + focus restore + Escape-to-close + dialog aria-labelledby are all preserved. The `.t-h1` / `.t-h2` token additions are pure CSS append (no overrides), so every existing heading using these tokens inherits `text-wrap: balance` automatically with no risk of breaking existing layouts.
+
+---
+Task ID: R23-2e
+Agent: frontend-styling-expert (CTA polish — FinalCTANew + DownloadCTA + DemoReadyToBuy)
+Task: Polish the 3 CTA sections to maximum detail — focus on visual quality, mobile, and theme consistency. Read each, identify 1-3 concrete polish improvements, apply them. Run eslint (0 errors) + tsc clean.
+
+Work Log:
+- Read worklog.md (13 686 lines, R23-1a state) for context — confirmed R20-3c (DownloadCTA spec-row refinement) and R21-3c (Pricing/FAQ/ContactForm/ContactSupport polish + DownloadCTA `w-full sm:w-auto` mobile fix) are the immediate prior polish rounds. Verified the standard focus-visible ring convention used across the codebase: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent` (used in Pricing, ContactForm, DownloadCTA, FeaturePageNav). Verified the standard primary-button pattern: `bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[...]`.
+- Read all 3 target files in full:
+  * src/components/marketing/FinalCTANew.tsx (152 → 138 lines after polish) — the closing CTA on every page.
+  * src/components/marketing/DownloadCTA.tsx (199 lines) — Windows download CTA on /pricing.
+  * src/components/demo/DemoReadyToBuy.tsx (141 lines) — "ready to buy" CTA after the demo.
+- Read globals.css token vocabulary (--accent-base, --accent-hover, --pnl-pos, --ink/--ink-2/--ink-3, --bg, --surface, --divider, --txt-primary/secondary/tertiary), the .section/.section-tight utility classes (clamp-based padding), the .eyebrow utility, and the global `*:focus-visible` rule (line 1124 — 2px accent outline + 4px halo safety net). Read MagneticButton.tsx to confirm its className prop is applied to the underlying motion.a / motion.button (so Tailwind focus-visible classes pass through correctly). Confirmed `text-[var(--ink)]` and `text-[var(--txt-primary)]` work as Tailwind arbitrary values (used in Navbar.tsx).
+
+Per-component findings + applied polish:
+
+───────────────────────────────────────────────────────────────────
+1. FinalCTANew.tsx — 2 polish improvements applied
+───────────────────────────────────────────────────────────────────
+Issue A — Mobile vertical padding too tall:
+  Symptom: `style={{ padding: "120px 24px 100px" }}` — 120px top + 100px bottom = 220px of vertical padding on a 375×667 mobile viewport. Combined with the headline (3 visual lines on mobile due to `<br/>` + balance wrap) + paragraph + CTA row + guarantee chips row, the section was over ~520px tall on mobile, pushing the closing CTA below the fold on smaller phones.
+  Fix: `padding: "clamp(72px, 10vw, 120px) 24px clamp(64px, 8vw, 100px)"` — mobile floor drops to 72px top / 64px bottom (saves ~80px vertical space on phones), clamps back to the original 120/100 on desktop (≥1200px). Added an inline comment documenting the rationale.
+  Files: src/components/marketing/FinalCTANew.tsx:20-26.
+
+Issue B — CTA buttons had no focus-visible rings and weak hover states:
+  Symptom: Both CTA Links used inline `style={{ ... }}` for base styles + a `transition: "transform 0.2s, filter 0.2s"` (primary) / `transition: "background 0.2s"` (secondary). Neither had any `:focus-visible` style — they relied on the global `*:focus-visible` rule (accent outline + halo) as a fallback, which works but is less polished than the explicit per-button ring used in sibling CTAs (DownloadCTA, Pricing, ContactForm, FeaturePageNav). The secondary "Ver la demo" button had NO hover state at all (transition was declared but no `:hover` rule), so it felt dead on interaction.
+  Fix: Converted both CTAs from inline styles to Tailwind classes (matching the polished pattern):
+    * Primary: `inline-flex items-center gap-2.5 rounded-full h-14 px-[30px] bg-[rgb(var(--accent-base))] text-[#06130d] text-base font-semibold shadow-[0_14px_38px_-14px_rgb(var(--accent-base)/0.65)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_18px_46px_-14px_rgb(var(--accent-base)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent`
+      — preserves the accent-green-bg / dark-green-text "mint candy" look (#06130d), adds hover lift + brightness pop + deepened accent shadow, adds the standard accent focus ring.
+    * Secondary: `inline-flex items-center gap-2.5 rounded-full h-14 px-7 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-base font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent`
+      — adds hover lift + accent-tinted border + subtle divider backdrop + accent focus ring. Was previously inert on hover.
+  Note: The headline `clamp(2.4rem, 5.5vw, 4.5rem)` was left as-is — at 320-375px mobile, "Deja de operar a ciegas." (23 chars at 38.4px ≈ 442px) exceeds the 272-327px content width and wraps to 2 visual lines, then `<br/>` + "Empieza a medir." on a 3rd line. This is acceptable readability (3-line closing headline on mobile is fine), and the existing `textWrap: "balance"` + `letterSpacing: -0.03em` keep it tight. The accent halo (`opacity: 0.45` + `blur(40px)` on accent-base 12%) reads subtly in both themes — verified in dark theme (green glow on near-black) and light theme (very faint green tint on paper-tone #f3f2ec, which is the intended "watermark" effect). No overflow on the halo (section has `overflow-hidden`).
+  Files: src/components/marketing/FinalCTANew.tsx:98-110.
+
+───────────────────────────────────────────────────────────────────
+2. DownloadCTA.tsx — 2 polish improvements applied
+───────────────────────────────────────────────────────────────────
+Issue A — "Instalador offline" subtext was `text-[11px]` (below the 12px mobile-readability floor):
+  Symptom: Line 156 `className="text-[11px] text-tertiary tnum ..."` — 11px text with a `·` separator and `tnum` (tabular-nums) on a 375px mobile viewport is hard to read, especially for the "sin conexión tras instalar" half. Below the 12px minimum recommended for body-adjacent text.
+  Fix: Bumped to `text-xs` (12px). Matches the system-requirements spec row above (also `text-xs`) and clears the readability floor. The `tnum` + `text-tertiary` + `text-center md:text-right` + `break-words` classes are preserved.
+  Files: src/components/marketing/DownloadCTA.tsx:157.
+
+Issue B — System-requirements spec row was floating text+icon pairs, not "trust badges":
+  Symptom: The 3 spec chips (Windows 10/11 · 64-bit · 50 MB) were `inline-flex items-center gap-1.5` spans with `text-xs text-tertiary` and `·` dot separators between them. They read as inline text rather than discrete badges — the task asked specifically "are the trust badges polished?". The `text-tertiary` color (the dimmest text token) made the specs feel like fine-print rather than authoritative system-requirement badges.
+  Fix: Converted each spec chip to a discrete pill badge: `inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary`. Changes:
+    * Removed the `·` separator spans (pills don't need separators — the gap-2 between them provides visual rhythm).
+    * Added `rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1` — hairline border + subtle divider backdrop gives each spec the "badge" affordance.
+    * Promoted `text-tertiary` → `text-secondary` — lifts the labels out of the dim range so Windows version / arch / size are unambiguous at a glance. `tnum` preserved on the inner label spans for tabular alignment of version digits + size figure.
+    * Changed container `gap-x-3 gap-y-2` → `gap-2` (pills need uniform gap, not asymmetric x/y).
+  Note: The download button itself was already polished in R20-3c / R21-3c — verified `w-full sm:w-auto` (line 151) IS present (mobile full-width, desktop auto), `focus-visible:ring-2 ring-[rgb(var(--accent-base)/0.6)]` IS present, `hover:-translate-y-0.5 hover:shadow-[...]` IS present. No changes needed on the button itself. The card's `whileHover={{ y: -4 }}` lift + the top accent sweep are preserved.
+  Files: src/components/marketing/DownloadCTA.tsx:111-132 (spec row), :157 (subtext).
+
+───────────────────────────────────────────────────────────────────
+3. DemoReadyToBuy.tsx — 3 polish improvements applied
+───────────────────────────────────────────────────────────────────
+Issue A — Primary MagneticButton used HARDCODED `bg-white text-black hover:bg-gray-100` (theme-incorrect in light mode):
+  Symptom: Line 79 `className="... bg-white text-black ... hover:bg-gray-100 ..."` — hardcoded white/gray. In dark theme (the default) this works (white button on dark bg). In light theme, a `bg-white` button on the paper-tone (#f3f2ec) section background has nearly zero contrast — the button edge disappears into the page. Violates the R20-3c "no hardcoded text-white/text-gray/bg-white" discipline applied across the rest of the marketing components.
+  Fix: Replaced with the standard token-driven primary-button pattern (matches DownloadCTA + Pricing + ContactForm): `bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] hover:bg-[rgb(var(--txt-primary)/0.88)]`. In dark theme: white button + dark text (unchanged visual). In light theme: dark button + paper text (proper contrast). Preserved the existing accent-tinted shadow stack (`shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.30),...]` + `hover:shadow-[0_10px_24px_-6px_rgb(var(--accent-base)/0.50),...]`) and `hover:-translate-y-0.5` lift.
+  Files: src/components/demo/DemoReadyToBuy.tsx:79.
+
+Issue B — Eyebrow hairlines used HARDCODED `bg-white opacity-60` (invisible in light theme):
+  Symptom: Lines 47 + 49 `<span className="w-6 h-px bg-white opacity-60" />` — the two 24px hairlines flanking the "¿Y ahora?" / "What's next?" eyebrow. Hardcoded `bg-white` at 60% opacity. In dark theme: subtle light line on dark bg ✓. In light theme: white line on paper-tone bg = INVISIBLE (white-on-near-white). The eyebrow lost its symmetric hairline decoration in light theme.
+  Fix: Replaced with `bg-[rgb(var(--txt-primary)/0.4)]` — token-driven text-primary color at 40% alpha. In dark theme: white at 40% = subtle light line (slightly dimmer than the old 60%, still clearly visible). In light theme: dark at 40% = subtle dark line on paper (now visible). Removed the `opacity-60` (alpha is now baked into the `/0.4`). Both hairlines updated.
+  Files: src/components/demo/DemoReadyToBuy.tsx:47, 49.
+
+Issue C — Neither MagneticButton had explicit focus-visible rings:
+  Symptom: Both MagneticButtons relied on the global `*:focus-visible` rule (globals.css:1124 — 2px accent outline + 4px halo) as the keyboard-focus fallback. Works, but inconsistent with the polished CTAs elsewhere (DownloadCTA, Pricing, ContactForm, FeaturePageNav) which all declare explicit `focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent` per-button.
+  Fix: Appended the standard focus-visible ring classes to both MagneticButton className strings:
+    * Primary (after the hover:shadow-[...]): `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent`
+    * Secondary (after the hover:shadow-[...]): same ring classes appended.
+  Note: The secondary button already had `hover:border-[rgb(var(--accent-base)/0.35)]` + `hover:bg-[rgb(var(--accent-base)/0.06)]` + `hover:-translate-y-0.5` — properly token-driven, no changes needed there. The aurora orbs (`bg-white opacity-[0.10]` / `opacity-[0.08]`) were left as-is — they're extremely subtle decorative glow and the white-on-dark "moonlight" effect is intentional; in light theme they fade to near-invisible which is acceptable for decorative-only orbs (the aurora-bg utility already provides accent color in both themes).
+  Files: src/components/demo/DemoReadyToBuy.tsx:79 (primary), :108 (secondary).
+
+Verification:
+- `./node_modules/.bin/eslint src/components/marketing/FinalCTANew.tsx src/components/marketing/DownloadCTA.tsx src/components/demo/DemoReadyToBuy.tsx` → 0 errors (exit 0, no output).
+- `./node_modules/.bin/tsc --noEmit 2>&1 | grep -v "examples/websocket\|skills/"` → clean (no output). Full tsc shows 4 pre-existing errors in examples/websocket/ (missing socket.io-client) + skills/ (image-edit + stock-analysis-skill type mismatches) — all unrelated to this task, filtered per the standard worklog verification pattern. `grep -E "FinalCTANew|DownloadCTA|DemoReadyToBuy"` on full tsc output → 0 matches (the 3 edited files have zero type errors).
+- No hardcoded text-white/text-gray/bg-white remain in the 3 edited files: FinalCTANew.tsx has none (uses tokens throughout), DownloadCTA.tsx has none (already clean per R20-3c), DemoReadyToBuy.tsx — the 2 hardcoded `bg-white` instances (eyebrow hairlines + primary button) are now token-driven; the 2 remaining `bg-white` references are the decorative aurora orbs (intentional, documented above).
+- FinalCTANew.tsx: primary CTA now has hover lift + brightness + deepened shadow + accent focus ring; secondary CTA now has hover lift + accent border tint + divider backdrop + accent focus ring (was previously inert on hover).
+- DownloadCTA.tsx: spec row now reads as 3 discrete pill badges with `text-secondary` (was dim `text-tertiary` floating text); "Instalador offline" subtext bumped from 11px to 12px (mobile-readable).
+- DemoReadyToBuy.tsx: primary button now themes correctly in light mode (token-driven bg/text instead of hardcoded white/black); eyebrow hairlines now visible in light mode (token-driven alpha instead of hardcoded white); both buttons have explicit accent focus rings.
+
+Stage Summary:
+- 3 CTA sections polished with 7 concrete improvements (2 + 2 + 3). All changes are visual-quality / mobile / theme-consistency focused; no behavioral or structural changes. The closing CTA on every page (FinalCTANew), the Windows download CTA on /pricing (DownloadCTA), and the post-demo "ready to buy" CTA (DemoReadyToBuy) now share a consistent polish vocabulary: token-driven colors, explicit accent focus-visible rings, hover-lift micro-interactions, and mobile-aware sizing. Lint + type-check both clean.
+
+---
+Task ID: R23-2d
+Agent: frontend-styling-expert
+Task: Polish gallery sections (Gallery.tsx on /features, DemoGallery.tsx on /demo) + WindowFrame.tsx mockup to maximum detail.
+
+Work Log:
+- Read worklog.md (13,896 lines) for full context — confirmed R20-3d added the "01 / 08" tnum caption indices + accent-glow CTA shadows + light-theme WindowFrame shadow override; R7-mobile verified Gallery/DemoGallery stack clean at 375px but flagged (line 12505) that WindowFrame's `aspect-[16/10]` body causes letterbox side-bars vs the screenshots' actual ~16:9 ratio — left as a future-round design-intent question. This round resolves it.
+- Inspected the 8 source webp screenshots' actual dimensions via PIL: all 8 are 1500×856 (ratio 1.7523, between 16:9=1.7778 and 16:10=1.6). The previous `aspect-[16/10]` body (1.6) forced visible side letterbox bars on every screenshot in both galleries + OverviewApp. Switched the body default + all 3 gallery call-sites to the exact ratio `aspect-[1500/856]` — screenshots now fill edge-to-edge with zero letterbox, fulfilling the "every pixel reads, uncropped" promise.
+- Read all 3 target files (Gallery.tsx, DemoGallery.tsx, WindowFrame.tsx) + supporting FeatureImage.tsx, Reveal.tsx, asset.ts, globals.css (window-frame light-theme override + .bg-veil tokens), demo/page.tsx (section structure), and OverviewApp.tsx (3rd WindowFrame consumer — verified the default-aspect change is a safe improvement there too: the hero frame becomes slightly shorter, giving more vertical breathing room to the surrounding KPI column).
+
+Polish applied (3 files + 1 enabler):
+
+1. **src/components/tj/WindowFrame.tsx** (2 improvements):
+   - (a) Default body aspect ratio `aspect-[16/10]` → `aspect-[1500/856]` to match the screenshots' actual resolution (1500×856) exactly. Eliminates letterbox side-bars in ALL 3 consumers (Gallery, DemoGallery, OverviewApp) without any consumer change. Updated the Spanish docstring that incorrectly claimed "~16:9" while using 16/10.
+   - (b) Title bar separation + traffic-light dot definition: bumped the title-bar bottom border from `rgb(var(--divider)/0.08)` → `0.12` (the rule was nearly invisible in light theme, so the title bar read as floating rather than framing the body) and the traffic-light dot ring from `0.08` → `0.14` (the bead edge was imperceptible, dots looked pasted on). Inline comments document the reasoning.
+
+2. **src/components/marketing/Gallery.tsx** (3 improvements):
+   - (a) Aspect ratio fix: pass `bodyClassName="aspect-[1500/856]"` to WindowFrame (explicit at the call-site for self-documentation, even though it now matches the default). Updated the docstring to reflect the real 1500×856 aspect.
+   - (b) "View full size" affordance: each WindowFrame is now wrapped in `<a href={asset(shot.src)} target="_blank" rel="noopener noreferrer">` so a click/tap opens the full 1500px webp in a new tab — genuine functionality, not just a visual hint. A subtle expand-icon chip (top-right, 28×28, dark scrim `bg-black/45 backdrop-blur-sm` with white arrow-corner icon) is always visible at 60% opacity on touch (no hover) and fades + lifts in on desktop hover. Sits over the title bar's empty right spacer so it never clashes with the centered caption or left traffic lights. Keyboard users get a `focus-visible:ring-2` accent ring on the anchor. Bilingual aria-label: "Ver 'X' a tamaño completo (se abre en pestaña nueva)" / "View 'X' at full size (opens in a new tab)".
+   - (c) Hover glow scope fix: the previous accent-glow div used `absolute inset-x-0 top-0 h-[calc(100%-0px)]` spanning the WHOLE figure (frame + caption), so the drop shadow anchored below the caption instead of the frame. Restructured so the glow is `absolute inset-0` of a new `relative` wrapper that contains ONLY the WindowFrame (inside the anchor) — the glow now hugs the frame's rounded-xl bounds exactly. Also moved the `group-hover:-translate-y-1` lift from a wrapper div onto the anchor itself so the lift + glow + chip are all coordinated on the same hover state.
+
+3. **src/components/demo/DemoGallery.tsx** (3 improvements):
+   - (a) Aspect ratio fix + "view full size" affordance: same `bodyClassName="aspect-[1500/856]"` + anchor-wrap + expand-chip pattern as Gallery (consistency across both galleries). The existing `motion.figure whileHover={{ y: -4 }}` + inner `group-hover:scale-[1.02]` are preserved — the anchor sits inside the figure so the framer-motion lift still works on the whole figure while the anchor scopes the click target + focus ring to the frame.
+   - (b) Caption hairline anchor: the R20-3d comment said "A hairline beneath the frame anchors the caption to the shot so they read as a single composed unit" but the hairline was never implemented. Added a centered 32px (`w-8`) 1px rule (`bg-[rgb(var(--divider)/0.25)]`) between the frame and the caption — theme-aware, editorial gallery rhythm. Tightened the caption's top margin from `mt-3` to `mt-2` so the hairline + index + name read as one composed unit.
+   - (c) Fixed self-link CTA bug: the primary CTA "Abrir la demo" / "Open the demo" pointed at `href={asset("/demo")}` — but DemoGallery is ON /demo, so this was a no-op self-link (clicking reloaded the current page). The AppDemoClient `<section>` in demo/page.tsx already had `scroll-mt-16` (clearly prepped as an anchor target) but no `id`. Added `id="demo"` to that section (1-line enabler in demo/page.tsx) and changed the CTA to `href="#demo"` — now clicking "Open the demo" smoothly scrolls up to the interactive demo above. Preserves the original CTA label + intent, makes it functional. The secondary CTA "Ver características" / "See features" → /features is unchanged (correct).
+
+Verification:
+- `./node_modules/.bin/eslint src/components/marketing/Gallery.tsx src/components/demo/DemoGallery.tsx src/components/tj/WindowFrame.tsx src/components/marketing/OverviewApp.tsx src/app/demo/page.tsx` → 0 errors, 0 warnings. ✓
+- `./node_modules/.bin/tsc --noEmit` → 0 errors in `src/` (the 4 remaining tsc errors are all in `examples/websocket/` and `skills/` directories — pre-existing, out of scope, not part of the Next.js project src tree). ✓
+- Caught + fixed a self-inflicted syntax error during the DemoGallery MultiEdit (dropped the docstring's closing `*/` when replacing the comment block) — re-ran eslint, confirmed clean.
+
+Stage Summary:
+- 3 target files polished with 8 concrete improvements (WindowFrame 2 + Gallery 3 + DemoGallery 3) + 1 enabler line in demo/page.tsx (`id="demo"` on the AppDemoClient section). All changes are visual-quality / mobile / theme-consistency / accessibility focused; the only behavioral change is the new "view full size" anchor (opens raw webp in new tab) and the fixed CTA self-link (now scrolls to the interactive demo). The letterbox issue flagged in R7-mobile (line 12505) is now resolved everywhere — screenshots fill their frames edge-to-edge at the exact 1500×856 aspect. Both galleries now share a consistent "view full size" affordance (anchor + expand chip, touch-visible at 60% / hover-revealed on desktop, keyboard focus ring) and the DemoGallery caption finally has the hairline anchor its R20-3d comment promised. Lint + type-check both clean on the 5 touched files.

@@ -17,7 +17,13 @@ export function FinalCTANew() {
   return (
     <section
       className="relative overflow-hidden border-t"
-      style={{ padding: "120px 24px 100px", borderColor: "rgb(var(--divider) / 0.06)" }}
+      style={{
+        // Mobile: 72px top / 64px bottom (was 120/100 — too tall on phones).
+        // Desktop: clamps back to the original 120/100. Keeps the cinematic
+        // closing-CTA breathing room on desktop without crushing mobile.
+        padding: "clamp(72px, 10vw, 120px) 24px clamp(64px, 8vw, 100px)",
+        borderColor: "rgb(var(--divider) / 0.06)",
+      }}
     >
       <div
         aria-hidden
@@ -91,34 +97,14 @@ export function FinalCTANew() {
         >
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2.5 rounded-full"
-            style={{
-              height: 56,
-              padding: "0 30px",
-              background: "rgb(var(--accent-base))",
-              color: "#06130d",
-              fontSize: 16,
-              fontWeight: 600,
-              boxShadow: "0 14px 38px -14px color-mix(in oklab, rgb(var(--accent-base)) 75%, #000)",
-              transition: "transform 0.2s, filter 0.2s",
-            }}
+            className="inline-flex items-center gap-2.5 rounded-full h-14 px-[30px] bg-[rgb(var(--accent-base))] text-[#06130d] text-base font-semibold shadow-[0_14px_38px_-14px_rgb(var(--accent-base)/0.65)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_18px_46px_-14px_rgb(var(--accent-base)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             {es ? "Empieza hoy — 29 $" : "Start today — $29"}
             <ArrowRight size={17} aria-hidden />
           </Link>
           <Link
             href="/demo"
-            className="inline-flex items-center gap-2.5 rounded-full"
-            style={{
-              height: 56,
-              padding: "0 28px",
-              background: "transparent",
-              border: "1px solid rgb(var(--divider) / 0.13)",
-              color: "var(--ink)",
-              fontSize: 16,
-              fontWeight: 600,
-              transition: "background 0.2s",
-            }}
+            className="inline-flex items-center gap-2.5 rounded-full h-14 px-7 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-base font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             {es ? "Ver la demo" : "See the demo"}
           </Link>

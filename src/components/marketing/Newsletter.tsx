@@ -147,6 +147,8 @@ export function Newsletter() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.55 }}
                         className="text-lg font-medium text-primary"
+                        aria-live="polite"
+                        role="status"
                       >
                         {es ? "¡Gracias! Revisa tu email." : "Thank you! Check your email."}
                       </motion.p>
@@ -182,11 +184,14 @@ export function Newsletter() {
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Correo electrónico" : "Email address"}
                           aria-invalid={status === "error"}
+                          aria-describedby={status === "error" ? "newsletter-error" : undefined}
+                          required
                           className="h-12 bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)]"
                         />
                         <AnimatePresence>
                           {status === "error" && (
                             <motion.p
+                              id="newsletter-error"
                               initial={{ opacity: 0, y: -4 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -4 }}
