@@ -13657,3 +13657,30 @@ Verification:
   - G9: 16 JSON-LD `<script type="application/ld+json">` blocks across 9 files (counted via `rg -nc`).
   - G10: out/sitemap.xml has 9 <url> entries with correct priorities + changeFrequencies.
   - G11: out/robots.txt has User-Agent: * / Allow: / / Sitemap: ... (overrides public/robots.txt).
+
+---
+Task ID: R23-1a
+Agent: general-purpose (marketing OverviewApp real-screenshot fix)
+Task: Replace the hand-built OverviewApp mockup with the real app screenshot (app-resumen.webp) inside a WindowFrame — owner reported the "Vistazo" section "doesn't look like the real app at all".
+
+Work Log:
+- Read worklog.md and the full OverviewApp.tsx (751 lines) to map structure: left column copy+CTA (1–291), right column wrapper `<div className="relative">` (294), halo (296), float-card P&L (308), float-card Guardián (352), hand-built window mockup (400–688), then closing divs.
+- Verified dependencies exist: src/components/tj/WindowFrame.tsx, src/components/tj/FeatureImage.tsx, src/lib/asset.ts, public/img/app-resumen.webp. Confirmed WindowFrame/FeatureImage/asset APIs match the replacement snippet (WindowFrame takes `caption`+`children`; FeatureImage takes `src/alt/fit/className/overlay/sizes`; asset prepends basePath).
+- Confirmed via ripgrep that the local helper `Kpi` and `parseInlineStyle` are module-private (not exported) and only referenced inside the mockup block being removed. FeaturesBento.tsx has its OWN independent `parseInlineStyle` — no cross-file dependency.
+- Added 3 imports after the fixtures import (lines 7–9): `WindowFrame`, `FeatureImage`, `asset`.
+- Replaced the ENTIRE hand-built mockup (the comment `{/* Mockup de la ventana de la app */}` through the caption/link wrapper `</div>`, i.e. old lines 400–689, ~290 lines of inline titlebar + tabs + KPIs + SVG equity-curve + calendar + status-bar JSX) with the new WindowFrame composition:
+    * `<WindowFrame caption="Trading Journal — Resumen">` wrapping a `<FeatureImage src={asset("/img/app-resumen.webp")} fit="contain" overlay={0} sizes="(max-width: 1024px) 100vw, 50vw" />` so the REAL screenshot shows whole + crisp (object-contain, no crop, no tint veil).
+    * Kept the responsive caption + "Explorar la demo →" link row, now reading "Vista Resumen · la app real" / "Summary view · the real app" and linking to `asset("/demo")` (basePath-aware).
+    * New comment header explains the swap and why (mockup didn't match the real app).
+- Per task step 4, KEPT the now-unused `Kpi` and `parseInlineStyle` helper functions (harmless dead code; task explicitly permits). Also left `perf`/`cal` locals + `getPerf`/`getCal` imports in place — both `noUnusedLocals` (tsc) and `no-unused-vars` (eslint) are OFF in this project's configs, so they compile/lint clean. `kpis` is still actively used by the float-card P&L.
+- Per task step 5, left both float-cards UNTOUCHED: float-card P&L (line ~313) and float-card Guardián (line ~357) still have `className="absolute z-10 ..."` so they overlay the new WindowFrame. Verified in the post-edit readback.
+- File shrank from 751 → 489 lines (the ~290-line mockup replaced by ~24 lines).
+
+Verification:
+- `./node_modules/.bin/eslint src/components/marketing/OverviewApp.tsx` → 0 errors (exit 0, no output).
+- `./node_modules/.bin/tsc --noEmit 2>&1 | grep -v "examples/websocket\|skills/"` → clean (no output).
+- dev.log: GET / 200 with `✓ Compiled` — page renders with the new screenshot; no compile/runtime errors after the edit.
+- Float-cards re-verified at `absolute z-10` (P&L card `hidden md:block`, Guardián card `hidden md:flex`) — decorative marketing overlays still sit above the WindowFrame.
+
+Stage Summary:
+- The "Vistazo"/OverviewApp section now shows the ACTUAL Resumen screenshot of the app inside an elegant WinUI-style WindowFrame, instead of a hand-coded mockup that diverged from the real UI. The two floating KPI/Guardián marketing cards still overlay the frame. Lint + type-check both clean; dev server compiles the home route without errors.

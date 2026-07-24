@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { getKpis, getPerf, getCal } from "@/lib/trading/fixtures";
+import { WindowFrame } from "@/components/tj/WindowFrame";
+import { FeatureImage } from "@/components/tj/FeatureImage";
+import { asset } from "@/lib/asset";
 
 /**
  * OverviewApp — sección `#overview` del HTML. Muestra la app con el
@@ -397,292 +400,27 @@ export function OverviewApp() {
               </div>
             </div>
 
-            {/* Mockup de la ventana de la app */}
-            <div
-              className="relative z-[2] transition-transform"
-              style={{ willChange: "transform" }}
-            >
-              <div
-                className="relative rounded-[14px] overflow-hidden"
-                style={{
-                  background: "color-mix(in oklab, var(--surface) 78%, transparent)",
-                  backdropFilter: "blur(22px) saturate(1.4)",
-                  WebkitBackdropFilter: "blur(22px) saturate(1.4)",
-                  border: "1px solid rgb(var(--divider) / 0.13)",
-                  boxShadow:
-                    "inset 0 1px 0 rgb(255 255 255 / 0.18), 0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78), 0 0 90px -22px color-mix(in oklab, rgb(var(--accent-base)) 55%, transparent)",
-                }}
-              >
-                {/* Titlebar */}
-                <div
-                  className="flex items-center justify-between"
-                  style={{
-                    height: 40,
-                    padding: "0 12px",
-                    borderBottom: "1px solid rgb(var(--divider) / 0.06)",
-                    background: "color-mix(in oklab, var(--surface-2) 72%, transparent)",
-                    gap: 10,
-                  }}
-                >
-                  <div className="flex items-center gap-2 flex-none">
-                    <span
-                      className="inline-grid place-items-center rounded-[5px]"
-                      style={{
-                        width: 18,
-                        height: 18,
-                        background: "linear-gradient(135deg, rgb(var(--accent-base)), rgb(var(--accent-hover)))",
-                        boxShadow: "inset 0 0 0 1px rgb(255 255 255 / 0.12)",
-                      }}
-                    >
-                      <svg width={11} height={11} viewBox="0 0 10 10" aria-hidden>
-                        <rect x={1} y={5.5} width={1.4} height={3} fill="#0d221a" opacity={0.9} />
-                        <rect x={4.3} y={3} width={1.4} height={5.5} fill="#0d221a" opacity={0.9} />
-                        <rect x={7.6} y={4} width={1.4} height={4.5} fill="#0d221a" opacity={0.9} />
-                      </svg>
-                    </span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)" }}>
-                      Trading Journal
-                    </span>
-                    <span
-                      className="tnum inline-flex items-center gap-1.5"
-                      style={{
-                        fontSize: 9.5,
-                        letterSpacing: "0.04em",
-                        padding: "3px 9px",
-                        borderRadius: 100,
-                        border: "1px solid rgb(var(--divider) / 0.13)",
-                        color: "var(--ink-2)",
-                        background: "color-mix(in oklab, var(--surface) 60%, transparent)",
-                      }}
-                    >
-                      <svg width={9} height={9} viewBox="0 0 16 16" fill="none" stroke="rgb(var(--accent-base))" strokeWidth={1.6} aria-hidden>
-                        <rect x={2} y={4} width={12} height={9} rx={1.5} />
-                        <path d="M2 7h12" />
-                      </svg>
-                      DEMO · 10.000 $
-                    </span>
-                  </div>
-                  <span className="tnum" style={{ fontSize: 10, color: "var(--ink-2)" }}>
-                    UTC <span style={{ color: "var(--ink)" }}>--:--:--</span>
-                  </span>
-                  <div className="flex items-stretch h-full flex-none">
-                    <span className="w-10 inline-grid place-items-center" style={{ color: "var(--ink-3)" }}>
-                      <svg width={10} height={10} viewBox="0 0 10 10" aria-hidden>
-                        <line x1={0.5} y1={5} x2={9.5} y2={5} stroke="currentColor" strokeWidth={1} />
-                      </svg>
-                    </span>
-                    <span className="w-10 inline-grid place-items-center" style={{ color: "var(--ink-3)" }}>
-                      <svg width={10} height={10} viewBox="0 0 10 10" aria-hidden>
-                        <rect x={0.5} y={0.5} width={9} height={9} stroke="currentColor" strokeWidth={1} fill="none" />
-                      </svg>
-                    </span>
-                    <span className="w-10 inline-grid place-items-center" style={{ color: "var(--ink-3)" }}>
-                      <svg width={10} height={10} viewBox="0 0 10 10" aria-hidden>
-                        <line x1={0.5} y1={0.5} x2={9.5} y2={9.5} stroke="currentColor" strokeWidth={1} />
-                        <line x1={9.5} y1={0.5} x2={0.5} y2={9.5} stroke="currentColor" strokeWidth={1} />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-                {/* Tabs */}
-                <div
-                  className="flex items-stretch overflow-hidden"
-                  style={{ height: 38, borderBottom: "1px solid rgb(var(--divider) / 0.06)", gap: 1, padding: "0 6px" }}
-                >
-                  {[
-                    { l: es ? "Resumen" : "Summary", active: true },
-                    { l: es ? "Operaciones" : "Trades", active: false },
-                    { l: es ? "Analítica" : "Analytics", active: false },
-                    { l: es ? "Diario" : "Journal", active: false },
-                    { l: es ? "Playbook" : "Playbook", active: false },
-                  ].map((t) => (
-                    <span
-                      key={t.l}
-                      className="relative inline-flex items-center gap-1.5"
-                      style={{
-                        padding: "0 10px",
-                        fontSize: 11.5,
-                        fontWeight: t.active ? 600 : 400,
-                        color: t.active ? "var(--ink)" : "var(--ink-3)",
-                      }}
-                    >
-                      <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                        <path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1v-9z" />
-                      </svg>
-                      {t.l}
-                      {t.active && (
-                        <span
-                          style={{
-                            position: "absolute",
-                            left: 10,
-                            right: 10,
-                            bottom: 0,
-                            height: 2,
-                            borderRadius: 100,
-                            background: "rgb(var(--accent-base))",
-                          }}
-                        />
-                      )}
-                    </span>
-                  ))}
-                </div>
-                {/* Contenido */}
-                <div style={{ padding: "14px 16px" }}>
-                  <div
-                    className="tnum"
-                    style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}
-                  >
-                    {es ? "Rendimiento" : "Performance"}
-                  </div>
-                  <div
-                    className="font-serif"
-                    style={{ marginTop: 3, fontSize: 19, color: "var(--ink)" }}
-                  >
-                    {es ? "Cómo va tu operativa" : "How your trading is going"}
-                  </div>
-                  {/* 4 KPIs */}
-                  {/* 4 KPIs. R21-3a — grid drops to 2 cols on mobile
-                      (375px) so the value strings (e.g. "+5.732,24 $"
-                      at 17px/700 ≈ 130px) don't overflow a 57px tile.
-                      Each tile gets its own bg; the container bg bleeds
-                      through the 1px gap as a hairline divider in any
-                      layout (replaces the per-tile borderLeft which
-                      only worked for the 4-col case). */}
-                  <div
-                    className="mt-3 grid grid-cols-2 sm:grid-cols-4 overflow-hidden"
-                    style={{
-                      border: "1px solid rgb(var(--divider) / 0.06)",
-                      borderRadius: 11,
-                      background: "rgb(var(--divider) / 0.06)",
-                      gap: 1,
-                    }}
-                  >
-                    <Kpi label={es ? "P&L total" : "Total P&L"} value="+5.732,24 $" color="var(--pos)" />
-                    <Kpi label="Win rate" value="50 %" color="var(--ink)" />
-                    <Kpi label="Expectancy" value="+28,66 $" color="var(--pos)" />
-                    <Kpi label="Profit factor" value="1,56" color="var(--ink)" />
-                  </div>
-                  {/* Curva + calendario */}
-                  <div className="mt-2.5 grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-2.5">
-                    <div
-                      style={{
-                        border: "1px solid rgb(var(--divider) / 0.06)",
-                        borderRadius: 11,
-                        padding: "12px 13px",
-                        background: "color-mix(in oklab, var(--surface-2) 40%, transparent)",
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className="tnum"
-                          style={{ fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-3)" }}
-                        >
-                          {es ? "Curva de rendimiento" : "Equity curve"}
-                        </span>
-                        <div className="flex gap-3">
-                          <span className="inline-flex items-center gap-1.5" style={{ fontSize: 10, color: "var(--ink-2)" }}>
-                            <span style={{ width: 12, height: 2, background: "#e2b34c", borderRadius: 2 }} />
-                            {es ? "Rendimiento" : "Performance"}
-                          </span>
-                          <span className="inline-flex items-center gap-1.5" style={{ fontSize: 10, color: "var(--ink-2)" }}>
-                            <span style={{ width: 12, height: 0, borderTop: "2px dashed rgb(var(--accent-base))" }} />
-                            Balance
-                          </span>
-                        </div>
-                      </div>
-                      <svg viewBox="0 0 640 220" className="w-full h-auto block mt-2.5" aria-hidden>
-                        <defs>
-                          <linearGradient id="tjPerfFill" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0" stopColor="#e2b34c" stopOpacity=".26" />
-                            <stop offset="1" stopColor="#e2b34c" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        {perf.grid.map((g, i) => (
-                          <g key={i}>
-                            <line x1={46} y1={g.y} x2={632} y2={g.y} stroke="rgb(var(--divider) / 0.06)" strokeWidth={1} />
-                            <text x={40} y={g.y} dy={3} textAnchor="end" fill="var(--ink-3)" style={{ fontFamily: "var(--font-geist-mono)", fontSize: 8.5 }}>
-                              {g.label}
-                            </text>
-                          </g>
-                        ))}
-                        <path d={perf.dd} fill="rgb(var(--pnl-neg) / 0.22)" />
-                        <path d={perf.fill} fill="url(#tjPerfFill)" />
-                        <path d={perf.dash} fill="none" stroke="rgb(var(--accent-base))" strokeWidth={1.4} strokeDasharray="5 4" opacity={0.85} />
-                        <path d={perf.line} fill="none" stroke="#e2b34c" strokeWidth={1.8} strokeLinejoin="round" />
-                        <circle cx={perf.endX} cy={perf.endY} r={7} fill="#e2b34c" opacity={0.16} />
-                        <circle cx={perf.endX} cy={perf.endY} r={3.2} fill="#e2b34c" />
-                      </svg>
-                    </div>
-                    <div
-                      style={{
-                        border: "1px solid rgb(var(--divider) / 0.06)",
-                        borderRadius: 11,
-                        padding: "12px 13px",
-                        background: "color-mix(in oklab, var(--surface-2) 40%, transparent)",
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className="tnum"
-                          style={{ fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-3)" }}
-                        >
-                          {es ? "Calendario" : "Calendar"}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span style={{ color: "var(--ink-3)", cursor: "pointer" }}>‹</span>
-                          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink)" }}>{cal.label}</span>
-                          <span style={{ color: "var(--ink-3)", cursor: "pointer" }}>›</span>
-                        </div>
-                      </div>
-                      <div className="mt-2 grid grid-cols-7 gap-1">
-                        {cal.cells.map((c, i) => {
-                          const cellStyle = c.style
-                            ? { ...parseInlineStyle(c.style), padding: "2px" }
-                            : { padding: "2px" };
-                          return (
-                            <div key={i} style={cellStyle}>
-                              <span className="tnum" style={{ fontSize: 7, opacity: 0.75 }}>{c.day}</span>
-                              <span className="tnum" style={{ fontSize: 7, fontWeight: 600, lineHeight: 1 }}>{c.val}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Status bar */}
-                <div
-                  className="flex items-center justify-between"
-                  style={{
-                    height: 32,
-                    padding: "0 14px",
-                    borderTop: "1px solid rgb(var(--divider) / 0.06)",
-                    background: "color-mix(in oklab, var(--surface-2) 66%, transparent)",
-                    gap: 12,
-                  }}
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <span className="inline-flex items-center gap-1.5" style={{ fontSize: 10.5, color: "var(--ink-3)" }}>
-                      <span className="inline-block rounded-full" style={{ width: 6, height: 6, background: "rgb(var(--accent-base))" }} />
-                      {es ? "✓ Compilación de desarrollo" : "✓ Development build"}
-                    </span>
-                    <span className="tnum" style={{ fontSize: 10, color: "var(--ink-3)" }}>
-                      {es ? "Guardado automático en tu equipo" : "Auto-save on your machine"}
-                    </span>
-                  </div>
-                  <span className="tnum" style={{ fontSize: 10, color: "var(--ink-3)" }}>
-                    v0.1.0
-                  </span>
-                </div>
-              </div>
-              {/* R21-3a — stack the caption + explore link vertically
-                  on mobile; the 47-char Spanish caption (~235px) + the
-                  18-char link (~110px) don't fit on one 327px line. */}
+            {/* Mockup de la ventana de la app — USA LA CAPTURA REAL
+                (app-resumen.webp) dentro de un WindowFrame, en vez de
+                un mockup hecho a mano que no coincidía con la app real. */}
+            <div className="relative z-[2] transition-transform" style={{ willChange: "transform" }}>
+              <WindowFrame caption="Trading Journal — Resumen">
+                <FeatureImage
+                  src={asset("/img/app-resumen.webp")}
+                  alt={es
+                    ? "Pantalla de Resumen de Trading Journal: curva de rendimiento, KPIs y calendario P&L"
+                    : "Trading Journal Overview screen: performance curve, KPIs and P&L calendar"}
+                  fit="contain"
+                  className="absolute inset-0 h-full w-full"
+                  overlay={0}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </WindowFrame>
               <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-1.5">
                 <span className="tnum" style={{ fontSize: 10, color: "var(--ink-3)" }}>
-                  {es ? "Vista Resumen · datos de muestra deterministas" : "Summary view · deterministic sample data"}
+                  {es ? "Vista Resumen · la app real" : "Summary view · the real app"}
                 </span>
-                <a href="/demo" style={{ fontSize: 11, color: "rgb(var(--accent-base))" }}>
+                <a href={asset("/demo")} style={{ fontSize: 11, color: "rgb(var(--accent-base))" }}>
                   {es ? "Explorar la demo →" : "Explore the demo →"}
                 </a>
               </div>
