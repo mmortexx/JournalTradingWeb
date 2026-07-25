@@ -393,7 +393,15 @@ function Result({ label, value, color }: { label: string; value: string; color: 
       </div>
       <div
         className="tnum min-w-0 break-words relative"
-        style={{ fontSize: 17, fontWeight: 700, marginTop: 4, color }}
+        // R27-1d — bumped 17→19px so the "Beneficio" result (text-pnl-pos,
+        // #0B8B4B ≈ 3.9:1 on the Result tile surface) clears WCAG AA in
+        // light theme. At 17px/700 it failed AA normal-text (4.5:1); at
+        // 19px/700 it qualifies as WCAG "large text" (≥14pt bold) which
+        // only requires 3:1. The "Riesgo $" (pnl-neg), "Tamaño" (ink) and
+        // "R:R" (accent-base) values already passed at 17px/700 — the bump
+        // is a uniform 2px lift so all four Result tiles stay optically
+        // balanced (a per-tile size would break the grid's rhythm).
+        style={{ fontSize: 19, fontWeight: 700, marginTop: 4, color }}
       >
         {value}
       </div>

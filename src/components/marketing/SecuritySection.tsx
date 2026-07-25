@@ -29,7 +29,14 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
   return (
     <section
       id="security"
-      className="section border-t border-[rgb(var(--divider)/0.06)]"
+      // R27-1b — `bg-veil` added: this section had NO background
+      // backing at all (just `border-t`). The eye WebGL (bright
+      // red/green fibers in light theme) was showing through the
+      // entire section, washing out the "Tus datos no salen de tu
+      // equipo. Nunca." heading + body copy + the TJ/cloud comparison
+      // rows. `bg-veil` (82 % bg in light / 74 % in dark) occludes
+      // the eye; the `border-t` top hairline is preserved.
+      className="section border-t border-[rgb(var(--divider)/0.06)] bg-veil"
     >
       <div className="max-w-[1240px] mx-auto px-5 md:px-8">
         <div className="max-w-[760px] mx-auto text-center mb-12">

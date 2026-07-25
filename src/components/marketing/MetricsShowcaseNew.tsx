@@ -111,7 +111,14 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                   />
                   <span className="text-[12px] sm:text-[13px]" style={{ color: "var(--ink-2)" }}>{m.l}</span>
                 </span>
-                <span className="tnum relative shrink-0 text-[17px] sm:text-[19px]" style={{ fontWeight: 700, color: m.c }}>{m.v}</span>
+                {/* R27-1d — bumped mobile size 17→19px so text-pnl-pos KPI
+                    values (Sharpe, Expectancy) clear WCAG AA in light theme.
+                    At 17px/700 the green (#0B8B4B ≈ 4.0:1 on the KPI tile
+                    surface) failed AA normal-text (4.5:1). At 19px/700 the
+                    value qualifies as WCAG "large text" (≥14pt bold = 18.66px
+                    bold) which only requires 3:1 — passes comfortably. Desktop
+                    was already 19px so no visual change there. */}
+                <span className="tnum relative shrink-0 text-[19px]" style={{ fontWeight: 700, color: m.c }}>{m.v}</span>
               </li>
             ))}
           </ul>

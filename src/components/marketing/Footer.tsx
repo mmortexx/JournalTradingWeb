@@ -262,10 +262,19 @@ export function Footer() {
             above. Status dot is decorative (aria-hidden); the label text
             carries the accessible meaning. */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-tertiary">
+          <p className="text-xs text-secondary">
             © <span className="tnum">{year}</span> {t("appName")}. {t("rights")}
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs text-tertiary">
+          {/* R27-1c — bottom bar cluster bumped from text-tertiary to
+              text-secondary. VLM flagged the copyright + legal links as
+              washed out on the bright footer surface; the parent already
+              had tertiary here, but `border-[rgb(var(--divider)/0.1)]` +
+              `liquid-glass` produce a near-white panel in light theme
+              where tertiary's ≈5.5:1 reads as faded on small 12px text.
+              The version `v1.4.2` is overridden back to text-tertiary
+              below — it's pure metadata and the dimmer weight helps it
+              read as secondary information next to the legal links. */}
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs text-secondary">
             {/* Status indicator — pulsing emerald dot + label. The
                 `animate-ping` ring is the radar sweep; the solid inner
                 dot is the steady state. Mirrors Stripe / Vercel status
@@ -291,7 +300,7 @@ export function Footer() {
               {es ? "Términos" : "Terms"}
             </Link>
             <span aria-hidden className="opacity-30">·</span>
-            <span className="tnum">v1.4.2</span>
+            <span className="tnum text-tertiary">v1.4.2</span>
             <span aria-hidden className="opacity-30">·</span>
             <span>ES + EN</span>
           </div>

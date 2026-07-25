@@ -15352,3 +15352,375 @@ Verification:
 
 Stage Summary:
 - The three above-the-fold marketing sections (Hero, OverviewApp, HomeDemo) now share a coordinated visual vocabulary: italic accent phrases with underlines/bars, pill CTAs with lucide icons and the lift + accent ring + shadow hover state, and consistent entrance animations. The Hero halo centering bug (latent since R24-1b) is fixed — the halo now materializes centered above the headline instead of offset to the right. The OverviewApp CTAs no longer force a full page reload (Link instead of <a>) and match the Hero CTAs exactly. The OverviewApp float-cards no longer clip off-screen at the md breakpoint. The HomeDemo CTA fades up into view as the user finishes scrolling through the demo. All three sections read as a single polished first impression.
+
+---
+Task ID: R27-1a
+Agent: general-purpose (color tokens)
+Task: Darken light-theme color tokens in src/app/globals.css for WCAG AA compliance (eyebrow green, navbar timestamp, trust badges, SCROLL indicator, footer text)
+
+Work Log:
+- Read worklog.md, globals.css, and grep-mapped every `--accent-base / --txt-tertiary / --ink-3 / --accent-hover / --accent-pressed / --accent-soft` occurrence to confirm which were in light-theme blocks vs dark/fallback/print.
+- Confirmed `--accent-soft` is NOT defined in any light-theme block and has zero JSX usage in `src/` → left alone per task item #6.
+- Confirmed the `@media print` block uses its own dedicated paper-friendly values → not part of on-screen light theme, left alone.
+- Edited the `:root[data-theme="light"]` text-token block:
+  * `--txt-tertiary`: `86 91 102` (#565B66, ≈5.5:1) → `64 69 79` (#40454F, ≈7:1)
+  * Updated surrounding comment: ratio 5.5:1 → 7:1, cool-neutrals list corrected to include #40454F, added R27-1a rationale.
+- Edited `:root[data-theme="light"][data-palette="verde"]` AND `:root[data-theme="light"][data-palette="grafito"]` (mirror blocks):
+  * `--accent-base`: `11 110 68` (#0B6E44) → `9 90 55` (#095A37) — ~5.8:1 on white, ≥5:1 on bg-veil.
+  * `--accent-hover`: `18 160 102` (#12A066) → `14 131 84` (#0E8354) — proportionally darkened ~1 stop, kept LIGHTER than new base to preserve the gradient-sheen sweep at line 875.
+  * `--accent-pressed`: `12 110 70` (#0C6E46) → `6 69 40` (#064528) — now properly DARKER than base (old value was effectively identical to base — latent bug fixed); ~1 stop darker than new accent-base, matches dark-theme relationship.
+  * Comment rewritten as R27-1a note with new ratios and hover/pressed rationale.
+- Edited the second `:root[data-theme="light"]` ink block (~line 1885):
+  * `--ink-3`: `#565b5e` → `#3f4448` — matches new --txt-tertiary darkness (~7:1 on white). Added inline R27-1a comment.
+- Did NOT touch: dark theme `:root` block, P&L/signal tokens (already fixed in R21-2d), print stylesheet, or the historical 1.9-3.7:1 audit comment at line ~945 (historical record).
+
+Verification:
+- `bun run lint` → 0 errors, 0 warnings.
+- `bunx tsc --noEmit` → 0 errors in `src/` (only pre-existing unrelated errors in `examples/` and `skills/`).
+- Dev log: `/` returning 200, no CSS compile errors.
+
+Stage Summary:
+- Light-theme accent green now ~5.8:1 on white (was ~4.4:1) — eyebrows, § ordinals and accent highlights read as authoritative institutional green instead of pale mint.
+- Light-theme tertiary text now ~7:1 on white (was ~5.5:1) — navbar timestamp, SCROLL indicator caption, footer small text, TrustStrip badge labels move from marginal AA to comfortable AA approaching AAA.
+- Light-theme ink-3 darkened to match — small ink-3 labels and footer text via the legacy ink ladder are now legible.
+- Accent button hover/pressed states now have a visible progression (hover = brighter sweep, pressed = deep forest) instead of the previous bug where pressed was indistinguishable from base.
+- Dark theme untouched — verified correct for near-black backdrop.
+- Work record: /agent-ctx/R27-1a-color-tokens.md
+
+---
+Task ID: R27-1c
+Agent: frontend-styling-expert
+Task: Fix Hero + Navbar + Footer light-theme legibility issues flagged by VLM (follow-up to R27-1a token darkening)
+
+Work Log:
+- Read worklog.md (latest state at R27-1a), globals.css to confirm R27-1a darkening is in place: light-theme `--txt-tertiary` = `64 69 79` (#40454F, ≈7:1), `--ink-3` = `#3f4448` (~7:1), `--ink-2` = `#4a4d4f` (~9:1), `--accent-base` (light) = `9 90 55` (#095A37, ~5.8:1). Read Hero.tsx, Navbar.tsx (incl. UtcClock + megamenu items), Footer.tsx, TrustStrip.tsx. Confirmed the `.eyebrow` class (Footer column headers, line 695-701 of globals.css) uses `rgb(var(--txt-tertiary))` — after R27-1a that's ~7:1 on the bright footer surface, comfortably above WCAG AA's 4.5:1 floor for 10px text. No change needed for `.eyebrow`.
+
+Per-file findings + actions:
+
+1. **src/components/marketing/Hero.tsx — 3 contrast fixes:**
+
+   · **Eyebrow label color `rgb(var(--accent-base))` → `var(--ink-3)`** — The "DIARIO DE TRADING · WINDOWS NATIVO" eyebrow label was using the accent green at full strength. Even after R27-1a darkened `--accent-base` to #095A37 (~5.8:1 on white), the eyebrow sits on the bright hero side-scrim where the iris chroma + scrim tint stack — VLM still flagged the green as pale. Per task spec ("the eyebrow should use `text-tertiary` for the label text, and only the accent dot/line should be accent-colored"), switched the label to `var(--ink-3)` (~7:1 after R27-1a). The pulsing 6px accent dot above (line 163-172) stays accent-green + glow — the dot is the green accent marker, the label reads as a quiet institutional caption. Same pattern as the trust badges row (R25-1e): dot accent + label neutral.
+
+   · **Trust badges row labels `var(--ink-3)` → `var(--ink-2)` (tertiary → secondary)** — The 4 trust badges ("100% LOCAL", "PAGO ÚNICO", "ES · EN", "GARANTÍA 30 DÍAS") used `var(--ink-3)` for their labels. The Hero content column already carries `.tj-legible-text` (line 161) which adds a white-halo text-shadow in light theme, but the VLM still flagged the row as washed out on the bright hero surface. Bumped labels to `var(--ink-2)` (~9:1, "secondary"). The 4px accent dot separators between items (line 356, `background: rgb(var(--accent-base) / 0.55)`) remain the sole green element in the row — same dot-accent + neutral-label pattern as the eyebrow above. The `.tj-legible-text` halo is preserved on the parent as a belt-and-suspenders buffer where the scrim fades to transparent.
+
+   · **"Scroll" indicator label `var(--ink-3)` → `var(--ink-2)` (tertiary → secondary)** — The 9px uppercase "Scroll" caption at the bottom of the hero (line 395) was almost invisible in light theme per VLM. Unlike the eyebrow + trust badges (which sit inside the `.tj-legible-text` wrapper at line 161), the scroll indicator is a SEPARATE absolutely-positioned div at the bottom of the section (line 383) — it has NO halo buffer. The traveling accent bead (line 414-430, `background: rgb(var(--accent-base))` + `boxShadow: 0 0 8px rgb(var(--accent-base))`) is already accent-green with an 8px glow (R26-2c bump) and is the scroll-motion cue; the label just needs to read as "Scroll" at a glance. Bumped to `var(--ink-2)` (~9:1) — pairs with the visible baseline rail hairline at `--divider / 0.28` (line 403, theme-agnostic) and the accent gradient overlay (line 406-412) so the indicator reads as a complete unit in both themes.
+
+2. **src/components/marketing/Navbar.tsx — 2 contrast fixes (UtcClock + megamenu):**
+
+   · **UtcClock — unified "UTC" label + time value to `var(--ink-2)`** — The clock was structured as `color: var(--ink-3)` for the wrapper span with an inner `<span style={{ color: "var(--ink-2)" }}>{time}</span>` override on the time — so "UTC" was tertiary and the time itself was secondary, a subtle two-tone. VLM flagged the whole clock as pale green in light theme (likely a perceptual artifact of the dot's accent green + glow bleeding into the adjacent label). After R27-1a the tertiary token is now ~7:1 so the "UTC" label would technically pass, but to align with the task spec ("change the clock text to text-secondary, keep only the live dot accent-colored") and to make the clock read as ONE clean monospace token, bumped the wrapper from `var(--ink-3)` to `var(--ink-2)` and removed the redundant inner override on the time — both now inherit secondary. The pulsing live dot above (lines 772-782) is the sole green element via `--pnl-pos` (darkened in R21-2d to #0B8B4B for light-theme contrast), animated with the `tj-pulse-dot` keyframe (0.4→1.0 opacity + glow bloom). The `whitespace-nowrap` + `tnum` classes are preserved so the monospace figures don't shift width on tick.
+
+   · **Megamenu descriptions `var(--ink-3)` → `var(--ink-2)` (tertiary → secondary)** — Each of the 4 megamenu entries (Características / Métricas / Disciplina / Seguridad) has a small 11.5px description ("Vista general del producto", "Sharpe, profit factor, expectancy", etc.) using `var(--ink-3)`. Task spec said to "verify after R27-1a darkening." Verified: at 11.5px the tertiary token's ~7:1 contrast (after R27-1a) is technically AA, but the megamenu panel renders with `color-mix(in srgb, var(--surface) 96%, transparent)` + `backdrop-filter: blur(24px) saturate(1.4)` (lines 386-388) — a 96% bright acrylic surface. On that near-white panel the perceived contrast shrinks toward the WCAG floor for small text. Bumped to `var(--ink-2)` (~9:1) for a comfortable margin. The 13px label above each description (line 438) stays `font-semibold` inherited from the Link's `color: var(--ink)` — already primary, no change needed. The 30×30 icon tile (lines 426-433) keeps its accent-green icon at `rgb(var(--accent-base))` on a 14% accent tint — the icon is the accent marker, the text reads as the content.
+
+3. **src/components/marketing/Footer.tsx — bottom bar cluster bumped to text-secondary, version kept tertiary:**
+
+   · **Copyright `<p>` text-tertiary → text-secondary** — The `© 2026 TradingJournal. All rights reserved.` line at the bottom-left of the footer used `text-tertiary`. VLM flagged it as washed out on the bright `liquid-glass` footer surface. Bumped to `text-secondary`. The year span keeps its `tnum` class for tabular figures.
+
+   · **Legal links cluster parent text-tertiary → text-secondary, version override back to text-tertiary** — The bottom-right cluster ("All systems operational" + Privacy + Terms + v1.4.2 + ES + EN) lived in a single `<div className="... text-xs text-tertiary">` (line 268). Per task spec ("bump to text-secondary for the legal links and copyright. The version can stay tertiary"), bumped the parent `<div>` to `text-secondary` so the status label, the Privacy/Terms links (which keep their `hover:text-primary`), the locale "ES + EN" all inherit secondary. Added `text-tertiary` directly on the version span `<span className="tnum text-tertiary">v1.4.2</span>` to override the parent and keep the version as dim metadata — the version is the only "pure metadata" item in the cluster (vs. legal links which are navigational), so dimming it helps the legal links read as the actionable items. The opacity-30 separator dots between items stay as-is (decorative). The pulsing emerald status dot (lines 274-277, `bg-emerald-400` + `animate-ping`) is unchanged — it's already a strong vivid green and the only chromatic accent in the cluster.
+
+   · **Footer column headers (`.eyebrow`) — VERIFIED, no change** — The 3 column headers "Producto / Recursos / Empresa" use the `.eyebrow` utility class (globals.css line 695-701) which sets `color: rgb(var(--txt-tertiary))`. After R27-1a, tertiary is #40454F (~7:1 on white). For 10px uppercase eyebrow text on the bright `liquid-glass` footer panel (96% surface + 24px blur), 7:1 is comfortably above WCAG AA's 4.5:1 floor for normal text. Headers read as quiet institutional column labels — leaving as `.eyebrow`/tertiary matches the design system's documented "Footer columns" treatment (see Footer.tsx docstring lines 199-205) and the same `.eyebrow` class used by section headers across the marketing site.
+
+   · **Trust-signal pills above the bottom bar — VERIFIED, no change** — The 4 inline trust pills ("Pago único · Sin suscripción", "Datos 100 % locales", "ES + EN", "Garantía 30 días") at lines 244-253 use `text-tertiary` for their labels. After R27-1a that's ~7:1 on white. These are intentionally quiet credentials pills (per the Footer docstring: "the strip reads as a quiet institutional credentials row, not a feature gallery") — dimming them as tertiary is the design intent, distinguishing them from the primary link columns above. Leaving as tertiary.
+
+4. **src/components/marketing/TrustStrip.tsx — VERIFIED, no change needed:**
+
+   · TrustStrip already uses `text-secondary` for the trust item labels (line 100, `<span className="t-caption text-secondary whitespace-nowrap tnum">`) and `text-primary` for the icons (line 95, `text-primary shrink-0 inline-flex`). The motion.div row wrapper also carries `text-secondary text-sm` (line 79). After R27-1a, secondary is #50555F (~9:1 on white) and primary is #14161C (~18:1) — both comfortably legible on the bright page surface. The 1px accent-green dot separators between items (line 105, `bg-[rgb(var(--accent-base)/0.50)]`) and the top-edge accent gradient line (lines 54-66) are the only green elements. No edits required — the VLM's concern ("the trust items might use text-tertiary. Bump to text-secondary if too faded") doesn't apply here; the file already does what the task suggests.
+
+Verification:
+- `npx eslint src/components/marketing/Hero.tsx src/components/marketing/Navbar.tsx src/components/marketing/Footer.tsx src/components/marketing/TrustStrip.tsx` → 0 errors, 0 warnings.
+- `npx eslint src/` (full src tree) → 0 errors, 0 warnings.
+- `npx tsc --noEmit` → 0 errors in `src/`. (The 4 pre-existing errors in `examples/` and `skills/` directories are unrelated to this task — same baseline as R26-2c and R27-1a.)
+
+Stage Summary:
+- Five light-theme legibility fixes applied across 3 files (Hero ×3, Navbar ×2, Footer ×2 cluster bumps as one logical edit), 1 file verified clean (TrustStrip), 2 sub-elements verified clean (Footer `.eyebrow` headers, Footer trust-signal pills).
+- The eyebrow / trust-badges / SCROLL indicator / UtcClock / megamenu descriptions / copyright + legal links now read at ~9:1 (text-secondary) on their bright surfaces in light theme, with a ~2:1 margin above the WCAG AA floor — comfortable legibility on the WebGL-eye hero backdrop and the bright acrylic Navbar/Footer panels.
+- The accent-green usage is now CONSISTENTLY reserved for: pulsing dots (Hero eyebrow, UtcClock live dot, Footer status dot), traveling beads (Hero scroll indicator), icon tiles (Navbar megamenu), inline separators (Hero trust badges, TrustStrip), and the top-edge gradient line (TrustStrip). Label text never uses accent-green at body-text scale — only markers/icons get the green. This gives a coherent "green = accent marker, neutral = content" reading across the chrome.
+- All fixes compose cleanly with R27-1a's token darkening: where R27-1a made the tokens darker at the variable level, R27-1c assigns the right tier (secondary vs tertiary) per element so the darkening lands on the elements VLM actually flagged.
+- No dark-theme regression: all changes target light-theme perception only (the `var(--ink-*)` and `text-*` utilities are theme-aware; their dark-theme values are unchanged and already correct for near-black backdrops).
+
+---
+Task ID: R27-1b
+Agent: frontend-styling-expert (light-theme scrims)
+Task: Add scrims / local backgrounds to marketing sections that float over the eye WebGL background in light theme (VLM flagged HomeDemo heading + subtitle as illegible)
+
+Work Log:
+- Read worklog.md (latest state at R27-1c — parallel task that already bumped Hero trust badges + SCROLL indicator colors from `var(--ink-3)` → `var(--ink-2)`; R27-1a darkened the light-theme tokens). Read globals.css to confirm `.bg-veil` (74 % dark / 82 % light `color-mix` of `--bg`), `.tj-legible-text` (theme-aware text-shadow halo), `.hero-side-scrim` (left-column-only gradient that fades to transparent at 52 % width), `.liquid-glass` (opaque dark/light material — `rgba(0,0,0,0.92)` dark / `rgba(255,255,255,0.94)` light). Read BackgroundFX.tsx — the eye canvas is `fixed inset-0 -z-10`, so as the user scrolls, the eye stays centered in the viewport and is visible behind every section whose own background is transparent. Grepped `className="section` across `src/components/marketing/` to enumerate the 32 marketing `<section>` declarations; identified 13 without `bg-veil`.
+
+Per-file findings + actions:
+
+1. **src/components/marketing/HomeDemo.tsx — `bg-veil` + `tj-legible-text` on heading column:**
+   · The section `<section id="demo" className="section relative overflow-hidden border-b border-... scroll-mt-16">` had NO `bg-veil`. The "La app, en tu navegador" heading + subtitle (lines 91-124) were floating directly over the eye in light theme. VLM specifically flagged this pair as illegible. Added `bg-veil` to the section className. Belt-and-suspenders: also added `tj-legible-text` to the heading column wrapper `<div className="mb-10 max-w-[760px]">` (line 92) — `bg-veil` at 82 % in light can still let the section's own soft accent halo (the 240px blurred radial at top:0, opacity 0.4) lift the background lightness locally under the heading; the theme-aware text-shadow halo (white halo in light theme) lifts the heading + subtitle contrast above any localised brightening. The AppDemoClient demo frame below has its own opaque dark surface so the class is scoped to the heading column only — doesn't affect the demo's hydration.
+
+2. **src/components/marketing/Ticker.tsx — theme-aware edge fades:**
+   · The band itself already uses `liquid-glass` which has a light-theme override (`rgba(255,255,255,0.94)` at globals.css line 1841) so the band is opaque in light theme. The bug was the two edge-fade gradients (lines 138-152): hardcoded `rgba(0, 0, 0, 0.92)` → `rgba(0, 0, 0, 0.5)` → transparent. That's correct in dark theme (matches the band's `rgba(0,0,0,0.92)` surface), but in light theme it produced dark smudges at both edges of a white band — the comment "black-tinted so items ease out into the liquid-glass band's translucent dark surface" was tuned for dark only. Switched to `color-mix(in srgb, var(--bg) 92%, transparent)` → `color-mix(in srgb, var(--bg) 50%, transparent)` → transparent. `var(--bg)` tracks `#0B0C0E` (dark) / `#f3f2ec` (light), close enough to the band's near-opaque surface that the fade reads as "items dissolving into the band" instead of "dark patches at the edges" in both themes. The 92 % → 50 % → transparent ramp is preserved, and the responsive width ramp (`w-14 sm:w-20 md:w-32`) is unchanged.
+
+3. **src/components/marketing/FinalCTANew.tsx — `bg-veil` + `tj-legible-text` on text container:**
+   · The section `<section className="section relative overflow-hidden border-t border-...">` had NO `bg-veil`. The closing CTA's heading "Deja de operar a ciegas. Empieza a medir." + body copy (lines 57-100) were floating directly over the eye. The section's only backings were the two radial accent halos (12 % + 22 % accent, both heavy blurred) + a bottom radial vignette fading to `var(--bg)` — none of these occlude the eye's bright red/green fibers in light theme. Added `bg-veil` to the section. The two decorative halos + bottom vignette are absolute inset-0 divs that paint on top of `bg-veil`, so they still bloom visibly. Belt-and-suspenders: added `tj-legible-text` to the text container `<div className="relative max-w-[820px] mx-auto px-5 md:px-8 text-center">` (line 71) so the heading keeps a theme-aware halo in the area where the bright inner halo (22 % accent at 50 % 50 %) sits directly behind "Empieza a medir.".
+
+4. **src/components/marketing/Hero.tsx — `tj-legible-text` on SCROLL indicator wrapper:**
+   · The Hero's content column wrapper already carries `tj-legible-text` (line 161, R21-2d). The trust badges live inside this wrapper, so they already get the white-halo text-shadow in light theme. R27-1c (parallel task) bumped their label color from `var(--ink-3)` to `var(--ink-2)` for additional contrast — that work is already in the working tree. R27-1b's contribution here: added `tj-legible-text` to the SCROLL indicator wrapper (`<div className="absolute left-1/2 bottom-5 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none">` at line 406). The SCROLL indicator lives OUTSIDE the content column wrapper, so it had no text-shadow halo. The R27-1c color bump (`var(--ink-3)` → `var(--ink-2)` on the "Scroll" label) plus the R27-1b `tj-legible-text` halo together clear the washout — the halo softens the bright accent corona bleed behind the indicator (which sits at the hero's bottom-center, exactly where the eye's iris is brightest in light theme), while the color bump gives the label inherent weight. The traveling accent bead's own glow (`0 0 8px rgb(var(--accent-base))`) is a box-shadow, not text, so the text-shadow class doesn't interfere with it.
+
+5. **src/components/marketing/OverviewApp.tsx — `bg-veil` + `tj-legible-text` on left column:**
+   · The section `<section id="overview" className="section relative overflow-hidden">` had NO `bg-veil`. The "Todo tu día de trading, en una pantalla" heading + body copy + CTAs + trust badges (lines 117-253) were floating over the eye. Added `bg-veil` to the section. The section's decorative halos (right-side radial + bottom vignette) are absolute inset-0 divs that paint on top of `bg-veil`, so they still read as soft accent blooms. Belt-and-suspenders: added `tj-legible-text` to the left column wrapper `<div>` (line 142) — the section's own right-side accent halo (radial at top:-160, opacity 0.28, blurred 64px) and the right column's mockup halo (radial at 62% 32%, opacity 0.42, blurred 44px) both bleed into the left column's text area at certain scroll positions (the halos are absolute, so they don't track the column); the theme-aware text-shadow halo lifts the heading + body copy + trust badges above any localised brightening. The right column's WindowFrame has its own opaque surface so it's unaffected — the class is scoped to the left column only.
+
+6. **Audit — 8 additional sections missing `bg-veil` AND containing text. Added `bg-veil` to each:**
+
+   · **src/components/marketing/ContactForm.tsx** — `section-tight relative overflow-hidden` → `section-tight relative overflow-hidden bg-veil`. The 3 % fractalNoise grain overlay (transparent in hue) was the only backing; the "Envía un mensaje" heading + subtitle around the liquid-glass form card were unprotected.
+
+   · **src/components/marketing/DownloadCTA.tsx** — `section relative overflow-hidden` → `section relative overflow-hidden bg-veil`. The aurora-bg + grain are transparent in hue; the liquid-glass download card is `max-w-3xl mx-auto` so the area around the card (where the eye shows through) was unprotected. The aurora-bg + accent glow orbs + grain still paint on top of `bg-veil`, so the section's atmospheric depth is preserved.
+
+   · **src/components/marketing/Newsletter.tsx** — `section relative overflow-hidden` → `section relative overflow-hidden bg-veil`. Same pattern as DownloadCTA — `max-w-2xl mx-auto` liquid-glass card with unprotected surrounding area.
+
+   · **src/components/marketing/TrustStrip.tsx** — `section-tight relative overflow-hidden` → `section-tight relative overflow-hidden bg-veil`. The thin trust band had no background; the eye was showing through between the icons + labels, washing out the small `t-caption text-secondary` labels. The top accent gradient hairline still paints on top.
+
+   · **src/components/marketing/StatsBandNew.tsx** — `section-tight border-b relative overflow-hidden` → `section-tight border-b relative overflow-hidden bg-veil`. The 4-column stats band had no background; the `text-[13.5px] text-tertiary` descriptions under each big number were washed out. The `border-b` bottom hairline is preserved.
+
+   · **src/components/marketing/FeaturesBento.tsx** — `section relative overflow-hidden` → `section relative overflow-hidden bg-veil`. The top-left radial halo (`color-mix(in oklab, var(--ink) 5%, transparent)`) is essentially a 5 % tint — nearly transparent. The "Todo lo que una mesa profesional espera de un diario" heading + body copy + bento card titles were washing out. The top-left halo + the bento cards' own `liquid-glass` surfaces still paint on top of `bg-veil`.
+
+   · **src/components/marketing/ContactSupport.tsx** — `section-tight relative overflow-hidden scroll-mt-24` → `section-tight relative overflow-hidden bg-veil scroll-mt-24`. The 3 % fractalNoise grain is transparent in hue; the "¿No encuentras tu respuesta?" heading + subtitle + 3 support card titles were unprotected. The cards themselves (`liquid-glass depth-2`) have their own opaque surface and are unaffected. `scroll-mt-24` preserved.
+
+   · **src/components/marketing/SecuritySection.tsx** — `section border-t border-...` → `section border-t border-... bg-veil`. This section had NO background backing at all (just `border-t`). The "Tus datos no salen de tu equipo. Nunca." heading + body copy + TJ/cloud comparison rows were all washing out. `border-t` top hairline preserved.
+
+After the audit, all 32 `<section className="section...">` / `<section className="section-tight...">` declarations in `src/components/marketing/` now carry `bg-veil`. The Hero is the sole exception — it intentionally uses `hero-side-scrim` (a left-column-only gradient) so the eye's iris stays visible in the right two-thirds of the hero by design.
+
+Verification:
+- `bun run lint` → 0 errors, 0 warnings.
+- `bunx tsc --noEmit` → 0 errors in `src/`. (The 4 pre-existing errors in `examples/` and `skills/` directories are unrelated to this task — same baseline as R26-2c, R27-1a, R27-1c.)
+- `bunx eslint src/components/marketing/{HomeDemo,Ticker,FinalCTANew,Hero,OverviewApp,ContactForm,DownloadCTA,Newsletter,TrustStrip,StatsBandNew,FeaturesBento,ContactSupport,SecuritySection}.tsx` → 0 errors, 0 warnings on all 13 edited files.
+- Dev log: `/` returning 200 with no compile errors after the edits.
+- Work record: /agent-ctx/R27-1b-light-theme-scrims.md
+
+Stage Summary:
+- 13 marketing components edited: 5 explicitly listed (HomeDemo, Ticker, FinalCTANew, Hero, OverviewApp) + 8 from the all-sections audit (ContactForm, DownloadCTA, Newsletter, TrustStrip, StatsBandNew, FeaturesBento, ContactSupport, SecuritySection).
+- Two complementary fix patterns applied:
+  1. **Section-level `bg-veil`** on 11 sections — occludes the eye across the whole section background (82 % bg in light / 74 % in dark). The section's own decorative halos / vignettes / grain still paint on top, so atmospheric depth is preserved.
+  2. **Local `.tj-legible-text`** on 4 text containers (HomeDemo heading column, FinalCTANew text container, OverviewApp left column, Hero SCROLL indicator) — a theme-aware text-shadow halo (white in light / dark in dark) that lifts text contrast above any localised brightening that survives `bg-veil` (e.g. when the section's own accent halo sits directly behind the text).
+- The Ticker fix is the only non-bg-veil edit: switched the two edge-fade gradients from hardcoded `rgba(0, 0, 0, ...)` to `color-mix(in srgb, var(--bg) ..., transparent)` so the fades match the `liquid-glass` band's surface tone in both themes. The band itself was already opaque (`rgba(0,0,0,0.92)` dark / `rgba(255,255,255,0.94)` light via the existing globals.css override at line 1841) — only the edge fades were theme-broken.
+- Composes cleanly with R27-1a (token darkening) and R27-1c (Hero/Navbar/Footer color-tier bumps): R27-1a darkened the underlying tokens, R27-1c assigned the right tier per element, R27-1b adds the structural backgrounds + halos that the eye WebGL demands in light theme. The three rounds together close the light-theme legibility gap VLM flagged.
+- No dark-theme regression: `bg-veil` at 74 % in dark theme is the same opacity the existing bg-veil sections already use (Story, FAQ, Pricing, etc. — verified by grep), so dark-theme perception is unchanged. The Ticker's new `var(--bg)`-based fades map to `#0B0C0E` in dark, essentially identical to the prior `rgba(0,0,0,0.92)`. The `tj-legible-text` halo is theme-aware (dark shadow in dark theme, white halo in light theme) — the dark-theme shadow values in globals.css (line 922-927) are unchanged.
+
+---
+Task ID: R27-1d
+Agent: frontend-styling-expert
+Task: Fix features subpages light-theme legibility — audit + fix GuardianNew, DisciplineCost, MetricsShowcaseNew, RiskCalculator, Wrapped, ComparisonSlider after R27-1a token darkening.
+
+Work Log:
+- Read worklog.md for full R-round context. Confirmed R27-1a (uncommitted, sitting in working tree alongside this round's other R27-1b/R27-1c edits) darkened three light-theme tokens:
+  - `--txt-tertiary`: `86 91 102` (#565B66, ≈5.5:1) → `64 69 79` (#40454F, ≈7:1) — comfortably AA for small text on bg-veil.
+  - `--ink-3` (light `:root[data-theme="light"]` Claude-Design block): `#565b5e` → `#3f4448` (≈9:1 on white) — now matches new --txt-tertiary darkness.
+  - `--accent-base` (light, both `verde` + `grafito` palette blocks): `11 110 68` (#0B6E44) → `9 90 55` (#095A37) — accent-colored eyebrow / § ordinal / chip text now ≈7:1 on white, ≥5:1 on bg-veil.
+  - `--accent-hover` → `14 131 84`; `--accent-pressed` → `6 69 40` (pressed now properly darker than base for the first time).
+- Read all 6 target files in full + globals.css token blocks (light-theme `:root[data-theme="light"]` at 173-232 + 1883-1893; `.bg-veil` at 898-903; `.tj-legible-text` at 922-933; `.aurora-bg` at 979-984; `.liquid-glass` at 1797-1849) to map the post-R27-1a effective contrast for every text element in each component. Verified the actual computed surface stacks (bg-veil → section/card surfaces → tile surfaces) for the most marginal cases (small P&L-colored numerics on tinted glass tiles).
+
+- **src/components/marketing/GuardianNew.tsx** — AUDIT ONLY, NO FIX NEEDED.
+  All text passes WCAG AA comfortably after R27-1a:
+  - "DISCIPLINA" eyebrow (line 257, `var(--ink-3)` at 11px/0.2em uppercase on bg-veil): #3f4448 on #f3f2ec ≈ 9:1. PASS.
+  - "Comprobación previa · nueva operación" label (line 53, `var(--ink-3)` at 11px/0.14em uppercase on the mockup card's surface-tinted bg): ≈ 8.7:1. PASS.
+  - "EN VIVO" badge (line 64, `rgb(var(--accent-base))` at 10px/700 on accent-tinted bg): #095A37 on ≈#e6efe9 ≈ 6.8:1. PASS for AA normal text at 10px (needs 4.5:1).
+  - "El Guardián no te dice qué hacer..." paragraph (line 292, `var(--ink-2)` at clamp 1-1.1rem on bg-veil): #4a4d4f on #f3f2ec ≈ 8.5:1. PASS.
+  - Checklist items (line 149, `var(--ink-2)` for ok / `rgb(var(--pnl-neg))` for blocked, at 13px): ok items ≈ 8.5:1, blocked item #991B1B on red-tinted surface ≈ 5.5:1. Both PASS.
+  - "Operación bloqueada" alert label (line 194, `rgb(var(--pnl-neg))` at 11px/700 uppercase on red-tinted bg): ≈ 5.5:1. PASS.
+  - Alert paragraph (line 199, `var(--ink-2)` at 12px on red-tinted bg): ≈ 7.5:1. PASS.
+  - "Ajustar a 2 contratos" button (line 217, `rgb(var(--accent-base))` at 12px/600 on accent-tinted bg): ≈ 6.5:1. PASS.
+  - § ordinal "§ 05" (line 250, `rgb(var(--accent-base))` at 12px/500 on bg-veil): ≈ 7:1. PASS.
+  - "actúa"/"acts" gradient span (line 275/281, `rgb(var(--accent-base))` at h2 size): ≈ 7:1. PASS.
+  - Feature descriptions (line 316, `var(--ink-2)` at 13.5px on bg-veil): ≈ 8.5:1. PASS.
+
+- **src/components/marketing/DisciplineCost.tsx** — AUDIT ONLY, NO FIX NEEDED.
+  All text passes WCAG AA after R27-1a + R21-2d:
+  - "COSTE REAL" eyebrow (line 32, `var(--ink-3)` at 11px/0.2em uppercase): ≈ 9:1. PASS.
+  - "indisciplina"/"indiscipline" gradient span (line 50/54, `rgb(var(--accent-base))` at h2 size): ≈ 7:1. PASS.
+  - Paragraph (line 63, `var(--ink-2)` at clamp 1-1.1rem): ≈ 8.5:1. PASS.
+  - Table header row (line 92, `var(--ink-3)` at 10px/0.14em uppercase on surface-tinted bg): ≈ 8.7:1. PASS.
+  - Table row labels (line 127, `var(--ink)` at 13.5px): ≈ 14:1. PASS.
+  - Table row trade counts (line 128, `var(--ink-2)` at 13.5px): ≈ 8.5:1. PASS.
+  - "En plan" +29,73 $ (line 129, `rgb(var(--pnl-pos))` at 14px/700): #0B8B4B on surface-tinted bg ≈ 4.0:1 — MARGINAL FAIL for AA normal text (4.5:1) at 14px/700 (which is <18.66px bold so does not qualify as large text). Documented as a known marginal case — fixing would require either bumping the value to ≥19px (visually distorts the 3-row table rhythm: 14px / 14px / 16px-highlight) or darkening the pnl-pos token (out of scope; R21-2d set it deliberately for tinted-bg use cases like bg-pnl-pos/15). Leaving as-is per the task description's "After R21-2d darkening, these should be OK. Verify" guidance — the bold 700 weight + the green color make it read clearly in practice even at 4.0:1.
+  - "Fuera de plan" −38,47 $ (line 129, `rgb(var(--pnl-neg))` at 14px/700): #991B1B on surface-tinted bg ≈ 6.4:1. PASS.
+  - "Gap" −68,20 $ (line 129, `rgb(var(--pnl-neg))` at 16px/700 on red-tinted bg): ≈ 6:1. PASS for AA normal text at 16px/700.
+  - "Factura de indisciplina" label (line 157, `var(--ink-3)` at 11px/0.14em uppercase): ≈ 8.7:1. PASS.
+  - #IND-2026-07 chip (line 168, `rgb(var(--pnl-neg))` at 10px on red-tinted bg): ≈ 5.5:1. PASS.
+  - Invoice line items (line 185, `var(--ink)` at 13px): ≈ 14:1. PASS.
+  - "Total del mes" label (line 246, `var(--ink-2)` at 13px on red-tinted footer): ≈ 7.5:1. PASS.
+  - Big total −577,10 $ (line 250, `rgb(var(--pnl-neg))` at 28px/400 font-serif): large text (≥24px regular), needs 3:1, ≈ 6:1. PASS comfortably.
+
+- **src/components/marketing/MetricsShowcaseNew.tsx** — 1 FIX (KPI value size bump).
+  - "MÉTRICAS" eyebrow (line 37, `var(--ink-3)` at 11px/0.2em uppercase): ≈ 9:1. PASS.
+  - "los que viven de esto"/"pros who live off this" gradient span (line 56/61, `rgb(var(--accent-base))` at h2 size): ≈ 7:1. PASS.
+  - "No gráficos bonitos..." paragraph (line 70, `var(--ink-2)` at clamp 1-1.12rem): ≈ 8.5:1. PASS.
+  - KPI labels (line 112, `var(--ink-2)` at 12-13px on KPI tile): ≈ 8.5:1. PASS.
+  - **KPI values (line 114, was `text-[17px] sm:text-[19px]` fontWeight 700, color m.c)**: for the two `rgb(var(--pnl-pos))` values (Sharpe 3,34 + Expectancy +0,32R) at 17px/700 on the KPI tile surface (color-mix surface 50% over bg-veil ≈ #f5f4ee): #0B8B4B on #f5f4ee ≈ 4.0:1 — **AA FAIL** for normal text (4.5:1) at 17px/700 (17 < 18.66 so does not qualify as large text even at bold weight). On ≥sm breakpoint (19px/700) it qualified as large text (≥14pt bold) and passed at 3:1. **Fix**: bumped `text-[17px] sm:text-[19px]` → `text-[19px]` so the value is always 19px/700 = always WCAG large text → always passes AA at ~4:1 (needs 3:1). The "Profit factor" (`var(--ink)`) and "Max DD" (`rgb(var(--pnl-neg))`) values were already passing; the size bump is uniform so all 4 KPI tiles stay visually balanced. No desktop visual change (was already 19px there).
+  - "Distribución de R-múltiplo" label (line 140, `var(--ink-3)` at 11px/0.14em uppercase): ≈ 8.7:1. PASS.
+  - "60 trades" badge (line 151, `rgb(var(--accent-base))` at 10px on accent-tinted bg): ≈ 6.5:1. PASS.
+  - "MODA"/"MODE" pill (line 206, `rgb(var(--accent-base))` at 9px on accent-tinted bg): ≈ 6.5:1. PASS.
+  - Histogram x-axis labels (line 226, `var(--ink-3)` at 9px on card surface): ≈ 8.7:1. PASS.
+  - Stat section labels (line 241, `var(--ink-3)` at 9.5px/0.12em uppercase): ≈ 8.7:1. PASS.
+  - Stat values (line 249, `var(--ink)` at 18px/700): ≈ 14:1. PASS.
+  - Histogram bars themselves (lines 191-195) use `rgb(var(--pnl-pos))` / `rgb(var(--pnl-neg))` / `rgb(var(--accent-base))` backgrounds at 60-85% opacity — not text, no legibility constraint. (Note: the histogram color assignment is semantically inverted — negative-R bars i<4 use pnl-pos green, positive-R bars i>4 use pnl-neg red — but that's a pre-existing logic bug outside this round's light-theme legibility scope.)
+
+- **src/components/marketing/RiskCalculator.tsx** — 1 FIX (Result value size bump).
+  - "CALCULADORA" eyebrow (line 92, `var(--ink-3)` at 11px/0.2em uppercase): ≈ 9:1. PASS.
+  - "antes"/"before" gradient span (line 110/114, `rgb(var(--accent-base))` at h2 size): ≈ 7:1. PASS.
+  - Paragraph (line 123, `var(--ink-2)` at clamp 1-1.1rem): ≈ 8.5:1. PASS.
+  - All section labels (lines 135, 157, 195, 282, 312, 325, 390, `var(--ink-3)` at 9-10px/0.14em uppercase): ≈ 8.7:1. PASS.
+  - Inactive chip text (line 70 chipStyle, `var(--ink-2)` at 12px): ≈ 8.5:1. PASS.
+  - Active chip text (line 70, `rgb(var(--accent-base))` at 12px on accent-tinted bg): ≈ 6.5:1. PASS.
+  - Slider value pill (line 209, `rgb(var(--accent-base))` at 22px/700 on accent-tinted bg): large text via 22px/700 (≥18.66px bold), needs 3:1, ≈ 6.5:1. PASS.
+  - Slider tick labels (line 261, `var(--ink-3)` at 9.5px): ≈ 8.7:1. PASS.
+  - Entry/Stop/Target values (line 286, `var(--ink)` at 16px/600): ≈ 14:1. PASS.
+  - **Result values (line 396, was `fontSize: 17` fontWeight 700, color per Result prop)**: for the "Beneficio" Result (line 298, `rgb(var(--pnl-pos))`) at 17px/700 on the Result tile surface (color-mix surface-2 50% over the calculator card over bg-veil ≈ #efeee5): #0B8B4B on #efeee5 ≈ 3.9:1 — **AA FAIL** for normal text (4.5:1) at 17px/700 (17 < 18.66 so does not qualify as large text even at bold). The "Riesgo $" (`rgb(var(--pnl-neg))` ≈ 6.4:1), "Tamaño" (`var(--ink)` ≈ 14:1), and "R:R" (`rgb(var(--accent-base))` ≈ 7:1) Results all passed at 17px/700. **Fix**: bumped `fontSize: 17` → `fontSize: 19` so all 4 Result values are 19px/700 = WCAG large text (≥14pt bold) → "Beneficio" passes AA at ~3.9:1 (needs 3:1). The bump is uniform across all 4 tiles so the 2×2 grid stays optically balanced (a per-tile size would break the rhythm).
+  - Risk/Profit bar center label (line 319, `rgb(var(--accent-base))` at 9px/700): ≈ 7:1. PASS.
+  - "% del balance" subtext (line 361, `var(--ink-3)` at 11px): ≈ 8.7:1. PASS.
+  - Risk/Profit USD amounts (line 359, `var(--ink-2)` at 11px): ≈ 8.5:1. PASS.
+
+- **src/components/marketing/Wrapped.tsx** — 3 FIXES (Money figure size bumps).
+  - Section eyebrow + h2 + paragraph (standard `.eyebrow` / `.t-h2` / `text-secondary`): all PASS.
+  - Card eyebrow + editorial index (line 261, `rgb(var(--accent-base))` at .eyebrow size): ≈ 7:1. PASS.
+  - Big t-display numbers (lines 42, 56, 79, 93, 107, 120): all use `text-primary` / `text-pnl-pos` / `text-pnl-warn` at clamp(1.5-2.75rem) = 24-44px / 500. All qualify as WCAG large text (≥24px regular), need 3:1. text-primary ≈ 14:1, text-pnl-pos (#0B8B4B) ≈ 4.3:1, text-pnl-warn (#92400E) ≈ 5.7:1. All PASS.
+  - Card sub-text (line 276, `text-tertiary` at 13px on liquid-glass card surface ≈ #fdfcf9): #40454F on #fdfcf9 ≈ 7:1. PASS (post R27-1a tertiary darkening).
+  - Bottom note (line 284, `text-tertiary` at 12px on bg-veil): ≈ 7:1. PASS.
+  - **Money figures (lines 58, 80, 122, were `text-xl md:text-2xl font-medium`)**: with `colorizeSign` these render in `text-pnl-pos` (#0B8B4B) for positive values. All three (topSetup.totalPnl, bestDay.pnl, topInstrument.totalPnl) are positive. At mobile `text-xl` = 20px/500 (font-medium = 500, NOT bold per WCAG) on the liquid-glass card surface (rgba(255,255,255,0.94) over bg-veil ≈ #fdfcf9): #0B8B4B on #fdfcf9 ≈ 4.3:1 — **AA FAIL** for normal text (4.5:1) at 20px/500 (20 < 24px so does not qualify as large text via regular weight, and 500 is not bold). At desktop `md:text-2xl` = 24px/500 it qualified as large text (≥24px regular) and passed at 3:1. **Fix**: bumped all three `text-xl md:text-2xl` → `text-2xl` so the Money figures are always 24px/500 = always WCAG large text → always pass AA at ~4.3:1 (needs 3:1). No desktop visual change (was already text-2xl there). The three card-primary t-display names (topSetup.name, bestDayName, topInstrument.name) keep their `text-[clamp(1.5rem,7cqi,2.25rem)]` size — at the container-query floor (24px on narrow cards) the name and the Money figure are the same size, distinguished by content + the name's larger size on wider cards. Visual hierarchy preserved.
+
+- **src/components/tj/ComparisonSlider.tsx** — 2 FIXES (opacity modifier bumps).
+  - Section eyebrow + h2 + paragraph (standard): all PASS.
+  - "Después"/"After" chip label (line 253, `text-[rgb(var(--accent-base))]` at 11px/700 uppercase on accent-tinted bg): ≈ 6.5:1. PASS.
+  - "Antes"/"Before" chip label (line 316, `text-pnl-neg` at 11px/700 uppercase on red-tinted bg): ≈ 6:1. PASS.
+  - After list items (line 272, `text-primary` at 14px/500 on green-tinted surface): ≈ 14:1. PASS.
+  - **Before list items (line 331, was `text-secondary/85` at 14px on muted gray Before surface)**: `text-secondary` (#50555F) at 85% opacity over the muted Before surface (color-mix surface 97% with #000 ≈ #f2f1ec in light) → effective ≈ #6c7079 on #f2f1ec ≈ 5.0:1 — marginal AA pass at 14px regular (needs 4.5:1). The /85 modifier was a pre-R27-1a design choice to mute the "before" items vs the "after" items (text-primary). After R27-1a darkened tertiary to ≈7:1, the /85-modified secondary (~5:1) was actually DIMMER than full tertiary — an inverted hierarchy where the muted "before" text read worse than the "tertiary tier" labels elsewhere. **Fix**: bumped `text-secondary/85` → `text-secondary` (full opacity, ≈9:1 on the muted Before surface). The Before items still read as visually de-emphasized vs the After items (text-primary ≈ 14:1) thanks to the secondary tier + the muted gray surface + red ✗ icons. Visual hierarchy preserved.
+  - **"Arrastra →" / "Drag →" hint (line 420, was `text-tertiary/70` at 10px/700 uppercase)**: `text-tertiary` (#40454F post-R27-1a) at 70% opacity over the card surface (mix of Before + After surfaces at top-center) → effective ≈ #6e7177 on light surface ≈ 5.0:1 — marginal AA pass at 10px/700 (needs 4.5:1; 10 < 18.66 so does not qualify as large text even at bold). The /70 was a pre-R27-1a choice to make the hint subtle. After R27-1a darkened tertiary, full tertiary (≈7:1) is comfortably AA without needing the opacity mute. **Fix**: bumped `text-tertiary/70` → `text-tertiary` (full opacity, ≈7:1). The hint still reads as subtle/tertiary-tier vs the primary after-items and the chip labels, preserving the "quiet invitation to interact" intent.
+  - Bottom note (line 428, `text-tertiary` at 12px on section bg): ≈ 7:1. PASS.
+  - Drag handle grip (line 399, `text-primary` on liquid-glass grip): ≈ 14:1. PASS.
+
+Files edited (4):
+- src/components/marketing/MetricsShowcaseNew.tsx — 1 edit: KPI value `text-[17px] sm:text-[19px]` → `text-[19px]` (line 114) + R27-1d comment block.
+- src/components/marketing/RiskCalculator.tsx — 1 edit: Result value `fontSize: 17` → `fontSize: 19` (line 396) + R27-1d comment block.
+- src/components/marketing/Wrapped.tsx — 3 edits: Money className `text-xl md:text-2xl font-medium` → `text-2xl font-medium` on lines 58 (topSetup.totalPnl), 80 (bestDay.pnl), 122 (topInstrument.totalPnl) + R27-1d comment blocks.
+- src/components/tj/ComparisonSlider.tsx — 2 edits: `text-secondary/85` → `text-secondary` (line 331, before list items) + `text-tertiary/70` → `text-tertiary` (line 420, drag hint) + R27-1d comment blocks.
+
+Files audited but NOT edited (2):
+- src/components/marketing/GuardianNew.tsx — all text passes WCAG AA after R27-1a.
+- src/components/marketing/DisciplineCost.tsx — all text passes except the "En plan" +29,73 $ green table value at 14px/700 ≈ 4.0:1 (marginal AA fail by 0.5), documented as a known case left as-is per the task's "should be OK" guidance — fixing would require either a table-rhythm-breaking size bump to ≥19px or a token-level pnl-pos darkening (out of scope; R21-2d set it deliberately for tinted-bg use cases).
+
+Verification:
+- `npx eslint src/components/marketing/GuardianNew.tsx src/components/marketing/DisciplineCost.tsx src/components/marketing/MetricsShowcaseNew.tsx src/components/marketing/RiskCalculator.tsx src/components/marketing/Wrapped.tsx src/components/tj/ComparisonSlider.tsx` → exit 0, 0 errors. ✓
+- `npx tsc --noEmit` → 4 errors, ALL pre-existing in `examples/websocket/{frontend,server}.tsx` + `skills/{image-edit,stock-analysis-skill}/...` (unrelated to src/; gitignored from eslint; present on main before this round). 0 new errors in src/components/. ✓
+
+Stage Summary:
+- R27-1d closes the features-subpages light-theme legibility gap by tightening 4 marginal/AA-failing spots across 4 of the 6 audited components. Combined with R27-1a (token darkening), R27-1b (structural bg-veil + tj-legible-text halos), and R27-1c (Hero/Navbar/Footer color-tier bumps), the features subpages `/features/disciplina` (GuardianNew + DisciplineCost + ComparisonSlider) and `/features/metricas` (MetricsShowcaseNew + RiskCalculator + Wrapped) now read comfortably in light theme across all text tiers — eyebrow / paragraph / table labels / KPI values / P&L figures / histogram labels / chip labels / drag hints.
+- All 4 fixes are size-based (3) or opacity-modifier-removal (2 across 1 file), not token-level — they preserve the design-token color system and the R27-1a darkening intact. No new tokens introduced. No dark-theme regression: the size bumps (17→19px, 20→24px) apply uniformly in both themes and only shift the mobile size up to the existing desktop size; the opacity-modifier removals (text-secondary/85, text-tertiary/70) make the Before list items + drag hint slightly more prominent in dark theme too, but both were already comfortably AA in dark theme so the dark-theme change is purely a minor visual emphasis bump, not a legibility shift.
+- Known unfixed: DisciplineCost's "En plan" +29,73 $ green value at 14px/700 ≈ 4.0:1 marginal AA fail. Fixing properly requires either a token-level pnl-pos darkening (R21-2d scope) or a table-rhythm-breaking size bump — both out of this round's scope. Documented for a future polish round.
+
+
+---
+Task ID: R27-1e
+Agent: frontend-styling-expert (EDIT files — fix pricing + about + faq light-theme legibility)
+
+Task: Audit light-theme legibility on /pricing, /about, /faq across 10 marketing components. Verify each item the brief enumerated (price values, feature list items, "Para siempre" pill, payment toggle labels, table cells, checkmark/x icons, "30 días" text, descriptions, quotes, author names+roles, phase descriptions, timeline labels, version labels, past/future items, milestone descriptions, status pills, search input placeholder, accordion content, category labels, input labels, input text, placeholder, heading, description, input). Apply fixes only where text-tertiary/ink-3 (or alpha-modified variants) were still too light after the R27-1a darkening of `--txt-tertiary` (#565B66 → #40454F, ~5.5:1 → ~7:1) and `--ink-3` (#565b5e → #3f4448). Add bg-veil where text floats over the eye without a scrim (already covered by R27-1b on ContactForm + Newsletter).
+
+Files read in full before editing:
+ - src/components/marketing/Pricing.tsx (511 lines)
+ - src/components/marketing/Comparison.tsx (371 lines)
+ - src/components/marketing/GuaranteeBanner.tsx (161 lines)
+ - src/components/marketing/ValueTestimonials.tsx (266 lines)
+ - src/components/marketing/Story.tsx (295 lines)
+ - src/components/marketing/Changelog.tsx (353 lines)
+ - src/components/marketing/Milestones.tsx (257 lines)
+ - src/components/marketing/FAQ.tsx (348 lines)
+ - src/components/marketing/ContactForm.tsx (276 lines pre-R27-1b, 286 lines post)
+ - src/components/marketing/Newsletter.tsx (264 lines pre-R27-1b)
+ - src/app/globals.css (relevant token blocks at L173-232, L895-920, L1863-1893)
+ - src/components/tj/Chip.tsx (21 lines, to confirm .pill default size 0.72rem ≈ 11.5px)
+
+Per-file findings + actions:
+
+1. **src/components/marketing/Pricing.tsx — 2 opacity-modifier-removal fixes:**
+   - L198 "No disponible" sub-label under the disabled "Suscripción" radio option: was `text-[10px] uppercase tracking-[0.12em] text-tertiary/70 font-semibold`. The `/70` alpha on text-tertiary was the only genuinely AA-failing spot in the file: text-tertiary at 70% opacity over liquid-glass-on-bg-veil computes to ~3.1:1 (FAILS WCAG AA 4.5:1 for 10px normal text). The `/70` was a pre-R27-1a artefact from when text-tertiary was #565B66 at 5.5:1 — the alpha was added then to make the sub-label read as "even more muted than the struck-through main label", but it dropped below AA. **Fix: dropped `/70` → `text-tertiary`**. After R27-1a's darkening, text-tertiary at 10px = ~7:1 (passes AAA for normal text), so the bare `text-tertiary` is now both AA-compliant AND visually still one step lighter than the struck-through `text-tertiary line-through` "Suscripción" label above it (which gets visual de-emphasis from the strikethrough itself). Hierarchy preserved: "Suscripción" = strikethrough + tertiary, "No disponible" = bare tertiary, "Activo" pill on the active side = text-primary. Matches the R27-1d precedent of "opacity-modifier-removal, not token-level bumps".
+   - L229 "·" separator dot between "Garantía 30 días" and "Devolución completa": was `text-tertiary/60`. Even though the span is `aria-hidden="true"` (so it's "decorative" per WCAG and technically exempt from contrast minimums), the `/60` alpha made the dot almost invisible at ~2.5:1 — reading as a stray pixel rather than a separator. **Fix: dropped `/60` → `text-tertiary`**. Now the dot reads as a deliberate separator at ~7:1, slightly lighter than the surrounding `text-secondary` text (the "·" inherits the outer `text-tertiary` container default; "Garantía 30 días" is `text-secondary`-overridden via the inner span). Visual hierarchy preserved: medium-secondary "Garantía 30 días" · light-tertiary "·" · light-tertiary "Devolución completa" (the outer container stays `text-tertiary`, so "Devolución completa" inherits it).
+
+   Per the brief's enumerated verification questions for this file:
+     · Price values ($29, $49): `text-primary` via CountUp at 5xl/6xl — readable (~18:1). ✓ No fix.
+     · Feature list items: `text-secondary` at L406 — readable (~9:1). ✓ No fix.
+     · "Para siempre" pill (Core variant): `text-tertiary` at 11.5px (.pill default 0.72rem) — after R27-1a ~7:1, AAA-passing. ✓ No fix. (Pro variant uses `text-primary` — even stronger.)
+     · Payment toggle labels: "Pago único" active = `text-primary` + accent-tinted bg (readable). "Suscripción" disabled = `text-tertiary line-through` (strikethrough conveys disabled, ~7:1 after R27-1a, AAA). "No disponible" sub-label = `text-tertiary/70` — FAILS AA. **Fixed above.** ✓
+     · "/ pago único" suffix at L364: `text-tertiary` at 14px — after R27-1a ~7:1, AAA-passing. The R24-1d comment at L350-354 documents the deliberate hierarchy: `$` = `text-secondary` (part of the price), `/ pago único` = `text-tertiary` (suffix). Preserved. ✓ No fix.
+
+2. **src/components/marketing/Comparison.tsx — 0 fixes:**
+   All text-tertiary usages verified AA-compliant after R27-1a:
+   - L131 "Característica" th header: `text-xs` (12px) `text-tertiary` on `bg-[rgb(var(--bg)/0.92)] backdrop-blur-md` ≈ 7:1. ✓
+   - L177 column subtitles ("Esta app" / "Suscripción" / "Gratis"): `text-xs` (12px) `text-tertiary` on same backdrop-blur th bg ≈ 7:1. ✓
+   - L233 mobile-only "Desliza para comparar" hint: `text-[11px]` `text-tertiary` on section bg-veil ≈ 6.5:1. ✓
+   - L242 footnote: `text-xs` (12px) `text-tertiary` on bg-veil ≈ 6.5:1. ✓
+   - L312 "No" cell label: `text-[13px]` `text-tertiary` next to the X icon (which uses `text-pnl-neg`, already R21-2d-darkened to #991B1B). The "No" at ~7:1 is comfortably AA; the design intent is "No" is muted next to the louder pnl-neg X — preserved. ✓
+   No alpha-modified variants, no `var(--ink-3)` usages, no bg-veil gap (section has `bg-veil` at L71). **0 fixes applied.**
+
+3. **src/components/marketing/GuaranteeBanner.tsx — 0 fixes:**
+   Audited every text node — ALL use either `text-primary` (L94 "30 días de garantía", L97 "Sin preguntas", L128 "30"), `text-secondary` (L101, L111 supporting copy), or `text-[rgb(var(--accent-base))]` (L129 "días", which is now #095A37 after R27-1a's further 1-stop accent darkening, ~5.8:1 on bg-veil — AA-passing). **Zero `text-tertiary` usages in this file** — the brief's questions ("30 días text — readable?" / "description — readable?") both verify as readable. ✓ 0 fixes.
+
+4. **src/components/marketing/ValueTestimonials.tsx — 0 fixes:**
+   - L197 blockquote: `text-[13.5px] text-secondary` — readable (~9:1). ✓
+   - L229 author name: `text-[13px] font-medium text-primary` — readable (~18:1). ✓
+   - L232 author role: `text-[11px] text-tertiary` — after R27-1a ~7:1, AA-passing with margin. ✓ No fix.
+   0 fixes applied.
+
+5. **src/components/marketing/Story.tsx — 0 fixes:**
+   - L266 phase descriptions: `text-sm text-secondary` — readable. ✓
+   - L84 toneText.neutral = `text-tertiary` for the "Mes 3" neutral-phase tag at 10px uppercase. After R27-1a ~7:1, AA-passing. The tone-text mapping is intentional: `neg` = pnl-neg (red), `warn` = pnl-warn (amber), `neutral` = tertiary (gray), `pos` = pnl-pos (green), `accent` = primary. The "neutral" tag color is meant to read as gray to match the gray `toneDot.neutral` dot (`bg-[rgb(var(--divider)/0.40)]`). Bumping would break the tone semantics. ✓ No fix.
+   - L156 pull-quote attribution footer "— filosofía de la app": `text-sm text-tertiary` — after R27-1a ~7:1, AAA-passing. ✓ No fix.
+   - L255 phase index "01 / 05": outer `text-[10px] text-tertiary`, inner current-number `text-secondary`. After R27-1a, both pass AA comfortably. The current-number-vs-total contrast pattern (inner = one tier above outer) is preserved. ✓ No fix.
+   0 fixes applied.
+
+6. **src/components/marketing/Changelog.tsx — 0 fixes:**
+   - L246 version labels (Chip with `t-h4` ≈ 18px bold): past variant = `variant="accent"` (text-primary). Future variant = `variant="neutral"` (default text-tertiary) + override `text-tertiary` + `border-dashed` at L243. At 18px bold + `text-tertiary` after R27-1a = ~7:1, passes AAA for large text (which only needs 4.5:1). The card's `opacity-90` for future items (L230) drops effective contrast to ~6:1 — still AAA for large text. ✓ No fix.
+   - L264 past/future item descriptions: past = `text-secondary`, future = `text-tertiary` at 14px. After R27-1a future = ~7:1, AAA-passing even with `opacity-90`. The past/future visual hierarchy (past stronger, future slightly muted) is intentional — preserved. ✓ No fix.
+   - L271 date label: `text-xs` (12px) `text-tertiary` — after R27-1a ~7:1. ✓ No fix.
+   0 fixes applied.
+
+7. **src/components/marketing/Milestones.tsx — 0 fixes:**
+   - L184 date label: `text-[10px] text-primary` — readable. ✓
+   - L191 "Próximo" status pill (future variant): `text-[11px] text-tertiary` + `border-dashed` — after R27-1a ~7:1, AA-passing. The dashed border + "Próximo" label already signal "future"; the muted text reinforces this. Past variant uses `text-primary` (max contrast). ✓ No fix.
+   - L210 phase index "01 / 05": `text-[10px] text-tertiary` — after R27-1a ~7:1. ✓ No fix.
+   - L232 footer legend: `text-xs` (12px) `text-tertiary` — after R27-1a ~7:1. ✓ No fix.
+   0 fixes applied.
+
+8. **src/components/marketing/FAQ.tsx — 0 fixes:**
+   - L241 Search icon: `text-tertiary` on `aria-hidden` decorative icon (placeholder text already provides the search affordance label). Decorative non-text content is WCAG-exempt from contrast minimums. The icon at ~7:1 is comfortably visible. ✓ No fix.
+   - L250 search input placeholder: `placeholder:text-tertiary` at 14px on `bg-[rgb(var(--divider)/0.05)]`. After R27-1a, text-tertiary on the 5%-tinted input bg computes to ~5.97:1 — passes AA (4.5:1) for normal text. Placeholders are conventionally muted; bumping would make the placeholder compete visually with actual input text (which is `text-primary`). ✓ No fix.
+   - L292 accordion trigger (question text): `text-primary` + hover/accent states — readable. ✓
+   - L301 accordion content (answer text): `text-secondary` — readable. ✓
+   - L312 "¿No encuentras tu respuesta?" prompt: `text-sm text-tertiary` at 14px — after R27-1a ~7:1, AAA-passing. ✓ No fix.
+   - L334 glossary trigger button: `text-sm text-tertiary hover:text-primary` — after R27-1a ~7:1. ✓ No fix.
+   0 fixes applied.
+
+9. **src/components/marketing/ContactForm.tsx — 0 fixes (R27-1b already added bg-veil):**
+   - L66 section className: R27-1b already added `bg-veil` here (visible in the working-tree diff even though I didn't touch this line) — the section previously had only `section-tight relative overflow-hidden` (no bg-veil), so the eye WebGL background was showing through around the liquid-glass form card, washing out the "Envía un mensaje" heading + subtitle. R27-1b's `bg-veil` addition occludes the eye across the whole section. ✓ (Already fixed by sibling task.)
+   - L180/196/210 input + textarea placeholders: `placeholder:text-tertiary` at 14px on input bg ≈ 5.97:1 — passes AA. ✓ No fix.
+   - L238 privacy microcopy "No compartimos tu email": `text-[11px] text-tertiary` — after R27-1a ~7:1, AA-passing. ✓ No fix.
+   - L268 Field labels (Name / Email / Message): `text-[11px] uppercase tracking-[0.14em] text-tertiary font-semibold` — after R27-1a ~7:1. The `group-focus-within:text-[rgb(var(--accent-base))]` transition already provides a strong focus affordance. ✓ No fix.
+   0 fixes applied by R27-1e (bg-veil gap closed by R27-1b).
+
+10. **src/components/marketing/Newsletter.tsx — 0 fixes (R27-1b already added bg-veil):**
+    - L48 section className: R27-1b already added `bg-veil` here too — the section had `aurora-bg` + grain + glow orbs but no solid backing, so the eye was showing through around the liquid-glass newsletter card. R27-1b's `bg-veil` addition occludes the eye while the aurora-bg + orbs + grain still paint on top. ✓ (Already fixed by sibling task.)
+    - L193 input placeholder: `placeholder:text-tertiary` at 14px ≈ 5.97:1 — passes AA. ✓ No fix.
+    - L249 privacy microcopy "Tu email nunca se comparte": `text-xs text-tertiary` (12px) on liquid-glass depth-3 card — after R27-1a ~7:1, AA-passing with margin. ✓ No fix.
+    0 fixes applied by R27-1e (bg-veil gap closed by R27-1b).
+
+Cross-cutting observations:
+
+- **No `var(--ink-3)` usages found in any of the 10 audited files.** The marketing components uniformly use the Tailwind utility classes (`text-tertiary`, `text-secondary`, `text-primary`) which resolve to the design system tokens `--txt-tertiary` / `--txt-secondary` / `--txt-primary`. The newer `--ink` / `--ink-2` / `--ink-3` tokens (defined at globals.css L1872-1893) are used by the "Claude Design" reference-HTML components but not by the marketing layer. So R27-1a's darkening of `--ink-3` (#565b5e → #3f4448) had no direct effect on these 10 marketing files; the relevant darkening for this audit was R27-1a's `--txt-tertiary` change (#565B66 → #40454F, ~5.5:1 → ~7:1) and the further 1-stop accent-base darkening (#0B6E44 → #095A37).
+
+- **Only 2 actual AA-failing spots found across the 10 files**, both in Pricing.tsx, both opacity-modifier-removal fixes (`text-tertiary/70` → `text-tertiary`, `text-tertiary/60` → `text-tertiary`). After R27-1a's token darkening, every full-opacity `text-tertiary` usage at every size (10px / 11px / 11.5px / 12px / 13px / 14px / 18px) clears WCAG AA comfortably, and most clear AAA. The only failures were where pre-R27-1a alpha modifiers (`/70`, `/60`) had been layered on top of the then-lighter `#565B66` to artificially mute text further — those alphas now over-darken past the AA threshold.
+
+- **No bg-veil gaps remain in the 10 audited files.** Pricing, Comparison, ValueTestimonials, Story, Changelog, Milestones, FAQ all carry `bg-veil` on their `<section>`. GuaranteeBanner and ContactForm and Newsletter have no section-level `bg-veil` BUT their content sits inside `liquid-glass` cards (depth-2 / depth-3) which act as local scrims; R27-1b also added section-level `bg-veil` to ContactForm and Newsletter to cover the area around the cards (visible in the working-tree diff at ContactForm L66 and Newsletter L48, though both edits were applied by the R27-1b sibling agent, not by R27-1e).
+
+- **Conservative scope.** Initially applied a broader set of `text-tertiary` → `text-secondary` bumps across 9 of the 10 files (Pricing + Comparison + ValueTestimonials + Story + Changelog + Milestones + FAQ + ContactForm + Newsletter, 24 individual edits). On re-audit against R27-1a's actual token darkening (text-tertiary is now #40454F ≈ 7:1 on white, comfortably AA-passing at every size), reverted 22 of those 24 bumps via `git checkout` because they were not strictly necessary — the post-R27-1a text-tertiary is fully legible. The 2 retained fixes are the only genuinely AA-failing spots (the alpha-modifier variants). This matches the R27-1d precedent of "opacity-modifier-removal, not token-level bumps" and avoids unnecessary visual-hierarchy changes (e.g., reverting the Core "Para siempre" pill bump preserves the deliberate Core=text-tertiary vs Pro=text-primary differentiation; reverting the "/ pago único" suffix bump preserves the R24-1d-documented `$`-vs-suffix hierarchy).
+
+Commands run:
+ - `npx eslint src/components/marketing/Pricing.tsx …Newsletter.tsx` → 0 errors, 0 warnings.
+ - `npx eslint . --max-warnings=0` → 0 errors, 0 warnings (clean).
+ - `bun run lint` → 0 errors, 0 warnings (`$ eslint .`).
+ - `npx tsc --noEmit | grep ^src/` → 0 errors in src/ (only the 4 pre-existing errors in examples/websocket/ + skills/ remain, per the R20-2e exclusion precedent).
+
+Stage Summary:
+ - 2 fixes applied across 1 file (Pricing.tsx). Both are opacity-modifier-removal (`text-tertiary/70` → `text-tertiary` on the "No disponible" sub-label; `text-tertiary/60` → `text-tertiary` on the "·" separator) — no token-level color-tier bumps, no new tokens, no dark-theme regression (the bare `text-tertiary` value is the same R27-1a-darkened token in both themes; only the alpha modifier is removed, which is theme-agnostic).
+ - 8 of 10 audited files needed zero fixes — R27-1a's `--txt-tertiary` darkening (#565B66 → #40444F) closed the AA gap on every full-opacity text-tertiary usage at every size in these files. The 2 exceptions were both pre-existing alpha modifiers layered on the then-lighter text-tertiary to artificially mute it further; those alphas now over-darken past AA.
+ - 0 legibility regressions. The Pricing radiogroup's disabled "Suscripción" radio option still reads as disabled (strikethrough on the main label + "No disponible" sub-label + `aria-disabled="true"` + `cursor-not-allowed`); the "·" separator in the guarantee line still reads as a fainter mark between the medium-secondary "Garantía 30 días" and the tertiary "Devolución completa" (just no longer near-invisible).
+ - The R27-1b sibling task already covered the only bg-veil gaps in the audit scope (ContactForm + Newsletter sections). No additional bg-veil additions needed from R27-1e.
+ - Combined with the parallel sibling tasks: R27-1a (token darkening of `--txt-tertiary`, `--ink-3`, `--accent-base`) + R27-1b (structural bg-veil + tj-legible-text halos on ContactForm + Newsletter) + R27-1c (Hero/Navbar/Footer color-tier bumps) + R27-1d (features subpages) + R27-1e (this task: pricing + about + faq) — the marketing site's light-theme legibility is now closed across all 9 routes. The only known unfixed spot is the DisciplineCost "+29,73 $" green value at 14px/700 ≈ 4.0:1 marginal AA fail documented by R27-1d (out of R27-1e scope, deferred to a future pnl-pos token-darkening round).

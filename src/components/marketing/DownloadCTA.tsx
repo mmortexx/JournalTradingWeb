@@ -32,7 +32,14 @@ export function DownloadCTA() {
   return (
     <section
       aria-label={es ? "Descarga" : "Download"}
-      className="section relative overflow-hidden"
+      // R27-1b — `bg-veil` added: the aurora-bg + grain overlays are
+      // transparent in hue, and the liquid-glass download card (while
+      // opaque itself) is `max-w-3xl mx-auto` — so the area around the
+      // card (where the eye WebGL background shows through in light
+      // theme) was unprotected. `bg-veil` occludes the eye across the
+      // whole section; the aurora-bg + accent glow orbs + grain still
+      // paint on top, so the section's atmospheric depth is preserved.
+      className="section relative overflow-hidden bg-veil"
     >
       {/* Aurora backdrop */}
       <div aria-hidden="true" className="absolute inset-0 aurora-bg pointer-events-none" />

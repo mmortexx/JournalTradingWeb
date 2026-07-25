@@ -440,7 +440,15 @@ export function Navbar() {
                       </span>
                       <span
                         className="mt-0.5 block text-[11.5px] leading-[1.4]"
-                        style={{ color: "var(--ink-3)" }}
+                        // R27-1c — bumped --ink-3 → --ink-2 (tertiary →
+                        // secondary). VLM flagged the megamenu descriptions
+                        // as borderline on the bright acrylic panel: at
+                        // 11.5px the tertiary token's ≈5.5:1 contrast
+                        // shrinks toward the WCAG floor once the panel's
+                        // 96 % surface tint + 24px blur are layered under
+                        // it. Secondary's ≈9:1 keeps the small descriptive
+                        // line safely legible in both themes.
+                        style={{ color: "var(--ink-2)" }}
                       >
                         {es ? item.descEs : item.descEn}
                       </span>
@@ -782,9 +790,17 @@ function UtcClock() {
       />
       <span
         className="tnum whitespace-nowrap"
-        style={{ fontSize: 11, letterSpacing: "0.04em", color: "var(--ink-3)" }}
+        // R27-1c — both the "UTC" label and the time value now use
+        // --ink-2 (text-secondary). Previously the label was --ink-3
+        // (tertiary) and only the time was secondary — VLM flagged the
+        // whole clock as pale green in light theme. The label + time
+        // are now a uniform secondary so the clock reads as one clean
+        // monospace token; the pulsing live dot above is the sole
+        // accent-green element (via --pnl-pos, darkened in R21-2d for
+        // light-theme contrast).
+        style={{ fontSize: 11, letterSpacing: "0.04em", color: "var(--ink-2)" }}
       >
-        UTC <span style={{ color: "var(--ink-2)" }}>{time}</span>
+        UTC <span>{time}</span>
       </span>
     </span>
   );

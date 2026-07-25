@@ -55,7 +55,14 @@ export function Wrapped() {
         <span className="flex flex-col gap-1 min-w-0">
           <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-pnl-pos break-words leading-tight">{topSetup.name}</span>
           <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum min-w-0">
-            <Money value={topSetup.totalPnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
+            {/* R27-1d — bumped text-xl→text-2xl (always 24px) so the green
+                P&L figure (text-pnl-pos #0B8B4B ≈ 4.3:1 on the liquid-glass
+                card surface) clears WCAG AA in light theme. At 20px/500
+                (text-xl) it failed AA normal-text (4.5:1); at 24px/500 it
+                qualifies as WCAG "large text" (≥24px regular) which only
+                requires 3:1. Desktop was already text-2xl so no visual
+                change there. */}
+            <Money value={topSetup.totalPnl} sign colorizeSign className="text-2xl font-medium whitespace-nowrap" />
             {/* R20-3b: added tnum so the `count` and `winRate` digits align
                 with the adjacent Money figure — mixed proportional /
                 tabular figures in the same baseline row looked jittery when
@@ -77,7 +84,9 @@ export function Wrapped() {
       value: (
         <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
           <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-primary whitespace-nowrap leading-tight">{bestDayName}</span>
-          <Money value={bestDay.pnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
+          {/* R27-1d — same text-xl→text-2xl bump as the setup card Money
+              above, for the same WCAG AA light-theme reason. */}
+          <Money value={bestDay.pnl} sign colorizeSign className="text-2xl font-medium whitespace-nowrap" />
         </span>
       ),
       sub: es
@@ -119,7 +128,9 @@ export function Wrapped() {
         <span className="flex flex-col gap-1 min-w-0">
           <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-primary break-words leading-tight">{topInstrument.name}</span>
           <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum min-w-0">
-            <Money value={topInstrument.totalPnl} sign colorizeSign className="text-xl md:text-2xl font-medium whitespace-nowrap" />
+            {/* R27-1d — same text-xl→text-2xl bump as the setup card Money
+                above, for the same WCAG AA light-theme reason. */}
+            <Money value={topInstrument.totalPnl} sign colorizeSign className="text-2xl font-medium whitespace-nowrap" />
             {/* R20-3b: tnum on the count chip — same rationale as the setup
                 card above. */}
             <span className="tnum text-sm text-tertiary whitespace-nowrap">

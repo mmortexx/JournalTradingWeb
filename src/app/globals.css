@@ -201,14 +201,16 @@
   --card-op: 0.60;
 
   /* Text on the new bright cool backdrop (≈ #F8FAFC, L≈0.97). Cool
-     neutrals (#14161C / #50555F / #787D87) replace the warm
+     neutrals (#14161C / #50555F / #40454F) replace the warm
      browns (#1B1A18 / #5A564E / #6E685E) so the light theme reads
      as institutional gray rather than sepia; contrast margins stay
      at the same WCAG 2.1 AA levels (primary ≈ 18:1, secondary ≈ 9:1,
-     tertiary ≈ 5.5:1). */
+     tertiary ≈ 7:1). R27-1a darkened tertiary (#565B66 → #40454F)
+     so small labels, captions, navbar timestamp and footer text
+     clear AA comfortably on bg-veil (#f3f2ec) — was marginal at 5.5:1. */
   --txt-primary: 20 22 28; /* #14161C — ≈ 18:1 */
   --txt-secondary: 80 85 95; /* #50555F — ≈ 9:1 */
-  --txt-tertiary: 86 91 102; /* #565B66 — ≈ 5.5:1 */
+  --txt-tertiary: 64 69 79; /* #40454F — ≈ 7:1 (R27-1a, was #565B66 ≈ 5.5:1) */
   --divider: 0 0 0;
 
   --background: oklch(0.97 0.006 250);
@@ -241,7 +243,7 @@
   --tint: 11 12 13;
 }
 :root[data-theme="light"][data-palette="verde"] {
-  --accent-base: 11 110 68; --accent-hover: 18 160 102; --accent-pressed: 12 110 70; /* R21-2d — darkened 1 stop (#0F8A56 → #0B6E44) so 12px eyebrow text clears WCAG AA (4.5:1) on bg-veil in light theme */
+  --accent-base: 9 90 55; --accent-hover: 14 131 84; --accent-pressed: 6 69 40; /* R27-1a — darkened 1 stop further (#0B6E44 → #095A37) so eyebrow / § ordinal / accent text clears WCAG AA at ~5.8:1 on white and ≥5:1 on bg-veil. Hover kept lighter than base for gradient sheen; pressed now properly darker than base. */
   --tint: 243 242 236;
 }
 /* Grafito — el nombre de la clave data-palette se conserva (evita romper
@@ -254,7 +256,7 @@
   --tint: 11 12 13;
 }
 :root[data-theme="light"][data-palette="grafito"] {
-  --accent-base: 11 110 68; --accent-hover: 18 160 102; --accent-pressed: 12 110 70; /* R21-2d — darkened 1 stop (#0F8A56 → #0B6E44) so 12px eyebrow text clears WCAG AA (4.5:1) on bg-veil in light theme */
+  --accent-base: 9 90 55; --accent-hover: 14 131 84; --accent-pressed: 6 69 40; /* R27-1a — darkened 1 stop further (#0B6E44 → #095A37) so eyebrow / § ordinal / accent text clears WCAG AA at ~5.8:1 on white and ≥5:1 on bg-veil. Hover kept lighter than base for gradient sheen; pressed now properly darker than base. */
   --tint: 243 242 236;
 }
 
@@ -1887,7 +1889,7 @@ button.icon-btn:hover > svg,
   --raised: #ffffff;
   --ink: #15171a;
   --ink-2: #4a4d4f;
-  --ink-3: #565b5e;
+  --ink-3: #3f4448; /* R27-1a — darkened from #565b5e to match new --txt-tertiary darkness (~7:1 on white) so small ink-3 labels / footer text clear WCAG AA on bg-veil */
   --line: rgba(20, 21, 23, 0.1);
   --line-2: rgba(20, 21, 23, 0.19);
 }

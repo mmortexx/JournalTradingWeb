@@ -195,7 +195,7 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
                 <span className="text-sm font-medium text-tertiary line-through decoration-1">
                   {es ? "Suscripción" : "Subscription"}
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary/70 font-semibold">
+                <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary font-semibold">
                   {es ? "No disponible" : "Not available"}
                 </span>
               </span>
@@ -226,7 +226,7 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
               <span className="font-medium text-secondary">
                 {es ? "Garantía 30 días" : "30-day guarantee"}
               </span>
-              <span className="text-tertiary/60" aria-hidden="true">
+              <span className="text-tertiary" aria-hidden="true">
                 ·
               </span>
               <span>{es ? "Devolución completa" : "Full refund"}</span>

@@ -129,9 +129,17 @@ export function Ticker() {
       aria-label="Market ticker"
       className="relative border-y border-[rgb(var(--divider)/0.14)] py-3 liquid-glass overflow-hidden select-none"
     >
-      {/* Left edge gradient fade — black-tinted so items ease out into the
-          liquid-glass band's translucent dark surface instead of clipping
-          at a hard edge. Floats over the dark page background.
+      {/* Left edge gradient fade — R27-1b: switched from hardcoded
+          `rgba(0, 0, 0, ...)` to `color-mix(in srgb, var(--bg) ...,
+          transparent)` so the fade matches the band's surface tone in
+          BOTH themes. The band's `liquid-glass` material is
+          `rgba(0,0,0,0.92)` in dark / `rgba(255,255,255,0.94)` in
+          light — so a black fade was correct in dark but read as dark
+          smudges at the edges of a white band in light theme. `var(--bg)`
+          tracks `#0B0C0E` (dark) / `#f3f2ec` (light), close enough to
+          the band's near-opaque surface that the fade reads as "items
+          dissolving into the band" instead of "dark patches at the
+          edges". The 92 % → 50 % → transparent ramp is preserved.
           R21-3a — narrowed on mobile (w-14 ≈ 56px) so less of the visible
           375px viewport is faded out; widens back to w-20 on sm and w-32
           on md+ where there's plenty of width to spare for the fade. */}
@@ -139,7 +147,7 @@ export function Ticker() {
         className="absolute left-0 top-0 bottom-0 z-10 w-14 sm:w-20 md:w-32 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to right, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.5) 55%, transparent 100%)",
+            "linear-gradient(to right, color-mix(in srgb, var(--bg) 92%, transparent) 0%, color-mix(in srgb, var(--bg) 50%, transparent) 55%, transparent 100%)",
         }}
       />
       {/* Right edge gradient fade — mirror of the left. */}
@@ -147,7 +155,7 @@ export function Ticker() {
         className="absolute right-0 top-0 bottom-0 z-10 w-14 sm:w-20 md:w-32 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to left, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.5) 55%, transparent 100%)",
+            "linear-gradient(to left, color-mix(in srgb, var(--bg) 92%, transparent) 0%, color-mix(in srgb, var(--bg) 50%, transparent) 55%, transparent 100%)",
         }}
       />
 

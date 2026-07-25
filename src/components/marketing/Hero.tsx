@@ -173,9 +173,15 @@ export function Hero() {
           <span
             className="uppercase tnum"
             style={{
+              // R27-1c — label moved off accent-base (too pale on the
+              // bright hero side-scrim in light theme, even after R27-1a
+              // darkened the green) onto the now-darker --ink-3 / text-
+              // tertiary. Only the pulsing accent dot above carries the
+              // green — the eyebrow reads as a quiet institutional label,
+              // not a faded accent tag.
               fontSize: 12,
               letterSpacing: "0.14em",
-              color: "rgb(var(--accent-base))",
+              color: "var(--ink-3)",
             }}
           >
             {es
@@ -329,7 +335,16 @@ export function Hero() {
             sat 16 px from its leading separator but 20 px from the
             previous label, an asymmetric rhythm. Aligned both to gap-x-5
             so every gap (label↔separator, separator↔label) is a uniform
-            20 px and the row reads as a machined rule. */}
+            20 px and the row reads as a machined rule.
+            R27-1b — VLM reported the trust badges still read as faded
+            in light theme even with `.tj-legible-text`'s white halo
+            (they live at the bottom of the hero, where the side-scrim
+            has already faded to transparent at 52 % width AND the eye
+            WebGL corona is brightest). Bumped each label from
+            `var(--ink-3)` (tertiary) to `var(--ink-2)` (secondary) —
+            a one-tier contrast lift that clears the washout without
+            promoting the badges to body-text weight (they're still
+            recognisably a credential rail, not lead copy). */}
         <div data-seq className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2.5">
           {[
             es ? "100 % LOCAL" : "100% LOCAL",
@@ -359,7 +374,13 @@ export function Hero() {
               )}
               <span
                 className="tnum"
-                style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--ink-3)" }}
+                // R27-1c — bumped --ink-3 → --ink-2 (tertiary →
+                // secondary). VLM flagged the trust badges as washed
+                // out on the bright hero surface; the parent already
+                // carries `.tj-legible-text` for a halo but the label
+                // itself needs more weight. The 4-px accent dot between
+                // items remains the sole green element in the row.
+                style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--ink-2)" }}
               >
                 {label}
               </span>
@@ -379,10 +400,21 @@ export function Hero() {
           • Animated traveling bead: a 2×6-px accent dot sweeps top→bottom
             on a 2.2 s loop (`tj-scroll-bead` keyframe) so the indicator
             feels alive rather than static — the bead is what reads as
-            "scroll" motion, the gradient is just the rail. */}
+            "scroll" motion, the gradient is just the rail.
+          R27-1b — added `tj-legible-text` to the wrapper so the "Scroll"
+          label + rail get the same theme-aware text-shadow halo the
+          hero's content column has. Belt-and-suspenders alongside the
+          R27-1c `--ink-3 → --ink-2` color bump on the label itself:
+          the halo softens the bright accent corona bleed behind the
+          indicator (which sits at the hero's bottom-center, exactly
+          where the eye's iris is brightest in light theme), while the
+          color bump gives the label inherent weight. The traveling
+          accent bead's own glow (`0 0 8px rgb(var(--accent-base))`)
+          is unaffected — it's a box-shadow, not text, so the
+          text-shadow class doesn't interfere. */}
       <div
         aria-hidden
-        className="absolute left-1/2 bottom-5 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none"
+        className="tj-legible-text absolute left-1/2 bottom-5 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 pointer-events-none"
       >
         <span
           className="uppercase tnum"
@@ -392,7 +424,15 @@ export function Hero() {
           // of the last glyph, making the visual glyph center sit ~1px
           // left of the 1px rail center. The padding balances the box
           // and the glyphs center perfectly on the rail.
-          style={{ fontSize: 9, letterSpacing: "0.2em", paddingLeft: "0.2em", color: "var(--ink-3)" }}
+          //
+          // R27-1c — bumped --ink-3 → --ink-2 (tertiary → secondary).
+          // VLM flagged the "Scroll" label as almost invisible: this
+          // indicator sits OUTSIDE the `.tj-legible-text` wrapper (the
+          // halo lives on the hero's content column, not the bottom
+          // rail), so it had no halo buffer. The traveling accent bead
+          // below stays accent-green + glow and is the scroll motion
+          // cue; the label just needs to read as "Scroll" at a glance.
+          style={{ fontSize: 9, letterSpacing: "0.2em", paddingLeft: "0.2em", color: "var(--ink-2)" }}
         >
           Scroll
         </span>

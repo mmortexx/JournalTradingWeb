@@ -29,7 +29,16 @@ export function StatsBandNew() {
     { v: "29 $", l: es ? "pago único · Core 29 $ · Pro 49 $" : "one-time payment · Core $29 · Pro $49" },
   ];
   return (
-    <section className="section-tight border-b relative overflow-hidden">
+    <section
+      // R27-1b — `bg-veil` added: this 4-column stats band had no
+      // background — the eye WebGL (bright red/green fibers in light
+      // theme) was showing through between the stats, washing out
+      // the `text-[13.5px] text-tertiary` descriptions under each
+      // big number. `bg-veil` (82 % bg in light / 74 % in dark)
+      // occludes the eye; the `border-b` bottom hairline is
+      // preserved for the section's lower edge.
+      className="section-tight border-b relative overflow-hidden bg-veil"
+    >
       <div className="max-w-page mx-auto px-5 md:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 md:gap-8">
           {stats.map((s, i) => (

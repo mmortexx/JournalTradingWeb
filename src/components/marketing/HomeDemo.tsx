@@ -31,7 +31,18 @@ export function HomeDemo() {
   return (
     <section
       id="demo"
-      className="section relative overflow-hidden border-b border-[rgb(var(--divider)/0.06)] scroll-mt-16"
+      // R27-1b — `bg-veil` added: in light theme the eye WebGL
+      // background (bright red/green fibers) was showing through this
+      // transparent section, washing out the "La app, en tu navegador"
+      // heading + subtitle. `bg-veil` mixes the page bg at 82 % in
+      // light (74 % in dark) — enough to occlude the eye while the
+      // demo's own dark WindowFrame still reads as a contrasting
+      // surface on top. Belt-and-suspenders: the heading wrapper below
+      // also carries `tj-legible-text` so the heading + subtitle keep
+      // a theme-aware text-shadow halo in the area where the eye's
+      // corona could still bleed through the veil at the section's
+      // top (the soft accent halo at top:0 sits over the heading).
+      className="section relative overflow-hidden bg-veil border-b border-[rgb(var(--divider)/0.06)] scroll-mt-16"
     >
       {/* Top accent hairline — a soft gradient rule that eases the eye
           into the demo section. Mirrors the closing hairline at the
@@ -65,7 +76,20 @@ export function HomeDemo() {
         }}
       />
       <div className="relative z-10 mx-auto max-w-[1280px] px-5 md:px-8">
-        <div className="mb-10 max-w-[760px]">
+        {/* R27-1b — `tj-legible-text` on the heading column: in light
+            theme the section's own soft accent halo (the 240px
+            blurred radial at top:0) sits directly behind this heading
+            area, and even with `bg-veil` at 82 % opacity the halo's
+            bright accent tint can still lift the background lightness
+            locally under the heading + subtitle. The theme-aware
+            text-shadow halo (.tj-legible-text in globals.css) is a
+            white halo in light theme that lifts the heading + subtitle
+            contrast above any localised brightening, mirroring the
+            treatment Hero's content column already has. The dark
+            AppDemoClient demo frame below is unaffected (it has its
+            own opaque dark surface) — the class is scoped to the
+            heading column only. */}
+        <div className="tj-legible-text mb-10 max-w-[760px]">
           <div
             className="mb-5 inline-flex items-center gap-3"
             // On very narrow viewports (<380px) the eyebrow row can

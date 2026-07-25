@@ -27,7 +27,19 @@ export function OverviewApp() {
   return (
     <section
       id="overview"
-      className="section relative overflow-hidden"
+      // R27-1b — `bg-veil` added: in light theme the eye WebGL
+      // background (bright red/green fibers) was showing through this
+      // transparent section, washing out the "Todo tu día de trading,
+      // en una pantalla" heading + body copy + the trust badge rail
+      // below the CTAs. `bg-veil` mixes the page bg at 82 % in light
+      // (74 % in dark) — enough to occlude the eye while the section's
+      // decorative halos (right-side radial + bottom vignette) still
+      // paint on top and read as soft accent blooms. The left column's
+      // heading + copy + trust badges also get the `tj-legible-text`
+      // halo (applied on the inner wrapper below) so any residual
+      // brightening from the section's own accent halo (right-side
+      // radial at top:-160) doesn't wash out the text.
+      className="section relative overflow-hidden bg-veil"
     >
       {/* Halo derecho superior */}
       <div
@@ -114,7 +126,20 @@ export function OverviewApp() {
           <span aria-hidden className="absolute -right-3.5 -bottom-4 w-3 h-3 border-r border-b" style={{ borderColor: "rgb(var(--divider) / 0.13)" }} />
 
           {/* Columna izquierda: copy + CTA */}
-          <div>
+          {/* R27-1b — `tj-legible-text` on the left column: even with
+              `bg-veil` occluding the eye, the section's own right-side
+              accent halo (radial at top:-160, opacity 0.28, blurred
+              64px) and the right column's mockup halo (radial at
+              62% 32%, opacity 0.42, blurred 44px) both bleed into the
+              left column's text area at certain scroll positions
+              (the halos are absolute, so they don't track the column).
+              The theme-aware text-shadow halo (white halo in light
+              theme, dark halo in dark) lifts the heading + body copy
+              + trust badges above any localised brightening. The
+              right column's mockup is unaffected (WindowFrame has its
+              own opaque surface) — the class is scoped to the left
+              column only. */}
+          <div className="tj-legible-text">
             <motion.h2
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}

@@ -328,7 +328,16 @@ export function ComparisonSlider() {
                         <path d="M3 3l6 6M9 3l-6 6" stroke="rgb(var(--pnl-neg))" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     </span>
-                    <span className="text-[14px] text-secondary/85">{line}</span>
+                    {/* R27-1d — bumped text-secondary/85 → text-secondary
+                        (full opacity) so the muted "before" list items
+                        clear WCAG AA comfortably in light theme. At /85
+                        the effective contrast on the muted Before surface
+                        was ~5:1 (marginal AA pass at 14px regular); at
+                        full opacity it's ~9:1. The Before items still
+                        read as visually de-emphasized vs the After items
+                        (text-primary ~18:1) thanks to the secondary tier
+                        + the muted gray surface + red ✗ icons. */}
+                    <span className="text-[14px] text-secondary">{line}</span>
                   </li>
                 ))}
               </ul>
@@ -417,7 +426,15 @@ export function ComparisonSlider() {
                 invitation to interact rather than a static label. Reduced
                 by the global prefers-reduced-motion rule. */}
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none" style={{ animation: "tj-float 2.4s ease-in-out infinite" }}>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary/70 font-semibold">
+              {/* R27-1d — bumped text-tertiary/70 → text-tertiary (full
+                  opacity) so the "Arrastra →" / "Drag →" hint clears WCAG
+                  AA comfortably in light theme. At 10px/700 the /70 modifier
+                  dropped the effective contrast to ~5:1 (marginal AA pass);
+                  at full opacity (post R27-1a tertiary darkening to #40454F)
+                  it's ~7:1. The hint still reads as subtle/tertiary-tier
+                  vs the primary after-items and the chip labels, preserving
+                  the "quiet invitation to interact" intent. */}
+              <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary font-semibold">
                 {es ? "Arrastra →" : "Drag →"}
               </span>
             </div>
