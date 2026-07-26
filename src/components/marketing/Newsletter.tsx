@@ -12,7 +12,6 @@ import { Eyebrow } from "@/components/tj/Eyebrow";
  * and a non-functional success animation (checkmark draw-in + cross-fade copy).
  *
  * Premium motion layer:
- *  - aurora-bg backdrop with two accent glow orbs.
  *  - Card scales in on scroll-into-view (0.94 → 1 with eased spring).
  *  - On submit success, AnimatePresence cross-fades the form out and an animated
  *    SVG checkmark (circle + path drawn via pathLength) in, with the thank-you
@@ -47,22 +46,8 @@ export function Newsletter() {
       aria-label={es ? "Boletín" : "Newsletter"}
       className="section relative overflow-hidden"
     >
-      {/* Aurora backdrop */}
-      <div aria-hidden="true" className="absolute inset-0 aurora-bg pointer-events-none" />
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-
-      {/* Static accent glow orbs */}
-      <div
-        aria-hidden="true"
-        className="absolute -top-32 -left-24 w-[420px] h-[420px] rounded-full blur-[130px] pointer-events-none opacity-20"
-        style={{ background: "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute bottom-[-140px] -right-28 w-[460px] h-[460px] rounded-full blur-[130px] pointer-events-none opacity-14"
-        style={{ background: "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)" }}
-      />
 
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
         <motion.div
@@ -190,7 +175,7 @@ export function Newsletter() {
                           aria-invalid={status === "error"}
                           aria-describedby={status === "error" ? "newsletter-error" : undefined}
                           required
-                          className="h-12 rounded-lg bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)]"
+                          className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)]"
                         />
                         <AnimatePresence>
                           {status === "error" && (
@@ -222,7 +207,7 @@ export function Newsletter() {
                             accent glow + 1px lift so the affordance feels alive. */}
                         <Button
                           type="submit"
-                          className="h-12 px-6 w-full sm:w-auto rounded-lg bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgb(var(--accent-base)/0.55)] transition-[background-color,transform,box-shadow] duration-200 shrink-0"
+                          className="h-12 px-6 w-full sm:w-auto rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform] duration-200 shrink-0"
                         >
                           {es ? "Suscribirme" : "Subscribe"}
                         </Button>

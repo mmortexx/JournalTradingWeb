@@ -13,7 +13,6 @@ import { ShortcutsHelp } from "@/components/tj/ShortcutsHelp";
 import { ScrollToTop } from "@/components/tj/ScrollToTop";
 import { SkipLink } from "@/components/tj/SkipLink";
 import { BackgroundFX } from "@/components/tj/BackgroundFX";
-import { ScrollProgress } from "@/components/tj/ScrollProgress";
 import { IntroSequence } from "@/components/tj/IntroSequence";
 import { SectionReveal } from "@/components/tj/SectionReveal";
 import { DecorFX } from "@/components/tj/DecorFX";
@@ -274,7 +273,6 @@ export default function RootLayout({
                 rejilla interactiva, barra de progreso de scroll, intro
                 con loader, reveal por sección y spotlight de tarjetas. */}
             <BackgroundFX />
-            <ScrollProgress />
             <IntroSequence />
             <SectionReveal />
             <DecorFX />

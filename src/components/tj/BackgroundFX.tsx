@@ -110,14 +110,42 @@ uniform float uBlink;    // párpados: 1 = abierto, 0 = cerrado
 
 const float TAU = 6.28318530718;
 
+/* ---- Contención del ojo ----
+   EYE_INTENSITY es el ÚNICO mando para lo protagonista que resulta el
+   ojo. Multiplica la cobertura final, así que afecta por igual a los
+   dos temas y no puede volver a desincronizarlos.
+     1.00 = la versión original (ilustración a pantalla completa)
+     0.45 = actual — el ojo lee como TEXTURA de fondo, no como dibujo
+
+   Por qué se bajó: la web se posiciona como "mesa institucional", y el
+   lenguaje de lo institucional es contención. Un iris incandescente a
+   plena intensidad comunicaba alarma y algo orgánico, justo lo
+   contrario. Además el titular del hero le caía encima y no se leía.
+   Subir este valor devuelve el ojo protagonista; bajarlo lo apaga.
+   No hace falta tocar nada más. */
+const float EYE_INTENSITY = 0.45;
+
+/* Radio del ojo en fracción de la dimensión menor. Bajado de 0.415:
+   además de atenuarlo hay que CONTENERLO — a 0.415 el iris cruzaba el
+   bloque de texto del hero de lado a lado. */
+const float EYE_RADIUS = 0.33;
+
 /* ---- Paleta (espejo de los tokens CSS de la marca) ---- */
 const vec3 BG_DARK    = vec3(0.043, 0.047, 0.051); /* --bg  #0b0c0d */
 const vec3 BG_LIGHT   = vec3(0.953, 0.949, 0.925); /* --bg  claro #f3f2ec */
 const vec3 RED_CORE   = vec3(0.937, 0.267, 0.267); /* --pnl-neg #EF4444 */
 const vec3 RED_DEEP   = vec3(0.620, 0.098, 0.078); /* brasa profunda */
 const vec3 EMBER      = vec3(1.000, 0.520, 0.200); /* ámbar de transición */
-const vec3 GREEN_CORE = vec3(0.204, 0.827, 0.600); /* --pnl-pos #34D399 */
-const vec3 GREEN_DEEP = vec3(0.031, 0.310, 0.208); /* esmeralda de fondo */
+/* Puntas CHAMPAGNE (antes verde esmeralda). El iris va ahora
+   rojo incandescente en el núcleo → ámbar → champagne en las puntas:
+   un degradado de incandescencia real, como metal caliente enfriándose.
+   El rojo→verde anterior leía como semáforo y, sobre todo, chocaba con
+   la regla del producto de que el acento y el verde de P&L son familias
+   distintas: tener verde P&L a pantalla completa detrás de toda la web
+   confundía el lenguaje del color. El champagne es el acento de marca
+   (Oro.xaml), así que el fondo ya habla el mismo idioma que la web. */
+const vec3 GOLD_CORE = vec3(0.780, 0.655, 0.420); /* #C7A76B champagne */
+const vec3 GOLD_DEEP = vec3(0.361, 0.278, 0.094); /* #5C4718 bronce */
 const vec3 RIM_WHITE  = vec3(1.000, 0.949, 0.878); /* marfil incandescente */
 const vec3 RING_IVORY = vec3(0.914, 0.894, 0.847); /* --accent-hover familia */
 
@@ -162,7 +190,7 @@ void main() {
 
   /* Radio del anillo exterior = unidad del sistema. El ojo está ANCLADO
      (no se desliza); la mirada la produce el seguimiento de más abajo. */
-  float R = 0.415 * minDim;
+  float R = EYE_RADIUS * minDim;
   vec2 center = res * vec2(0.5, uEyeY);
   vec2 p0 = (frag - center) / R;
   float r0 = length(p0);
@@ -249,7 +277,7 @@ void main() {
     /* Rampa de color rojo→ámbar→verde (evita el pantano rojo+verde). */
     float tcol = smoothstep(rp * 0.9, tip * 0.98, rw);
     vec3 hot  = mix(vec3(0.88, 0.15, 0.12), EMBER, smoothstep(0.30, 0.54, tcol));
-    vec3 cold = mix(GREEN_CORE * 1.06, GREEN_DEEP, smoothstep(0.68, 1.0, tcol));
+    vec3 cold = mix(GOLD_CORE * 1.06, GOLD_DEEP, smoothstep(0.68, 1.0, tcol));
     vec3 fiberCol = mix(hot, cold, smoothstep(0.44, 0.68, tcol));
 
     /* Raíces blanco-fuego: las fibras nacen incandescentes y toman
@@ -259,13 +287,20 @@ void main() {
 
     /* Jitter de tono por fibra: profundidad orgánica. */
     float jit = anoise(a01w, 55.0, rw * 3.0, vec2(77.7, 19.1));
-    fiberCol = mix(fiberCol, mix(RED_DEEP, GREEN_DEEP, tcol), jit * 0.38);
+    fiberCol = mix(fiberCol, mix(RED_DEEP, GOLD_DEEP, tcol), jit * 0.38);
 
     col += fiberCol * irisL * 2.05;
 
-    /* Aro de raíces incandescente pegado a la pupila. */
+    /* Aro de raíces incandescente pegado a la pupila.
+       Base baja + peso en strand: con base 0.38 el aro superaba el
+       punto de clipping del tonemap en TODO su perímetro y leía como una
+       banda blanca sólida que tapaba las fibras justo donde nacen (el
+       detalle más caro del iris, perdido por sobreexposición). Bajando
+       la base y subiendo la modulación por fibra, el pico de brillo se
+       mantiene sobre los filamentos pero los huecos entre ellos dejan de
+       quemarse — el aro vuelve a leerse como raíces, no como un halo. */
     float rim = exp(-pow((rw - rp * 1.07) / 0.05, 2.0));
-    col += RIM_WHITE * rim * (0.38 + 1.05 * strand) * irisBand * 1.7;
+    col += RIM_WHITE * rim * (0.20 + 1.55 * strand) * irisBand * 1.7;
 
     /* Chispas blancas en el tercio interior de las fibras. */
     float sparkle = pow(fine, 6.0) * (1.0 - smoothstep(rp, rp + 0.36, rw));
@@ -311,7 +346,7 @@ void main() {
      como en la referencia, sin geometría visible. */
   float tuft = anoise(a01w, 14.0, 3.3, vec2(11.3, 47.9));
   float halo = exp(-pow((r - tip * 0.90) / (0.20 + 0.10 * tuft), 2.0));
-  vec3 haloCol = mix(GREEN_CORE, GREEN_DEEP, 0.45) * 0.85 + RING_IVORY * 0.10;
+  vec3 haloCol = mix(GOLD_CORE, GOLD_DEEP, 0.45) * 0.85 + RING_IVORY * 0.10;
   col += haloCol * halo * (0.16 + 0.30 * tuft)
        * smoothstep(rp, rp * 1.6, r);
 
@@ -344,7 +379,7 @@ void main() {
   /* ---- Niebla ambiental y bokeh ---- */
   float haze = (1.0 - smoothstep(0.15, 1.55, r));
   float wisp = fbm(p * 1.1 + vec2(uTime * 0.012, -uTime * 0.009));
-  vec3 hazeCol = mix(RED_DEEP, GREEN_DEEP, smoothstep(0.35, 1.15, r));
+  vec3 hazeCol = mix(RED_DEEP, GOLD_DEEP, smoothstep(0.35, 1.15, r));
   col += hazeCol * haze * (0.03 + 0.11 * wisp);
 
   for (int i = 0; i < 10; i++) {
@@ -356,7 +391,7 @@ void main() {
     float d = length(p - bp);
     float sz = mix(0.010, 0.034, hash11(fi * 3.1 + 9.0));
     float tw = 0.5 + 0.5 * sin(uTime * 0.5 + fi * 2.3);
-    vec3 bc = mix(GREEN_CORE, RED_CORE, step(0.62, h1)) * 0.55 + RIM_WHITE * 0.30;
+    vec3 bc = mix(GOLD_CORE, RED_CORE, step(0.62, h1)) * 0.55 + RIM_WHITE * 0.30;
     col += bc * exp(-(d * d) / (sz * sz)) * 0.5 * (0.35 + 0.65 * tw);
   }
 
@@ -384,7 +419,7 @@ void main() {
   float dtw = 0.35 + 0.65 * sin(uTime * (0.5 + dh * 1.1) + dh * 41.0);
   float ddist = length(dfrac - 0.5);
   float dspark = dstar * exp(-ddist * ddist * 34.0) * dtw;
-  vec3 dcol = mix(GREEN_CORE, RIM_WHITE, hash11(dh * 91.0 + 3.0));
+  vec3 dcol = mix(GOLD_CORE, RIM_WHITE, hash11(dh * 91.0 + 3.0));
   col += dcol * dspark * 0.09;
 
   /* ---- Composición final ---- */
@@ -400,48 +435,64 @@ void main() {
   float vig = smoothstep(1.65, 0.35, length((uv - 0.5) * vec2(res.x / res.y, 1.0) * 1.35));
   vec3 base = BG_DARK * mix(1.0, 0.72, vig * 0.8);
 
-  /* MISMO color en ambos temas: richColor (la saturación 1.6 que hacía
-     tan vívido el modo claro) es ahora la fuente única — el oscuro
-     dejaba de usarla y por eso su tono se veía distinto/apagado frente
-     al claro. A petición expresa: el tono del claro, también en oscuro. */
-  vec3 richColor = mix(vec3(luma), col, 1.6);
+  /* ---- Composición: UN SOLO operador para los dos temas ----
+     Aquí estaba el motivo real de que el ojo NO fuera el mismo en claro
+     y en oscuro, pese a que el comentario anterior afirmaba justo lo
+     contrario. No era el color: era que cada tema usaba un OPERADOR DE
+     COMPOSICIÓN distinto.
 
-  vec3 dark = base + richColor;
+         oscuro →  base + richColor              (aditivo)
+         claro  →  mix(BG_LIGHT, richColor, p)   (over, con cobertura)
 
-  /* Tema claro: TINTA sobre papel, no luz añadida sobre blanco.
-     Medido con readPixels: la primera versión (BG_LIGHT*(1-luma*k) +
-     col*m) daba [255,241,233] en el centro de la pupila — blanco puro
-     clippeado, prácticamente el mismo valor que el fondo [242,243,236].
-     Sumar color sobre una base ~0.95 satura los tres canales casi de
-     inmediato; el resultado siempre iba a leer como "blanco con un
-     tinte", nunca como color de verdad, por mucho que subiera el
-     multiplicador.
-     La técnica correcta es un compuesto "over" (como tinta impresa):
-     donde el ojo tiene presencia real se pinta el color casi entero;
-     donde no la tiene, se ve el papel puro — nunca se SUMAN ambos.
-       - eyePresence: accionado por GEOMETRÍA (pupil + irisBand +
-         halo), no por luma. La primera versión usaba luma y el rojo
-         del centro —naturalmente más brillante que el verde exterior—
-         quedaba casi opaco mientras el verde se diluía hacia el papel:
-         mismo tono en teoría, pero el ojo se leía rojo-dominante en
-         claro y equilibrado en oscuro. irisBand cubre la MISMA banda
-         para el tramo rojo y el verde (solo se apaga en el 38% final
-         emplumado, igual que en oscuro), así que ambos colores reciben
-         la misma cobertura de "tinta" — el tono ya no depende de qué
-         tan brillante sea cada color.
-       - richColor: mismo color que ya usa el tema oscuro (col), con
-         un empujón de saturación adicional (1.6) MÁS allá del 1.06
-         global de la línea de arriba — un canal puede clippear a tope
-         (rojo a 255 con verde/azul bajos sigue leyendo como "rojo
-         vivo"), muy distinto a los tres canales clippeando juntos
-         (eso sí lee como blanco, el bug anterior).
-     richColor se declara antes de la rama oscura: desde el pivote de
-     "mismo tono en ambos temas" es la fuente ÚNICA de color de las
-     dos ramas. */
-  float eyePresence = clamp(pupil + irisBand * 1.15 + halo * 1.3, 0.0, 1.0);
-  eyePresence = max(eyePresence, luma * 0.9) * blinkFactor;
-  vec3 light = mix(BG_LIGHT, richColor, eyePresence);
-  vec3 outCol = mix(dark, light, uTheme);
+     Un aditivo ignora la cobertura por completo: en oscuro el halo, la
+     niebla ambiental, el bokeh y el polvo se SUMABAN enteros, y el ojo
+     se leía más grande, más difuso y rodeado de velo. En claro todo eso
+     pasaba por la cobertura y quedaba recortado. Partir del mismo
+     richColor no bastaba — con operadores distintos salen dos imágenes
+     distintas.
+
+     Ahora ambos temas usan el MISMO over con la MISMA cobertura, y lo
+     único que cambia entre ellos es el color de fondo sobre el que se
+     compone. Sobre negro, over y aditivo casi coinciden donde la
+     cobertura es alta (el iris), así que el oscuro conserva su aspecto;
+     lo que pierde es exactamente el velo que el claro nunca tuvo.
+
+     SI HAY QUE RETOCAR LA MEZCLA, TÓCALA UNA VEZ: en cuanto se vuelva a
+     bifurcar por tema, los dos ojos vuelven a divergir. */
+  /* Saturación bajada de 1.6 a 1.18: el empujón fuerte existía para que
+     el ojo "reventara" en modo claro cuando cada tema componía distinto.
+     Con un solo operador ya no hace falta, y a 1.6 el rojo salía neón
+     —lo que más rompía el tono institucional—. */
+  vec3 richColor = mix(vec3(luma), col, 1.18);
+
+  /* Cobertura del ojo — accionada por GEOMETRÍA (pupila + banda de iris
+     + halo), nunca por luminancia. Con luma, el rojo del centro (más
+     brillante por naturaleza que el verde exterior) quedaba casi opaco
+     mientras el verde se diluía hacia el fondo: el ojo se leía
+     rojo-dominante. irisBand cubre por igual el tramo rojo y el verde,
+     así que ambos reciben la misma cantidad de tinta y el tono deja de
+     depender de lo brillante que sea cada color. */
+  float presence = clamp(pupil + irisBand * 1.15 + halo * 0.95, 0.0, 1.0);
+  /* Rodilla sobre la presencia. La cola ancha del halo y la niebla
+     ambiental valen ~0.05-0.20 sobre casi todo el hero: en oscuro eso es
+     atmósfera (se suma a un fondo negro y no molesta), pero en claro se
+     mezclaba contra el papel y pintaba un VELO GRIS SUCIO — el ojo leía
+     como una pegatina opaca con el borde elíptico del halo visible.
+     Anular la presencia por debajo de ~0.18 devuelve el papel limpio y
+     hace que el halo se disuelva de verdad. No afecta al iris: irisBand
+     ya satura a 1 mucho antes de la rodilla. */
+  presence *= smoothstep(0.0, 0.18, presence);
+  /* Mismo criterio para el aporte por luminancia: solo lo genuinamente
+     brillante (bokeh, chispas, fibras) deja marca; el suelo de niebla ya
+     no tiñe. Antes luma * 0.9 reintroducía por detrás justo el velo
+     que la rodilla acababa de quitar. */
+  float lumaPresence = smoothstep(0.04, 0.30, luma) * 0.75;
+  float eyePresence = max(presence, lumaPresence) * blinkFactor * EYE_INTENSITY;
+
+  /* Lo ÚNICO que distingue a los dos temas: el fondo sobre el que se
+     compone. El color del ojo y su cobertura son idénticos. */
+  vec3 bgCol = mix(base, BG_LIGHT, uTheme);
+  vec3 outCol = mix(bgCol, richColor, eyePresence);
 
   /* Dithering: mata el banding de los degradados oscuros. mod() antes
      del hash por la misma razón que el polvo de fondo: frag sin acotar
@@ -559,8 +610,6 @@ export function BackgroundFX() {
     let last = performance.now();
     let t0 = last;
 
-    let scrollS = 0; // progreso suavizado
-    let lastY = window.scrollY;
     let lookX = 0;
     let lookY = 0;
     let lookTX = 0;
@@ -578,16 +627,8 @@ export function BackgroundFX() {
       return s - Math.floor(s);
     };
 
-    /* Mirada de scroll por FIJACIONES (sacada → fijación → retorno),
-       como un ojo que lee — sustituye al seguimiento elástico continuo
-       que daba bandazos pegados a la rueda. Solo mueve la MIRADA; la
-       pupila no cambia de tamaño con el scroll. */
-    let gazeState = 0; // 0 = centro · 1 = leyendo hacia abajo · -1 = arriba
-    let gazeCur = 0;
-    let gazeFrom = 0;
-    let gazeTo = 0;
-    let gazeStart = t0 - 9999;
-    let lastScrollActive = 0;
+    /* (Aquí vivía el estado de la mirada de scroll. Retirado: el ojo no
+       reacciona al desplazamiento de la página, solo al puntero.) */
 
     /* Micro-sacadas: un ojo real nunca queda perfectamente quieto —
        cada 1,4–4 s hace un flick rápido e involuntario a un punto
@@ -621,12 +662,6 @@ export function BackgroundFX() {
       }
     };
 
-    const scrollProgress = () => {
-      const doc = document.documentElement;
-      const max = Math.max(1, doc.scrollHeight - window.innerHeight);
-      return Math.min(1, Math.max(0, window.scrollY / max));
-    };
-
     const onPointer = (e: PointerEvent) => {
       lookTX = (e.clientX / window.innerWidth - 0.5) * 2;
       lookTY = -(e.clientY / window.innerHeight - 0.5) * 2;
@@ -639,44 +674,22 @@ export function BackgroundFX() {
     const draw = (now: number, dt: number) => {
       const t = (now - t0) / 1000;
 
-      /* Scroll: progreso suavizado (solo para la exposición por tramo). */
-      const prog01 = scrollProgress();
-      scrollS = damp(scrollS, prog01, 3.2, dt);
-      const dy = window.scrollY - lastY;
-      lastY = window.scrollY;
+      /* EL SCROLL NO MUEVE EL OJO. Por decisión expresa del dueño, el
+         ojo solo responde al PUNTERO.
+         Se retiró aquí la "mirada de scroll por fijaciones" (una sacada
+         balística hacia abajo/arriba al detectar desplazamiento, con
+         retorno al centro a los 500 ms de parar). Estaba bien resuelta
+         técnicamente, pero cualquier reacción al scroll hace que el
+         fondo compita con la lectura: mueves la rueda para leer y lo
+         que se mueve es el fondo.
+         También se retiró la exposición variable por tramo de scroll
+         (la que subía y bajaba el brillo según la posición en la
+         página): era otra reacción al scroll, más sutil pero igual de
+         indeseada, y ahora la intensidad es constante.
+         Si algún día se quiere recuperar, que sea DETRÁS de una
+         preferencia explícita, no por defecto. */
 
-      /* Mirada de scroll por FIJACIONES: al detectar desplazamiento
-         sostenido, UNA sacada balística (160 ms, easeOutQuart) hacia
-         abajo/arriba y la mirada queda FIJADA ahí mientras dure el
-         scroll; a los 500 ms de parar, sacada de retorno al centro.
-         Es el patrón sacada→fijación de un ojo leyendo — nada de
-         deslizamiento elástico pegado a la velocidad de la rueda.
-         (La pupila NO se dilata con el scroll — el dueño lo pidió
-         retirar: leía como que la pupila "crecía" al hacer scroll.) */
-      const scrolling = Math.abs(dy) > 2;
-      if (scrolling) lastScrollActive = now;
-      if (!reduce) {
-        const dir = dy > 0 ? 1 : -1;
-        if (scrolling && gazeState !== dir) {
-          gazeState = dir;
-          gazeFrom = gazeCur;
-          gazeTo = dir > 0 ? -0.3 : 0.24;
-          gazeStart = now;
-        } else if (
-          !scrolling &&
-          gazeState !== 0 &&
-          now - lastScrollActive > 500
-        ) {
-          gazeState = 0;
-          gazeFrom = gazeCur;
-          gazeTo = 0;
-          gazeStart = now;
-        }
-        const gk = Math.min(1, (now - gazeStart) / 160);
-        gazeCur = gazeFrom + (gazeTo - gazeFrom) * (1 - Math.pow(1 - gk, 4));
-      }
-
-      /* Mirada con inercia. */
+      /* Mirada con inercia — puntero únicamente. */
       lookX = damp(lookX, lookTX, 4.5, dt);
       lookY = damp(lookY, lookTY, 4.5, dt);
 
@@ -709,12 +722,12 @@ export function BackgroundFX() {
       if (intro < 1) intro = Math.min(1, (now - t0) / 1100);
       const introE = 1 - Math.pow(1 - intro, 3); // easeOutCubic
 
-      /* Exposición por tramo: presencia SIEMPRE — protagonista arriba,
-         apenas medio paso atrás sobre el contenido, pleno de nuevo
-         hacia el cierre (antes caía un 44 % y el ojo desaparecía). */
-      const mid = smoothstep01((scrollS - 0.06) / 0.24);
-      const end = smoothstep01((scrollS - 0.78) / 0.2);
-      const exposure = (1.0 - 0.24 * mid + 0.24 * end) * 1.14;
+      /* Exposición CONSTANTE. Antes variaba con el tramo de scroll; se
+         retiró junto con la mirada de scroll (ver nota de más arriba):
+         el ojo no reacciona al desplazamiento de ninguna forma.
+         La contención global vive ahora en EYE_INTENSITY, dentro del
+         shader, que es el único mando de intensidad. */
+      const exposure = 1.14;
 
       /* Parpadeo: cierre 130 ms (acelerando) + apertura 240 ms (suave) —
          un pelín más lento y líquido que antes. Doble parpadeo raro
@@ -739,12 +752,14 @@ export function BackgroundFX() {
 
       gl.uniform2f(uni.uRes, canvas.width, canvas.height);
       gl.uniform1f(uni.uTime, reduce ? 13.7 : t);
-      gl.uniform1f(uni.uScroll, scrollS);
+      /* uScroll queda a 0 fijo: el shader ya no debe saber nada del
+         desplazamiento de la página. */
+      gl.uniform1f(uni.uScroll, 0.0);
       gl.uniform1f(uni.uDilate, 0.0);
       gl.uniform2f(
         uni.uLook,
         (finePointer ? lookX : 0) + saccadeX,
-        (finePointer ? lookY : 0) + gazeCur + saccadeY
+        (finePointer ? lookY : 0) + saccadeY
       );
       gl.uniform1f(uni.uBlink, reduce ? 1 : open);
       gl.uniform1f(uni.uIntro, introE);
@@ -754,13 +769,14 @@ export function BackgroundFX() {
          anclado — no se desliza con el scroll (aquello leía como
          parallax barato); te sigue solo con la MIRADA. gl_FragCoord
          tiene el eje Y invertido → 1 - yVisual. */
-      gl.uniform1f(uni.uEyeY, 1 - 0.46);
+      /* 34 % desde arriba (antes 46 %). El hero alinea su contenido
+         ABAJO, así que con el ojo centrado a media altura el titular le
+         cruzaba el iris por el medio y perdía legibilidad. Subiéndolo,
+         ojo y texto ocupan mitades distintas de la pantalla y ninguno
+         estorba al otro. Sigue siendo un valor FIJO: el ojo no se
+         desliza con el scroll. */
+      gl.uniform1f(uni.uEyeY, 1 - 0.34);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-
-    const smoothstep01 = (x: number) => {
-      const c = Math.min(1, Math.max(0, x));
-      return c * c * (3 - 2 * c);
     };
 
     const loop = (now: number) => {

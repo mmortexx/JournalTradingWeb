@@ -84,7 +84,7 @@ export function IntroSequence() {
     const ov = document.createElement("div");
     ov.id = "tj-loader";
     ov.innerHTML =
-      '<div style="position:absolute;left:0;right:0;bottom:0;height:2px;background:rgb(var(--divider) / 0.06)"><div data-lb style="height:100%;width:0;background:linear-gradient(90deg,rgb(var(--accent-base)),rgb(var(--accent-hover)));box-shadow:0 0 14px rgb(var(--accent-base) / 0.55)"></div></div>' +
+      '<div style="position:absolute;left:0;right:0;bottom:0;height:2px;background:rgb(var(--divider) / 0.06)"><div data-lb style="height:100%;width:0;background:linear-gradient(90deg,rgb(var(--accent-base)),rgb(var(--accent-hover)));"></div></div>' +
       '<div style="display:flex;flex-direction:column;align-items:center;gap:15px">' +
       '<span style="width:46px;height:46px;border-radius:12px;background:color-mix(in srgb,var(--surface) 66%,transparent);border:1px solid rgb(var(--divider) / 0.13);display:grid;place-items:center">' +
       '<svg width="22" height="22" viewBox="0 0 16 16" fill="none"><path d="M3 1.8v12.4M8 1.8v12.4M13 1.8v12.4" stroke="rgb(var(--accent-base))" stroke-width="1" stroke-linecap="round" opacity=".45"></path><rect x="2" y="7" width="2" height="5" rx=".4" fill="rgb(var(--accent-base))"></rect><rect x="7" y="4.5" width="2" height="5" rx=".4" fill="rgb(var(--accent-base))"></rect><rect x="12" y="2.6" width="2" height="5" rx=".4" fill="rgb(var(--accent-base))"></rect></svg>' +

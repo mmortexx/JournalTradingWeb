@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
-import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 // Estimated reading time (security + tech specs + integrations).
@@ -126,7 +125,6 @@ export default function SeguridadPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
-      <ReadingProgressIndicator />
       <SecuritySection num="01" />
       <TechSpecs />
       <Integrations />

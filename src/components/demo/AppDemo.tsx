@@ -21,15 +21,24 @@ import { BusinessPage } from "./pages/BusinessPage";
 import { SettingsPage } from "./pages/SettingsPage";
 
 /** The demo: a windowed recreation of the native app, fully interactive. */
-export function AppDemo() {
+/**
+ * @param hideHeader Oculta la cabecera interna (eyebrow + titular +
+ * subtítulo). La sección HomeDemo ya pinta su propio titular antes de
+ * incrustar el demo, así que sin esta bandera el visitante veía DOS
+ * veces seguidas "La app, en tu navegador." — uno alineado a la
+ * izquierda y otro centrado. La ruta /demo sí usa la cabecera interna.
+ */
+export function AppDemo({ hideHeader = false }: { hideHeader?: boolean } = {}) {
   return (
     <DemoProvider>
-      <AppDemoInner />
+      {/* La bandera tiene que BAJAR hasta AppDemoInner: la cabecera se
+          pinta ahí dentro, no en este envoltorio. */}
+      <AppDemoInner hideHeader={hideHeader} />
     </DemoProvider>
   );
 }
 
-function AppDemoInner() {
+function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
   const { t, lang } = useLang();
   const { page, fullscreen, setFullscreen, setPage, goBack } = useDemo();
 
@@ -271,22 +280,25 @@ function AppDemoInner() {
 
   return (
     <div className="max-w-page mx-auto px-5 md:px-8">
-      {/* Section header */}
-      <div className="text-center max-w-2xl mx-auto mb-10">
-        <div className="eyebrow inline-flex items-center gap-2 justify-center mb-3">
-          <span className="w-6 h-px bg-white opacity-60" />
-          {t("demoTitle")}
-          <span className="w-6 h-px bg-white opacity-60" />
+      {/* Cabecera de sección — se omite cuando quien incrusta el demo ya
+          pone la suya (ver la nota de `hideHeader` arriba). */}
+      {!hideHeader && (
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="eyebrow inline-flex items-center gap-2 justify-center mb-3">
+            <span className="w-6 h-px bg-white opacity-60" />
+            {t("demoTitle")}
+            <span className="w-6 h-px bg-white opacity-60" />
+          </div>
+          <h2 className="font-medium tracking-[-0.03em] leading-tight" style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)" }}>
+            {lang === "es" ? (
+              <>La app, <span className="text-gradient">en tu navegador.</span></>
+            ) : (
+              <>The app, <span className="text-gradient">in your browser.</span></>
+            )}
+          </h2>
+          <p className="text-lg text-secondary mt-4 leading-relaxed">{t("demoSubtitle")}</p>
         </div>
-        <h2 className="font-medium tracking-[-0.03em] leading-tight" style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)" }}>
-          {lang === "es" ? (
-            <>La app, <span className="text-gradient">en tu navegador.</span></>
-          ) : (
-            <>The app, <span className="text-gradient">in your browser.</span></>
-          )}
-        </h2>
-        <p className="text-lg text-secondary mt-4 leading-relaxed">{t("demoSubtitle")}</p>
-      </div>
+      )}
 
       {/* App window — floats over the page like a real OS window.
           Two-layer structure so the drop shadow + hairline border actually

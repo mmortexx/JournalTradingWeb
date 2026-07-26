@@ -147,7 +147,10 @@ export function HomeDemo() {
               : "This isn't a video: it's the app, recreated. Click the tabs, open a trade, play with the calculator. Sample data, just like the real app."}
           </p>
         </div>
-        <AppDemoClient />
+        {/* `hideHeader`: esta sección ya pinta su propio eyebrow § 02 y
+            su titular justo arriba. Sin esta bandera, el demo repetía
+            "La app, en tu navegador." una segunda vez, centrado. */}
+        <AppDemoClient hideHeader />
 
         {/* CTA row — clear next step to the dedicated /demo route.
             Before R23-2c this section had no link to /demo at all,
@@ -156,9 +159,9 @@ export function HomeDemo() {
             the same one that lives at /demo, but the dedicated route
             gives a focused, full-viewport surface with its own URL
             for sharing — worth signalling. The button mirrors the
-            dark-pill "See the demo" treatment from Hero so the two
-            CTAs read as a coordinated pair, and uses the
-            `tj-cta-sheen` class for the same animated sheen sweep.
+            treatment from Hero so the two CTAs read as a coordinated
+            pair. Tras el rediseño institucional es un rectángulo de
+            4 px sin sheen ni sombra de acento, como el resto.
 
             Mobile (375px): button is full-width so it never overflows
             and the tap target stays comfortable (54px tall, matching
@@ -193,7 +196,8 @@ export function HomeDemo() {
           <Link
             href="/demo"
             aria-label={es ? "Abrir la demo a página completa" : "Open the full-page demo"}
-            className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center items-center gap-2.5 rounded-full h-[54px] px-7 bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.12),0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
+            style={{ background: "rgb(var(--accent-base))", color: "#1A1917" }}
           >
             <span>{es ? "Abrir demo a página completa" : "Open full-page demo"}</span>
             <ArrowRight size={16} aria-hidden />

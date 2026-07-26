@@ -98,7 +98,6 @@ export function HowItWorks() {
                   whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                   className="relative w-[144px] h-[144px] rounded-card liquid-glass depth-1 flex items-center justify-center transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 >
-                    <div className="absolute inset-0 rounded-card aurora-bg opacity-60" />
                     {/* Step illustration */}
                     <div className="relative">
                       {s.icon}
@@ -115,7 +114,7 @@ export function HowItWorks() {
                       duration: 0.5,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="absolute -top-2 -right-2 w-9 h-9 rounded-full bg-[rgb(var(--accent-base))] text-[#06130d] text-xs font-bold tnum flex items-center justify-center shadow-[0_4px_14px_-2px_rgb(var(--accent-base)/0.7)] ring-2 ring-[rgb(var(--bg))] z-10"
+                    className="absolute -top-2 -right-2 w-9 h-9 rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] text-xs font-bold tnum flex items-center justify-center ring-2 ring-[var(--bg)] z-10"
                   >
                     {s.n}
                   </motion.span>

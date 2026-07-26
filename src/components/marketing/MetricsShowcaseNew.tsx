@@ -92,17 +92,14 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 // R24-1c: added a tiny color-coded 3×3 dot before each label
                 // so the metric direction reads at a glance (pos / neg /
                 // accent / ink) without needing to parse the value first.
-                className="group/metric relative flex min-w-0 items-center justify-between gap-2 sm:gap-3 transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
+                className="group/metric relative flex min-w-0 items-center justify-between gap-2 sm:gap-3 rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-[transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)]"
                 style={{
                   padding: "14px 16px",
-                  borderRadius: 12,
-                  border: "1px solid rgb(var(--divider) / 0.13)",
                   background: "color-mix(in oklab, var(--surface) 50%, transparent)",
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
                 }}
               >
-                <span className="pointer-events-none absolute inset-0 rounded-[12px] opacity-0 group-hover/metric:opacity-100 transition-opacity duration-300" aria-hidden style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.35)" }} />
                 <span className="relative inline-flex items-center gap-2 min-w-0 break-words">
                   <span
                     aria-hidden
@@ -130,10 +127,9 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative"
+          className="relative rounded-[8px]"
           style={{
             padding: 24,
-            borderRadius: 18,
             border: "1px solid rgb(var(--divider) / 0.13)",
             background: "color-mix(in oklab, var(--surface) 60%, transparent)",
             backdropFilter: "blur(20px) saturate(1.4)",
@@ -153,7 +149,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               style={{
                 fontSize: 10,
                 padding: "4px 9px",
-                borderRadius: 100,
+                borderRadius: 4,
                 background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
                 color: "rgb(var(--accent-base))",
                 border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 30%, transparent)",
@@ -191,7 +187,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 <div
                   key={i}
                   title={`${b.r} · ${es ? `${count} operaciones` : `${count} trades`}`}
-                  className="flex-1 rounded-t relative cursor-default transition-[transform,filter] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3%] hover:brightness-110"
+                  className="flex-1 rounded-t relative cursor-default transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[3%]"
                   style={{
                     height: `${b.h}%`,
                     background:
@@ -206,7 +202,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 >
                   {i === 4 && (
                     <span
-                      className="tnum absolute -top-5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full"
+                      className="tnum absolute -top-5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[4px]"
                       style={{
                         fontSize: 9,
                         letterSpacing: "0.1em",

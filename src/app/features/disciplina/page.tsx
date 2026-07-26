@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
-import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 // Estimated reading time (guardian + discipline cost + before/after + comparison
@@ -130,7 +129,6 @@ export default function DisciplinaPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
-      <ReadingProgressIndicator />
       <GuardianNew num="01" />
       <DisciplineCost num="02" />
       <BeforeAfter />

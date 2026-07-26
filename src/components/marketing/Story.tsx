@@ -198,49 +198,24 @@ export function Story() {
                     }}
                     aria-hidden="true"
                   />
-                  {/* Dot pulse halo — softened (scale 2.1, initial opacity
-                      0.30) so the emphasis reads as a single quiet breath
-                      rather than a loud pop competing with the dot itself.
-                      Sits BEHIND the dot via the same absolute position.
-                      For the terminal "pos" phase (the trader's destination)
-                      the halo loops continuously — a slow breath that draws
-                      the eye to where the arc arrives, while every other
-                      phase keeps its one-shot entry pulse. */}
+                  {/* Dot pulse halo — un único "aliento" al entrar en
+                      viewport (softened scale 2.1, opacity inicial 0.30).
+                      El bucle infinito que tenía la fase terminal "pos" se
+                      retiró (movimiento decorativo gratuito); ahora las
+                      cinco fases comparten el mismo pulso de entrada, una
+                      sola vez. */}
                   <motion.span
                     aria-hidden="true"
                     className={`absolute left-0 top-1.5 w-[15px] h-[15px] rounded-full ${toneDot[p.tone]} pointer-events-none`}
                     initial={{ scale: 0.6, opacity: 0.30 }}
-                    {...(p.tone === "pos"
-                      ? {
-                          animate: { scale: [0.6, 2.1], opacity: [0.35, 0] },
-                          transition: {
-                            delay: i * 0.08 + 1.2,
-                            duration: 2.2,
-                            ease: [0.22, 1, 0.36, 1],
-                            repeat: Infinity,
-                            repeatDelay: 0.8,
-                          },
-                        }
-                      : {
-                          whileInView: { scale: 2.1, opacity: 0 },
-                          viewport: { once: true, margin: "-40px" },
-                          transition: { delay: i * 0.08 + 0.2, duration: 1.05, ease: [0.22, 1, 0.36, 1] },
-                        })}
+                    whileInView={{ scale: 2.1, opacity: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ delay: i * 0.08 + 0.2, duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
                   />
                   <motion.div
                     whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                    className="group relative liquid-glass depth-2 rounded-card p-5 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)] hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.40)]"
+                    className="group relative liquid-glass depth-2 rounded-card border border-transparent p-5 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
                   >
-                    {/* Accent corner glow — fades in on hover to give the
-                        card a focal lift beyond the spring translate. */}
-                    <div
-                      aria-hidden="true"
-                      className="absolute -right-10 -top-10 w-28 h-28 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none"
-                      style={{
-                        background:
-                          "radial-gradient(circle, rgb(var(--accent-base) / 0.30), transparent 70%)",
-                      }}
-                    />
                     <div className="flex items-center justify-between gap-3">
                       <span
                         className={`text-[10px] uppercase tracking-[0.14em] font-semibold tnum ${toneText[p.tone]}`}

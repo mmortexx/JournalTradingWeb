@@ -94,16 +94,8 @@ export function SocialProof() {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="group relative liquid-glass depth-2 rounded-card overflow-hidden h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="group relative liquid-glass depth-2 rounded-card overflow-hidden h-full border border-transparent transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)]"
             >
-              {/* Accent border glow on hover. */}
-              <div
-                className="absolute inset-0 rounded-card pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  boxShadow: `inset 0 0 0 1px rgb(var(--accent-base) / 0.35), 0 0 24px rgb(var(--accent-base) / 0.15)`,
-                }}
-              />
-
               <div className="p-6 flex flex-col gap-5 h-full">
                 {/* Rating — stars pop in sequence on view. */}
                 <div className="flex items-center justify-between">
@@ -131,7 +123,7 @@ export function SocialProof() {
                         </motion.svg>
                       ))}
                     </div>
-                    <span className="pill bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.15)] tnum">
+                    <span className="pill !rounded-[4px] bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.15)] tnum">
                       {t.yearsTrading} {es ? "años operando" : "yrs trading"}
                     </span>
                   </div>

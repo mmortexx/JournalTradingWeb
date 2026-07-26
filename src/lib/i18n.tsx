@@ -343,10 +343,6 @@ export const STR = {
   pro: { es: "Pro", en: "Pro" },
   mostPopular: { es: "Más popular", en: "Most popular" },
   perOnce: { es: "una vez", en: "once" },
-  guarantee: {
-    es: "Garantía de devolución de 30 días, sin preguntas.",
-    en: "30-day no-questions refund guarantee.",
-  },
 
   // ---- FAQ ----
   faqEyebrow: { es: "Dudas frecuentes", en: "Common questions" },

@@ -67,16 +67,8 @@ export function Integrations() {
                 ease: [0.22, 1, 0.36, 1],
               }}
               whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="group relative liquid-glass depth-1 rounded-card p-4 h-full flex flex-col gap-3 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--divider)/0.20)] hover:shadow-[0_8px_30px_rgb(var(--accent-base)/0.08)]"
+              className="group relative liquid-glass depth-1 rounded-card border border-transparent p-4 h-full flex flex-col gap-3 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)]"
             >
-              {/* Accent border glow on hover. */}
-              <div
-                className="absolute inset-0 rounded-card pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  boxShadow: `inset 0 0 0 1px rgb(var(--accent-base) / 0.45), 0 0 20px rgb(var(--accent-base) / 0.18)`,
-                }}
-              />
-
               {/* Row: monogram mark (left) + CSV chip (right). */}
               <div className="relative flex items-center justify-between">
                 <span
@@ -86,7 +78,7 @@ export function Integrations() {
                 >
                   {b.mark}
                 </span>
-                <span className="pill bg-[rgb(var(--accent-base)/0.08)] text-[rgb(var(--accent-base))] border border-[rgb(var(--accent-base)/0.20)] text-[10px] uppercase tracking-[0.14em]">
+                <span className="inline-flex items-center rounded-[4px] px-[0.55rem] py-[0.15rem] bg-[rgb(var(--accent-base)/0.08)] text-[rgb(var(--accent-base))] border border-[rgb(var(--accent-base)/0.20)] text-[10px] font-semibold uppercase tracking-[0.14em]">
                   CSV
                 </span>
               </div>

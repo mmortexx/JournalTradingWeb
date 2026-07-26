@@ -78,45 +78,62 @@
 :root {
   --radius: 0.625rem;
 
-  /* Accent — verde/esmeralda institucional, el mismo verde que usa la
-     app real (capturas de la app nativa: pestaña activa, botones "Long",
-     confirmaciones) y que ya vivía en el sitio como --pnl-pos. Unificar
-     el acento de marketing con el acento real del producto — antes el
-     sitio usaba un "grafito" (#B9B2A6) que no existe en la app de
-     verdad, dos identidades distintas para el mismo producto. Estos
-     valores en :root son el SSR-safe fallback para que el primer paint
-     ya salga con el tono correcto aunque el script anti-FOUC aún no
-     haya aplicado el data-palette. */
-  --accent-base: 52 211 153; /* #34D399 — mismo verde que --pnl-pos */
-  --accent-hover: 103 222 179; /* #67DEB3 */
-  --accent-pressed: 31 127 92; /* #1F7F5C */
-  --accent-soft: 52 211 153;
+  /* Accent — CHAMPAGNE/BRONCE ("Oro"), el acento real de la app.
+     ────────────────────────────────────────────────────────────────
+     NO CAMBIAR A VERDE. Esto ya se rompió una vez: el commit 63e7e42
+     puso aquí el verde de --pnl-pos afirmando haberlo "comprobado
+     contra capturas reales". Es falso por partida doble:
 
-  /* P&L — slightly brighter green (Emerald-400 / #34D399) and slightly
-     deeper red (Red-600 / #EF4444) so positive/negative figures read
-     at a glance on both dark glass (translucent wash knocks real
-     contrast down a notch) and the bright light-theme glass. Same
-     hue family as before so existing visual associations hold. */
-  --pnl-pos: 52 211 153; /* #34D399 */
-  --pnl-neg: 239 68 68; /* #EF4444 */
+       1. La paleta DEFAULT de la app es "Oro" (champagne/bronce), no
+          verde. Fuente:
+          Agenda Trading/03-mvp/app/src/TradingJournal.App/Resources/
+          Palettes/Oro.xaml:2 → "la original del proyecto, DEFAULT".
+          Valores: #8A6C35 (light) / #C7A76B (dark, Light2).
+       2. Igualar el acento al verde de P&L es EXACTAMENTE lo que el
+          design-system de la app prohíbe. Palettes/Esmeralda.xaml:5-7
+          deja escrito que incluso la paleta verde se eligió
+          "deliberadamente distinto del verde P&L puro #00B573/#00F5A0
+          para que nunca se confundan": acento y P&L son dos familias
+          semánticas separadas y confundirlas rompe la lectura del
+          producto.
+
+     Ojo al verificar: las capturas de public/img MEZCLAN paletas
+     (app-resumen está en Oro, app-nueva en Esmeralda). Las capturas NO
+     son la fuente de verdad — lo es Oro.xaml, que declara el default.
+
+     Estos valores en :root son el fallback SSR-safe para que el primer
+     paint salga con el tono correcto aunque el script anti-FOUC aún no
+     haya aplicado el data-palette. */
+  --accent-base: 199 167 107; /* #C7A76B — champagne (dark) */
+  --accent-hover: 214 188 133; /* #D6BC85 */
+  --accent-pressed: 176 144 90; /* #B0905A */
+  --accent-soft: 199 167 107;
+
+  /* P&L — valores exactos de la app real (Resources/Colors.xaml:109-112,
+     rama dark). Familia SEPARADA del acento: el acento es champagne y
+     el P&L es verde/rojo, y nunca deben coincidir (ver la nota larga
+     del bloque de acento). */
+  --pnl-pos: 0 245 160; /* #00F5A0 */
+  --pnl-neg: 255 77 77; /* #FF4D4D */
   --pnl-warn: 224 147 43; /* #E0932B */
 
-  --sig-green: 52 211 153;
-  --sig-amber: 224 147 43;
-  --sig-red: 229 103 90;
+  /* Semáforo — tercera familia independiente del P&L en la app
+     (Colors.xaml:116-118): estado/veredicto, no dinero. */
+  --sig-green: 61 174 115; /* #3DAE73 */
+  --sig-amber: 224 147 43; /* #E0932B */
+  --sig-red: 229 103 90; /* #E5675A */
 
-  /* 3-level material — palette tint at escalating opacity.
-     Refined (R1-a) to a richer, more institutional near-black
-     (≈ #0E0F12, "Bloomberg terminal" depth) — one step darker than
-     the prior #121418 so the dark canvas reads as deeper and more
-     confident. The cool blue-gray cast is preserved so the brand
-     still reads as "serious fintech" rather than neutral charcoal;
-     the slightly darker floor also lets accent + P&L colors pop
-     with a touch more chroma separation. */
-  --tint: 14 15 18; /* #0E0F12 — Bloomberg terminal depth */
-  --canvas: 14 15 18;
-  --chrome: 14 15 18;
-  --card: 14 15 18;
+  /* Material de 3 niveles — el tinte de la paleta a opacidad creciente.
+     Tinte CÁLIDO #201E1B, el valor real de la app (Oro.xaml:59-61).
+     Antes era #0E0F12, un near-black azulado ("Bloomberg terminal"):
+     se veía gris frío junto a una app cuyo material es marrón cálido,
+     y era una de las razones de que la demo no se pareciera. El cálido
+     además hace de cama natural al acento champagne — sobre el azulado
+     el dorado viraba a mostaza sucia. */
+  --tint: 32 30 27; /* #201E1B — tinte CÁLIDO de la app (Oro.xaml:59-61) */
+  --canvas: 32 30 27;
+  --chrome: 32 30 27;
+  --card: 32 30 27;
   --canvas-op: 0.12;
   --chrome-op: 0.8;
   --card-op: 0.55;
@@ -188,14 +205,19 @@
   --sig-amber: 224 147 43;
   --sig-red: 229 103 90;
 
-  /* Cool, very light blue-gray (Figma-style #F8FAFC) replaces the
-     warm #EEF2F7 so the light theme reads as bright & airy rather
-     than tinted. Same cool cast as the new dark keeps the brand
-     coherent across the theme toggle. */
-  --tint: 248 250 252; /* #F8FAFC */
-  --canvas: 248 250 252;
-  --chrome: 248 250 252;
-  --card: 248 250 252;
+  /* Papel CÁLIDO #F7F4EE — el valor real de la app (Oro.xaml:22-24).
+     Sustituye al azulado #F8FAFC: el claro debe ser el mismo papel
+     hueso que la app, no un gris frío, y además es la cama que hace
+     que el acento champagne lea como oro y no como mostaza.
+     NOTA: los tokens de P&L de más arriba se quedan como están. La app
+     usa #1E7A4C/#D6332A en claro, pero aquí se oscurecieron a
+     propósito (#0B8B4B/#991B1B) para cumplir WCAG AA sobre los
+     fondos translúcidos de la web, que la app nativa no tiene.
+     Copiar los de la app sería revertir esa corrección. */
+  --tint: 247 244 238; /* #F7F4EE */
+  --canvas: 247 244 238;
+  --chrome: 247 244 238;
+  --card: 247 244 238;
   --canvas-op: 0.07;
   --chrome-op: 0.8;
   --card-op: 0.60;
@@ -233,31 +255,36 @@
   --ring: rgb(var(--accent-base));
 }
 
-/* ===== Accent: paleta única "verde" =====
-   Tras el rediseño solo hay una paleta (verde institucional #34B476).
-   El atributo data-palette se mantiene para no romper selectores que lo
-   consultan, pero ya no hay variantes. Si en el futuro se añaden más
-   paletas, restaurar el formato de bloques por nombre. */
+/* ===== Accent: paleta "Oro" (champagne/bronce) =====
+   Los nombres de clave data-palette ("verde"/"grafito") se conservan
+   para no romper selectores ni el localStorage ya escrito en los
+   navegadores de los visitantes, pero AMBOS apuntan ya a la paleta Oro
+   real de la app. El default en <html> es data-palette="grafito", así
+   que ese es el bloque que manda en runtime.
+
+   Valores: Oro.xaml (SystemAccentColor* y AccentFillColor*Brush).
+   Dark  → #C7A76B base · #D6BC85 hover · #B0905A pressed
+   Light → #8A6C35 base · #71581F hover · #5C4718 pressed
+   El base en claro da 4.91:1 sobre blanco (dato del propio
+   Esmeralda.xaml:7), por encima del 4.5:1 que pide WCAG AA para texto
+   normal, así que el acento en claro sigue siendo apto para texto.
+
+   NO devolver esto al verde: ver la nota larga del bloque :root. */
 :root[data-palette="verde"] {
-  --accent-base: 52 180 118; --accent-hover: 95 209 150; --accent-pressed: 21 92 60; --accent-soft: 52 180 118;
-  --tint: 11 12 13;
+  --accent-base: 199 167 107; --accent-hover: 214 188 133; --accent-pressed: 176 144 90; --accent-soft: 199 167 107;
+  --tint: 32 30 27;
 }
 :root[data-theme="light"][data-palette="verde"] {
-  --accent-base: 9 90 55; --accent-hover: 14 131 84; --accent-pressed: 6 69 40; /* R27-1a — darkened 1 stop further (#0B6E44 → #095A37) so eyebrow / § ordinal / accent text clears WCAG AA at ~5.8:1 on white and ≥5:1 on bg-veil. Hover kept lighter than base for gradient sheen; pressed now properly darker than base. */
-  --tint: 243 242 236;
+  --accent-base: 138 108 53; --accent-hover: 113 88 31; --accent-pressed: 92 71 24;
+  --tint: 247 244 238;
 }
-/* Grafito — el nombre de la clave data-palette se conserva (evita romper
-   selectores/localStorage existentes), pero el valor ya es el verde
-   institucional real de la app: mismo dark que --pnl-pos (#34D399), y en
-   light un verde más profundo y saturado (#0F8A56) para mantener el
-   contraste sobre fondos claros. */
 :root[data-palette="grafito"] {
-  --accent-base: 52 211 153; --accent-hover: 103 222 179; --accent-pressed: 31 127 92; --accent-soft: 52 211 153;
-  --tint: 11 12 13;
+  --accent-base: 199 167 107; --accent-hover: 214 188 133; --accent-pressed: 176 144 90; --accent-soft: 199 167 107;
+  --tint: 32 30 27;
 }
 :root[data-theme="light"][data-palette="grafito"] {
-  --accent-base: 9 90 55; --accent-hover: 14 131 84; --accent-pressed: 6 69 40; /* R27-1a — darkened 1 stop further (#0B6E44 → #095A37) so eyebrow / § ordinal / accent text clears WCAG AA at ~5.8:1 on white and ≥5:1 on bg-veil. Hover kept lighter than base for gradient sheen; pressed now properly darker than base. */
-  --tint: 243 242 236;
+  --accent-base: 138 108 53; --accent-hover: 113 88 31; --accent-pressed: 92 71 24;
+  --tint: 247 244 238;
 }
 
 /* Keep shadcn `.dark` variant in sync with data-theme dark */
@@ -751,18 +778,16 @@
     0 2px 4px rgb(0 0 0 / 0.22),
     0 8px 18px rgb(0 0 0 / 0.22);
 }
+/* Sin tinte de acento: una sombra comunica DISTANCIA, no color. */
 @utility depth-3 {
   box-shadow:
     0 4px 10px rgb(0 0 0 / 0.26),
-    0 18px 40px rgb(0 0 0 / 0.30),
-    0 0 28px rgb(var(--accent-base) / 0.10);
+    0 18px 40px rgb(0 0 0 / 0.30);
 }
 @utility depth-4 {
   box-shadow:
     0 6px 14px rgb(0 0 0 / 0.30),
-    0 24px 56px rgb(0 0 0 / 0.36),
-    0 0 36px rgb(var(--accent-base) / 0.16),
-    0 0 0 1px rgb(var(--accent-base) / 0.10);
+    0 24px 56px rgb(0 0 0 / 0.36);
 }
 :root[data-theme="light"] .depth-1 {
   box-shadow:
@@ -777,15 +802,12 @@
 :root[data-theme="light"] .depth-3 {
   box-shadow:
     0 4px 10px rgb(0 0 0 / 0.12),
-    0 18px 40px rgb(0 0 0 / 0.14),
-    0 0 32px rgb(var(--accent-base) / 0.14);
+    0 18px 40px rgb(0 0 0 / 0.14);
 }
 :root[data-theme="light"] .depth-4 {
   box-shadow:
     0 6px 14px rgb(0 0 0 / 0.16),
-    0 24px 56px rgb(0 0 0 / 0.20),
-    0 0 40px rgb(var(--accent-base) / 0.20),
-    0 0 0 1px rgb(var(--accent-base) / 0.14);
+    0 24px 56px rgb(0 0 0 / 0.20);
 }
 
 /* ============================================================
@@ -820,25 +842,30 @@
     0 2px 4px rgb(0 0 0 / 0.22),
     0 8px 18px rgb(0 0 0 / 0.22);
 }
+/* Elevación SIN tinte de acento.
+   Estas tres reglas llevaban un halo de color incrustado
+   (`0 0 Npx rgb(var(--accent-base) / …)`), así que cada tarjeta del
+   sitio se encendía en dorado al pasar por encima. Era la fuente
+   SISTÉMICA del brillo: por eso, al limpiar los componentes uno a uno,
+   seguían apareciendo decenas de sombras de acento — no estaban en los
+   componentes, estaban aquí.
+   La elevación ahora es sombra neutra pura, que es lo que una sombra
+   debe comunicar: distancia, no color. El acento se reserva para
+   señales con significado (ruta activa, foco, CTA). */
 .depth-2:hover {
   box-shadow:
     0 4px 10px rgb(0 0 0 / 0.26),
-    0 18px 40px rgb(0 0 0 / 0.30),
-    0 0 28px rgb(var(--accent-base) / 0.10);
+    0 18px 40px rgb(0 0 0 / 0.30);
 }
 .depth-3:hover {
   box-shadow:
     0 6px 14px rgb(0 0 0 / 0.30),
-    0 24px 56px rgb(0 0 0 / 0.36),
-    0 0 36px rgb(var(--accent-base) / 0.16),
-    0 0 0 1px rgb(var(--accent-base) / 0.10);
+    0 24px 56px rgb(0 0 0 / 0.36);
 }
 .depth-4:hover {
   box-shadow:
     0 8px 18px rgb(0 0 0 / 0.34),
-    0 30px 72px rgb(0 0 0 / 0.42),
-    0 0 48px rgb(var(--accent-base) / 0.22),
-    0 0 0 1px rgb(var(--accent-base) / 0.18);
+    0 30px 72px rgb(0 0 0 / 0.42);
 }
 :root[data-theme="light"] .depth-1:hover {
   box-shadow:
@@ -848,22 +875,17 @@
 :root[data-theme="light"] .depth-2:hover {
   box-shadow:
     0 4px 10px rgb(0 0 0 / 0.12),
-    0 18px 40px rgb(0 0 0 / 0.14),
-    0 0 32px rgb(var(--accent-base) / 0.14);
+    0 18px 40px rgb(0 0 0 / 0.14);
 }
 :root[data-theme="light"] .depth-3:hover {
   box-shadow:
     0 6px 14px rgb(0 0 0 / 0.16),
-    0 24px 56px rgb(0 0 0 / 0.20),
-    0 0 40px rgb(var(--accent-base) / 0.20),
-    0 0 0 1px rgb(var(--accent-base) / 0.14);
+    0 24px 56px rgb(0 0 0 / 0.20);
 }
 :root[data-theme="light"] .depth-4:hover {
   box-shadow:
     0 8px 18px rgb(0 0 0 / 0.20),
-    0 30px 72px rgb(0 0 0 / 0.26),
-    0 0 48px rgb(var(--accent-base) / 0.26),
-    0 0 0 1px rgb(var(--accent-base) / 0.22);
+    0 30px 72px rgb(0 0 0 / 0.26);
 }
 
 @layer utilities {

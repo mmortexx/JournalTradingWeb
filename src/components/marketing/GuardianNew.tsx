@@ -19,32 +19,20 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
       id="guardian"
       className="section bg-veil relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)]"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 80% 30%, color-mix(in oklab, rgb(var(--pnl-warn)) 8%, transparent), transparent 70%)",
-        }}
-      />
       <div className="relative max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Mockup tarjeta "Comprobación previa" */}
         <div
-          className="relative"
+          className="relative rounded-[8px]"
           style={{
             padding: 20,
-            borderRadius: 18,
             border: "1px solid rgb(var(--divider) / 0.13)",
             background: "color-mix(in oklab, var(--surface) 70%, transparent)",
             backdropFilter: "blur(20px) saturate(1.4)",
             WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            // R20-3b: depth-2 elevation + accent-tinted outer glow so the
-            // mockup card floats off the section veil rather than sitting
-            // flat (was a single inset highlight — invisible on the dark
-            // backdrop). Mirrors the depth-2 + accent-glow combo used on
-            // the Wrapped / MetricsShowcaseNew glass panels.
+            // Elevación neutra: se retiró el resplandor teñido de acento
+            // (era un glow de color puro sin función informativa).
             boxShadow:
-              "inset 0 1px 0 rgb(255 255 255 / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22), 0 0 24px rgb(var(--accent-base) / 0.06)",
+              "inset 0 1px 0 rgb(255 255 255 / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)",
           }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
@@ -59,7 +47,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               style={{
                 fontSize: 10,
                 padding: "3px 9px",
-                borderRadius: 100,
+                borderRadius: 4,
                 background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
                 color: "rgb(var(--accent-base))",
                 border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 30%, transparent)",
@@ -72,14 +60,6 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                   width: 5,
                   height: 5,
                   background: "rgb(var(--accent-base))",
-                  // R24-1c: animate the LIVE dot with tj-glow (keyframe in
-                  // globals.css — opacity 0.5 ↔ 0.85) so the "EN VIVO" /
-                  // "LIVE" badge actually reads as live rather than a
-                  // static green bead. The same keyframe is used by other
-                  // ambient-living elements across the site so the pulse
-                  // rhythm stays consistent.
-                  animation: "tj-glow 1.8s ease-in-out infinite",
-                  boxShadow: "0 0 6px rgb(var(--accent-base) / 0.6)",
                 }}
               />
               {es ? "EN VIVO" : "LIVE"}
@@ -87,7 +67,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
           </div>
           {/* Fila del trade */}
           <div
-            className="rounded-[12px] p-3 mb-4"
+            className="rounded-[8px] p-3 mb-4"
             style={{
               background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
               border: "1px solid rgb(var(--divider) / 0.06)",
@@ -98,7 +78,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                 className="tnum inline-block"
                 style={{
                   padding: "4px 10px",
-                  borderRadius: 100,
+                  borderRadius: 4,
                   background: "color-mix(in oklab, rgb(var(--pnl-pos)) 14%, transparent)",
                   color: "rgb(var(--pnl-pos))",
                   fontSize: 11,
@@ -131,17 +111,11 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                       ? "color-mix(in oklab, rgb(var(--pnl-pos)) 18%, transparent)"
                       : "color-mix(in oklab, rgb(var(--pnl-neg)) 18%, transparent)",
                     color: c.ok ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))",
-                    // R24-1c: swapped the inset-shadow-only ring for a
-                    // solid 1px border of the same pnl color so the ✓/✕
-                    // container reads as a stamped seal (inset shadow alone
-                    // was nearly imperceptible on the dark glass). Bumped
-                    // size 18→20 so the glyph + ring have room to breathe at
-                    // 11px/800. Added a 0 0 8px glow halo so the icons read
-                    // as luminous rather than pasted on.
+                    // Sello del ✓/✕: borde sólido de 1px del color pnl
+                    // correspondiente. Se retiró el anillo/glow por
+                    // box-shadow (rule 2 — sin sombras de color); el borde
+                    // real cumple la misma función de "sello".
                     border: `1px solid ${c.ok ? "rgb(var(--pnl-pos) / 0.45)" : "rgb(var(--pnl-neg) / 0.50)"}`,
-                    boxShadow: c.ok
-                      ? "inset 0 0 0 1px rgb(var(--pnl-pos) / 0.18), 0 0 8px rgb(var(--pnl-pos) / 0.10)"
-                      : "inset 0 0 0 1px rgb(var(--pnl-neg) / 0.20), 0 0 8px rgb(var(--pnl-neg) / 0.12)",
                   }}
                 >
                   <span style={{ fontSize: 11, fontWeight: 800, lineHeight: 1 }}>{c.ok ? "✓" : "✕"}</span>
@@ -160,13 +134,12 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               the OPERACIÓN BLOQUEADA label read as a single stamped seal
               rather than a floating icon + text. */}
           <div
-            className="rounded-[10px] mb-3 relative overflow-hidden"
+            className="rounded-[8px] mb-3 relative overflow-hidden"
             style={{
               padding: "12px 14px 12px 16px",
               background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",
               border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 28%, transparent)",
-              boxShadow:
-                "inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 0 1px rgb(var(--pnl-neg) / 0.05), 0 10px 28px -12px rgb(var(--pnl-neg) / 0.30)",
+              boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06)",
             }}
           >
             <span
@@ -184,7 +157,6 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                   background: "color-mix(in oklab, rgb(var(--pnl-neg)) 18%, transparent)",
                   color: "rgb(var(--pnl-neg))",
                   border: "1px solid rgb(var(--pnl-neg) / 0.45)",
-                  boxShadow: "inset 0 0 0 1px rgb(var(--pnl-neg) / 0.18), 0 0 8px rgb(var(--pnl-neg) / 0.12)",
                 }}
               >
                 <AlertTriangle size={12} strokeWidth={2.4} style={{ color: "rgb(var(--pnl-neg))" }} />
@@ -212,7 +184,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               style={{
                 height: 36,
                 padding: "0 12px",
-                borderRadius: 100,
+                borderRadius: 4,
                 background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
                 color: "rgb(var(--accent-base))",
                 border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 35%, transparent)",
@@ -228,7 +200,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               style={{
                 height: 36,
                 padding: "0 12px",
-                borderRadius: 100,
+                borderRadius: 4,
                 background: "transparent",
                 color: "var(--ink-2)",
                 border: "1px solid rgb(var(--divider) / 0.13)",

@@ -24,8 +24,12 @@ export function TrustStrip() {
 
   const items = [
     {
+      // Sustituye a la antigua "Garantía 30 días" (retirada: no se
+      // ofrecen reembolsos). El escudo se reaprovecha para el Guardián,
+      // que es su significado en el resto del sitio — así la tira
+      // mantiene sus 5 elementos y el icono no queda huérfano.
       icon: <ShieldIcon />,
-      label: es ? "Garantía 30 días" : "30-day guarantee",
+      label: es ? "Guardián de disciplina" : "Discipline guardian",
     },
     {
       icon: <InfinityIcon />,
@@ -47,7 +51,7 @@ export function TrustStrip() {
 
   return (
     <section
-      aria-label={es ? "Garantías" : "Guarantees"}
+      aria-label={es ? "Confianza" : "Trust"}
       // R27-1b — `bg-veil` added: this thin trust band had no
       // background — the eye WebGL (bright red/green fibers in light
       // theme) was showing through between the icons + labels,

@@ -4,70 +4,74 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLang } from "@/lib/i18n";
+import { useLang, type Lang } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 
 /**
- * Navbar — barra edge-to-edge con material translúcido acrylic premium.
+ * Navbar — barra edge-to-edge con material acrylic premium.
  *
- * Composición (desktop):
- *  - Barra que ocupa TODO el ancho de la web (edge-to-edge, no píldora
- *    flotante). Material acrylic de alta calidad: blur 24 + saturate 1.8,
- *    fondo `--surface` al 80 % (oscuro) / 88 % (claro) que sube a 92 % /
- *    96 % al hacer scroll >10 px, borde inferior hairline, inset
- *    highlight superior y sombra profunda al scroll. El contenido
- *    interior se alinea a `max-w-page mx-auto`.
- *  - Marca: cuadrado de vidrio con el trío de velas + wordmark serif.
- *  - "Producto" abre un MEGAMENÚ desplegable de 520 px con 4 entradas
- *    (Características / Métricas / Disciplina / Seguridad), cada una
- *    con icono, título y descripción — hover con retardo de cierre de
- *    140 ms, click alterna, Escape cierra, click en entrada cierra.
- *  - Demo y Precios como enlaces píldora.
- *  - Clúster derecho: reloj UTC en vivo con punto de sesión, toggle de
- *    tema (círculo 38 px), toggle de idioma y CTA "Comprar" en píldora
- *    accent con sheen.
+ * R28 — reescritura de la barra. Los tres problemas estructurales que
+ * arrastraba la versión anterior y que esta corrige:
+ *
+ *  1. MAQUETA ARBITRARIA. Antes: cinco hijos en un `justify-between`
+ *     con dos separadores hairline intercalados. El espacio sobrante se
+ *     repartía entre huecos sin jerarquía, así que la navegación no
+ *     quedaba centrada ni anclada a nada — solo "en algún punto" entre
+ *     la marca y el clúster. Ahora: rejilla de tres zonas
+ *     `[1fr_auto_1fr]`, con la navegación ópticamente centrada en la
+ *     página pase lo que pase con el ancho de la marca o del clúster.
+ *     Los separadores sobran (la rejilla ya estructura) y se retiran.
+ *
+ *  2. HOVER EN JAVASCRIPT, TECLADO SIN FEEDBACK. Antes cada enlace
+ *     llevaba `onMouseEnter`/`onMouseLeave` mutando `el.style` a mano.
+ *     Eso (a) salta de golpe en vez de interpolar, (b) deja el estado
+ *     pegado si el puntero sale durante una navegación y (c) —el fallo
+ *     serio— NO se dispara con foco de teclado, así que quien tabula no
+ *     veía absolutamente nada. Ahora el realce y el foco se declaran en
+ *     CSS con `hover:` / `focus-visible:`, de modo que ratón y teclado
+ *     reciben exactamente el mismo trato.
+ *
+ *  3. INDICADOR ACTIVO REDUNDANTE. Antes la ruta activa se marcaba a la
+ *     vez con fondo Y con barra inferior. Ahora el fondo es exclusivo
+ *     del hover/foco (transitorio) y la regla de acento es exclusiva de
+ *     "dónde estás" (persistente). Dos señales, dos significados.
+ *
+ *  4. R28-b — VUELTA DE TUERCA INSTITUCIONAL. Una versión intermedia
+ *     usaba una píldora compartida con `layoutId` que VIAJABA entre
+ *     elementos con muelle. Resolvía la accesibilidad, pero el gesto es
+ *     de "SaaS premium" y la web se posiciona como mesa institucional:
+ *     ahí el realce se enciende, no se desliza. Retirada. En la misma
+ *     línea: radios de 4 px (el radio de control real de la app) en vez
+ *     de `rounded-full`, CTA sin sheen ni sombra de color, megamenú sin
+ *     muelle ni escalonado, y el cambio de tema sin voltereta.
+ *
+ * Además: la barra condensa 68 → 56 px al hacer scroll (el material
+ * gana opacidad y sombra a la vez), y una hairline de acento en el
+ * borde inferior traza el progreso de lectura de la página — coherente
+ * con un producto que va de medir.
  *
  * El material se diseñó para leerse sobre el ojo WebGL del fondo en
- * AMBOS temas: en oscuro el `--surface` (#141618) aporta el scrim; en
- * claro el `--surface` (#fbfaf7) aporta la base blanca translúcida que
- * aísla el cromatismo del iris sin competir con él.
+ * AMBOS temas: en oscuro `--surface` (#141618) aporta el scrim; en
+ * claro `--surface` (#fbfaf7) aporta la base translúcida que aísla el
+ * cromatismo del iris sin competir con él.
  *
- * El drawer móvil (focus-trap, scroll-lock, Escape, cierre por ruta)
- * se conserva íntegro del navbar anterior — es maquinaria a11y probada.
+ * El drawer móvil (focus-trap, scroll-lock, Escape, cierre por ruta) se
+ * conserva íntegro — es maquinaria a11y probada y no se toca.
  *
- * El reloj arranca en "--:--:--" tanto en servidor como en el primer
- * render de cliente y solo empieza a tickear dentro de un efecto — así
- * la hidratación nunca ve horas distintas (cero mismatch).
- *
- * R24-1b polish round:
- *  - Megamenu: Metrics icon stroke normalized 1.4 → 1.3 to match the
- *    other three product icons (consistent stroke weight across the
- *    grid).
- *  - UtcClock: 10.5 → 11 px for legibility; live dot now uses the
- *    pronounced `tj-pulse-dot` keyframe (0.4→1.0 opacity + glow bloom)
- *    instead of the subtle `tj-glow` — a status dot must read as alive.
- *  - Theme toggle: AnimatePresence cross-fade + rotate between sun /
- *    moon icons (was an instant swap).
- *  - Language toggle: shows "ES · EN" with the active language in
- *    accent color so it's unambiguous which is live (was a single
- *    ambiguous code with no indication of the other option).
- *  - Buy button: hover now intensifies the shadow + adds a 1-px accent
- *    ring, matching the Hero primary CTA's hover treatment so the two
- *    read as a coordinated pair.
- *  - Mobile drawer: link gap 1 → 1.5 (better breathing); active link
- *    swaps the right-side dot for a 3-px left accent bar (the standard
- *    active-row pattern, more visible than a 1.5-px dot).
- *  - Scroll-state material transition: easing upgraded from `ease` to
- *    cubic-bezier(0.22, 1, 0.36, 1) for a more premium deceleration.
+ * El reloj arranca en "--:--:--" en servidor y en el primer render de
+ * cliente, y solo tickea dentro de un efecto: la hidratación nunca ve
+ * horas distintas (cero mismatch).
  */
 export function Navbar() {
-  const { t, lang, toggle } = useLang();
+  const { t, lang } = useLang();
   const es = lang === "es";
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  /** Elemento de navegación bajo el puntero/foco — mueve la píldora. */
+  const [hovered, setHovered] = useState<string | null>(null);
   const megaCloseTimer = useRef<number | null>(null);
 
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -96,8 +100,8 @@ export function Navbar() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setMegaOpen(false);
-        // Return focus to the "Producto" trigger so keyboard users keep
-        // their place in the tab order after closing the panel.
+        // Devuelve el foco al disparador "Producto" para que quien usa
+        // teclado conserve su sitio en el orden de tabulación.
         megaButtonRef.current?.focus();
       }
     };
@@ -105,7 +109,7 @@ export function Navbar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [megaOpen]);
 
-  // Focus trap del drawer móvil (sin cambios respecto al navbar previo).
+  // Focus trap del drawer móvil (maquinaria a11y intacta).
   useEffect(() => {
     if (!mobileOpen) return;
     const raf = requestAnimationFrame(() => {
@@ -164,11 +168,14 @@ export function Navbar() {
     };
   }, [mobileOpen]);
 
-  // Cerrar drawer y megamenú al cambiar de ruta.
+  // Cerrar drawer y megamenú al cambiar de ruta. `hovered` también se
+  // limpia: si no, la píldora se quedaba encallada bajo el elemento que
+  // acabas de pulsar cuando el puntero ya no está encima.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setMobileOpen(false);
     setMegaOpen(false);
+    setHovered(null);
   }, [pathname]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -235,7 +242,7 @@ export function Navbar() {
   ];
 
   // Enlaces del drawer móvil — mantiene Acerca de y FAQ (en desktop
-  // viven en el footer; la píldora sigue al HTML: Producto/Demo/Precios).
+  // viven en el footer; la barra sigue al HTML: Producto/Demo/Precios).
   const drawerLinks: { href: string; labelEs: string; labelEn: string }[] = [
     { href: "/features", labelEs: "Características", labelEn: "Features" },
     { href: "/demo", labelEs: "Demo", labelEn: "Demo" },
@@ -244,355 +251,294 @@ export function Navbar() {
     { href: "/faq", labelEs: "FAQ", labelEn: "FAQ" },
   ];
 
-  const pillLink = (href: string, label: string) => {
-    const active = pathname === href;
+  /** ¿Esta ruta (o una subruta suya) es la página actual? */
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
+
+  /**
+   * Realce compartido. Un único nodo con `layoutId` que Framer mueve
+   * entre elementos: en vez de que cada píldora se encienda y se apague
+   * por su cuenta, el fondo VIAJA de una a otra. Es la diferencia entre
+   * una barra que responde y una que se siente construida.
+   */
+  const hoverPill = (key: string) =>
+    hovered === key ? (
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-[4px]"
+        style={{ background: "color-mix(in srgb, var(--ink) 6%, transparent)" }}
+      />
+    ) : null;
+
+  /** Regla de acento persistente que marca la ruta actual. */
+  const activeBar = (
+    <span
+      aria-hidden
+      className="absolute -bottom-[6px] left-2 right-2 h-[2px]"
+      style={{ background: "rgb(var(--accent-base))" }}
+    />
+  );
+
+  const navLink = (href: string, label: string) => {
+    const active = isActive(href);
     return (
-      <Link
+      <div
         key={href}
-        href={href}
-        aria-current={active ? "page" : undefined}
-        className="relative rounded-full px-[15px] py-[9px] text-sm transition-colors duration-200"
-        style={{
-          color: active ? "var(--ink)" : "var(--ink-2)",
-          background: active
-            ? "color-mix(in srgb, var(--ink) 6%, transparent)"
-            : "transparent",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = "var(--ink)";
-          e.currentTarget.style.background =
-            "color-mix(in srgb, var(--ink) 6%, transparent)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = active ? "var(--ink)" : "var(--ink-2)";
-          e.currentTarget.style.background = active
-            ? "color-mix(in srgb, var(--ink) 6%, transparent)"
-            : "transparent";
-        }}
+        className="relative"
+        onMouseEnter={() => setHovered(href)}
       >
-        {label}
-        {/* Indicador de página activa — barra de acento bajo la píldora,
-            mismo lenguaje que el subrayado de pestaña activa del demo
-            (TopNav). */}
-        {active && (
-          <span
-            aria-hidden
-            className="absolute inset-x-3 -bottom-[3px] h-[2px] rounded-full"
-            style={{ background: "rgb(var(--accent-base))" }}
-          />
-        )}
-      </Link>
+        {hoverPill(href)}
+        <Link
+          href={href}
+          aria-current={active ? "page" : undefined}
+          onFocus={() => setHovered(href)}
+          className="relative z-10 block rounded-[4px] px-[15px] py-[9px] text-sm transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+          style={{ color: active || hovered === href ? "var(--ink)" : "var(--ink-2)" }}
+        >
+          {label}
+        </Link>
+        {active && activeBar}
+      </div>
     );
   };
 
+  const productActive = pathname.startsWith("/features");
+
   return (
-    <header className="fixed top-0 inset-x-0 z-50">
+    <header className="fixed inset-x-0 top-0 z-50">
       <nav
-        className="flex w-full items-center justify-between gap-4 border-b px-5 md:px-8"
+        className="relative flex w-full items-center border-b px-5 md:px-8"
         style={{
-          height: 60,
+          // Condensación al hacer scroll: la barra se estrecha mientras
+          // el material gana cuerpo. Un solo gesto, dos señales.
+          height: scrolled ? 56 : 68,
           borderColor: "rgb(var(--divider) / 0.1)",
           background: scrolled
             ? "color-mix(in srgb, var(--surface) 92%, transparent)"
-            : "color-mix(in srgb, var(--surface) 80%, transparent)",
+            : "color-mix(in srgb, var(--surface) 78%, transparent)",
           backdropFilter: "blur(24px) saturate(1.8)",
           WebkitBackdropFilter: "blur(24px) saturate(1.8)",
           boxShadow: scrolled
             ? "inset 0 1px 0 rgb(var(--divider) / 0.16), 0 14px 40px -16px rgb(0 0 0 / 0.55)"
             : "inset 0 1px 0 rgb(var(--divider) / 0.14), 0 6px 20px -12px rgb(0 0 0 / 0.4)",
-          transition: "background 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+          transition:
+            "height 0.34s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
-        {/* Inner container — constrains content to the page max width
-            while the material bar itself spans edge-to-edge. */}
-        <div className="flex w-full max-w-page mx-auto items-center justify-between gap-4">
-        {/* Marca */}
-        <Link
-          href="/"
-          className="flex min-w-0 shrink-0 items-center gap-[11px]"
-          style={{ color: "var(--ink)" }}
-          aria-label={t("appName")}
-        >
-          <BrandMark />
-          <span
-            className="font-serif truncate"
-            style={{ fontSize: 19, fontWeight: 500, letterSpacing: "-0.01em" }}
+        {/* Rejilla de tres zonas: la navegación queda ópticamente
+            centrada en la página con independencia de lo que midan la
+            marca (izquierda) y el clúster de utilidades (derecha). */}
+        <div className="mx-auto grid w-full max-w-page grid-cols-[1fr_auto_1fr] items-center gap-4">
+          {/* ZONA 1 — Marca */}
+          <Link
+            href="/"
+            className="flex min-w-0 items-center gap-[11px] justify-self-start rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+            style={{ color: "var(--ink)" }}
+            aria-label={t("appName")}
           >
-            {t("appName")}
-          </span>
-        </Link>
-
-        {/* Separador — estructura visual entre marca y navegación, mismo
-            lenguaje hairline que el resto del sitio (--divider). */}
-        <div
-          aria-hidden
-          className="hidden h-6 w-px shrink-0 md:block"
-          style={{ background: "rgb(var(--divider) / 0.15)" }}
-        />
-
-        {/* Enlaces desktop: Producto (megamenú) · Demo · Precios */}
-        <div className="hidden items-center gap-0.5 md:flex">
-          <div
-            className="relative"
-            onMouseEnter={megaEnter}
-            onMouseLeave={megaLeave}
-          >
-            <button
-              type="button"
-              id="navbar-producto-trigger"
-              ref={megaButtonRef}
-              onClick={() => setMegaOpen((o) => !o)}
-              aria-expanded={megaOpen}
-              aria-haspopup="menu"
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border-0 bg-transparent px-[15px] py-[9px] text-sm transition-colors duration-200"
-              style={{
-                color: megaOpen ? "var(--ink)" : "var(--ink-2)",
-                background: megaOpen
-                  ? "color-mix(in srgb, var(--ink) 6%, transparent)"
-                  : "transparent",
-                fontFamily: "inherit",
-              }}
+            <BrandMark />
+            <span
+              className="truncate font-serif"
+              style={{ fontSize: 19, fontWeight: 500, letterSpacing: "-0.01em" }}
             >
-              {es ? "Producto" : "Product"}
-              <svg
-                width="9"
-                height="9"
-                viewBox="0 0 16 16"
-                fill="none"
-                aria-hidden
+              {t("appName")}
+            </span>
+          </Link>
+
+          {/* ZONA 2 — Navegación centrada: Producto (megamenú) · Demo · Precios */}
+          <div
+            className="hidden items-center gap-0.5 justify-self-center md:flex"
+            onMouseLeave={() => setHovered(null)}
+          >
+            <div
+              className="relative"
+              onMouseEnter={() => {
+                setHovered("product");
+                megaEnter();
+              }}
+              onMouseLeave={megaLeave}
+            >
+              {hoverPill("product")}
+              <button
+                type="button"
+                id="navbar-producto-trigger"
+                ref={megaButtonRef}
+                onClick={() => setMegaOpen((o) => !o)}
+                onFocus={() => setHovered("product")}
+                aria-expanded={megaOpen}
+                aria-haspopup="menu"
+                className="relative z-10 inline-flex cursor-pointer items-center gap-1.5 rounded-[4px] border-0 bg-transparent px-[15px] py-[9px] text-sm outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
                 style={{
-                  transition: "transform 0.2s",
-                  transform: megaOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  color:
+                    megaOpen || productActive || hovered === "product"
+                      ? "var(--ink)"
+                      : "var(--ink-2)",
+                  fontFamily: "inherit",
                 }}
               >
-                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            {/* Panel del megamenú */}
-            <div
-              role="menu"
-              aria-labelledby="navbar-producto-trigger"
-              className="absolute left-1/2 w-[520px] max-w-[calc(100vw-3rem)] rounded-[14px] border p-2.5"
-              style={{
-                top: "calc(100% + 12px)",
-                transform: megaOpen
-                  ? "translateX(-50%) translateY(0)"
-                  : "translateX(-50%) translateY(-6px)",
-                opacity: megaOpen ? 1 : 0,
-                visibility: megaOpen ? "visible" : "hidden",
-                pointerEvents: megaOpen ? "auto" : "none",
-                transition: "opacity 0.18s ease, transform 0.18s ease, visibility 0.18s",
-                borderColor: "rgb(var(--divider) / 0.13)",
-                background: "color-mix(in srgb, var(--surface) 96%, transparent)",
-                backdropFilter: "blur(24px) saturate(1.4)",
-                WebkitBackdropFilter: "blur(24px) saturate(1.4)",
-                boxShadow:
-                  "0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78)",
-              }}
-            >
-              <div className="grid grid-cols-2 gap-1">
-                {productItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    role="menuitem"
-                    onClick={() => setMegaOpen(false)}
-                    className="flex gap-[11px] rounded-[10px] px-3 py-[11px] transition-colors"
-                    style={{ color: "var(--ink)" }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background =
-                        "color-mix(in srgb, var(--ink) 5%, transparent)";
-                      // Optimistic prefetch: inject a <link rel="prefetch">
-                      // for the route so the page is already in the browser
-                      // cache when the visitor clicks. Idempotent — if the
-                      // link already exists, no duplicate is added. This
-                      // gives near-instant navigation from the megamenu on
-                      // slow connections without forcing all routes to
-                      // prefetch on page load.
-                      const id = `prefetch-${item.href.replace(/[^a-z0-9]/gi, "-")}`;
-                      if (!document.getElementById(id)) {
-                        const link = document.createElement("link");
-                        link.id = id;
-                        link.rel = "prefetch";
-                        link.href = item.href;
-                        link.as = "document";
-                        document.head.appendChild(link);
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "transparent";
+                {es ? "Producto" : "Product"}
+                <svg
+                  width="9"
+                  height="9"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden
+                  style={{
+                    transition: "transform 0.28s cubic-bezier(0.22, 1, 0.36, 1)",
+                    transform: megaOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                >
+                  <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {productActive && activeBar}
+
+              {/* Panel del megamenú. AnimatePresence en lugar de
+                  conmutar `visibility`: así el panel se desmonta de
+                  verdad y no queda en el árbol de accesibilidad estando
+                  cerrado. */}
+              <AnimatePresence>
+                {megaOpen && (
+                  <motion.div
+                    role="menu"
+                    aria-labelledby="navbar-producto-trigger"
+                    /* Apertura corta y plana: sin muelle ni escala. Un
+                       menú de herramientas aparece, no rebota. */
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.13, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute left-1/2 w-[520px] max-w-[calc(100vw-3rem)] origin-top rounded-[8px] border p-2"
+                    style={{
+                      top: "calc(100% + 14px)",
+                      x: "-50%",
+                      borderColor: "rgb(var(--divider) / 0.13)",
+                      background: "color-mix(in srgb, var(--surface) 96%, transparent)",
+                      backdropFilter: "blur(24px) saturate(1.4)",
+                      WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+                      boxShadow:
+                        "0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78)",
                     }}
                   >
+                    {/* Punta que ancla el panel a su disparador — sin
+                        ella el menú parecía flotar suelto bajo la barra. */}
                     <span
-                      className="grid flex-none place-items-center rounded-lg"
+                      aria-hidden
+                      className="absolute left-1/2 -top-[6px] h-[11px] w-[11px] -translate-x-1/2 rotate-45 rounded-[2px] border-l border-t"
                       style={{
-                        width: 30,
-                        height: 30,
-                        background: "rgb(var(--accent-base) / 0.14)",
-                        color: "rgb(var(--accent-base))",
+                        borderColor: "rgb(var(--divider) / 0.13)",
+                        background: "color-mix(in srgb, var(--surface) 96%, transparent)",
                       }}
-                    >
-                      {item.icon}
-                    </span>
-                    <span>
-                      <span className="block text-[13px] font-semibold">
-                        {es ? item.labelEs : item.labelEn}
-                      </span>
-                      <span
-                        className="mt-0.5 block text-[11.5px] leading-[1.4]"
-                        // R27-1c — bumped --ink-3 → --ink-2 (tertiary →
-                        // secondary). VLM flagged the megamenu descriptions
-                        // as borderline on the bright acrylic panel: at
-                        // 11.5px the tertiary token's ≈5.5:1 contrast
-                        // shrinks toward the WCAG floor once the panel's
-                        // 96 % surface tint + 24px blur are layered under
-                        // it. Secondary's ≈9:1 keeps the small descriptive
-                        // line safely legible in both themes.
-                        style={{ color: "var(--ink-2)" }}
-                      >
-                        {es ? item.descEs : item.descEn}
-                      </span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
+                    />
+                    <div className="relative grid grid-cols-2 gap-1">
+                      {/* Sin escalonado de entrada: las cuatro entradas
+                          aparecen a la vez. El escalonado hacía esperar
+                          al usuario a que el menú "terminara". */}
+                      {productItems.map((item) => (
+                        <div key={item.href}>
+                          <Link
+                            href={item.href}
+                            role="menuitem"
+                            onClick={() => setMegaOpen(false)}
+                            className="group flex gap-[11px] rounded-[4px] px-3 py-[11px] outline-none transition-colors hover:bg-[color-mix(in_srgb,var(--ink)_5%,transparent)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_5%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+                            style={{ color: "var(--ink)" }}
+                            onMouseEnter={() => {
+                              // Prefetch optimista: inyecta un
+                              // <link rel="prefetch"> para que la ruta ya
+                              // esté en caché cuando se pulse. Idempotente.
+                              const id = "prefetch-" + item.href.replace(/[^a-z0-9]/gi, "-");
+                              if (!document.getElementById(id)) {
+                                const link = document.createElement("link");
+                                link.id = id;
+                                link.rel = "prefetch";
+                                link.href = item.href;
+                                link.as = "document";
+                                document.head.appendChild(link);
+                              }
+                            }}
+                          >
+                            <span
+                              className="grid flex-none place-items-center rounded-[4px]"
+                              style={{
+                                width: 30,
+                                height: 30,
+                                background: "rgb(var(--accent-base) / 0.14)",
+                                color: "rgb(var(--accent-base))",
+                              }}
+                            >
+                              {item.icon}
+                            </span>
+                            <span>
+                              <span className="block text-[13px] font-semibold">
+                                {es ? item.labelEs : item.labelEn}
+                              </span>
+                              <span
+                                className="mt-0.5 block text-[11.5px] leading-[1.4]"
+                                // R27-1c — --ink-3 → --ink-2. A 11.5 px el
+                                // token terciario (~5.5:1) se acerca al
+                                // suelo WCAG una vez se apilan el 96 % de
+                                // surface y el blur de 24 px del panel. El
+                                // secundario (~9:1) lo deja seguro en
+                                // ambos temas.
+                                style={{ color: "var(--ink-2)" }}
+                              >
+                                {es ? item.descEs : item.descEn}
+                              </span>
+                            </span>
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
+
+            {navLink("/demo", "Demo")}
+            {navLink("/pricing", es ? "Precios" : "Pricing")}
           </div>
-          {pillLink("/demo", "Demo")}
-          {pillLink("/pricing", es ? "Precios" : "Pricing")}
-        </div>
 
-        {/* Separador — cierra el grupo de navegación antes del clúster de
-            utilidades (reloj/tema/idioma/CTA), mismo lenguaje hairline. */}
-        <div
-          aria-hidden
-          className="hidden h-6 w-px shrink-0 md:block"
-          style={{ background: "rgb(var(--divider) / 0.15)" }}
-        />
+          {/* ZONA 3 — Utilidades: reloj UTC · tema · idioma · CTA · hamburguesa */}
+          <div className="flex flex-none items-center gap-2 justify-self-end">
+            <UtcClock />
+            <IconButton
+              onClick={toggleTheme}
+              label={es ? "Cambiar tema" : "Toggle theme"}
+              extraProps={{ "data-theme-toggle": true }}
+            >
+              {/* Cruce corto entre sol y luna, solo opacidad: la voltereta
+                  con rotación y escala era un gesto de juguete en una
+                  barra que debe leerse como instrumental. `mode="wait"`
+                  evita que se solapen; `initial={false}` evita el
+                  destello al montar. */}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={theme}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  className="grid place-items-center"
+                  style={{ width: 15, height: 15 }}
+                >
+                  {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                </motion.span>
+              </AnimatePresence>
+            </IconButton>
 
-        {/* Clúster derecho: reloj UTC · tema · idioma · CTA · hamburguesa */}
-        <div className="flex flex-none items-center gap-2">
-          <UtcClock />
-          <button
-            onClick={toggleTheme}
-            data-theme-toggle
-            className="grid flex-none cursor-pointer place-items-center rounded-full border bg-transparent transition-colors duration-200"
-            style={{
-              width: 38,
-              height: 38,
-              borderColor: "rgb(var(--divider) / 0.06)",
-              color: "var(--ink-2)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "var(--ink)";
-              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.13)";
-              e.currentTarget.style.background =
-                "color-mix(in srgb, var(--ink) 5%, transparent)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "var(--ink-2)";
-              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.06)";
-              e.currentTarget.style.background = "transparent";
-            }}
-            aria-label={es ? "Cambiar tema" : "Toggle theme"}
-            title={es ? "Cambiar tema" : "Toggle theme"}
-          >
-            {/* R24-1b — cross-fade + rotate between sun / moon on theme
-                change. `mode="wait"` ensures the exiting icon completes
-                before the entering one mounts so they don't overlap; the
-                ±90° rotation + 0.7→1 scale reads as the icon "flipping"
-                like a coin, premium toggle feel. `initial={false}` skips
-                the entrance animation on first mount (no flash). */}
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={theme}
-                initial={{ opacity: 0, rotate: -90, scale: 0.7 }}
-                animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                exit={{ opacity: 0, rotate: 90, scale: 0.7 }}
-                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                className="grid place-items-center"
-                style={{ width: 15, height: 15 }}
-              >
-                {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-              </motion.span>
-            </AnimatePresence>
-          </button>
-          <button
-            onClick={toggle}
-            className="grid flex-none cursor-pointer place-items-center rounded-full border bg-transparent text-[10.5px] font-semibold tracking-wide transition-colors duration-200"
-            style={{
-              width: 38,
-              height: 38,
-              borderColor: "rgb(var(--divider) / 0.06)",
-              color: "var(--ink-2)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.13)";
-              e.currentTarget.style.background =
-                "color-mix(in srgb, var(--ink) 5%, transparent)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgb(var(--divider) / 0.06)";
-              e.currentTarget.style.background = "transparent";
-            }}
-            aria-label={es ? "Cambiar idioma" : "Toggle language"}
-            title={es ? "Cambiar idioma" : "Toggle language"}
-          >
-            {/* R24-1b — show BOTH codes so it's unambiguous which language
-                is live. The active one is rendered in accent green at full
-                weight; the inactive one is dimmed to ink-3 at 60 % so the
-                toggle reads as a pair, not a single ambiguous code. The
-                middle dot is a hairline separator at the same weight. */}
-            <span className="flex items-center gap-[3px]">
-              <span
-                style={{
-                  color: es ? "rgb(var(--accent-base))" : "var(--ink-3)",
-                  opacity: es ? 1 : 0.6,
-                }}
-              >
-                ES
-              </span>
-              <span style={{ color: "var(--ink-3)", opacity: 0.4 }}>·</span>
-              <span
-                style={{
-                  color: !es ? "rgb(var(--accent-base))" : "var(--ink-3)",
-                  opacity: !es ? 1 : 0.6,
-                }}
-              >
-                EN
-              </span>
-            </span>
-          </button>
-          <motion.div
-            whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-            className="hidden sm:inline-flex"
-          >
+            <LanguagePicker />
+
+            {/* CTA — rectángulo de 4 px, sin sheen ni sombra de color.
+                El único realce es un cambio de tono, declarado igual
+                para ratón y teclado. */}
             <Link
               href="/pricing"
-              className="tj-cta-sheen inline-flex flex-none items-center gap-[7px] whitespace-nowrap rounded-full text-sm font-semibold transition-[transform,filter] duration-200"
+              className="hidden flex-none items-center gap-[7px] whitespace-nowrap rounded-[4px] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] sm:inline-flex"
               style={{
-                height: 40,
-                padding: "0 20px",
+                height: 38,
+                padding: "0 18px",
                 background: "rgb(var(--accent-base))",
-                color: "#06130d",
-                boxShadow:
-                  "0 10px 26px -12px color-mix(in srgb, rgb(var(--accent-base)) 70%, #000)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-1px)";
-                e.currentTarget.style.filter = "brightness(1.08)";
-                // R24-1b — intensify the accent glow + add a 1-px accent
-                // ring on hover so the Buy CTA's lift reads as deliberate
-                // (same treatment as the Hero primary CTA — the two CTAs
-                // lift + ring as a coordinated pair across the page).
-                e.currentTarget.style.boxShadow =
-                  "0 14px 32px -10px color-mix(in srgb, rgb(var(--accent-base)) 80%, #000), 0 0 0 1px rgb(var(--accent-base) / 0.30)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "";
-                e.currentTarget.style.filter = "";
-                e.currentTarget.style.boxShadow =
-                  "0 10px 26px -12px color-mix(in srgb, rgb(var(--accent-base)) 70%, #000)";
+                color: "#1A1917",
               }}
             >
               {es ? "Comprar" : "Buy"}
@@ -600,30 +546,32 @@ export function Navbar() {
                 <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
-          </motion.div>
 
-          <button
-            ref={menuButtonRef}
-            onClick={() => setMobileOpen((o) => !o)}
-            className="icon-btn md:hidden grid h-9 w-9 place-items-center rounded-full text-[var(--ink-2)] transition-colors duration-200 hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)]"
-            aria-label={mobileOpen ? (es ? "Cerrar menú" : "Close menu") : (es ? "Abrir menú" : "Open menu")}
-            aria-expanded={mobileOpen}
-            aria-haspopup="dialog"
-            aria-controls="mobile-nav-drawer"
-          >
-            {mobileOpen ? (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-            )}
-          </button>
+            <button
+              ref={menuButtonRef}
+              onClick={() => setMobileOpen((o) => !o)}
+              className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-2)] outline-none transition-colors duration-200 hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] md:hidden"
+              aria-label={mobileOpen ? (es ? "Cerrar menú" : "Close menu") : (es ? "Abrir menú" : "Open menu")}
+              aria-expanded={mobileOpen}
+              aria-haspopup="dialog"
+              aria-controls="mobile-nav-drawer"
+            >
+              {mobileOpen ? (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+              )}
+            </button>
+          </div>
         </div>
-        {/* Cierre del inner container (max-w-page) — el material de la
-            barra sigue spaneando edge-to-edge por fuera. */}
-        </div>
+
+        {/* Aquí había una hairline de acento que se iba rellenando con el
+            progreso de lectura. Retirada por decisión del dueño: no
+            quiere ninguna barra que se rellene en la cabecera. La barra
+            es una barra de navegación, no un indicador. */}
       </nav>
 
-      {/* Drawer móvil — maquinaria a11y intacta del navbar anterior. */}
+      {/* Drawer móvil — maquinaria a11y intacta. */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -634,7 +582,7 @@ export function Navbar() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               onClick={() => setMobileOpen(false)}
-              className="md:hidden fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm md:hidden"
               aria-hidden="true"
             />
             <motion.aside
@@ -649,9 +597,9 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="md:hidden fixed top-0 right-0 bottom-0 z-[60] w-[300px] max-w-[84vw] liquid-glass backdrop-blur-xl border-l border-[rgb(var(--divider)/0.1)] flex flex-col safe-top outline-none"
+              className="liquid-glass safe-top fixed top-0 right-0 bottom-0 z-[60] flex w-[300px] max-w-[84vw] flex-col border-l border-[rgb(var(--divider)/0.1)] outline-none backdrop-blur-xl md:hidden"
             >
-              <div className="flex items-center justify-between h-16 px-5 border-b border-[rgb(var(--divider)/0.05)] shrink-0">
+              <div className="flex h-16 shrink-0 items-center justify-between border-b border-[rgb(var(--divider)/0.05)] px-5">
                 <Link
                   href="/"
                   onClick={() => setMobileOpen(false)}
@@ -666,7 +614,7 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="icon-btn w-8 h-8 rounded-md grid place-items-center text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[rgb(var(--divider)/0.05)] transition-colors"
+                  className="icon-btn grid h-8 w-8 place-items-center rounded-md text-[var(--ink-2)] transition-colors hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)]"
                   aria-label={es ? "Cerrar menú" : "Close menu"}
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -675,33 +623,28 @@ export function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-1.5" aria-label={es ? "Secciones" : "Sections"}>
+              <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-3" aria-label={es ? "Secciones" : "Sections"}>
                 {drawerLinks.map((l) => {
-                  const active = pathname === l.href;
+                  const active = isActive(l.href);
                   return (
                     <Link
                       key={l.href}
                       href={l.href}
                       onClick={() => setMobileOpen(false)}
                       aria-current={active ? "page" : undefined}
-                      className={`relative min-h-[44px] flex items-center pl-4 pr-3 py-2.5 text-sm rounded-lg transition-colors ${
+                      className={`relative flex min-h-[44px] items-center rounded-lg py-2.5 pr-3 pl-4 text-sm transition-colors ${
                         active
-                          ? "text-[var(--ink)] bg-[rgb(var(--divider)/0.06)] font-medium"
-                          : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[rgb(var(--divider)/0.05)]"
+                          ? "bg-[rgb(var(--divider)/0.06)] font-medium text-[var(--ink)]"
+                          : "text-[var(--ink-2)] hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)]"
                       }`}
                     >
-                      {/* R24-1b — left accent bar replaces the right-side
-                          dot. The 3-px bar with rounded right corners is
-                          the standard iOS / Material active-row pattern;
-                          it reads as a clear "you are here" marker at a
-                          glance, where the 1.5-px dot on the right could
-                          be mistaken for a decorative bullet. The bar is
-                          inset 6 px from top / bottom so it doesn't kiss
-                          the rounded-lg corner of the row. */}
+                      {/* Barra de acento a la izquierda: patrón estándar
+                          de fila activa, mucho más legible de un vistazo
+                          que un punto decorativo a la derecha. */}
                       {active && (
                         <span
                           aria-hidden
-                          className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full"
+                          className="absolute top-1.5 bottom-1.5 left-0 w-[3px] rounded-r-full"
                           style={{ background: "rgb(var(--accent-base))" }}
                         />
                       )}
@@ -711,27 +654,24 @@ export function Navbar() {
                 })}
               </nav>
 
-              <div className="p-4 border-t border-[rgb(var(--divider)/0.05)] safe-bottom shrink-0">
-                <motion.div
-                  whileTap={{ scale: 0.98, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+              <div className="safe-bottom shrink-0 border-t border-[rgb(var(--divider)/0.05)] p-4">
+                {/* Mismo tratamiento que el CTA de escritorio: rectángulo
+                    de 4 px, sin sheen ni sombra de acento. Se me pasó en
+                    la primera pasada porque vive dentro del drawer. */}
+                <Link
+                  href="/pricing"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[4px] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                  style={{
+                    background: "rgb(var(--accent-base))",
+                    color: "#1A1917",
+                  }}
                 >
-                  <Link
-                    href="/pricing"
-                    onClick={() => setMobileOpen(false)}
-                    className="tj-cta-sheen group flex items-center justify-center gap-1.5 h-11 w-full rounded-full text-sm font-semibold transition-[background-color,box-shadow,transform] duration-200"
-                    style={{
-                      background: "rgb(var(--accent-base))",
-                      color: "#06130d",
-                      boxShadow:
-                        "0 10px 26px -12px color-mix(in srgb, rgb(var(--accent-base)) 70%, #000)",
-                    }}
-                  >
-                    {t("buyNow")}
-                    <svg className="transition-transform duration-200 group-hover:translate-x-0.5" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </Link>
-                </motion.div>
+                  {t("buyNow")}
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </Link>
               </div>
             </motion.aside>
           </>
@@ -742,13 +682,211 @@ export function Navbar() {
 }
 
 /**
- * UtcClock — "UTC HH:MM:SS" en vivo con punto de mercado verde con
- * glow, como en la píldora del HTML. Renderiza "--:--:--" en servidor
- * y primer paint; el intervalo arranca en un efecto (cero mismatch de
- * hidratación). Oculto por debajo de `lg` (1024 px): a 768–1023 px el
- * clúster derecho (reloj + tema + idioma + Buy) + nav + marca supera
- * el ancho interno de la barra y el botón Buy quedaba silenciosamente
- * recortado por el `overflow-x: hidden` del body (ver R21-1e issue #1).
+ * IconButton — botón circular de 38 px del clúster derecho.
+ *
+ * Existe para que el hover y el FOCO compartan exactamente la misma
+ * declaración. En la versión anterior cada botón repetía a mano un par
+ * `onMouseEnter`/`onMouseLeave` de ocho líneas que solo respondía al
+ * ratón: con teclado no pasaba nada. Al declararlo en CSS, `hover:` y
+ * `focus-visible:` reciben idéntico tratamiento sin duplicar nada.
+ */
+function IconButton({
+  onClick,
+  label,
+  children,
+  className = "",
+  extraProps = {},
+}: {
+  onClick: () => void;
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+  extraProps?: Record<string, unknown>;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`grid flex-none cursor-pointer place-items-center rounded-[4px] border bg-transparent text-[var(--ink-2)] outline-none transition-colors duration-150 border-[rgb(var(--divider)/0.14)] hover:border-[rgb(var(--divider)/0.24)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:text-[var(--ink)] focus-visible:border-[rgb(var(--divider)/0.24)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] ${className}`}
+      style={{ width: 36, height: 36 }}
+      {...extraProps}
+    >
+      {children}
+    </button>
+  );
+}
+
+/**
+ * LanguagePicker — selector de idioma.
+ *
+ * Sustituye al interruptor "ES · EN" que vivía en un botón de 36 px. Ese
+ * patrón tenía dos problemas: apretaba dos códigos y un separador en un
+ * cuadrado diminuto (ilegible y pobre), y sobre todo NO ESCALA — un
+ * interruptor solo sirve para dos opciones, así que en cuanto se añada
+ * un tercer idioma hay que tirarlo y rehacerlo.
+ *
+ * Esto es un desplegable de verdad: la lista sale de LANGUAGES, y añadir
+ * un idioma es AÑADIR UNA LÍNEA a ese array. Cada entrada muestra el
+ * código y el nombre en su propia lengua (Español, no "Spanish"), que es
+ * como se hace bien: quien busca su idioma lo reconoce aunque no
+ * entienda el idioma actual de la página.
+ *
+ * Accesibilidad: `aria-haspopup="listbox"` + `aria-expanded`, cada
+ * opción con `role="option"` y `aria-selected`, Escape cierra y devuelve
+ * el foco al disparador, y el clic fuera cierra.
+ */
+const LANGUAGES: { code: Lang; code2: string; native: string }[] = [
+  { code: "es", code2: "ES", native: "Español" },
+  { code: "en", code2: "EN", native: "English" },
+];
+
+function LanguagePicker() {
+  const { lang, setLang } = useLang();
+  const es = lang === "es";
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        btnRef.current?.focus();
+      }
+    };
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (!popRef.current?.contains(t) && !btnRef.current?.contains(t)) setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("mousedown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mousedown", onDown);
+    };
+  }, [open]);
+
+  const actual = LANGUAGES.find((l) => l.code === lang) ?? LANGUAGES[0];
+
+  return (
+    <div className="relative flex-none">
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={es ? "Cambiar idioma" : "Change language"}
+        title={es ? "Cambiar idioma" : "Change language"}
+        className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-[4px] border bg-transparent px-2.5 text-[11px] font-semibold tracking-wide text-[var(--ink-2)] outline-none transition-colors duration-150 border-[rgb(var(--divider)/0.14)] hover:border-[rgb(var(--divider)/0.24)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:text-[var(--ink)] focus-visible:border-[rgb(var(--divider)/0.24)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+      >
+        <GlobeIcon />
+        <span className="tnum">{actual.code2}</span>
+        <svg
+          width="8"
+          height="8"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden
+          style={{
+            transition: "transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        >
+          <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            ref={popRef}
+            role="listbox"
+            aria-label={es ? "Idiomas" : "Languages"}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.13, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute right-0 z-50 min-w-[168px] rounded-[8px] border p-1"
+            style={{
+              top: "calc(100% + 8px)",
+              borderColor: "rgb(var(--divider) / 0.14)",
+              background: "color-mix(in srgb, var(--surface) 97%, transparent)",
+              backdropFilter: "blur(24px) saturate(1.4)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+              boxShadow: "0 1px 2px rgb(0 0 0 / 0.5), 0 30px 60px -24px rgb(0 0 0 / 0.7)",
+            }}
+          >
+            {LANGUAGES.map((l) => {
+              const activo = l.code === lang;
+              return (
+                <button
+                  key={l.code}
+                  type="button"
+                  role="option"
+                  aria-selected={activo}
+                  onClick={() => {
+                    setLang(l.code);
+                    setOpen(false);
+                    btnRef.current?.focus();
+                  }}
+                  className="flex w-full cursor-pointer items-center gap-2.5 rounded-[4px] border-0 bg-transparent px-2.5 py-2 text-left outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+                  style={{ fontFamily: "inherit" }}
+                >
+                  <span
+                    className="tnum w-6 shrink-0 text-[11px] font-semibold tracking-wide"
+                    style={{ color: activo ? "rgb(var(--accent-base))" : "var(--ink-3)" }}
+                  >
+                    {l.code2}
+                  </span>
+                  <span
+                    className="flex-1 text-[13px]"
+                    style={{ color: activo ? "var(--ink)" : "var(--ink-2)" }}
+                  >
+                    {l.native}
+                  </span>
+                  {/* Marca del idioma activo. Un check, no un color de
+                      fondo: el fondo ya lo usa el estado de hover y dos
+                      señales distintas no deben compartir soporte. */}
+                  {activo && (
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+                      <path
+                        d="M3.5 8.5l3 3 6-7"
+                        stroke="rgb(var(--accent-base))"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function GlobeIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" />
+      <path d="M2 8h12M8 2c1.7 1.8 2.6 3.9 2.6 6S9.7 12.2 8 14C6.3 12.2 5.4 10.1 5.4 8S6.3 3.8 8 2Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/**
+ * UtcClock — "UTC HH:MM:SS" en vivo con punto de sesión verde. Renderiza
+ * "--:--:--" en servidor y primer paint; el intervalo arranca en un
+ * efecto (cero mismatch de hidratación). Oculto por debajo de `lg`
+ * (1024 px): entre 768 y 1023 px el clúster derecho + navegación +
+ * marca supera el ancho interno y el botón Comprar quedaba recortado en
+ * silencio por el `overflow-x: hidden` del body (ver R21-1e issue #1).
  */
 function UtcClock() {
   const [time, setTime] = useState("--:--:--");
@@ -770,34 +908,27 @@ function UtcClock() {
       className="mr-0.5 hidden items-center gap-1.5 border-r pr-2 lg:inline-flex"
       style={{ borderColor: "rgb(var(--divider) / 0.13)" }}
     >
-      {/* R24-1b — pronounced live-dot pulse. `tj-pulse-dot` swings
-          opacity 0.4→1.0 with a box-shadow bloom so the status dot
-          reads as "market open / session live" at a glance (the prior
-          `tj-glow` was too subtle — 0.5→0.85 — and looked static). The
-          dot's `color` is set to the pnl-pos green so `currentColor` in
-          the keyframe's box-shadow resolves to the same green as the
-          background, giving a coordinated glow. */}
+      {/* Punto de sesión — sólido, sin el latido `tj-pulse-dot`. Era el
+          último bucle infinito decorativo que quedaba en la barra: una
+          luz parpadeando permanentemente junto al reloj compite con la
+          lectura y no aporta información (el estado no cambia). El
+          color en verde P&L ya comunica "sesión abierta". */}
       <span
         aria-hidden
         className="rounded-full"
         style={{
           width: 5,
           height: 5,
-          color: "rgb(var(--pnl-pos, 62 207 142))",
-          background: "currentColor",
-          animation: "tj-pulse-dot 2s ease-in-out infinite",
+          background: "rgb(var(--pnl-pos, 62 207 142))",
         }}
       />
       <span
         className="tnum whitespace-nowrap"
-        // R27-1c — both the "UTC" label and the time value now use
-        // --ink-2 (text-secondary). Previously the label was --ink-3
-        // (tertiary) and only the time was secondary — VLM flagged the
-        // whole clock as pale green in light theme. The label + time
-        // are now a uniform secondary so the clock reads as one clean
-        // monospace token; the pulsing live dot above is the sole
-        // accent-green element (via --pnl-pos, darkened in R21-2d for
-        // light-theme contrast).
+        // R27-1c — etiqueta y valor comparten --ink-2. Antes la etiqueta
+        // era terciaria y solo la hora secundaria, y el reloj entero se
+        // leía verdoso y desigual en tema claro. Ahora es un token
+        // monoespaciado uniforme; el punto pulsante es el único
+        // elemento en verde de acento.
         style={{ fontSize: 11, letterSpacing: "0.04em", color: "var(--ink-2)" }}
       >
         UTC <span>{time}</span>
@@ -807,10 +938,10 @@ function UtcClock() {
 }
 
 /**
- * BrandMark — trío de velas del HTML de referencia sobre un cuadrado
- * de vidrio (32 px, blur + hairline + inset highlight). Los cuerpos
- * ascienden y las mechas quedan al 45 % para que el trío lea como
- * marca y no como gráfico genérico.
+ * BrandMark — trío de velas sobre un cuadrado de vidrio (32 px, blur +
+ * hairline + inset highlight). Los cuerpos ascienden y las mechas
+ * quedan al 45 % para que el trío lea como marca y no como gráfico
+ * genérico.
  */
 function BrandMark() {
   return (

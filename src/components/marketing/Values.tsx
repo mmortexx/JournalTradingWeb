@@ -73,11 +73,6 @@ export function Values() {
 
   return (
     <section id="values" className="section bg-veil relative overflow-hidden scroll-mt-24">
-      {/* subtle aurora tint to separate from neighbors */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none aurora-bg opacity-30"
-      />
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
@@ -130,15 +125,6 @@ export function Values() {
                   aria-hidden="true"
                   className="absolute left-0 top-6 bottom-6 w-px bg-[rgb(var(--accent-base)/0.20)] origin-center transition-[transform,background-color] duration-300 group-hover:scale-y-[1.4] group-hover:bg-[rgb(var(--accent-base)/0.65)]"
                 />
-                {/* Soft corner glow on hover */}
-                <div
-                  aria-hidden="true"
-                  className="absolute -right-12 -top-12 w-32 h-32 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgb(var(--accent-base) / 0.35), transparent 70%)",
-                  }}
-                />
 
                 <div className="relative flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
@@ -152,7 +138,7 @@ export function Values() {
                         color is present before hover. The base ring deepens
                         to 0.30 on hover to match the existing hover shadow. */}
                     <span
-                      className="shrink-0 w-9 h-9 rounded-lg liquid-glass flex items-center justify-center text-tertiary shadow-[inset_0_0_0_1px_rgb(var(--accent-base)/0.18)] transition-[color,box-shadow] duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:shadow-[inset_0_0_0_1px_rgb(var(--accent-base)/0.30)]"
+                      className="shrink-0 w-9 h-9 rounded-lg liquid-glass border border-[rgb(var(--accent-base)/0.18)] flex items-center justify-center text-tertiary transition-colors duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:border-[rgb(var(--accent-base)/0.30)]"
                       aria-hidden="true"
                     >
                       {v.icon}

@@ -89,7 +89,7 @@ export function BeforeAfter() {
           {/* ───────── BEFORE — muted, desaturated, red ✗ ───────── */}
           <Reveal className="h-full flex flex-col">
             {/* Tinted header pill */}
-            <div className="mb-3 self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pnl-neg/10 border border-pnl-neg/25">
+            <div className="mb-3 self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-[4px] bg-pnl-neg/10 border border-pnl-neg/25">
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-neg/15 text-pnl-neg">
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -176,7 +176,7 @@ export function BeforeAfter() {
           {/* ───────── AFTER — vibrant, accent glow, ✓, slightly larger ───────── */}
           <Reveal delay={0.2} className="h-full flex flex-col">
             {/* Tinted header pill */}
-            <div className="mb-3 self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-base)/0.1)] border border-[rgb(var(--accent-base)/0.3)]">
+            <div className="mb-3 self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-[4px] bg-[rgb(var(--accent-base)/0.1)] border border-[rgb(var(--accent-base)/0.3)]">
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[rgb(var(--accent-base)/0.15)] text-[rgb(var(--accent-base))]">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -194,16 +194,12 @@ export function BeforeAfter() {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
               whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              // R20-3b: border switched neutral divider → accent-tinted so the
-              // After card’s edge matches the green ✓ icons (previously the
-              // neutral border fought the green wash and the card read as
-              // “unbranded glass”). Accent at 0.28 so it never competes with
-              // the static top-line highlight above.
-              className="relative flex-1 rounded-card liquid-glass depth-3 overflow-hidden border border-[rgb(var(--accent-base)/0.28)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{
-                boxShadow:
-                  "0 0 0 1px rgb(var(--accent-base) / 0.20), 0 14px 44px -8px rgb(var(--accent-base) / 0.35)",
-              }}
+              // El borde ya se encarga de marcar el estado "después" en
+              // acento (antes llevaba además un halo de sombra teñida de
+              // acento redundante con el propio borde — se retiró; la
+              // elevación pasa a ser la neutra `depth-2`, igual que la
+              // tarjeta "antes").
+              className="relative flex-1 rounded-card liquid-glass depth-2 overflow-hidden border border-[rgb(var(--accent-base)/0.28)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
             >
               {/* Accent wash */}
               <div

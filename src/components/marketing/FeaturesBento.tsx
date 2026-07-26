@@ -99,24 +99,15 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             // / ValueTestimonials / Story / Milestones / ContactSupport.
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5 }}
-            className="group lg:col-span-7 relative overflow-hidden"
+            className="group lg:col-span-7 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
             style={{
               padding: 24,
-              borderRadius: 18,
-              border: "1px solid rgb(var(--divider) / 0.13)",
               background: "color-mix(in oklab, var(--surface) 55%, transparent)",
               backdropFilter: "blur(20px) saturate(1.4)",
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
               minHeight: 360,
             }}
           >
-            {/* R26-1b — accent border glow on hover (matches the canonical
-                marketing-card hover vocabulary). */}
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
-            />
             {/* R25-1e — premium top-edge accent sweep. The calendar is
                 the bento's anchor (span 7); a 2px accent gradient at the
                 top edge marks it as the lead card. Same vocabulary as the
@@ -131,8 +122,8 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             />
             <div className="flex items-center gap-2 mb-2">
               <span
-                className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
+                className="inline-grid place-items-center rounded-lg border border-[rgb(var(--accent-base)/0.20)]"
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
               >
                 <CalendarDays size={15} aria-hidden />
               </span>
@@ -202,27 +193,19 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="group lg:col-span-5 relative overflow-hidden"
+            className="group lg:col-span-5 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
             style={{
               padding: 24,
-              borderRadius: 18,
-              border: "1px solid rgb(var(--divider) / 0.13)",
               background: "color-mix(in oklab, var(--surface) 55%, transparent)",
               backdropFilter: "blur(20px) saturate(1.4)",
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
               minHeight: 360,
             }}
           >
-            {/* R26-1b — accent border glow on hover. */}
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
-            />
             <div className="flex items-center gap-2 mb-2">
               <span
-                className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
+                className="inline-grid place-items-center rounded-lg border border-[rgb(var(--accent-base)/0.20)]"
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
               >
                 <LineChart size={15} aria-hidden />
               </span>
@@ -272,7 +255,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
                 style={{
                   fontSize: 10,
                   padding: "4px 10px",
-                  borderRadius: 100,
+                  borderRadius: 4,
                   background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
                   color: "rgb(var(--accent-base))",
                   border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 30%, transparent)",
@@ -290,26 +273,18 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="group lg:col-span-4 relative overflow-hidden"
+            className="group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
             style={{
               padding: 24,
-              borderRadius: 18,
-              border: "1px solid rgb(var(--divider) / 0.13)",
               background: "color-mix(in oklab, var(--surface) 55%, transparent)",
               backdropFilter: "blur(20px) saturate(1.4)",
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             }}
           >
-            {/* R26-1b — accent border glow on hover. */}
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
-            />
             <div className="flex items-center gap-2 mb-2">
               <span
-                className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
+                className="inline-grid place-items-center rounded-lg border border-[rgb(var(--accent-base)/0.20)]"
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
               >
                 <BookOpen size={15} aria-hidden />
               </span>
@@ -335,8 +310,8 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               ].map((s) => (
                 <div key={s.n} className="flex items-center gap-3">
                   <span style={{ fontSize: 13, color: "var(--ink)", flex: 1 }}>{s.n}</span>
-                  <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
-                    <div className="h-full rounded-full" style={{ width: s.w, background: s.c }} />
+                  <div className="flex-1 h-1 rounded-[3px] overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
+                    <div className="h-full rounded-[3px]" style={{ width: s.w, background: s.c }} />
                   </div>
                   <span
                     className="tnum"
@@ -356,26 +331,18 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="group lg:col-span-4 relative overflow-hidden"
+            className="group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
             style={{
               padding: 24,
-              borderRadius: 18,
-              border: "1px solid rgb(var(--divider) / 0.13)",
               background: "color-mix(in oklab, var(--surface) 55%, transparent)",
               backdropFilter: "blur(20px) saturate(1.4)",
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             }}
           >
-            {/* R26-1b — accent border glow on hover. */}
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
-            />
             <div className="flex items-center gap-2 mb-2">
               <span
-                className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
+                className="inline-grid place-items-center rounded-lg border border-[rgb(var(--accent-base)/0.20)]"
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
               >
                 <NotebookPen size={15} aria-hidden />
               </span>
@@ -393,7 +360,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               {es ? "Lo que pasó, lo que sentiste" : "What happened, what you felt"}
             </h3>
             <div
-              className="mt-4 rounded-[10px] p-4"
+              className="mt-4 rounded-[8px] p-4"
               style={{
                 background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
                 border: "1px solid rgb(var(--divider) / 0.06)",
@@ -422,26 +389,18 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="group lg:col-span-4 relative overflow-hidden"
+            className="group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
             style={{
               padding: 24,
-              borderRadius: 18,
-              border: "1px solid rgb(var(--divider) / 0.13)",
               background: "color-mix(in oklab, var(--surface) 55%, transparent)",
               backdropFilter: "blur(20px) saturate(1.4)",
               WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             }}
           >
-            {/* R26-1b — accent border glow on hover. */}
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.40), 0 0 24px rgb(var(--accent-base) / 0.16)", borderRadius: 18 }}
-            />
             <div className="flex items-center gap-2 mb-2">
               <span
-                className="inline-grid place-items-center rounded-lg"
-                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))", boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.20)" }}
+                className="inline-grid place-items-center rounded-lg border border-[rgb(var(--accent-base)/0.20)]"
+                style={{ width: 30, height: 30, background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)", color: "rgb(var(--accent-base))" }}
               >
                 <Layers size={15} aria-hidden />
               </span>
@@ -472,7 +431,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
                   style={{
                     fontSize: 11.5,
                     padding: "5px 11px",
-                    borderRadius: 100,
+                    borderRadius: 4,
                     border: "1px solid rgb(var(--divider) / 0.13)",
                     color: "var(--ink-2)",
                     background: "color-mix(in oklab, var(--surface-2) 40%, transparent)",

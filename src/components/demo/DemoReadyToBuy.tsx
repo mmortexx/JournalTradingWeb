@@ -64,8 +64,8 @@ export function DemoReadyToBuy() {
             </h2>
             <p className="mt-4 text-base md:text-lg text-secondary leading-relaxed max-w-xl mx-auto">
               {es
-                ? "Llévatelo a tu máquina. Pago único, sin suscripción, con garantía de 30 días."
-                : "Take it to your machine. One-time payment, no subscription, with a 30-day guarantee."}
+                ? "Llévatelo a tu máquina. Pago único, sin suscripción y con tus datos siempre en tu equipo."
+                : "Take it to your machine. One-time payment, no subscription, and your data always on your machine."}
             </p>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <motion.div

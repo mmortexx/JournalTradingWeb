@@ -33,7 +33,6 @@ export default function Loading() {
               className="block w-2.5 h-2.5 rounded-full"
               style={{
                 background: "rgb(var(--accent-base))",
-                boxShadow: "0 0 8px rgb(var(--accent-base))",
               }}
               // Reduced-motion users get static dots; the loading label
               // below provides the loading affordance on its own.

@@ -11,11 +11,9 @@ import { asset } from "@/lib/asset";
  * "next action" before the soft close.
  *
  * Premium motion layer:
- *  - aurora-bg + two drifting accent glow orbs behind the card.
  *  - Card scales in on view (0.96 → 1).
- *  - Download button: lift + accent shadow ring on hover, press-down on tap.
- *  - Windows logo 4-pane SVG with a subtle hover shimmer.
- *  - prefers-reduced-motion disables orb drift + button shimmer.
+ *  - Download button: lift on hover, press-down on tap.
+ *  - prefers-reduced-motion disables the hover lift.
  *
  * The download href is "#" — purely visual, the Windows build is not yet
  * shipped. System-requirements line uses `tnum` for the version numbers
@@ -41,22 +39,8 @@ export function DownloadCTA() {
       // paint on top, so the section's atmospheric depth is preserved.
       className="section relative overflow-hidden bg-veil"
     >
-      {/* Aurora backdrop */}
-      <div aria-hidden="true" className="absolute inset-0 aurora-bg pointer-events-none" />
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-
-      {/* Static accent glow orbs */}
-      <div
-        aria-hidden="true"
-        className="absolute -top-32 -left-24 w-[440px] h-[440px] rounded-full blur-[130px] pointer-events-none opacity-20"
-        style={{ background: "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute bottom-[-140px] -right-28 w-[480px] h-[480px] rounded-full blur-[130px] pointer-events-none opacity-14"
-        style={{ background: "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)" }}
-      />
 
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
         <motion.div
@@ -128,15 +112,15 @@ export function DownloadCTA() {
                   size are unambiguous at a glance. tnum keeps the version
                   digits + size figure on the tabular baseline. */}
               <div className="mt-5 flex flex-wrap items-center justify-center md:justify-start gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">Windows 10/11</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">64-bit</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">50 MB</span>
                 </span>
@@ -160,9 +144,9 @@ export function DownloadCTA() {
                     : { y: -2, transition: { type: "spring", stiffness: 300, damping: 20 } }
                 }
                 whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-5 sm:px-8 py-3 rounded-lg bg-[rgb(var(--accent-base))] text-[#06130d] font-medium transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-5 sm:px-8 py-3 rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-medium transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[rgb(var(--accent-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
-                <WindowsIcon className="shrink-0 transition-transform duration-200 group-hover:scale-105 group-hover:brightness-110" />
+                <WindowsIcon className="shrink-0 transition-transform duration-200 group-hover:scale-105" />
                 <span className="break-words">{es ? "Descargar para Windows" : "Download for Windows"}</span>
               </motion.a>
               {/* R24-1d — promotes the offline-installer subtext from bare

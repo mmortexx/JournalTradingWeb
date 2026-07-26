@@ -143,11 +143,6 @@ export function Changelog() {
 
   return (
     <section id="changelog" className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24">
-      {/* Aurora tint to lift the section off the page */}
-      <div
-        className="absolute inset-0 pointer-events-none aurora-bg opacity-40"
-        aria-hidden
-      />
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
@@ -226,8 +221,8 @@ export function Changelog() {
                         whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                         className={`liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                           isPast
-                            ? "hover:shadow-[0_0_36px_-10px_rgb(var(--accent-base)/0.45)] hover:border-[rgb(var(--accent-base)/0.30)]"
-                            : "opacity-90 hover:opacity-100 hover:border-[rgb(var(--divider)/0.25)] hover:shadow-[0_0_28px_-10px_rgb(var(--pnl-warn)/0.30)]"
+                            ? "hover:border-[rgb(var(--accent-base)/0.30)]"
+                            : "opacity-90 hover:opacity-100 hover:border-[rgb(var(--divider)/0.25)]"
                         }`}
                       >
                           <div
@@ -284,10 +279,8 @@ export function Changelog() {
                     </motion.div>
                   </div>
 
-                  {/* Node dot — pops in on view. Past: solid accent with
-                      glow ring. Future: hollow ring with a faint pulsing
-                      halo behind it (single keyframe loop) so the "in
-                      progress" state reads as alive, not just absent. */}
+                  {/* Node dot — pops in on view. Past: solid accent dot.
+                      Future: hollow ring signals "in progress". */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     whileInView={{ scale: 1, opacity: 1 }}
@@ -301,28 +294,9 @@ export function Changelog() {
                     aria-hidden
                   >
                     {isPast ? (
-                      <span className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))] ring-4 ring-[rgb(var(--accent-base)/0.15)] shadow-[0_0_12px_-2px_rgb(var(--accent-base)/0.6)]" />
+                      <span className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))]" />
                     ) : (
-                      <span className="relative block w-3.5 h-3.5">
-                        {/* Pulsing halo — sits behind the hollow ring,
-                            scales 1 → 1.8 and fades 0.5 → 0 over 1.6s
-                            on a 0.4s delay (yoyo loop). Marks the
-                            upcoming item as "in progress". */}
-                        <motion.span
-                          aria-hidden
-                          className="absolute inset-0 rounded-full bg-[rgb(var(--pnl-warn)/0.45)]"
-                          initial={{ scale: 1, opacity: 0.5 }}
-                          animate={{ scale: 1.8, opacity: 0 }}
-                          transition={{
-                            duration: 1.6,
-                            delay: 0.4,
-                            repeat: Infinity,
-                            repeatType: "loop",
-                            ease: "easeOut",
-                          }}
-                        />
-                        <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.55)] bg-background" />
-                      </span>
+                      <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.55)] bg-background" />
                     )}
                   </motion.div>
 

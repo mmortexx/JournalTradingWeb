@@ -46,7 +46,6 @@ export function ScrollProgress() {
       style={{
         background:
           "linear-gradient(90deg, rgb(var(--accent-base)), rgb(var(--accent-hover)))",
-        boxShadow: "0 0 12px rgb(var(--accent-base) / 0.55)",
       }}
     />
   );

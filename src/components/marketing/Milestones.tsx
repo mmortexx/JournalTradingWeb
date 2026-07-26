@@ -62,11 +62,6 @@ export function Milestones() {
 
   return (
     <section id="milestones" className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24">
-      {/* faint backdrop line that anchors the whole timeline */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none aurora-bg opacity-25"
-      />
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
@@ -139,7 +134,7 @@ export function Milestones() {
                       {isPast ? (
                         <motion.span
                           aria-hidden="true"
-                          className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))] ring-4 ring-[rgb(var(--accent-base)/0.15)] shadow-[0_0_12px_-2px_rgb(var(--accent-base)/0.6)]"
+                          className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))]"
                           initial={{ scale: 0, opacity: 0 }}
                           whileInView={{ scale: 1, opacity: 1 }}
                           viewport={{ once: true, margin: "-40px" }}
@@ -152,23 +147,9 @@ export function Milestones() {
                         />
                       ) : (
                         <span className="relative block w-3.5 h-3.5">
-                          {/* Pulsing halo — mirrors the Changelog future
-                              dot treatment so both timelines share one
-                              "in progress" vocabulary. Scales 1 → 1.8 and
-                              fades 0.5 → 0 over 1.6s on a 0.4s delay loop. */}
-                          <motion.span
-                            aria-hidden
-                            className="absolute inset-0 rounded-full bg-[rgb(var(--pnl-warn)/0.45)]"
-                            initial={{ scale: 1, opacity: 0.5 }}
-                            animate={{ scale: 1.8, opacity: 0 }}
-                            transition={{
-                              duration: 1.6,
-                              delay: 0.4,
-                              repeat: Infinity,
-                              repeatType: "loop",
-                              ease: "easeOut",
-                            }}
-                          />
+                          {/* Anillo hueco estático: indicador de "en camino".
+                              El halo pulsante en bucle infinito se retiró
+                              (movimiento decorativo gratuito). */}
                           <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.55)] bg-background" />
                         </span>
                       )}
@@ -179,13 +160,13 @@ export function Milestones() {
                         a spring y-shift. The shadow + border tokens stay
                         accent-tinted so a past milestone reads as "shipped
                         with energy" and the upcoming one stays muted. */}
-                    <div className="mt-3 liquid-glass depth-1 rounded-card p-4 transition-[box-shadow,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.4)] hover:border-[rgb(var(--accent-base)/0.30)]">
+                    <div className="mt-3 liquid-glass depth-1 rounded-card border border-transparent p-4 transition-[box-shadow,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-[rgb(var(--accent-base)/0.30)]">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary tnum">
                           {m.date}
                         </span>
                         <span
-                          className={`pill text-[11px] uppercase tracking-[0.12em] tnum ${
+                          className={`inline-flex items-center gap-1 rounded-[4px] px-[0.55rem] py-[0.15rem] text-[11px] font-semibold uppercase tracking-[0.12em] tnum ${
                             isPast
                               ? "bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)]"
                               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border border-dashed border-[rgb(var(--divider)/0.22)]"

@@ -33,33 +33,11 @@ export function FinalCTANew() {
       // medir.".
       className="section relative overflow-hidden bg-veil border-t border-[rgb(var(--divider)/0.06)]"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 50% 50%, color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent), transparent 70%)",
-          filter: "blur(40px)",
-          opacity: 0.45,
-        }}
-      />
-      {/* R25-1e — layered halo: a second, smaller, brighter inner halo
-          sits on top of the outer halo for a "core + corona" effect
-          that reads more premium than a single flat glow. The inner
-          halo is 36%×30% (vs outer 60%×50%), 22% accent (vs 12%), and
-          blurred less (24px vs 40px) — so the center reads as a
-          brighter, tighter core while the outer halo provides the
-          wide corona. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(36% 30% at 50% 50%, color-mix(in oklab, rgb(var(--accent-base)) 22%, transparent), transparent 70%)",
-          filter: "blur(22px)",
-          opacity: 0.6,
-        }}
-      />
+      {/* Halo "núcleo + corona" retirado (rediseño institucional). Eran
+          DOS discos de acento difuminados y superpuestos detrás del
+          titular de cierre. Buscaban un efecto premium, pero el
+          resultado era una mancha dorada difusa justo donde debe mandar
+          el mensaje de compra. El titular y el CTA se sostienen solos. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -110,8 +88,8 @@ export function FinalCTANew() {
           }}
         >
           {es
-            ? "40+ métricas, guardián de disciplina y tus datos en tu máquina. Pago único desde 29 $, garantía de devolución 30 días."
-            : "40+ metrics, a discipline guardian, and your data on your machine. One-time payment from $29, 30-day money-back guarantee."}
+            ? "40+ métricas, guardián de disciplina y tus datos en tu máquina. Pago único desde 29 $, sin suscripciones."
+            : "40+ metrics, a discipline guardian, and your data on your machine. One-time payment from $29, no subscriptions."}
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -122,14 +100,16 @@ export function FinalCTANew() {
         >
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2.5 rounded-full h-14 px-[30px] bg-[rgb(var(--accent-base))] text-[#06130d] text-base font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] px-8 text-base font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            style={{ background: "rgb(var(--accent-base))", color: "#1A1917" }}
           >
             {es ? "Empieza hoy — 29 $" : "Start today — $29"}
             <ArrowRight size={17} aria-hidden />
           </Link>
           <Link
             href="/demo"
-            className="liquid-glass inline-flex items-center gap-2.5 rounded-full h-14 px-7 border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-base font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] border px-8 text-base font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
           >
             {/* R25-1e — Play icon prefix matches the Hero's "Ver la demo"
                 button pattern so the two CTAs read as a coordinated pair
@@ -147,7 +127,7 @@ export function FinalCTANew() {
           className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
         >
           {[
-            es ? "Garantía 30 días" : "30-day guarantee",
+            es ? "Actualizaciones 1.x gratuitas" : "Free 1.x updates",
             es ? "Pago único · sin suscripción" : "One-time payment · no subscription",
             "100 % local",
             es ? "Soporte directo" : "Direct support",

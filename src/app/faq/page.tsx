@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQ } from "@/components/marketing/FAQ";
 import { TableOfContents } from "@/components/tj/TableOfContents";
-import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 
 // Estimated reading time (16 Q&A entries + contact sections). ~650 words
 // across all answers at 220 wpm = ~3 min.
@@ -116,18 +115,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "¿Y si la app no es para mí?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Tienes 30 días desde la compra para pedir reembolso completo, sin preguntas. Escríbenos y lo gestionamos en menos de 48 h.",
-      },
-    },
-    {
-      "@type": "Question",
       name: "¿Puedo probar antes de comprar?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Puedes explorar la demo en vivo de esta misma web con datos deterministas (sin registro, sin descargar nada). Si después de comprar sientes que no encaja, tienes 30 días de garantía de devolución completa, sin preguntas.",
+        text: "Sí. Puedes explorar la demo en vivo de esta misma web con datos deterministas, sin registro y sin descargar nada. Es la app recreada al completo: puedes recorrer las pantallas y ver exactamente qué te llevas antes de pagar.",
       },
     },
     {
@@ -136,14 +127,6 @@ const faqSchema = {
       acceptedAnswer: {
         "@type": "Answer",
         text: "Core incluye el journal completo, 40+ métricas, 2 cuentas de trading, gestión de riesgo, disciplina e informes PDF básicos. Pro desbloquea además: cuentas ilimitadas, modo prop firm, simulador Monte Carlo, informe de track record, risk of ruin, informes PDF avanzados y el importador de rivales que migra tu journal anterior en 5 minutos.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "¿Cómo funciona la garantía de 30 días?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Compras con total tranquilidad. Si en 30 días sientes que la app no es para ti, escribes a soporte y te devolvemos el 100% del dinero, sin preguntas ni condiciones. Sin formularios, sin interrogatorios.",
       },
     },
     {
@@ -261,7 +244,6 @@ export default function FaqPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ReadingProgressIndicator />
       <FAQ standalone />
       <StillHaveQuestions />
       <ContactSupport />

@@ -95,16 +95,11 @@ export function PageHeader({
             "linear-gradient(180deg, transparent, color-mix(in srgb, var(--bg) 52%, transparent))",
         }}
       />
-      {/* Static accent glow — pinned to the top center, soft enough not to
-          compete with the headline. The 600×300 px disc is intentionally
-          larger than the heading column so its falloff reads as ambient
-          light rather than a backdrop "behind" the text. No animation,
-          no parallax — just a quiet halo. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] opacity-[0.14]"
-        style={{ background: "rgb(var(--accent-base))" }}
-      />
+      {/* Halo de acento retirado (rediseño institucional). Era un disco
+          de 600×300 px difuminado 120 px sobre TODAS las cabeceras de
+          página: una mancha dorada permanente detrás de cada titular.
+          No marcaba nada — solo teñía. La cabecera se sostiene con la
+          jerarquía tipográfica y el grano de abajo. */}
       {/* Section grain — opt-in 3 % fractalNoise overlay so the page
           header reads as the same machined surface as the sections below
           it (Bento, HowItWorks, Pricing, etc.) rather than a flat black

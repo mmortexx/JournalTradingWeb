@@ -60,7 +60,6 @@ export function ReadingProgressIndicator() {
         style={{
           width: `${progress}%`,
           background: "rgb(var(--accent-base) / 0.7)",
-          boxShadow: "0 0 8px rgb(var(--accent-base) / 0.4)",
         }}
       />
     </div>

@@ -11,7 +11,6 @@ import { Reveal } from "@/components/tj/Reveal";
  *
  * Design:
  *  - `glass rounded-card p-6` centered banner with a single line of copy.
- *  - Subtle accent glow: a static radial gradient seated at the top edge.
  *  - Accent on the second clause to draw the eye and signal "help is here".
  *  - Accent-only palette — no indigo/blue.
  */
@@ -31,16 +30,6 @@ export function StillHaveQuestions() {
             whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
             className="relative liquid-glass depth-2 rounded-card p-6 md:p-7 overflow-hidden text-center"
           >
-            {/* Subtle static accent glow — radial seated at top center */}
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(60% 120% at 50% 0%, rgb(var(--accent-base) / 0.18) 0%, transparent 60%)",
-              }}
-            />
-
             <p className="relative text-lg md:text-xl font-medium text-primary text-balance">
               {es ? (
                 <>

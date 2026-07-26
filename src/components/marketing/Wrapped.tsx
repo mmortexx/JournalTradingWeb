@@ -147,8 +147,6 @@ export function Wrapped() {
 
   return (
     <section className="section cv-auto relative overflow-hidden bg-veil">
-      {/* Aurora wash background */}
-      <div className="absolute inset-0 aurora-bg opacity-50 pointer-events-none" />
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
@@ -203,66 +201,8 @@ export function Wrapped() {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                className={`group relative liquid-glass depth-2 rounded-card overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${span}`}
-                style={{
-                  // R24-1c: persistent tone-tinted inner ring at rest so each
-                  // card reads as "stamped" with its own tone (accent for
-                  // streak/day/total, pos for setup/instrument, warn for the
-                  // cost-of-indiscipline card). Without this the warn card
-                  // was visually indistinguishable from the accent cards at
-                  // rest — it only earned its red glow on hover. The ring is
-                  // whisper-faint (1px inset at 8–12 % alpha) so it reads as
-                  // material weight, not a colored frame.
-                  boxShadow:
-                    c.tone === "warn"
-                      ? "inset 0 0 0 1px rgb(var(--pnl-warn) / 0.12), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)"
-                      : c.tone === "pos"
-                        ? "inset 0 0 0 1px rgb(var(--pnl-pos) / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)"
-                        : "inset 0 0 0 1px rgb(var(--accent-base) / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)",
-                }}
+                className={`group relative liquid-glass depth-2 rounded-card overflow-hidden border border-transparent transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)] ${span}`}
               >
-                {/* Accent border glow on hover. */}
-                <div
-                  className="absolute inset-0 rounded-card pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  style={{
-                    boxShadow: `inset 0 0 0 1px rgb(var(--accent-base) / 0.35), 0 0 28px rgb(var(--accent-base) / 0.15)`,
-                  }}
-                />
-
-                {/* Decorative corner glow — R20-3b: refined the pulse.
-                    Bumped size (w-40 → w-44), tightened the hover lift
-                    (opacity-50 → 65 + scale-125), and extended the
-                    transition to cover transform too so the bloom reads as
-                    a single motion rather than two. Rest opacity nudged down
-                    30 → 28 so the hover delta reads as a clearer "lights up". */}
-                <div
-                  className="absolute -top-12 -right-12 w-44 h-44 rounded-full blur-3xl opacity-[0.28] pointer-events-none transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-[0.65] group-hover:scale-125"
-                  style={{
-                    background:
-                      c.tone === "pos"
-                        ? "radial-gradient(circle, rgb(var(--pnl-pos)), transparent 70%)"
-                        : c.tone === "warn"
-                        ? "radial-gradient(circle, rgb(var(--pnl-warn)), transparent 70%)"
-                        : "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)",
-                  }}
-                />
-                {/* R20-3b: subtle counter-glow at the opposite (bottom-left)
-                    corner so the bloom reads as ambient light rather than a
-                    single sticker. Smaller + dimmer so it doesn’t double
-                    the weight of the top-right bloom. */}
-                <div
-                  aria-hidden
-                  className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full blur-3xl opacity-15 pointer-events-none transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-30 group-hover:scale-110"
-                  style={{
-                    background:
-                      c.tone === "pos"
-                        ? "radial-gradient(circle, rgb(var(--pnl-pos)), transparent 70%)"
-                        : c.tone === "warn"
-                        ? "radial-gradient(circle, rgb(var(--pnl-warn)), transparent 70%)"
-                        : "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)",
-                  }}
-                />
-
                 <div className="relative p-6 md:p-7 flex flex-col h-full justify-between gap-4 cq-wrap min-w-0">
                   {/* R24-1c: editorial index (01 — 06) before the eyebrow so
                       the bento reads as a numbered sequence (magazine

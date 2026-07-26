@@ -84,18 +84,6 @@ export function ValueTestimonials() {
       aria-label={es ? "Valor por dinero" : "Value for money"}
       className="section-tight relative overflow-hidden bg-veil"
     >
-      {/* Faint accent wash — single radial glow, no particle field, to keep
-          this section lighter than the main SocialProof band. */}
-      <div
-        aria-hidden="true"
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[360px] rounded-full blur-[140px] pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)",
-          opacity: 0.06,
-        }}
-      />
-
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
         <Reveal className="max-w-2xl mx-auto text-center">
           <div className="flex justify-center">
@@ -136,16 +124,8 @@ export function ValueTestimonials() {
               whileHover={
                 reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }
               }
-              className="group relative liquid-glass depth-2 rounded-card p-5 flex flex-col gap-4 h-full overflow-hidden"
+              className="group relative liquid-glass depth-2 rounded-card p-5 flex flex-col gap-4 h-full overflow-hidden border border-transparent transition-[border-color] duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
             >
-              {/* Hover accent border glow. */}
-              <div
-                className="absolute inset-0 rounded-card pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  boxShadow: `inset 0 0 0 1px rgb(var(--accent-base) / 0.35), 0 0 24px rgb(var(--accent-base) / 0.15)`,
-                }}
-                aria-hidden="true"
-              />
 
               {/* Value chip — the headline stat the trader attributes to the app.
                   R24-1d adds a small accent dot prefix (matches the
@@ -153,7 +133,7 @@ export function ValueTestimonials() {
                   reads as a deliberate credential stat rather than a
                   bare text pill. */}
               <div className="relative flex items-center justify-between gap-2">
-                <span className="pill bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !text-[11px] uppercase tracking-[0.1em] tnum gap-1.5">
+                <span className="pill !rounded-[4px] bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !text-[11px] uppercase tracking-[0.1em] tnum gap-1.5">
                   <span className="size-1.5 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
                   {es ? t.chipEs : t.chipEn}
                 </span>

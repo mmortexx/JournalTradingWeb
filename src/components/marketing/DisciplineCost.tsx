@@ -80,7 +80,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               width so break-words can wrap long labels instead of pushing
               the value column off the right edge. */}
           <div
-            className="rounded-[14px] overflow-hidden"
+            className="rounded-[8px] overflow-hidden"
             style={{
               border: "1px solid rgb(var(--divider) / 0.13)",
               background: "color-mix(in oklab, var(--surface) 50%, transparent)",
@@ -143,7 +143,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
           className="relative"
           style={{
             padding: 22,
-            borderRadius: 18,
+            borderRadius: 8,
             border: "1px solid rgb(var(--divider) / 0.13)",
             background: "color-mix(in oklab, var(--surface) 70%, transparent)",
             backdropFilter: "blur(20px) saturate(1.4)",
@@ -163,7 +163,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               style={{
                 fontSize: 10,
                 padding: "3px 9px",
-                borderRadius: 100,
+                borderRadius: 4,
                 background: "rgb(var(--pnl-neg) / 0.14)",
                 color: "rgb(var(--pnl-neg))",
                 border: "1px solid rgb(var(--pnl-neg) / 0.28)",
@@ -185,9 +185,9 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                   <span className="min-w-0 break-words" style={{ fontSize: 13, color: "var(--ink)" }}>{row.l}</span>
                   <span className="tnum shrink-0" style={{ fontSize: 12, color: "var(--ink-2)" }}>{row.pct} %</span>
                 </div>
-                <div className="h-1 rounded-full overflow-hidden relative" style={{ background: "rgb(var(--divider) / 0.13)", boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.18)" }}>
+                <div className="h-1 rounded-[3px] overflow-hidden relative" style={{ background: "rgb(var(--divider) / 0.13)", boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.18)" }}>
                   <div
-                    className="h-full rounded-full relative"
+                    className="h-full rounded-[3px] relative"
                     style={{
                       width: `${row.pct * 2.5}%`,
                       // R20-3b: gradient fill — solid red on the leading edge,
@@ -211,7 +211,6 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                       style={{
                         width: 2,
                         background: "rgb(var(--pnl-neg))",
-                        boxShadow: "0 0 6px rgb(var(--pnl-neg) / 0.55)",
                       }}
                     />
                   </div>

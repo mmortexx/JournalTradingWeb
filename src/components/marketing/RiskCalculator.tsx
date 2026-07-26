@@ -61,7 +61,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
   const chipStyle = (active: boolean): React.CSSProperties => ({
     fontSize: 12,
     padding: "8px 14px",
-    borderRadius: 100,
+    borderRadius: 4,
     cursor: "pointer",
     transition: "background 0.2s, color 0.2s, border-color 0.2s",
     background: active
@@ -179,7 +179,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
           className="relative"
           style={{
             padding: 24,
-            borderRadius: 18,
+            borderRadius: 8,
             border: "1px solid rgb(var(--divider) / 0.13)",
             background: "color-mix(in oklab, var(--surface) 60%, transparent)",
             backdropFilter: "blur(20px) saturate(1.4)",
@@ -211,7 +211,6 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
                   borderRadius: 8,
                   background: "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)",
                   border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 35%, transparent)",
-                  boxShadow: "0 0 14px rgb(var(--accent-base) / 0.18)",
                 }}
               >
                 {fmtNum(riskPct)} %
@@ -224,11 +223,11 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
                 visually convey “how far along the range you are”). Width =
                 (riskPct − min) / (max − min) × 100. */}
             <div
-              className="relative h-1 rounded-full mb-1.5 overflow-hidden"
+              className="relative h-1 rounded-[3px] mb-1.5 overflow-hidden"
               style={{ background: "rgb(var(--divider) / 0.13)" }}
             >
               <div
-                className="absolute left-0 top-0 h-full rounded-full"
+                className="absolute left-0 top-0 h-full rounded-[3px]"
                 style={{
                   width: `${((riskPct - 0.25) / (3 - 0.25)) * 100}%`,
                   background: "linear-gradient(90deg, color-mix(in oklab, rgb(var(--accent-base)) 45%, transparent), rgb(var(--accent-base)))",
@@ -265,7 +264,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 
           {/* Entrada / Stop / Target */}
           <div
-            className="grid grid-cols-3 gap-2 p-3 rounded-[12px] mb-5"
+            className="grid grid-cols-3 gap-2 p-3 rounded-[8px] mb-5"
             style={{
               background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
               border: "1px solid rgb(var(--divider) / 0.06)",
@@ -329,7 +328,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               </span>
             </div>
             <div
-              className="relative h-2 rounded-full overflow-hidden"
+              className="relative h-2 rounded-[4px] overflow-hidden"
               style={{ background: "rgb(var(--divider) / 0.13)" }}
             >
               <div
@@ -374,17 +373,11 @@ function Result({ label, value, color }: { label: string; value: string; color: 
       // R24-1c: hover lift + accent inner ring so each Result tile reads
       // as tappable (matches the MetricsShowcaseNew KPI tile polish).
       // Bumped label from 9px → 10px (above the 10px floor for legibility).
-      className="group/result relative min-w-0 rounded-[12px] px-3 sm:px-4 py-3.5 transition-[box-shadow,transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
+      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-3 sm:px-4 py-3.5 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{
         background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
-        border: "1px solid rgb(var(--divider) / 0.06)",
       }}
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[12px] opacity-0 group-hover/result:opacity-100 transition-opacity duration-200"
-        style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.30)" }}
-      />
       <div
         className="tnum relative"
         style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}

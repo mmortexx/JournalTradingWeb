@@ -13,12 +13,12 @@ import {
 } from "@/components/ui/accordion";
 
 /**
- * PricingFAQ — small, pricing-specific accordion (5 items) shown on the
+ * PricingFAQ — small, pricing-specific accordion (4 items) shown on the
  * Pricing page between Comparison and TrustStrip.
  *
  * Distinct from the main marketing FAQ.tsx:
  *  - Narrower scope: only questions a buyer has at the pricing-decision moment
- *    (trial, payment methods, guarantee, multi-computer, lost license).
+ *    (trial, payment methods, multi-computer, lost license).
  *  - No search bar (the set is small enough that a search would feel heavy).
  *  - Centered institutional header above the accordion (eyebrow + headline
  *    + lead + 3 reassurance pills) — mirrors the Pricing header rhythm so
@@ -56,15 +56,11 @@ export function PricingFAQ() {
     ? [
         {
           q: "¿Puedo probar antes de comprar?",
-          a: "Sí. Tienes la demo en vivo de esta misma web — sin registro, sin descargar nada, con datos deterministas. Y si después de comprar sientes que no encaja, tienes 30 días de garantía de devolución completa, sin preguntas.",
+          a: "Sí. Tienes la demo en vivo de esta misma web — sin registro, sin descargar nada, con datos deterministas.",
         },
         {
           q: "¿Qué métodos de pago aceptáis?",
           a: "Tarjeta de crédito/débito y PayPal. Emitimos factura con IVA si procede.",
-        },
-        {
-          q: "¿Cómo funciona la garantía de 30 días?",
-          a: "Si en 30 días sientes que la app no es para ti, escribes a soporte y te devolvemos el 100 % del dinero, sin preguntas.",
         },
         {
           q: "¿Puedo usarlo en varios ordenadores?",
@@ -78,15 +74,11 @@ export function PricingFAQ() {
     : [
         {
           q: "Can I try before buying?",
-          a: "Yes. You have the live demo on this very site — no signup, nothing to download, with deterministic data. And if after buying it doesn't fit, you're covered by the 30-day no-questions refund guarantee.",
+          a: "Yes. You have the live demo on this very site — no signup, nothing to download, with deterministic data.",
         },
         {
           q: "What payment methods do you accept?",
           a: "Credit/debit card and PayPal. We issue VAT invoices where applicable.",
-        },
-        {
-          q: "How does the 30-day guarantee work?",
-          a: "If within 30 days you feel the app isn't for you, email support and we'll refund 100% of your money, no questions asked.",
         },
         {
           q: "Can I use it on multiple computers?",
@@ -98,10 +90,13 @@ export function PricingFAQ() {
         },
       ];
 
+  /* La píldora de garantía se retiró (no se ofrecen reembolsos). Se
+     mantiene el trío que pide la maqueta con "Sin suscripción", que es
+     una promesa que el producto sí sostiene. */
   const pills = [
-    es ? "30 días de garantía" : "30-day guarantee",
     es ? "Datos 100 % locales" : "100 % local data",
     es ? "Pago único" : "One-time payment",
+    es ? "Sin suscripción" : "No subscription",
   ];
 
   return (
@@ -110,17 +105,6 @@ export function PricingFAQ() {
       aria-label={es ? "Preguntas frecuentes sobre precios" : "Pricing FAQ"}
       className="section-tight bg-veil relative overflow-hidden scroll-mt-24"
     >
-      {/* Soft radial accent glow behind the accordion — anchors the
-          section to the same dark-premium aesthetic as the Pricing
-          cards above. */}
-      <div
-        aria-hidden="true"
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[680px] h-[420px] rounded-full blur-[140px] pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)",
-          opacity: 0.08,
-        }}
-      />
       {/* Opt-in 3% fractalNoise grain — matches HeroVideo / Bento /
           Pricing so the FAQ reads as a continuation of the same premium
           printed surface. */}
@@ -147,12 +131,12 @@ export function PricingFAQ() {
           </h2>
           <p className="mt-4 text-base md:text-lg text-secondary leading-relaxed">
             {es
-              ? "Cinco respuestas rápidas sobre prueba, pago, garantía y licencia. Si te queda alguna duda, escríbenos: respondemos en menos de 24 h."
-              : "Five quick answers about trial, payment, guarantee and license. If anything is still unclear, email us: we reply within 24 h."}
+              ? "Cuatro respuestas rápidas sobre prueba, pago y licencia. Si te queda alguna duda, escríbenos: respondemos en menos de 24 h."
+              : "Four quick answers about trial, payment and license. If anything is still unclear, email us: we reply within 24 h."}
           </p>
 
           {/* Compact reassurance row — three pills summarizing the
-              guarantee, local-first and one-time payment promises.
+              local-first, one-time payment and no-subscription promises.
               Centered so they read as a single horizontal credential
               strip directly under the lead. */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -167,7 +151,7 @@ export function PricingFAQ() {
                   delay: 0.18 + i * 0.08,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="pill bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.10)] tnum"
+                className="pill !rounded-[4px] bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.10)] tnum"
               >
                 <span className="size-1.5 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
                 {label}
@@ -191,7 +175,7 @@ export function PricingFAQ() {
                 <AccordionItem
                   key={item.q}
                   value={`item-${i}`}
-                  className="border-[rgb(var(--divider)/0.10)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.04)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),0_0_30px_-6px_rgb(var(--accent-base)/0.22)]"
+                  className="border-[rgb(var(--divider)/0.10)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.04)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base))]"
                 >
                   <AccordionTrigger className="text-left text-sm font-medium text-primary hover:text-primary hover:no-underline py-5 transition-colors [&>svg]:!text-tertiary [&[data-state=open]>svg]:!text-[rgb(var(--accent-base))] [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:text-[rgb(var(--accent-base))]">
                     {/* Wrap the question in a min-w-0 span so the flex

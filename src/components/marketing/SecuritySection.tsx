@@ -100,7 +100,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
                 key={c.t}
                 style={{
                   padding: 24,
-                  borderRadius: 18,
+                  borderRadius: 8,
                   border: "1px solid rgb(var(--divider) / 0.13)",
                   background: "color-mix(in oklab, var(--surface) 55%, transparent)",
                   backdropFilter: "blur(20px) saturate(1.4)",
@@ -127,7 +127,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
           className="overflow-hidden"
           style={{
             border: "1px solid rgb(var(--divider) / 0.13)",
-            borderRadius: 16,
+            borderRadius: 8,
             background: "color-mix(in oklab, var(--surface) 60%, transparent)",
             backdropFilter: "blur(16px) saturate(1.4)",
             WebkitBackdropFilter: "blur(16px) saturate(1.4)",
@@ -149,8 +149,8 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
               &nbsp;
             </span>
             <span
-              className="tnum"
-              style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgb(var(--accent-base))", fontWeight: 600, boxShadow: "inset 2px 0 0 rgb(var(--accent-base) / 0.30)" }}
+              className="tnum border-l-2 border-[rgb(var(--accent-base)/0.30)] pl-2"
+              style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgb(var(--accent-base))", fontWeight: 600 }}
             >
               Trading Journal
             </span>
@@ -173,8 +173,8 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
             >
               <span style={{ fontSize: 13, color: "var(--ink-2)" }}>{row.l}</span>
               <span
-                className="flex items-center gap-2"
-                style={{ fontSize: 13, color: "var(--ink)", boxShadow: "inset 2px 0 0 rgb(var(--accent-base) / 0.30)" }}
+                className="flex items-center gap-2 border-l-2 border-[rgb(var(--accent-base)/0.30)] pl-2"
+                style={{ fontSize: 13, color: "var(--ink)" }}
               >
                 {typeof row.tj === "boolean" ? (
                   row.tj ? (

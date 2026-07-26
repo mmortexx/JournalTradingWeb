@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Story } from "@/components/marketing/Story";
 import { Values } from "@/components/marketing/Values";
 import { TableOfContents } from "@/components/tj/TableOfContents";
-import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 // Estimated reading time (story + values + social proof + testimonials +
@@ -120,7 +119,6 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <ReadingProgressIndicator />
       <Story />
       <Values />
       <SocialProof />

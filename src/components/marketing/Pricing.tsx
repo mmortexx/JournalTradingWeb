@@ -100,15 +100,6 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
       id="pricing"
       className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24"
     >
-      {/* Soft radial accent glow behind the cards. */}
-      <div
-        aria-hidden="true"
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[680px] h-[480px] rounded-full blur-[140px] pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, rgb(var(--accent-base)), transparent 70%)",
-          opacity: 0.10,
-        }}
-      />
       {/* Opt-in 3% fractalNoise grain — matches HeroVideo / Bento so the
           conversion section reads as a premium printed surface. */}
       <div className="grain absolute inset-0 pointer-events-none" aria-hidden="true" />
@@ -120,7 +111,17 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
             porque el PageHeader ya aporta su propio kicker + subtítulo. */}
         <Reveal className="text-center max-w-3xl mx-auto">
           {!standalone && <Eyebrow className="justify-center">{t("pricingEyebrow")}</Eyebrow>}
-          <h2 className={`text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance ${standalone ? "" : "mt-5"}`}>
+          {/* Mismo caso que en FAQ: en /pricing el PageHeader ya titula
+              "Lo compras una vez. Es tuyo para siempre.", así que este h2
+              repetía el titular en pantalla. Se conserva en el documento
+              (índice + SEO) pero oculto a la vista con `sr-only`. */}
+          <h2
+            className={
+              standalone
+                ? "sr-only"
+                : "text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance mt-5"
+            }
+          >
             {es ? (
               <>
                 Lo compras una vez. Es tuyo para{" "}
@@ -151,19 +152,18 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
           <div
             role="radiogroup"
             aria-label={es ? "Modelo de pago" : "Payment model"}
-            className="mt-10 mx-auto max-w-md liquid-glass rounded-pill p-1.5 flex items-stretch gap-1"
+            className="mt-10 mx-auto max-w-md liquid-glass rounded-lg p-1.5 flex items-stretch gap-1"
           >
             {/* Active: One-time */}
             <div
               role="radio"
               aria-checked="true"
               tabIndex={0}
-              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] px-3 sm:px-4 py-2.5 cursor-default outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--divider)/0.40)]"
+              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[4px] px-3 sm:px-4 py-2.5 cursor-default outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--divider)/0.40)]"
               style={{
                 background:
                   "linear-gradient(180deg, rgb(var(--accent-base) / 0.18), rgb(var(--accent-base) / 0.08))",
-                boxShadow:
-                  "inset 0 0 0 1px rgb(var(--accent-base) / 0.45), 0 8px 24px -10px rgb(var(--accent-base) / 0.5)",
+                boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.45)",
               }}
             >
               <span
@@ -173,7 +173,7 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
               <span className="text-sm font-semibold text-primary tnum">
                 {es ? "Pago único" : "One-time"}
               </span>
-              <span className="hidden sm:inline-flex pill bg-[rgb(var(--divider)/0.10)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
+              <span className="hidden sm:inline-flex pill !rounded-[4px] bg-[rgb(var(--divider)/0.10)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
                 {es ? "Activo" : "Active"}
               </span>
             </div>
@@ -211,9 +211,11 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
           ))}
         </div>
 
-        {/* Guarantee line — centered, simple. The detailed guarantee already
-            lives in GuaranteeBanner above this section, so this is just the
-            closing reassurance chip. */}
+        {/* Línea de cierre — centrada, simple. Antes prometía la garantía
+            de 30 días (retirada: no se ofrecen reembolsos). El escudo se
+            reaprovecha para la promesa que sí se sostiene y que es el
+            argumento de venta real del producto: los datos no salen del
+            equipo. */}
         <Reveal delay={0.16}>
           <div className="mt-12 flex items-center justify-center gap-2.5 text-sm text-tertiary">
             <span
@@ -224,12 +226,12 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="font-medium text-secondary">
-                {es ? "Garantía 30 días" : "30-day guarantee"}
+                {es ? "Pago único" : "One-time payment"}
               </span>
               <span className="text-tertiary" aria-hidden="true">
                 ·
               </span>
-              <span>{es ? "Devolución completa" : "Full refund"}</span>
+              <span>{es ? "Tus datos nunca salen de tu equipo" : "Your data never leaves your machine"}</span>
             </span>
           </div>
         </Reveal>
@@ -251,14 +253,12 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className={`relative liquid-glass rounded-card p-6 sm:p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isPro
-          ? "gradient-border depth-4 border-[rgb(var(--accent-base)/0.22)]"
-          : "depth-2 border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--divider)/0.18)] hover:depth-3"
+          ? "depth-2 border-[rgb(var(--accent-base)/0.35)]"
+          : "depth-2 border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--divider)/0.18)]"
       }`}
       style={
         isPro
           ? {
-              boxShadow:
-                "0 24px 70px -22px rgb(var(--accent-base) / 0.50), inset 0 1px 0 rgb(var(--accent-base) / 0.10)",
               // Establish a stacking context so the "PREMIUM" watermark
               // (z-index: -1) stays trapped inside this card — paints
               // above the liquid-glass fill but below the in-flow text content.
@@ -275,14 +275,18 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
               accent ring + glow already framing the Pro card, so the whole
               Pro surface reads as a single premium object (R20-3c). */}
           <span
-            className="pill border uppercase tracking-[0.1em] backdrop-blur-md"
+            className="pill !rounded-[4px] border uppercase tracking-[0.1em] backdrop-blur-md"
             style={{
-              background:
-                "linear-gradient(180deg, rgb(var(--accent-base) / 0.95), rgb(var(--accent-hover) / 0.85))",
-              color: "rgb(var(--accent-pressed))",
-              borderColor: "rgb(var(--accent-base) / 0.55)",
-              boxShadow:
-                "0 8px 22px -6px rgb(var(--accent-base) / 0.65), inset 0 1px 0 rgb(var(--divider) / 0.35)",
+              /* Fondo champagne PLANO y texto casi negro.
+                 Antes el texto era `--accent-pressed` (#B0905A) sobre un
+                 degradado de `--accent-base` → `--accent-hover`: dorado
+                 sobre dorado, ~1.4:1 de contraste. La insignia se veía
+                 como una barra dorada maciza y SIN TEXTO. El tono oscuro
+                 (#1A1917) es el mismo que usa la app real como texto
+                 sobre acento, y da ~9:1. */
+              background: "rgb(var(--accent-base))",
+              color: "#1A1917",
+              borderColor: "rgb(var(--accent-base))",
             }}
           >
             {es ? "Más popular" : "Most popular"}
@@ -326,7 +330,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
             (R24-1d). text-primary kept for full WCAG-AA contrast on the
             tinted backdrop in both themes. */}
         <span
-          className={`pill border shrink-0 ${
+          className={`pill !rounded-[4px] border shrink-0 ${
             isPro
               ? "bg-[rgb(var(--accent-base)/0.12)] text-primary border-[rgb(var(--accent-base)/0.32)]"
               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border-[rgb(var(--divider)/0.10)]"
@@ -427,7 +431,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         <MagneticButton
           href="#"
           strength={0.18}
-          className="group w-full flex items-center justify-center gap-2 h-12 px-6 rounded-lg text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[rgb(var(--bg))] shadow-[0_2px_8px_-2px_rgb(var(--accent-base)/0.40),0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(var(--accent-base)/0.55),0_2px_8px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="group w-full flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[var(--bg)] shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         >
           {plan.cta}
           <svg

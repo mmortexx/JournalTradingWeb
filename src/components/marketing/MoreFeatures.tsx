@@ -111,7 +111,7 @@ export function MoreFeatures() {
             >
               <motion.article
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                className="group liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)] hover:shadow-[0_0_28px_-10px_rgb(var(--accent-base)/0.40)]"
+                className="group liquid-glass depth-1 rounded-card border border-transparent p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
               >
                   {/* Icon */}
                   <div

@@ -90,11 +90,6 @@ export function Gallery() {
 
   return (
     <section className="section bg-veil relative overflow-hidden">
-      {/* Ambient glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 w-[700px] h-[400px] rounded-full blur-[140px] opacity-[0.06] bg-[rgb(var(--divider))]"
-      />
       {/* Section grain */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
@@ -142,7 +137,7 @@ export function Gallery() {
                     : `View "${shot.title}" at full size (opens in a new tab)`}
                   className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent transition-transform duration-[380ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5"
                 >
-                  <div className="relative">
+                  <div className="relative rounded-xl border border-transparent transition-colors duration-300 group-hover:border-[rgb(var(--accent-base)/0.45)]">
                     <WindowFrame
                       caption={shot.caption}
                       bodyClassName="aspect-[1500/856]"
@@ -156,20 +151,6 @@ export function Gallery() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     </WindowFrame>
-                    {/* Hover: subtle accent border glow scoped to the
-                        frame only (absolute inset-0 of the `relative`
-                        wrapper, NOT the figure). */}
-                    {/* R24-1c: deepened the accent-glow on hover (wider
-                        halo + a hairline outer ring at /0.06) so the frame
-                        reads as a luminous floating card, not a flat tint.
-                        The rest opacity stays 0 (six glowing frames at once
-                        would be noisy) — the lift + glow only fire when a
-                        single frame is actually being considered. */}
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.45), 0 20px 48px -14px rgb(var(--accent-base) / 0.32), 0 0 0 1px rgb(var(--accent-base) / 0.06)" }}
-                    />
                     {/* "View full size" affordance — expand-icon chip at
                         the top-right of the frame. Always visible at 60%
                         opacity on touch (no hover), fades + lifts in on

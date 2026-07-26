@@ -130,7 +130,7 @@ export function Footer() {
     es ? "Pago único · Sin suscripción" : "One-time payment · No subscription",
     es ? "Datos 100 % locales" : "100 % local data",
     "ES + EN",
-    es ? "Garantía 30 días" : "30-day guarantee",
+    es ? "Actualizaciones 1.x gratuitas" : "Free 1.x updates",
   ];
 
   return (
@@ -162,7 +162,7 @@ export function Footer() {
                 Signals the "your data never leaves your machine" promise
                 inline in the brand column. Same hairline language as the
                 rest of the design system (`border-white/10`). */}
-            <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-[11px] font-medium text-secondary">
+            <div className="mt-4 inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-[11px] font-medium text-secondary">
               <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path
                   d="M5 7V5a3 3 0 016 0v2M4 7h8v7H4V7z"
@@ -188,7 +188,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   ariaLabel={label}
                   strength={0.3}
-                  className="icon-btn w-7 h-7 grid place-items-center rounded-full liquid-glass text-secondary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-200"
+                  className="icon-btn grid h-7 w-7 place-items-center rounded-[4px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
                 >
                   <Icon />
                 </MagneticButton>
@@ -245,7 +245,7 @@ export function Footer() {
           {trust.map((item) => (
             <span
               key={item}
-              className="inline-flex items-center rounded-full border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.02)] px-2.5 py-1 text-xs text-tertiary"
+              className="inline-flex items-center rounded-[4px] border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.02)] px-2.5 py-1 text-xs text-tertiary"
             >
               {item}
             </span>
@@ -275,15 +275,19 @@ export function Footer() {
               below — it's pure metadata and the dimmer weight helps it
               read as secondary information next to the legal links. */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs text-secondary">
-            {/* Status indicator — pulsing emerald dot + label. The
-                `animate-ping` ring is the radar sweep; the solid inner
-                dot is the steady state. Mirrors Stripe / Vercel status
-                badges. */}
+            {/* Indicador de estado — punto sólido, SIN el anillo
+                `animate-ping`. El barrido tipo radar latía en bucle en
+                el pie de todas las páginas: mucho reclamo visual para un
+                dato que no cambia nunca. El punto en verde P&L ya dice
+                "operativo"; el color es la señal, no el movimiento. */}
             <span className="inline-flex items-center gap-1.5">
-              <span aria-hidden className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400/60 animate-ping" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              </span>
+              {/* El envoltorio `relative flex` existía solo para apilar
+                  el anillo del radar sobre el punto. Sin anillo, sobra. */}
+              <span
+                aria-hidden
+                className="inline-flex h-1.5 w-1.5 rounded-full"
+                style={{ background: "rgb(var(--pnl-pos))" }}
+              />
               <span>{es ? "Sistemas operativos" : "All systems operational"}</span>
             </span>
             <span aria-hidden className="opacity-30">·</span>

@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { GuaranteeBanner } from "@/components/marketing/GuaranteeBanner";
 import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
-import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 
-// Estimated reading time (guarantee + pricing cards + comparison + pricing FAQ +
+// Estimated reading time (pricing cards + comparison + pricing FAQ +
 // trust strip + testimonials + stats + newsletter + download CTA).
 // ~850 words at 220 wpm = ~4 min.
 const READING_TIME_MIN = 4;
@@ -41,7 +39,7 @@ const breadcrumbSchema = {
 };
 
 /**
- * FAQPage structured data — mirrors the 5 visible Q&A items rendered by
+ * FAQPage structured data — mirrors the 4 visible Q&A items rendered by
  * the PricingFAQ component (ES-default since the site is ES-default).
  * Per Google's FAQ rich-result guidelines, FAQPage schema must appear on
  * the page where the Q&A is visible — that requirement is met on /pricing
@@ -50,7 +48,7 @@ const breadcrumbSchema = {
  *
  * IMPORTANT: keep this in sync with src/components/marketing/PricingFAQ.tsx
  * if the visible ES Q&A copy changes — Google penalizes schema/visible-text
- * mismatches. The 5 Q&A texts below are the ES version verbatim from
+ * mismatches. The 4 Q&A texts below are the ES version verbatim from
  * PricingFAQ.tsx.
  */
 const faqSchema = {
@@ -62,7 +60,7 @@ const faqSchema = {
       name: "¿Puedo probar antes de comprar?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Tienes la demo en vivo de esta misma web — sin registro, sin descargar nada, con datos deterministas. Y si después de comprar sientes que no encaja, tienes 30 días de garantía de devolución completa, sin preguntas.",
+        text: "Sí. Tienes la demo en vivo de esta misma web — sin registro, sin descargar nada, con datos deterministas.",
       },
     },
     {
@@ -71,14 +69,6 @@ const faqSchema = {
       acceptedAnswer: {
         "@type": "Answer",
         text: "Tarjeta de crédito/débito y PayPal. Emitimos factura con IVA si procede.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "¿Cómo funciona la garantía de 30 días?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Si en 30 días sientes que la app no es para ti, escribes a soporte y te devolvemos el 100 % del dinero, sin preguntas.",
       },
     },
     {
@@ -158,13 +148,13 @@ const productSchema = {
 export const metadata: Metadata = {
   title: "Precios",
   description:
-    "Pago único. Sin suscripciones. Core $29 · Pro $49. Garantía de 30 días sin preguntas. Tus datos 100% locales para siempre.",
+    "Pago único. Sin suscripciones. Core $29 · Pro $49. Tus datos 100% locales para siempre.",
   alternates: {
     canonical: `${SITE_URL}/pricing/`,
   },
   openGraph: {
     title: "Precios — Trading Journal",
-    description: "Pago único. Sin suscripciones. Core $29 · Pro $49. Garantía de 30 días.",
+    description: "Pago único. Sin suscripciones. Core $29 · Pro $49.",
     url: `${SITE_URL}/pricing/`,
     type: "website",
     siteName: "Trading Journal",
@@ -183,7 +173,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Precios — Trading Journal",
     description:
-      "Pago único, sin suscripciones. Core $29 · Pro $49 con garantía de 30 días sin preguntas. Tus datos 100% locales para siempre.",
+      "Pago único, sin suscripciones. Core $29 · Pro $49. Tus datos 100% locales para siempre.",
     images: [OG_IMAGE],
   },
 };
@@ -237,8 +227,8 @@ export default function PricingPage() {
         titleEn="You buy it once. Yours forever."
         titleHighlightEs="Tuyo para siempre."
         titleHighlightEn="Yours forever."
-        subtitleEs="Sin suscripciones. Sin nube. Sin perder acceso a tu historial si dejas de pagar. Garantía de devolución de 30 días, sin preguntas."
-        subtitleEn="No subscriptions. No cloud. No losing access to your history if you stop paying. 30-day no-questions refund guarantee."
+        subtitleEs="Sin suscripciones. Sin nube. Sin perder acceso a tu historial si dejas de pagar."
+        subtitleEn="No subscriptions. No cloud. No losing access to your history if you stop paying."
         breadcrumbEs="Precios"
         breadcrumbEn="Pricing"
         readingTimeMin={READING_TIME_MIN}
@@ -255,15 +245,10 @@ export default function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ReadingProgressIndicator />
-      {/* Prominent 30-day money-back guarantee banner — sits between the
-          page header and the pricing cards to reinforce the no-risk promise
-          before the visitor even sees the prices. */}
-      <GuaranteeBanner />
       <Pricing standalone />
       <Comparison />
-      {/* Pricing-specific FAQ — 5 bilingual Q&A focused on trial, payment,
-          guarantee, multi-computer and lost license. */}
+      {/* Pricing-specific FAQ — 4 bilingual Q&A focused on trial, payment,
+          multi-computer and lost license. */}
       <PricingFAQ />
       <TrustStrip />
       {/* Compact 3-testimonial row focused on value-for-money (ROI,

@@ -62,8 +62,12 @@ export function OverviewApp() {
           background:
             "radial-gradient(circle, color-mix(in oklab, rgb(var(--accent-base)) 13%, transparent), transparent 72%)",
           filter: "blur(64px)",
-          opacity: 0.28,
-          animation: "tj-glow 9s ease-in-out infinite",
+          /* Halo bajado de 0.28 a 0.10 y SIN el bucle `tj-glow` de 9 s.
+             Una mancha de color latiendo en la esquina es adorno puro:
+             no marca nada, y el latido llama la atención sobre el vacío.
+             Se conserva a intensidad mínima solo como separación tonal
+             entre esta sección y el hero. */
+          opacity: 0.1,
         }}
       />
       {/* Viñeta inferior */}
@@ -105,7 +109,9 @@ export function OverviewApp() {
             <span className="inline-flex items-center gap-1.5">
               <span
                 className="inline-block rounded-full"
-                style={{ width: 5, height: 5, background: "rgb(var(--pnl-pos))", animation: "tj-glow 2.4s ease-in-out infinite" }}
+                /* Punto de estado sin latido: el color ya dice lo que
+                   tiene que decir. */
+                style={{ width: 5, height: 5, background: "rgb(var(--pnl-pos))" }}
               />
               <span
                 className="tnum"
@@ -225,30 +231,25 @@ export function OverviewApp() {
                 ? "El diario que mide con el rigor de una mesa profesional: las métricas que de verdad importan, disciplina que te frena antes del error y tus datos —siempre— en tu máquina."
                 : "The journal that measures with the rigour of a professional desk: the metrics that actually matter, discipline that brakes you before the error, and your data —always— on your machine."}
             </p>
-            {/* R26-2c — CTAs ported to match Hero EXACTLY: `<Link>`
-                (was `<a>`, which forced a full page reload on a Next
-                route), `rounded-full h-[54px]` (was `rounded-[11px]
-                h-[52px]`), `text-[15px] font-semibold` (was 15.5px /
-                font-medium), and lucide `ArrowRight` / `Play` icons (were
-                unicode `→` / `▶`, which rendered soft at non-integer
-                sizes). The pill + lucide + Link pattern now reads as a
-                single coordinated CTA pair with the Hero. The hover
-                shadow layers the same 4px accent halo as the Hero so the
-                two sections' CTAs share the "lift + accent ring + shadow"
-                hover state. */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            {/* CTAs — calcados del hero tras el rediseño institucional:
+                rectángulos de 4 px, sin sheen, sin sombra de acento, sin
+                elevación al pasar por encima. El realce es un cambio de
+                color, declarado igual para ratón y teclado. */}
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/pricing"
-                className="tj-cta-sheen inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-7 bg-[rgb(var(--accent-base))] text-[#06130d] text-[15px] font-semibold shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] transition-[transform,filter,box-shadow] duration-200 hover:-translate-y-0.5 hover:brightness-[1.08] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.12),0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
+                style={{ background: "rgb(var(--accent-base))", color: "#1A1917" }}
               >
                 {es ? "Comprar — desde 29 $" : "Buy — from $29"}
                 <ArrowRight size={16} aria-hidden />
               </Link>
               <Link
                 href="/demo"
-                className="liquid-glass inline-flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2.5 rounded-full h-[54px] px-[26px] border border-[rgb(var(--divider)/0.13)] text-[var(--ink)] text-[15px] font-semibold transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.05)] hover:shadow-[0_0_0_4px_rgb(var(--accent-base)/0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[4px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
+                style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
               >
-                <Play size={15} fill="currentColor" aria-hidden />
+                <Play size={14} fill="currentColor" aria-hidden />
                 {es ? "Ver la demo" : "See the demo"}
               </Link>
             </div>
@@ -257,7 +258,7 @@ export function OverviewApp() {
                 "100% LOCAL",
                 es ? "PAGO ÚNICO" : "ONE-TIME",
                 "ES · EN",
-                es ? "GARANTÍA 30 DÍAS" : "30-DAY GUARANTEE",
+                es ? "SIN SUSCRIPCIÓN" : "NO SUBSCRIPTION",
               ].map((label, i) => (
                 <span key={label} className="flex items-center gap-3.5">
                   {i > 0 && (
@@ -307,13 +308,16 @@ export function OverviewApp() {
                 left: -64,
                 top: 150,
                 border: "1px solid rgb(var(--divider) / 0.13)",
-                borderRadius: 12,
+                borderRadius: 8,
                 background: "color-mix(in oklab, var(--surface) 94%, transparent)",
                 backdropFilter: "blur(8px)",
                 boxShadow: "var(--shadow, 0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78))",
                 padding: "12px 14px",
                 minWidth: 148,
-                animation: "tj-float 6s ease-in-out infinite",
+                /* Sin `tj-float`: estas fichas muestran DATOS (P&L,
+                   estado del guardián). Un dato que flota arriba y abajo
+                   en bucle se lee como decoración y resta credibilidad
+                   justo a lo que debería darla. Quedan quietas. */
               }}
             >
               <div
@@ -351,12 +355,12 @@ export function OverviewApp() {
                 left: -56,
                 bottom: 40,
                 border: "1px solid rgb(var(--divider) / 0.13)",
-                borderRadius: 12,
+                borderRadius: 8,
                 background: "color-mix(in oklab, var(--surface) 94%, transparent)",
                 backdropFilter: "blur(8px)",
                 boxShadow: "var(--shadow, 0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78))",
                 padding: "11px 13px",
-                animation: "tj-float 6s ease-in-out infinite 1.4s",
+                /* Sin `tj-float`, mismo motivo que la ficha de arriba. */
               }}
             >
               <span

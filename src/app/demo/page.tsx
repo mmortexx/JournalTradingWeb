@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
-import { ReadingProgressIndicator } from "@/components/tj/ReadingProgressIndicator";
 
 // Estimated reading time (capabilities + demo + gallery + stats + ready-to-buy).
 // ~400 words at 220 wpm = ~2 min.
@@ -114,11 +113,13 @@ export default function DemoPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <ReadingProgressIndicator />
       {/* What you can do — 6 feature cards previewing the demo */}
       <DemoCapabilities />
       <section id="demo" className="section bg-veil scroll-mt-16">
-        <AppDemoClient />
+        {/* `hideHeader`: el PageHeader de arriba ya titula "La app, en tu
+            navegador." y repite el mismo subtítulo, así que sin esta
+            bandera el visitante leía el titular dos veces seguidas. */}
+        <AppDemoClient hideHeader />
       </section>
       {/* Screenshot gallery — all 8 optimized webp images */}
       <DemoGallery />

@@ -193,6 +193,6 @@ function DemoSkeleton() {
   );
 }
 
-export function AppDemoClient() {
-  return <AppDemo />;
+export function AppDemoClient({ hideHeader = false }: { hideHeader?: boolean } = {}) {
+  return <AppDemo hideHeader={hideHeader} />;
 }

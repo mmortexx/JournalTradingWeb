@@ -91,20 +91,12 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
           a: "Tarjeta de crédito/débito y PayPal. Emitimos factura con IVA si procede.",
         },
         {
-          q: "¿Y si la app no es para mí?",
-          a: "Tienes 30 días desde la compra para pedir reembolso completo, sin preguntas. Escríbenos y lo gestionamos en menos de 48 h.",
-        },
-        {
           q: "¿Puedo probar antes de comprar?",
-          a: "Sí. Puedes explorar la demo en vivo de esta misma web con datos deterministas (sin registro, sin descargar nada). Si después de comprar sientes que no encaja, tienes 30 días de garantía de devolución completa, sin preguntas.",
+          a: "Sí. Puedes explorar la demo en vivo de esta misma web con datos deterministas, sin registro y sin descargar nada. Es la app recreada al completo: puedes recorrer las pantallas y ver exactamente qué te llevas antes de pagar.",
         },
         {
           q: "¿Cuál es la diferencia entre Core y Pro?",
           a: "Core incluye el journal completo, 40+ métricas, 2 cuentas de trading, gestión de riesgo, disciplina e informes PDF básicos. Pro desbloquea además: cuentas ilimitadas, modo prop firm, simulador Monte Carlo, informe de track record, risk of ruin, informes PDF avanzados y el importador de rivales que migra tu journal anterior en 5 minutos.",
-        },
-        {
-          q: "¿Cómo funciona la garantía de 30 días?",
-          a: "Compras con total tranquilidad. Si en 30 días sientes que la app no es para ti, escribes a soporte y te devolvemos el 100% del dinero, sin preguntas ni condiciones. Sin formularios, sin interrogatorios.",
         },
         {
           q: "¿Funciona sin internet?",
@@ -157,20 +149,12 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
           a: "Credit/debit card and PayPal. We issue VAT invoices where applicable.",
         },
         {
-          q: "What if the app isn't for me?",
-          a: "You have 30 days from purchase to request a full refund, no questions asked. Email us and we'll process it within 48 hours.",
-        },
-        {
           q: "Can I try before buying?",
-          a: "Yes. You can explore the live demo on this very site with deterministic data (no signup, nothing to download). If after buying it doesn't fit, you're covered by the 30-day no-questions refund guarantee.",
+          a: "Yes. You can explore the live demo on this very site with deterministic data, no signup and nothing to download. It's the full app recreated: you can walk through the screens and see exactly what you're getting before you pay.",
         },
         {
           q: "What's the difference between Core and Pro?",
           a: "Core includes the full journal, 40+ metrics, 2 trading accounts, risk management, discipline, and basic PDF reports. Pro additionally unlocks unlimited accounts, prop firm mode, the Monte Carlo simulator, track record report, risk of ruin, advanced PDF reports, and the rival importer that migrates your old journal in 5 minutes.",
-        },
-        {
-          q: "How does the 30-day guarantee work?",
-          a: "Buy with total peace of mind. If within 30 days you feel the app isn't for you, email support and we'll refund 100% of your money, no questions asked. No forms, no interrogations.",
         },
         {
           q: "Does it work without internet?",
@@ -219,8 +203,21 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
               </div>
             </Reveal>
           )}
+          {/* En /faq el PageHeader ya titula "Preguntas frecuentes.", así
+              que este h2 se repetía A LA VISTA dos veces seguidas. El
+              comentario de arriba tiene razón en que el h2 debe seguir
+              EXISTIENDO (lo consumen el índice lateral y el esquema de
+              encabezados para SEO), pero eso no obliga a mostrarlo: con
+              `sr-only` sigue en el documento y en el árbol de
+              accesibilidad, y deja de duplicar el titular en pantalla. */}
           <Reveal delay={0.06}>
-            <h2 className={`relative t-h2 text-primary ${standalone ? "" : "mt-5"}`}>
+            <h2
+              className={
+                standalone
+                  ? "sr-only"
+                  : "relative t-h2 text-primary mt-5"
+              }
+            >
               {es ? (
                 <>
                   Preguntas <span className="text-gradient">frecuentes</span>
@@ -247,7 +244,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={es ? "Buscar en las preguntas…" : "Search questions…"}
               aria-label={es ? "Buscar en las preguntas frecuentes" : "Search frequently asked questions"}
-              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-md h-11 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
+              className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.10)] rounded-[4px] h-11 pl-10 pr-3 text-sm text-primary placeholder:text-tertiary outline-none transition-[border-color,box-shadow,background-color] duration-200 hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:bg-[rgb(var(--divider)/0.07)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.20)] focus-visible:ring-offset-0"
             />
           </div>
         </Reveal>
@@ -287,7 +284,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
                   <AccordionItem
                     key={item.q}
                     value={`item-${i}`}
-                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=closed]:hover:bg-[rgb(var(--divider)/0.04)] data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),0_0_30px_-6px_rgb(var(--accent-base)/0.32)]"
+                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=closed]:hover:bg-[rgb(var(--divider)/0.04)] data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base))]"
                   >
                     <AccordionTrigger className="text-left text-base md:text-[1.05rem] font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:text-[rgb(var(--accent-base))]">
                       {/* Wrap the question in a min-w-0 span so the flex

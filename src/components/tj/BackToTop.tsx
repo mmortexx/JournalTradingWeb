@@ -67,18 +67,40 @@ export function BackToTop() {
   const dashOffset = RING_CIRCUMFERENCE * (1 - progress / 100);
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.button
-          type="button"
-          onClick={scrollToTop}
-          aria-label={es ? "Volver arriba" : "Back to top"}
-          className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-primary transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgb(var(--accent-base)/0.40)] active:scale-95"
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.7 }}
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        >
+    /* El anclaje `fixed` vive en un contenedor que framer-motion NO
+       toca, y solo el botón de dentro se anima.
+       Antes el `fixed bottom-6 right-6` estaba en el propio
+       motion.button: al montarlo/desmontarlo, AnimatePresence asume el
+       control del posicionamiento del hijo y, con un elemento anclado
+       por `right`, calculaba mal el desplazamiento — el botón acababa
+       con `position: relative` y `left: -24px`, es decir, fuera de la
+       pantalla por la izquierda y arrastrado al flujo normal del
+       documento en vez de flotar. Separando anclaje (contenedor) de
+       animación (hijo) el fallo no puede reproducirse, dependa lo que
+       dependa de los internos de la librería.
+       `pointer-events-none` en el contenedor evita que el hueco de
+       44 px intercepte clics cuando el botón no está visible; el botón
+       los recupera con `pointer-events-auto`. */
+    <div className="fixed bottom-6 right-6 z-40 pointer-events-none">
+      <AnimatePresence>
+        {visible && (
+          <motion.button
+            type="button"
+            onClick={scrollToTop}
+            aria-label={es ? "Volver arriba" : "Back to top"}
+            className="pointer-events-auto relative w-11 h-11 rounded-full liquid-glass flex items-center justify-center text-primary transition-[box-shadow] duration-200 hover:shadow-[0_8px_28px_rgb(var(--accent-base)/0.40)]"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            /* El realce al pasar por encima se hace con framer-motion, no
+               con `hover:-translate-y-0.5` de Tailwind: motion escribe
+               `transform` en el estilo en línea para animar la escala, así
+               que la clase de Tailwind quedaba pisada y el botón nunca
+               llegaba a levantarse. */
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
           {/* Scroll-progress ring — SVG circle with a dash that fills
               clockwise as the user scrolls. Rotated -90deg so 0% starts
               at 12 o'clock. Sits behind the arrow. */}
@@ -115,8 +137,7 @@ export function BackToTop() {
               strokeDasharray={RING_CIRCUMFERENCE}
               strokeDashoffset={dashOffset}
               style={{
-                transition: "stroke-dashoffset 0.1s linear, filter 0.2s ease",
-                filter: "drop-shadow(0 0 2px rgb(var(--accent-base) / 0.5))",
+                transition: "stroke-dashoffset 0.1s linear",
               }}
             />
           </svg>
@@ -135,8 +156,9 @@ export function BackToTop() {
           >
             <path d="M9 14V4M4 8l5-5 5 5" />
           </svg>
-        </motion.button>
-      )}
-    </AnimatePresence>
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

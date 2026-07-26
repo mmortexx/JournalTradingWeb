@@ -132,16 +132,8 @@ export function TestimonialsWall() {
                 ease: [0.22, 1, 0.36, 1],
               }}
               whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="group relative liquid-glass depth-2 rounded-card p-5 mb-4 break-inside-avoid transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="group relative liquid-glass depth-2 rounded-card p-5 mb-4 break-inside-avoid border border-transparent transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)]"
             >
-              {/* Accent border glow on hover. */}
-              <div
-                className="absolute inset-0 rounded-card pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  boxShadow: `inset 0 0 0 1px rgb(var(--accent-base) / 0.35), 0 0 24px rgb(var(--accent-base) / 0.15)`,
-                }}
-              />
-
               {/* Rating stars + verified chip. */}
               <div className="relative flex items-center justify-between mb-3">
                 <div className="flex items-center gap-0.5" aria-label={es ? "5 de 5 estrellas" : "5 of 5 stars"}>
@@ -160,7 +152,7 @@ export function TestimonialsWall() {
                     </svg>
                   ))}
                 </div>
-                <span className="pill bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.15)] flex items-center gap-1 text-[11px]">
+                <span className="pill !rounded-[4px] bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.15)] flex items-center gap-1 text-[11px]">
                   <svg
                     width="10"
                     height="10"
