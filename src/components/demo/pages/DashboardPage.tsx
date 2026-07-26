@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import {
@@ -56,7 +56,7 @@ function sliceMetricsByDays(m: Metrics, days: number): Metrics {
 }
 
 const inputCls =
-  "w-full bg-white/5 border border-white/10 rounded-md h-9 px-3 text-sm text-primary tnum placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors appearance-none";
+  "w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md h-9 px-3 text-sm text-primary tnum placeholder:text-tertiary focus:border-[rgb(var(--divider)/0.2)] focus:bg-[rgb(var(--divider)/0.08)] transition-colors appearance-none";
 const labelCls =
   "block text-[11px] uppercase tracking-[0.15em] text-tertiary mb-1.5";
 
@@ -127,6 +127,7 @@ export function DashboardPage() {
   );
   const [quantity, setQuantity] = useState<string>("1");
   const [note, setNote] = useState<string>("");
+  const [advanced, setAdvanced] = useState(false);
 
   const inst =
     INSTRUMENTS.find((i) => i.symbol === instrumentSymbol) ?? INSTRUMENTS[0];
@@ -140,8 +141,6 @@ export function DashboardPage() {
   const stopDist = Math.abs(entryNum - stopNum);
   // planned R:R = |target - entry| / |entry - stop| (real app's TradeRrDisplay).
   const plannedRr = stopDist > 0 ? Math.abs(targetNum - entryNum) / stopDist : 0;
-  // realized R multiple = |exit - entry| / |entry - stop|
-  const realizedR = stopDist > 0 ? Math.abs(exitNum - entryNum) / stopDist : 0;
 
   // ----- risk-$ calculation (real app: % of equity by default) -----
   // The real app moved the sizing CALCULATOR into its own dialog — the
@@ -289,7 +288,7 @@ export function DashboardPage() {
         {/* Composer card — 2-col grid (image left, data right) */}
         <Reveal delay={0.1}>
           <motion.div
-            className="liquid-glass depth-3 hover:shadow-[0_6px_14px_rgb(0_0_0_/_0.32),0_24px_56px_rgb(0_0_0_/_0.36),0_0_44px_rgb(255_255_255_/_0.08)] transition-shadow duration-300 rounded-card p-5 md:p-6 relative overflow-hidden"
+            className="demo-card p-5 md:p-6 relative overflow-hidden"
           >
             <div className="relative z-10">
               {/* R26-1d: wrap the composer inputs + footer actions in a real
@@ -320,7 +319,7 @@ export function DashboardPage() {
                   <button
                     type="button"
                     aria-label={t("dropScreens")}
-                    className="w-full border border-dashed border-white/15 rounded-md flex flex-col items-center justify-center gap-2 text-tertiary hover:text-secondary hover:border-white/30 hover:bg-white/5 transition-colors group"
+                    className="w-full border border-dashed border-[rgb(var(--divider)/0.15)] rounded-md flex flex-col items-center justify-center gap-2 text-tertiary hover:text-secondary hover:border-[rgb(var(--divider)/0.3)] hover:bg-[rgb(var(--divider)/0.05)] transition-colors group"
                     style={{ height: 380 }}
                   >
                     <svg
@@ -353,13 +352,13 @@ export function DashboardPage() {
                       vertical hairlines, anchored to the bottom of the
                       left column. Top border = hairline divider. Mirrors
                       the WinUI VerticalHairlineStyle strip. */}
-                  <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="mt-4 pt-4 border-t border-[rgb(var(--divider)/0.1)]">
                     <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary mb-3">
                       {es ? "Riesgo de esta operación" : "Trade risk"}
                     </div>
                     <div className="grid grid-cols-[1fr_1px_1fr_1px_1fr] gap-x-4 items-stretch">
                       {/* Risk $ */}
-                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
                         <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
                           {t("riskUsd")}
                         </div>
@@ -374,7 +373,7 @@ export function DashboardPage() {
                         aria-hidden="true"
                       />
                       {/* R:R planned */}
-                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
                         <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
                           {t("rr")}
                         </div>
@@ -396,7 +395,7 @@ export function DashboardPage() {
                         aria-hidden="true"
                       />
                       {/* % of account */}
-                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+                      <div className="flex flex-col items-center justify-center gap-1 text-center py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
                         <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
                           {es ? "% cuenta" : "% acct"}
                         </div>
@@ -444,7 +443,7 @@ export function DashboardPage() {
                                 ? d === "long"
                                   ? "bg-pnl-pos/15 border-pnl-pos/40 text-primary"
                                   : "bg-pnl-neg/15 border-pnl-neg/40 text-primary"
-                                : "bg-white/5 border-white/10 text-tertiary hover:text-secondary hover:border-white/20"
+                                : "bg-[rgb(var(--divider)/0.05)] border-[rgb(var(--divider)/0.1)] text-tertiary hover:text-secondary hover:border-[rgb(var(--divider)/0.2)]"
                             }`}
                           >
                             {active && (
@@ -560,25 +559,51 @@ export function DashboardPage() {
                         className={inputCls}
                       />
                     </div>
+                    {/* "Calcular tamaño" va pegado a Cantidad, como en la
+                        app (DashboardPage.xaml L466): la calculadora de
+                        tamaño de posición vive en su propio diálogo y al
+                        confirmar rellena este campo. En la demo el botón
+                        deja la cifra que ya calcula el propio composer —
+                        el gesto es el mismo, sin abrir un diálogo que
+                        aquí no aporta nada. */}
                     <div>
-                      <span className={labelCls}>
-                        {es ? "R realizado" : "Realized R"}
+                      <span className={labelCls} aria-hidden="true">
+                        &nbsp;
                       </span>
-                      <div className="h-9 px-3 flex items-center justify-center rounded-md bg-white/5 border border-white/10 min-w-[88px]">
-                        <span
-                          className={`text-sm font-medium tnum ${
-                            realizedR >= 2
-                              ? "text-pnl-pos"
-                              : realizedR >= 1
-                              ? "text-pnl-warn"
-                              : realizedR > 0
-                              ? "text-pnl-neg"
-                              : "text-tertiary"
-                          }`}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (stopDist > 0) {
+                            // 1 % de la cuenta entre la distancia al stop:
+                            // el tamaño que arriesga exactamente ese 1 %.
+                            const mult =
+                              inst.assetClass === "forex"
+                                ? 100_000
+                                : inst.assetClass === "futures"
+                                  ? FUTURES_MULTIPLIER
+                                  : 1;
+                            const q =
+                              (INITIAL_BALANCE_CONST * 0.01) / (stopDist * mult);
+                            setQuantity(q < 1 ? q.toFixed(3) : q.toFixed(2));
+                          }
+                        }}
+                        className="h-9 px-3 inline-flex items-center gap-1.5 rounded-md border border-[rgb(var(--divider)/0.12)] text-[12px] text-secondary hover:text-primary hover:bg-[rgb(var(--divider)/0.06)] transition-colors whitespace-nowrap"
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          aria-hidden="true"
                         >
-                          {fmtNum(realizedR, lang, 2)}R
-                        </span>
-                      </div>
+                          <rect x="5" y="3" width="14" height="18" rx="2" />
+                          <path d="M8 7h8M8 11h2M12 11h2M16 11h.01M8 15h2M12 15h2M16 15h.01" />
+                        </svg>
+                        {es ? "Calcular tamaño" : "Size calculator"}
+                      </button>
                     </div>
                   </div>
 
@@ -648,10 +673,46 @@ export function DashboardPage() {
                       onChange={(e) => setNote(e.target.value)}
                       placeholder={t("notePlaceholder")}
                       rows={3}
-                      className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm text-primary placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 transition-colors resize-none min-h-[88px] flex-1"
+                      className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md px-3 py-2 text-sm text-primary placeholder:text-tertiary focus:border-[rgb(var(--divider)/0.2)] focus:bg-[rgb(var(--divider)/0.08)] transition-colors resize-none min-h-[88px] flex-1"
                       aria-label={t("notePlaceholder")}
                     />
                   </div>
+
+                  {/* Modo avanzado — el interruptor que cierra el composer
+                      en la app (Capture_AdvancedModeLabel). Abre el
+                      registro por tramos: varias entradas o varias
+                      salidas en la misma operación, que es lo que
+                      distingue un diario serio de una hoja de cálculo.
+                      En la demo declara la capacidad; el desglose por
+                      tramos se ve entero en el detalle de la operación,
+                      en la tabla "Anatomía". */}
+                  <label className="flex items-center gap-2.5 cursor-pointer select-none pt-1">
+                    <input
+                      type="checkbox"
+                      checked={advanced}
+                      onChange={(e) => setAdvanced(e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className={`relative w-9 h-5 rounded-full transition-colors shrink-0 ${
+                        advanced
+                          ? "bg-[rgb(var(--accent-base))]"
+                          : "bg-[rgb(var(--divider)/0.15)]"
+                      } peer-focus-visible:ring-2 peer-focus-visible:ring-[rgb(var(--accent-base)/0.5)]`}
+                    >
+                      <span
+                        className={`absolute top-[3px] w-3.5 h-3.5 rounded-full transition-[left] ${
+                          advanced ? "left-[19px] bg-[#1A1917]" : "left-[3px] bg-[rgb(var(--txt-secondary))]"
+                        }`}
+                      />
+                    </span>
+                    <span className="text-[12px] text-secondary">
+                      {es
+                        ? "Modo avanzado (varias entradas o salidas)"
+                        : "Advanced mode (multiple entries or exits)"}
+                    </span>
+                  </label>
                 </div>
               </div>
 
@@ -659,7 +720,7 @@ export function DashboardPage() {
                   Top-border hairline (mirrors the WinUI DividerStroke).
                   Left: session count. Right: Save draft + Register
                   (accent, min-width 200, Ctrl+Enter). */}
-              <div className="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3 justify-between">
+              <div className="mt-6 pt-4 border-t border-[rgb(var(--divider)/0.1)] flex flex-wrap items-center gap-3 justify-between">
                 {/* Session count */}
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-sm font-semibold tnum text-primary">
@@ -676,7 +737,7 @@ export function DashboardPage() {
                     type="button"
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                    className="h-11 px-4 rounded-md bg-white/5 border border-white/10 text-secondary font-medium text-sm flex items-center gap-2 hover:bg-white/8 hover:text-primary transition-colors"
+                    className="h-11 px-4 rounded-md bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] text-secondary font-medium text-sm flex items-center gap-2 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors"
                   >
                     <svg
                       width="14"
@@ -746,6 +807,17 @@ export function DashboardPage() {
             </h2>
           </Reveal>
         </div>
+
+        {/* El parte de hoy — la primera tarjeta del Resumen en la app
+            (DashboardPage.xaml L637-670). Es lo que el histórico dice del
+            día ANTES de operar, y lo dice con la muestra en la mano: si no
+            da para afirmar nada, lo declara en vez de inventarse una
+            ventaja. La demo no la tenía, y es justo la pieza que hace que
+            el Resumen se reconozca como esta app y no como un panel
+            genérico de métricas. */}
+        <Reveal delay={0.06}>
+          <TodayBriefing />
+        </Reveal>
 
         {/* KPI strip — 7 cells with vertical hairline dividers (no card).
             Mirrors the WinUI Grid with VerticalHairlineStyle borders
@@ -853,17 +925,26 @@ export function DashboardPage() {
           </div>
         </Reveal>
 
+        {/* Aviso de realidad — el InfoBar que la app pinta bajo la franja
+            de KPIs (Summary_Reality*, Resources.resw L1612-1615). Pone la
+            racha y la caída actuales frente a lo que el AZAR produce con
+            ese porcentaje de acierto: sin esa referencia, tres pérdidas
+            seguidas se leen como "algo va mal" cuando son lo normal. Es
+            la pieza que convierte el panel en un antídoto contra el tilt. */}
+        <Reveal delay={0.12}>
+          <RealityCheck />
+        </Reveal>
+
         {/* Equity curve + Calendar — 50/50 side-by-side. The real app's
             ColumnDefinition Width="*" / Width="*" — both halves equal.
             (Previous demo was 2/3 + 1/3.) */}
         <div className="grid lg:grid-cols-2 gap-4 md:gap-5">
           {/* Equity curve card */}
           <Reveal delay={0.1}>
-            <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 relative overflow-hidden h-full">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -top-20 -right-20 w-[320px] h-[320px] rounded-full blur-[120px] opacity-[0.12] bg-white"
-              />
+            {/* Sin halo decorativo: la app no ilumina las esquinas de sus
+                tarjetas, y ese resplandor blanco era otra marca de "esto es
+                una web", no una ventana de escritorio. */}
+            <div className="demo-card p-5 relative overflow-hidden h-full">
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-3 gap-3 flex-wrap">
                   <div>
@@ -886,7 +967,7 @@ export function DashboardPage() {
                     </div>
                   </div>
                   {/* Timeframe selector — 1M / 3M / 6M */}
-                  <div className="flex items-center gap-0.5 bg-white/5 border border-white/10 rounded-md p-0.5">
+                  <div className="flex items-center gap-0.5 bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md p-0.5">
                     {TIMEFRAMES.map((mode) => {
                       const active = tfSel === mode;
                       return (
@@ -904,7 +985,7 @@ export function DashboardPage() {
                           {active && (
                             <motion.span
                               layoutId="tf-pill"
-                              className="absolute inset-0 rounded bg-white/10 border border-white/15"
+                              className="absolute inset-0 rounded bg-[rgb(var(--divider)/0.1)] border border-[rgb(var(--divider)/0.15)]"
                               transition={{
                                 type: "spring",
                                 stiffness: 380,
@@ -937,7 +1018,7 @@ export function DashboardPage() {
           DashboardPage (it lives in Diario / Operaciones), but useful in
           the demo so a logged trade is immediately visible. */}
       <Reveal delay={0.1}>
-        <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 relative overflow-hidden">
+        <div className="demo-card p-5 relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex items-baseline justify-between mb-4 gap-3">
               <div>
@@ -975,7 +1056,7 @@ export function DashboardPage() {
                       duration: 0.3,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="group w-full flex items-center gap-3 py-2.5 hover:bg-white/5 -mx-2 px-2 rounded-md transition-colors text-left"
+                    className="group w-full flex items-center gap-3 py-2.5 hover:bg-[rgb(var(--divider)/0.05)] -mx-2 px-2 rounded-md transition-colors text-left"
                   >
                     <div className="flex items-center gap-2 min-w-0 w-[80px] sm:w-[110px] shrink-0">
                       <span
@@ -1049,7 +1130,7 @@ function KpiCell({
   value: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-center min-w-0 px-1 py-1 rounded-md transition-colors hover:bg-white/[0.03]">
+    <div className="flex flex-col items-center gap-1 text-center min-w-0 px-1 py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
       <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary truncate max-w-full">
         {label}
       </div>
@@ -1058,6 +1139,173 @@ function KpiCell({
           whether the value is a <Money> span, a plain number, or a streak
           chip — keeps the row's baseline perfectly aligned. */}
       <div className="min-w-0 break-words [&>*]:text-lg [&>*]:font-semibold [&>span]:tnum">{value}</div>
+    </div>
+  );
+}
+
+/**
+ * TodayBriefing — "El parte de hoy" (DashboardPage.xaml L637-670).
+ *
+ * Cuatro líneas que la app compone a partir del histórico REAL del
+ * trader: qué deja su operación típica en el día de la semana que es
+ * hoy, si ya ha cerrado algo, cómo va su cadencia y en qué racha llega.
+ * Lo que la hace distinta de un widget de métricas cualquiera es que
+ * declara cuándo NO puede afirmar nada: con muestra corta o con
+ * resultados a ambos lados del cero, lo dice en vez de fabricar una
+ * ventaja. Se reproducen aquí las cadenas literales de la app
+ * (Summary_Briefing*, Resources.resw L608-617).
+ *
+ * El día de la semana se calcula tras montar, no en el render inicial:
+ * la fecha del servidor y la del visitante no coinciden y el desajuste
+ * rompería la hidratación (mismo motivo que el reloj del título).
+ */
+function TodayBriefing() {
+  const { lang } = useLang();
+  const es = lang === "es";
+  const [weekday, setWeekday] = useState<string | null>(null);
+
+  useEffect(() => {
+    setWeekday(
+      new Date().toLocaleDateString(es ? "es-ES" : "en-GB", { weekday: "long" })
+    );
+  }, [es]);
+
+  // Operaciones de la muestra que cayeron en el mismo día de la semana:
+  // es la cifra con la que la app decide si puede afirmar algo o no.
+  const sameWeekdayCount = useMemo(() => {
+    if (!weekday) return 0;
+    const target = new Date().getDay();
+    return TRADES.filter((tr) => tr.closedAt.getDay() === target).length;
+  }, [weekday]);
+
+  const streak = METRICS.currentStreak;
+
+  return (
+    <div className="demo-card p-5">
+      <div className="text-[11px] uppercase tracking-[0.15em] text-tertiary">
+        {es ? "El parte de hoy" : "Today's briefing"}
+      </div>
+      <p className="mt-2 text-[12px] text-tertiary leading-relaxed max-w-3xl">
+        {es
+          ? "Lo que tu histórico dice de hoy, antes de operar — no una predicción. Cuando la muestra no da para afirmar nada, lo dice."
+          : "What your history says about today, before you trade — not a prediction. When the sample cannot support a claim, it says so."}
+      </p>
+      <div className="mt-4 space-y-2 text-[13px] text-secondary leading-relaxed max-w-3xl">
+        {/* Línea del día de la semana. En la muestra de la demo los
+            resultados de cualquier día caen a los dos lados del cero, así
+            que se usa la variante "ruidosa" — la que declara que no hay
+            ventaja que afirmar. */}
+        <p>
+          {weekday
+            ? es
+              ? `Es ${weekday}. Con ${sameWeekdayCount} operaciones, tus resultados de ese día van de un lado a otro del cero: no hay ventaja ni desventaja que afirmar.`
+              : `It is ${weekday}. Across ${sameWeekdayCount} trades, your results that day fall on both sides of zero: there is no edge or disadvantage to claim.`
+            : " "}
+        </p>
+        <p>
+          {es
+            ? "Todavía no has cerrado ninguna operación hoy."
+            : "You have not closed any trade today."}
+        </p>
+        {/* Con una sola operación no hay "racha" que anunciar: decir
+            "1 ganadora seguidas" es la clase de descuido que delata que
+            el texto lo compone una plantilla. */}
+        {streak.kind !== "none" && streak.count > 1 && (
+          <p>
+            {es
+              ? `Llegas con ${streak.count} ${
+                  streak.kind === "win" ? "ganadoras" : "pérdidas"
+                } seguidas.`
+              : `You arrive on a run of ${streak.count} ${
+                  streak.kind === "win" ? "winners" : "losers"
+                }.`}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * RealityCheck — el aviso de la app bajo la franja de KPIs
+ * (Summary_RealityStreakNormal / Summary_RealityDrawdownNormal).
+ *
+ * Los dos umbrales NO son cifras inventadas para la demo: salen de la
+ * estadística de rachas. Con n operaciones y probabilidad de fallo q, la
+ * racha perdedora más larga que cabe esperar es log(n)/log(1/q), y el
+ * listón que el azar solo supera 1 de cada 20 veces es
+ * log(n / ln(1/0,95))/log(1/q). Con los 200 trades y el 50 % de acierto
+ * de la muestra dan 7 y 11 — los mismos números que enseña la app.
+ *
+ * La caída "típica" se deriva de ahí: una racha esperada de pérdidas
+ * medias, medida contra el balance inicial.
+ */
+function RealityCheck() {
+  const { lang } = useLang();
+  const es = lang === "es";
+
+  const streak = METRICS.currentStreak;
+  const n = METRICS.closedCount;
+  const q = 1 - METRICS.winRate; // probabilidad de perder
+
+  if (n < 20 || q <= 0 || q >= 1) return null;
+
+  const expectedStreak = Math.round(Math.log(n) / Math.log(1 / q));
+  const rareStreak = Math.round(
+    Math.log(n / Math.log(1 / 0.95)) / Math.log(1 / q)
+  );
+
+  // Caída típica: la racha esperada de pérdidas medias sobre el balance
+  // de partida. Es el mismo orden de magnitud que la simulación de la app.
+  const typicalDd =
+    (expectedStreak * Math.abs(METRICS.avgLoss)) / INITIAL_BALANCE_CONST;
+  const rareDd = (rareStreak * Math.abs(METRICS.avgLoss)) / INITIAL_BALANCE_CONST;
+
+  /* Las dos frases son INDEPENDIENTES y cada una tiene su condición,
+     exactamente como en LoadRealityCheck (PerformanceViewModel.cs
+     L396-432): de la racha solo se habla si está EN una racha perdedora
+     — en mitad de una buena racha nadie necesita que le tranquilicen, y
+     decirlo entonces convierte el aviso en ruido que se aprende a
+     saltar. De la caída, solo si hay una vigente. */
+  const parts: string[] = [];
+
+  if (streak.kind === "loss" && streak.count > 0) {
+    parts.push(
+      es
+        ? `Llevas ${streak.count} pérdidas seguidas: con tu porcentaje de acierto lo normal es llegar a ${expectedStreak}, y ${rareStreak} tampoco sería raro.`
+        : `You are on a run of ${streak.count} losses: with your win rate, reaching ${expectedStreak} is normal, and ${rareStreak} would not be unusual either.`
+    );
+  }
+
+  if (METRICS.currentDrawdown > 0) {
+    parts.push(
+      es
+        ? `Caída actual ${fmtPct(METRICS.currentDrawdown, lang, 1)}: la típica operando así es ${fmtPct(typicalDd, lang, 1)}, y ${fmtPct(rareDd, lang, 1)} sigue estando dentro de lo esperable.`
+        : `Current drawdown ${fmtPct(METRICS.currentDrawdown, lang, 1)}: trading like this the typical one is ${fmtPct(typicalDd, lang, 1)}, and ${fmtPct(rareDd, lang, 1)} is still within what to expect.`
+    );
+  }
+
+  if (parts.length === 0) return null;
+
+  return (
+    <div className="flex items-start gap-3 rounded-[6px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.02)] px-4 py-3">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        className="text-tertiary shrink-0 mt-[2px]"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v5M12 7.5v.01" />
+      </svg>
+      <p className="text-[12px] text-secondary leading-relaxed">
+        {parts.join(" ")}
+      </p>
     </div>
   );
 }

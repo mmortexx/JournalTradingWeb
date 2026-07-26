@@ -7,6 +7,7 @@ import {
   TRADES,
   computeMetrics,
   INSTRUMENTS,
+  SETUP_NAMES,
 } from "@/lib/trading/data";
 import {
   customTradeToTrade,
@@ -50,9 +51,22 @@ const ASSET_LABEL: Record<string, { es: string; en: string }> = {
   futures: { es: "Futuros", en: "Futures" },
 };
 
+/** La app escribe la plaza con su nombre completo y traducido ("Nueva
+ *  York", "Londres", "Asia"), no con la abreviatura interna del dato. */
+const SESSION_LABEL: Record<string, { es: string; en: string }> = {
+  London: { es: "Londres", en: "London" },
+  NY: { es: "Nueva York", en: "New York" },
+  Asia: { es: "Asia", en: "Asia" },
+};
+
 const PAGE_SIZE = 20;
 
-type FilterGroup = "instrument" | "direction" | "compliance";
+type FilterGroup =
+  | "instrument"
+  | "direction"
+  | "compliance"
+  | "outcome"
+  | "setup";
 
 /** Sortable column keys — mirrors the five GhostButtonStyle sort headers
  *  in TradesPage.xaml (symbol / duration / date / pnl / r). */
@@ -60,7 +74,7 @@ type SortKey = "symbol" | "duration" | "date" | "pnl" | "r";
 type SortDir = "asc" | "desc";
 
 const SORT_KEYS: { key: SortKey; labelEs: string; labelEn: string; align: "left" | "right" }[] = [
-  { key: "symbol", labelEs: "Símbolo", labelEn: "Symbol", align: "left" },
+  { key: "symbol", labelEs: "Instrumento", labelEn: "Instrument", align: "left" },
   { key: "duration", labelEs: "Duración", labelEn: "Duration", align: "left" },
   { key: "date", labelEs: "Fecha", labelEn: "Date", align: "left" },
   { key: "pnl", labelEs: "P&L", labelEn: "P&L", align: "right" },
@@ -113,7 +127,7 @@ function SortHeader({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-1 px-1.5 py-0.5 -mx-1.5 rounded-sm group/sort transition-colors hover:bg-white/[0.04] ${
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 -mx-1.5 rounded-sm group/sort transition-colors hover:bg-[rgb(var(--divider)/0.04)] ${
         align === "right" ? "flex-row-reverse ml-auto" : ""
       }`}
     >
@@ -195,8 +209,8 @@ const TradeRow = memo(function TradeRow({
         ease: [0.22, 1, 0.36, 1],
       }}
       onClick={() => !isConfirming && goDetail(trade.id)}
-      className={`group relative cursor-pointer border-b border-white/[0.06] last:border-b-0 transition-[background-color,box-shadow] duration-150 ${
-        selected ? "bg-[rgb(var(--accent-base)/0.08)]" : "even:bg-white/[0.02] hover:bg-white/[0.06]"
+      className={`group relative cursor-pointer border-b border-[rgb(var(--divider)/0.06)] last:border-b-0 transition-[background-color,box-shadow] duration-150 ${
+        selected ? "bg-[rgb(var(--accent-base)/0.08)]" : "even:bg-[rgb(var(--divider)/0.02)] hover:bg-[rgb(var(--divider)/0.06)]"
       } hover:shadow-[inset_2px_0_0_0_rgb(var(--accent-base))] ${
         isConfirming ? "bg-pnl-neg/10" : ""
       }`}
@@ -210,7 +224,7 @@ const TradeRow = memo(function TradeRow({
             onClick={(e) => e.stopPropagation()}
             onChange={() => onToggleSelect(trade.id)}
             aria-label={`${trade.instrument} ${t("selectTrade")}`}
-            className="h-3.5 w-3.5 rounded-[3px] border-white/20 bg-white/5 accent-[rgb(var(--accent-base))] cursor-pointer"
+            className="h-3.5 w-3.5 rounded-[3px] border-[rgb(var(--divider)/0.2)] bg-[rgb(var(--divider)/0.05)] accent-[rgb(var(--accent-base))] cursor-pointer"
           />
           <Chip variant={trade.direction === "long" ? "pos" : "neg"}>
             {trade.direction === "long" ? t("long") : t("short")}
@@ -231,7 +245,7 @@ const TradeRow = memo(function TradeRow({
           </span>
           {isCustom && (
             <span
-              className="text-[9px] uppercase tracking-[0.15em] font-semibold text-primary border border-white/20 rounded-sm px-1 py-px"
+              className="text-[9px] uppercase tracking-[0.15em] font-semibold text-primary border border-[rgb(var(--divider)/0.2)] rounded-sm px-1 py-px"
               title={t("customTradeBadge")}
             >
               {t("customTradeBadge")}
@@ -247,7 +261,7 @@ const TradeRow = memo(function TradeRow({
 
       {/* Col 3 — session. */}
       <td className="px-3 py-2.5 whitespace-nowrap text-tertiary text-xs">
-        {trade.session}
+        {SESSION_LABEL[trade.session]?.[lang] ?? trade.session}
       </td>
 
       {/* Col 4 — entry → exit. */}
@@ -320,7 +334,7 @@ const TradeRow = memo(function TradeRow({
                     setConfirmingId(null);
                   }}
                   aria-label={t("cancelDelete")}
-                  className="h-6 px-2 rounded text-[11px] font-medium bg-white/5 text-tertiary border border-white/10 hover:bg-white/8 hover:text-secondary transition-colors"
+                  className="h-6 px-2 rounded text-[11px] font-medium bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.1)] hover:bg-[rgb(var(--divider)/0.08)] hover:text-secondary transition-colors"
                 >
                   {t("cancelDelete")}
                 </button>
@@ -404,10 +418,15 @@ const PnlCell = memo(function PnlCell({
 });
 
 /* ============================================================
- * Filter chip — radio-styled chip mirroring FilterChipStyle
- * (RadioButton + content). Active state uses a shared-layout
- * spring background so the selection slides between chips in
- * the same group.
+ * Chip de filtro — réplica de FilterChipStyle (Styles.xaml
+ * L380-430), que es un RadioButton re-plantillado:
+ *   · En reposo: velo tenue, texto secundario, SIN borde,
+ *     esquinas de píldora (CornerRadius 15) y padding 13,5.
+ *   · Seleccionado: fondo BrandAccentSoftBrush (el acento al
+ *     16 %) y texto AccentTextFillColorPrimaryBrush.
+ * La demo pintaba el seleccionado con una píldora BLANCA con
+ * borde — el chip activo quedaba gris en una app cuyo estado
+ * activo es siempre del color de la paleta.
  * ============================================================ */
 function FilterChip({
   active,
@@ -431,19 +450,25 @@ function FilterChip({
       whileTap={{ scale: 0.96 }}
       className="relative inline-flex items-center"
     >
+      {/* El fondo del activo se desliza entre chips del mismo grupo
+          (layoutId compartido) — el equivalente animado del cambio de
+          VisualState del RadioButton. */}
       {active && (
         <motion.span
           layoutId={`trade-filter-${group}`}
-          className="pointer-events-none absolute inset-0 rounded-full border border-white/20 bg-white/8"
+          className="pointer-events-none absolute inset-0 rounded-full bg-[rgb(var(--accent-base)/0.16)]"
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
         />
       )}
-      <Chip
-        variant={active ? "accent" : "default"}
-        className="relative"
+      <span
+        className={`relative inline-flex items-center rounded-full px-3 py-[5px] text-[12px] whitespace-nowrap transition-colors ${
+          active
+            ? "text-[rgb(var(--accent-hover))] font-medium"
+            : "text-secondary bg-[rgb(var(--divider)/0.05)] hover:bg-[rgb(var(--divider)/0.09)] hover:text-primary"
+        }`}
       >
         {children}
-      </Chip>
+      </span>
     </motion.button>
   );
 }
@@ -508,7 +533,7 @@ function BulkActionBar({
     // The accent left-edge bar (3px wide, full height) signals that the
     // bar is a contextual action strip — mirrors the WinUI accent bar on
     // command bars.
-    <div className="relative border-y border-white/10 bg-[rgb(var(--accent-base)/0.04)] px-5 py-2.5">
+    <div className="relative border-y border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--accent-base)/0.04)] px-5 py-2.5">
       <div
         aria-hidden
         className="absolute left-0 top-0 bottom-0 w-[3px] bg-[rgb(var(--accent-base))]"
@@ -521,7 +546,7 @@ function BulkActionBar({
           {lang === "es" ? "seleccionadas" : "selected"}
         </span>
 
-        <span className="hidden md:inline-block w-px h-4 bg-white/10 mx-1" aria-hidden="true" />
+        <span className="hidden md:inline-block w-px h-4 bg-[rgb(var(--divider)/0.1)] mx-1" aria-hidden="true" />
 
         <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary hidden md:inline">
           {lang === "es" ? "Etiqueta" : "Tag"}
@@ -538,7 +563,7 @@ function BulkActionBar({
           }}
           placeholder={lang === "es" ? "Añadir etiqueta…" : "Add tag…"}
           aria-label={lang === "es" ? "Etiqueta en lote" : "Bulk tag"}
-          className="bg-white/5 border border-white/10 rounded-md h-7 px-2 text-xs text-primary placeholder:text-tertiary focus:outline-none focus:border-white/25 focus:bg-white/8 transition-colors w-40"
+          className="bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md h-7 px-2 text-xs text-primary placeholder:text-tertiary focus:outline-none focus:border-[rgb(var(--divider)/0.25)] focus:bg-[rgb(var(--divider)/0.08)] transition-colors w-40"
         />
         <button
           type="button"
@@ -548,7 +573,7 @@ function BulkActionBar({
               setTag("");
             }
           }}
-          className="text-[11px] font-medium text-secondary hover:text-primary border border-white/10 hover:border-white/25 rounded-md h-7 px-2 transition-colors"
+          className="text-[11px] font-medium text-secondary hover:text-primary border border-[rgb(var(--divider)/0.1)] hover:border-[rgb(var(--divider)/0.25)] rounded-md h-7 px-2 transition-colors"
         >
           {lang === "es" ? "Añadir" : "Add"}
         </button>
@@ -560,12 +585,12 @@ function BulkActionBar({
               setTag("");
             }
           }}
-          className="text-[11px] font-medium text-tertiary hover:text-secondary border border-white/10 hover:border-white/25 rounded-md h-7 px-2 transition-colors"
+          className="text-[11px] font-medium text-tertiary hover:text-secondary border border-[rgb(var(--divider)/0.1)] hover:border-[rgb(var(--divider)/0.25)] rounded-md h-7 px-2 transition-colors"
         >
           {lang === "es" ? "Quitar" : "Remove"}
         </button>
 
-        <span className="hidden md:inline-block w-px h-4 bg-white/10 mx-1" aria-hidden="true" />
+        <span className="hidden md:inline-block w-px h-4 bg-[rgb(var(--divider)/0.1)] mx-1" aria-hidden="true" />
 
         <button
           type="button"
@@ -581,6 +606,7 @@ function BulkActionBar({
 
 export function TradesPage() {
   const { t, tf, lang } = useLang();
+  const es = lang === "es";
   const { toast } = useToast();
   const { filters, setFilters, clearFilters, goDetail } = useDemo();
   const customTrades = useCustomTrades();
@@ -591,6 +617,12 @@ export function TradesPage() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  // Tercera fila de filtros de la app (TradesPage.xaml L107-213):
+  // Resultado y Setup. Viven en estado local y no en el contexto de la
+  // demo porque, a diferencia de instrumento/dirección/cumplimiento, no
+  // los comparte ninguna otra página.
+  const [outcome, setOutcome] = useState<"all" | "win" | "loss" | "be">("all");
+  const [setupSel, setSetupSel] = useState<string>("all");
 
   const customIds = useMemo(
     () => new Set(customTrades.map((c) => c.id)),
@@ -622,7 +654,12 @@ export function TradesPage() {
       if (filters.instrument !== "all" && tr.instrument !== filters.instrument) return false;
       if (filters.direction !== "all" && tr.direction !== filters.direction) return false;
       if (filters.compliance === "yes" && tr.compliance !== "yes") return false;
-      if (filters.compliance === "no" && tr.compliance === "yes") return false;
+      if (filters.compliance === "partial" && tr.compliance !== "partial") return false;
+      if (filters.compliance === "no" && tr.compliance !== "no") return false;
+      if (outcome === "win" && tr.netPnl <= 0) return false;
+      if (outcome === "loss" && tr.netPnl >= 0) return false;
+      if (outcome === "be" && tr.netPnl !== 0) return false;
+      if (setupSel !== "all" && tr.setup !== setupSel) return false;
       if (q) {
         const hay =
           `${tr.instrument} ${tr.setup} ${tr.entryNote} ${tr.closeNote}`.toLowerCase();
@@ -630,7 +667,15 @@ export function TradesPage() {
       }
       return true;
     });
-  }, [allTrades, debounced, filters.instrument, filters.direction, filters.compliance]);
+  }, [
+    allTrades,
+    debounced,
+    filters.instrument,
+    filters.direction,
+    filters.compliance,
+    outcome,
+    setupSel,
+  ]);
 
   // Sort the filtered list by the active column.
   const sorted = useMemo(() => {
@@ -669,9 +714,11 @@ export function TradesPage() {
     filters.instrument !== "all" ||
     filters.direction !== "all" ||
     filters.compliance !== "all" ||
+    outcome !== "all" ||
+    setupSel !== "all" ||
     debounced.trim() !== "";
 
-  const filterSig = `${filters.instrument}|${filters.direction}|${filters.compliance}|${debounced.trim()}|${sortKey}|${sortDir}`;
+  const filterSig = `${filters.instrument}|${filters.direction}|${filters.compliance}|${outcome}|${setupSel}|${debounced.trim()}|${sortKey}|${sortDir}`;
 
   const totalPnl = metrics.netPnl;
   const totalR =
@@ -682,6 +729,8 @@ export function TradesPage() {
   const resetAll = () => {
     clearFilters();
     setQuery("");
+    setOutcome("all");
+    setSetupSel("all");
   };
 
   function handleDelete(tradeId: number) {
@@ -790,7 +839,7 @@ export function TradesPage() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("searchPlaceholder")}
               aria-label={t("searchPlaceholder")}
-              className="bg-white/5 border border-white/10 rounded-md h-9 pl-9 pr-3 text-sm w-full text-primary placeholder:text-tertiary focus:outline-none focus:border-white/25 focus:bg-white/8 transition-colors"
+              className="bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md h-9 pl-9 pr-3 text-sm w-full text-primary placeholder:text-tertiary focus:outline-none focus:border-[rgb(var(--divider)/0.25)] focus:bg-[rgb(var(--divider)/0.08)] transition-colors"
             />
           </div>
         </div>
@@ -862,7 +911,7 @@ export function TradesPage() {
             </div>
           </div>
 
-          <span className="hidden md:inline-block w-px h-4 bg-white/10" aria-hidden="true" />
+          <span className="hidden md:inline-block w-px h-4 bg-[rgb(var(--divider)/0.1)]" aria-hidden="true" />
 
           <div className="flex items-center gap-2.5 flex-wrap">
             <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
@@ -885,6 +934,17 @@ export function TradesPage() {
               >
                 {t("complied")}
               </FilterChip>
+              {/* "Parcial" existe en la app (el tipo Compliance es
+                  yes/partial/no) y la demo se lo saltaba, así que un
+                  tercio de las operaciones no era filtrable. */}
+              <FilterChip
+                active={filters.compliance === "partial"}
+                onClick={() => handleSetFilters({ compliance: "partial" })}
+                group="compliance"
+                label={t("partial")}
+              >
+                {t("partial")}
+              </FilterChip>
               <FilterChip
                 active={filters.compliance === "no"}
                 onClick={() => handleSetFilters({ compliance: "no" })}
@@ -895,12 +955,81 @@ export function TradesPage() {
               </FilterChip>
             </div>
           </div>
+        </div>
+
+        {/* Fila 3 — Resultado + Setup (TradesPage.xaml L107-213). Sin
+            ella no se podía revisar "mis perdedoras de este setup", que
+            es justo para lo que se abre esta pantalla. */}
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary min-w-[92px]">
+              {es ? "Resultado" : "Result"}
+            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {(
+                [
+                  ["all", t("all")],
+                  ["win", es ? "Ganadoras" : "Winners"],
+                  ["loss", es ? "Perdedoras" : "Losers"],
+                  ["be", es ? "A cero" : "Breakeven"],
+                ] as const
+              ).map(([key, label]) => (
+                <FilterChip
+                  key={key}
+                  active={outcome === key}
+                  onClick={() => {
+                    setOutcome(key);
+                    setVisibleCount(PAGE_SIZE);
+                  }}
+                  group="outcome"
+                  label={label}
+                >
+                  {label}
+                </FilterChip>
+              ))}
+            </div>
+          </div>
+
+          <span className="hidden md:inline-block w-px h-4 bg-[rgb(var(--divider)/0.12)]" aria-hidden="true" />
+
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
+              Setup
+            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <FilterChip
+                active={setupSel === "all"}
+                onClick={() => {
+                  setSetupSel("all");
+                  setVisibleCount(PAGE_SIZE);
+                }}
+                group="setup"
+                label={t("all")}
+              >
+                {t("all")}
+              </FilterChip>
+              {SETUP_NAMES.map((s) => (
+                <FilterChip
+                  key={s}
+                  active={setupSel === s}
+                  onClick={() => {
+                    setSetupSel(s);
+                    setVisibleCount(PAGE_SIZE);
+                  }}
+                  group="setup"
+                  label={s}
+                >
+                  {s}
+                </FilterChip>
+              ))}
+            </div>
+          </div>
 
           {filterActive && (
             <button
               type="button"
               onClick={resetAll}
-              className="ml-auto inline-flex items-center gap-1.5 text-xs text-tertiary hover:text-secondary transition-colors px-2 py-1 rounded-md hover:bg-white/5"
+              className="ml-auto inline-flex items-center gap-1.5 text-xs text-tertiary hover:text-secondary transition-colors px-2 py-1 rounded-md hover:bg-[rgb(var(--divider)/0.05)]"
               aria-label={t("clearFilters")}
             >
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
@@ -916,12 +1045,24 @@ export function TradesPage() {
            (mirrors TradesPage.xaml lines 228-271). ===== */}
       <div className="space-y-2">
         <Eyebrow>{t("summary")}</Eyebrow>
-        <div className="flex items-stretch rounded-card liquid-glass depth-1 p-4">
+        {/* Sin caja: en Operaciones la ÚNICA superficie encajonada es la
+            tabla. Los filtros y los KPIs viven sobre el lienzo desnudo
+            (TradesPage.xaml L15-16, "full-bleed: menos superficies
+            encajonadas"). Meterlos en una tarjeta, como hacía la demo,
+            rompía esa jerarquía y llenaba la pantalla de recuadros. */}
+        <div className="flex items-stretch py-2">
+          {/* El símbolo va DETRÁS de la cifra ("+5.732,24 US$"), como en
+              toda la app y como en la propia columna P&L de la tabla de
+              abajo. Con el prefijo "$" delante, este KPI era el único
+              sitio de la demo que escribía el dinero al modo anglosajón
+              — y estaba a tres centímetros de una columna que lo escribe
+              al modo europeo. */}
           <KpiStripCell label={t("pnlTotal")} filterSig={filterSig} showHairline>
             <CountUp
               to={Math.abs(totalPnl)}
               decimals={2}
-              prefix={totalPnl < 0 ? "−$" : "$"}
+              prefix={totalPnl < 0 ? "−" : "+"}
+              suffix=" US$"
               tone={totalPnl > 0 ? "pos" : totalPnl < 0 ? "neg" : "neutral"}
             />
           </KpiStripCell>
@@ -943,11 +1084,11 @@ export function TradesPage() {
       </div>
 
       {/* ===== Trades table card (the only boxed surface) ===== */}
-      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card overflow-hidden">
+      <div className="demo-card overflow-hidden">
         <div className="relative">
           <div className="overflow-x-auto custom-scroll">
             <table className="w-full text-sm border-collapse min-w-[1080px]">
-              <thead className="liquid-glass border-b border-white/10">
+              <thead className="demo-chrome border-b border-[rgb(var(--divider)/0.10)]">
                 <tr className="text-left">
                   {/* Col 0 — select-all checkbox + direction caption. */}
                   <th scope="col" className="pl-5 pr-3 py-3 whitespace-nowrap w-[88px]">
@@ -960,7 +1101,7 @@ export function TradesPage() {
                         }}
                         onChange={toggleSelectAllVisible}
                         aria-label={t("selectAll")}
-                        className="h-3.5 w-3.5 rounded-[3px] border-white/20 bg-white/5 accent-[rgb(var(--accent-base))] cursor-pointer"
+                        className="h-3.5 w-3.5 rounded-[3px] border-[rgb(var(--divider)/0.2)] bg-[rgb(var(--divider)/0.05)] accent-[rgb(var(--accent-base))] cursor-pointer"
                       />
                       <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
                         {t("direction")}
@@ -976,7 +1117,7 @@ export function TradesPage() {
                       align="left"
                       onClick={() => handleSort("symbol")}
                     >
-                      {lang === "es" ? "Símbolo" : "Symbol"}
+                      {lang === "es" ? "Instrumento" : "Instrument"}
                     </SortHeader>
                   </th>
 
@@ -1104,7 +1245,7 @@ export function TradesPage() {
                         <button
                           type="button"
                           onClick={resetAll}
-                          className="px-3 py-1.5 rounded-md text-xs font-medium border border-white/10 hover:bg-white/5 transition-colors text-secondary"
+                          className="px-3 py-1.5 rounded-md text-xs font-medium border border-[rgb(var(--divider)/0.1)] hover:bg-[rgb(var(--divider)/0.05)] transition-colors text-secondary"
                         >
                           {t("clearFilters")}
                         </button>
@@ -1115,7 +1256,7 @@ export function TradesPage() {
 
                 {/* Footer totals row. */}
                 {filtered.length > 0 && (
-                  <tr className="bg-white/[0.03] border-t-2 border-white/10">
+                  <tr className="bg-[rgb(var(--divider)/0.03)] border-t-2 border-[rgb(var(--divider)/0.1)]">
                     <td colSpan={6} className="pl-5 pr-3 py-3 text-xs uppercase tracking-[0.15em] text-tertiary">
                       {tf("tradesCount", filtered.length)}
                     </td>
@@ -1178,13 +1319,13 @@ export function TradesPage() {
         {/* Load more — mirrors TradesPage.xaml's GhostButtonStyle
             "Load more" footer (lines 704-713). */}
         {hasMore && (
-          <div className="border-t border-white/10 p-4 flex justify-center">
+          <div className="border-t border-[rgb(var(--divider)/0.1)] p-4 flex justify-center">
             <button
               type="button"
               onClick={() =>
                 setVisibleCount((c) => Math.min(c + PAGE_SIZE, sorted.length))
               }
-              className="px-4 py-1.5 rounded-md text-xs font-medium border border-white/10 text-secondary hover:text-primary hover:bg-white/5 transition-colors"
+              className="px-4 py-1.5 rounded-md text-xs font-medium border border-[rgb(var(--divider)/0.1)] text-secondary hover:text-primary hover:bg-[rgb(var(--divider)/0.05)] transition-colors"
             >
               {lang === "es"
                 ? `Cargar más (${sorted.length - visibleCount} restantes)`

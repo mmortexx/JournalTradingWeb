@@ -40,8 +40,8 @@ interface DemoShortcutsHintProps {
  * listeners (and the AppDemo `?` interceptor) can suppress their own keys
  * while this overlay is mounted.
  *
- * Refined kbd styling: `<kbd>` elements with `bg-white/10 border
- * border-white/15 rounded px-1.5 py-0.5 text-xs font-mono tnum`.
+ * Refined kbd styling: `<kbd>` elements with `bg-[rgb(var(--divider)/0.1)] border
+ * border-[rgb(var(--divider)/0.15)] rounded px-1.5 py-0.5 text-xs font-mono tnum`.
  *
  * Positioning: `absolute bottom-9 right-2 z-30` — anchored to the
  * bottom-right of the demo window, just above the h-7 (28px) status bar.
@@ -195,7 +195,7 @@ export function DemoShortcutsHint({ open, onClose }: DemoShortcutsHintProps) {
             </ul>
 
             {/* Footer */}
-            <div className="mt-3 pt-3 border-t border-white/10 text-[10px] text-tertiary leading-snug">
+            <div className="mt-3 pt-3 border-t border-[rgb(var(--divider)/0.1)] text-[10px] text-tertiary leading-snug">
               {es
                 ? "Funcionan sobre la demo · pulsa ? cuando quieras"
                 : "Work while on the demo · press ? anytime"}
@@ -211,11 +211,11 @@ export function DemoShortcutsHint({ open, onClose }: DemoShortcutsHintProps) {
 /* Small inline primitives                                            */
 /* ------------------------------------------------------------------ */
 
-/** Refined kbd keycap — `bg-white/10 border border-white/15 rounded
+/** Refined kbd keycap — `bg-[rgb(var(--divider)/0.1)] border border-[rgb(var(--divider)/0.15)] rounded
  *  px-1.5 py-0.5 text-xs font-mono tnum`. */
 function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[18px] h-5 px-1.5 rounded bg-white/10 border border-white/15 text-[10px] font-mono tnum text-secondary">
+    <kbd className="inline-flex items-center justify-center min-w-[18px] h-5 px-1.5 rounded bg-[rgb(var(--divider)/0.1)] border border-[rgb(var(--divider)/0.15)] text-[10px] font-mono tnum text-secondary">
       {children}
     </kbd>
   );

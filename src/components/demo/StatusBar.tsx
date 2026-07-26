@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { METRICS } from "@/lib/trading/data";
 import { fmtPct } from "@/lib/trading/format";
@@ -43,7 +42,7 @@ import { fmtPct } from "@/lib/trading/format";
  *             shortcuts are still accessible via the `?` key, no
  *             share/reset affordance in the native chrome).
  *
- * Layout: `.liquid-glass border-t border-white/10 h-7 flex items-center
+ * Layout: `.liquid-glass border-t border-[rgb(var(--divider)/0.1)] h-7 flex items-center
  * justify-between px-3 text-[11px] text-tertiary tnum` — the
  * institutional status-bar pattern. The bottom corners are rounded
  * automatically by the parent window's `overflow-hidden` +
@@ -67,7 +66,7 @@ export function StatusBar() {
   const complianceLabel = fmtPct(compliance, lang, 0);
 
   return (
-    <div className="liquid-glass border-t border-white/10 relative flex items-center justify-between px-3 h-7 text-[11px] text-tertiary select-none">
+    <div className="demo-chrome demo-hairline border-t relative flex items-center justify-between px-4 h-7 text-[11px] text-tertiary select-none">
       {/* LEFT — discipline LED + "Disciplina: NN %" text. Static
           (non-clickable) — matches the real app's DisciplineStatus
           StackPanel (XAML L313-318), which is a status indicator, not
@@ -92,49 +91,15 @@ export function StatusBar() {
         </span>
       </span>
 
-      {/* CENTER — "Auto-saved on your machine" note. Absolutely centered
-          so the layout doesn't shift when the left/right text changes
-          width. Hidden on <sm to keep the bar readable on narrow
-          viewports (the discipline % and version stay visible). */}
-      <div className="absolute left-1/2 -translate-x-1/2 hidden sm:flex items-center gap-1.5 pointer-events-none">
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-tertiary opacity-70"
-          aria-hidden="true"
-        >
-          {/* Local-save / disk icon — a floppy-disk-style mark, evokes
-              "saved to your machine" without literal cloud-off imagery. */}
-          <path d="M3 3h8l2 2v8H3V3z" />
-          <path d="M5 3v3h5V3" />
-          <rect x="5" y="9" width="6" height="3" />
-        </svg>
-        <span className="truncate">{t("autoSaved")}</span>
-      </div>
+      {/* CENTRO — nota de guardado. En la app va justo detrás del estado
+          de disciplina, no centrada en la ventana (XAML L359-362); aquí
+          se sigue el mismo orden de lectura. Sin icono: la app no lo
+          lleva. */}
+      <span className="hidden sm:inline truncate ml-3">{t("autoSaved")}</span>
 
-      {/* RIGHT — version text with tabular numerals (mirrors the real
-          app's VersionText). The leading accent dot ties the version
-          badge to the demo's accent identity; the "v" prefix is dimmer
-          than the digits so the version number reads as the focal
-          element. Kept in sync with the SettingsPage's "About" build
-          info ("Versión 2.4.1") so the two sources of truth never
-          diverge. */}
-      <span className="inline-flex items-center gap-1.5">
-        <span
-          aria-hidden="true"
-          className="w-1 h-1 rounded-full bg-[rgb(var(--accent-base))]"
-        />
-        <span className="tnum tabular-nums">
-          <span className="text-tertiary">v</span>
-          <span className="text-secondary">2.4.1</span>
-        </span>
-      </span>
+      {/* DERECHA — versión, en texto terciario y cifras tabulares, igual
+          que el VersionText de la app. */}
+      <span className="tnum tabular-nums ml-auto">v2.4.1</span>
     </div>
   );
 }
@@ -144,47 +109,19 @@ export function StatusBar() {
 /* ------------------------------------------------------------------ */
 
 /**
- * DisciplineLED — steady green dot (matches the real app's
- * DisciplineLed Ellipse, XAML L314-315) with a subtle breathing halo
- * so the status bar feels alive. The real app uses a solid Ellipse
- * with no pulse — the LED is a state indicator (green = healthy
- * discipline), not a heartbeat. We keep the dot steady (so the
- * "always on" semantic is preserved) but add a soft accent halo that
- * scales from 1 to 2.4 and fades over 2s, looping — a gentle
- * "heartbeat" that doesn't compete with the dot's state-indicator
- * role. Respects prefers-reduced-motion (halo hidden, dot only).
+ * DisciplineLED — punto fijo, sin pulso ni halo, exactamente como el
+ * Ellipse DisciplineLed de la app (XAML L353-354). El LED es un
+ * indicador de ESTADO (verde = disciplina sana, ámbar = aviso), no un
+ * latido: animarlo lo convertía en una decoración de web y era una de
+ * las cosas que delataban que esto no era la app.
  */
 function DisciplineLED({ healthy }: { healthy: boolean }) {
-  const reduce = useReducedMotion();
   const colorVar = healthy ? "--pnl-pos" : "--pnl-warn";
   return (
     <span
-      className="relative inline-flex items-center justify-center w-3 h-3 shrink-0"
+      className="w-1.5 h-1.5 rounded-full shrink-0"
+      style={{ backgroundColor: `rgb(var(${colorVar}))` }}
       aria-hidden="true"
-    >
-      {/* Breathing halo — soft ring that scales + fades over 2s. */}
-      {!reduce && (
-        <motion.span
-          className="absolute inset-0 rounded-full"
-          style={{ backgroundColor: `rgb(var(${colorVar}))` }}
-          initial={{ scale: 1, opacity: 0.55 }}
-          animate={{ scale: 2.4, opacity: 0 }}
-          transition={{
-            duration: 2,
-            ease: "easeOut",
-            repeat: Infinity,
-            repeatDelay: 0.3,
-          }}
-        />
-      )}
-      {/* Steady dot — the state indicator (green = healthy, amber = warn). */}
-      <span
-        className="relative w-1.5 h-1.5 rounded-full"
-        style={{
-          backgroundColor: `rgb(var(${colorVar}))`,
-          boxShadow: `0 0 5px rgb(var(${colorVar}) / 0.6)`,
-        }}
-      />
-    </span>
+    />
   );
 }

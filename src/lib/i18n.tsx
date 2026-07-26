@@ -184,7 +184,9 @@ export const STR = {
   colClosed: { es: "Cierre", en: "Closed" },
   colNetPnl: { es: "P&L neto", en: "Net P&L" },
   colR: { es: "R", en: "R" },
-  summary: { es: "Resumen del filtro", en: "Filter summary" },
+  // Literal de la app (Trades_SummaryEyebrow): la franja de KPIs de
+  // Operaciones mide LO QUE ESTÁ A LA VISTA tras filtrar, no "el filtro".
+  summary: { es: "Lo que hay en pantalla", en: "What is on screen" },
   selectTrade: { es: "Seleccionar operación", en: "Select trade" },
   selectAll: { es: "Seleccionar todas las visibles", en: "Select all visible" },
 

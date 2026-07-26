@@ -14,11 +14,6 @@ import { TradesPage } from "./pages/TradesPage";
 import { TradeDetailPage } from "./pages/TradeDetailPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { JournalPage } from "./pages/JournalPage";
-import { PlaybookPage } from "./pages/PlaybookPage";
-import { ExperimentsPage } from "./pages/ExperimentsPage";
-import { FiscalPage } from "./pages/FiscalPage";
-import { BusinessPage } from "./pages/BusinessPage";
-import { SettingsPage } from "./pages/SettingsPage";
 
 /** The demo: a windowed recreation of the native app, fully interactive. */
 /**
@@ -60,7 +55,6 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
   const demoRootRef = useRef<HTMLDivElement>(null);
 
   // Label the scrollable panel with the active page name (used by role="tabpanel").
-  // R25-1a: includes the 3 new pages (experiments / fiscal / business).
   const panelLabelKey =
     page === "detail"
       ? "pageTrades"
@@ -68,12 +62,7 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
           | "pageDashboard"
           | "pageTrades"
           | "pageAnalytics"
-          | "pageJournal"
-          | "pagePlaybook"
-          | "pageExperiments"
-          | "pageFiscal"
-          | "pageBusiness"
-          | "pageSettings");
+          | "pageJournal");
 
   // Exit fullscreen on Escape — listener attaches only while fullscreen is
   // active. The `setFullscreen(false)` call lives inside the event handler,
@@ -197,9 +186,8 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
   /* ----------------------------------------------------------------
      Touch swipe — horizontal swipe on the demo content area advances
      to the next/previous page in the main navigation chain:
-       dashboard → trades → analytics → journal → playbook → experiments →
-       fiscal → business → settings
-     (R25-1a: was a 6-page chain, now 9 — matches the post-R25-1a TopNav.)
+       dashboard → trades → analytics → journal
+     (mismas cuatro pestañas que muestra el TopNav).
      The TradeDetailPage ("detail") is a drill-down from trades; a
      swipe-right there pops back to trades (matching the back button),
      a swipe-left jumps forward to analytics (the next main page).
@@ -214,11 +202,6 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
     "trades",
     "analytics",
     "journal",
-    "playbook",
-    "experiments",
-    "fiscal",
-    "business",
-    "settings",
   ] as const;
   const SWIPE_THRESHOLD = 50;
   const touchStart = useRef<{ x: number; y: number } | null>(null);
@@ -300,31 +283,21 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
         </div>
       )}
 
-      {/* App window — floats over the page like a real OS window.
-          Two-layer structure so the drop shadow + hairline border actually
-          render (the `.liquid-glass` class sets `border: none` and its own
-          `box-shadow`, which would silently override any `border-*` or
-          `shadow-*` Tailwind utility on the same element):
-            • Outer wrapper: `rounded-xl overflow-hidden border border-white/10
-              shadow-[...]` — the 1px hairline border + a 4-layer shadow stack
-              (depth-3's key/fill/accent-glow + the task's heavier
-              `0 24px 80px -12px rgb(0 0 0/0.6)` drop shadow) that reads as a
-              real floating window, not a flat card.
-            • Inner: `liquid-glass rounded-xl overflow-hidden` — the machined
-              glass material (translucent fill, 4px backdrop blur, 1px white
-              top inset highlight, 1px black bottom inset, ::before rim
-              gradient). `overflow-hidden` clips every child (title bar, nav,
-              content, status bar) to the 12px window radius. */}
+      {/* La ventana de la app. Una ventana de Windows 11 no es una tarjeta
+          de cristal: es una superficie OPACA con una hairline finísima y
+          una sombra proyectada que la despega del fondo. Por eso aquí se
+          usa `.demo-window` (el lienzo de la app, ver globals.css) y no
+          `.liquid-glass`, que pintaba un contorno blanco al 30 % arriba y
+          abajo — el brillo que hacía que esto pareciera un mockup web.
+          Radio 8 px, el ControlCornerRadius de WinUI. */}
       <div
         ref={demoRootRef}
         className={`relative mx-auto transition-[transform,border-radius,box-shadow,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          fullscreen
-            ? "fixed inset-3 z-[100] rounded-xl"
-            : "rounded-xl"
+          fullscreen ? "fixed inset-3 z-[100] rounded-lg" : "rounded-lg"
         }`}
       >
-        <div className="rounded-xl overflow-hidden border border-white/10 shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)]">
-        <div className="liquid-glass rounded-xl overflow-hidden">
+        <div className="rounded-lg overflow-hidden border border-[rgb(var(--divider)/0.10)] shadow-[0_2px_8px_rgb(0_0_0/0.28),0_18px_50px_-12px_rgb(0_0_0/0.55)]">
+        <div className="demo-window rounded-lg overflow-hidden">
           <WindowChrome />
           <TopNav />
 
@@ -353,11 +326,6 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
                   {page === "detail" && <TradeDetailPage />}
                   {page === "analytics" && <AnalyticsPage />}
                   {page === "journal" && <JournalPage />}
-                  {page === "playbook" && <PlaybookPage />}
-                  {page === "experiments" && <ExperimentsPage />}
-                  {page === "fiscal" && <FiscalPage />}
-                  {page === "business" && <BusinessPage />}
-                  {page === "settings" && <SettingsPage />}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -392,26 +360,14 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
             onClose={() => setShortcutsOpen(false)}
           />
 
-          {/* Window top reflection — thin 1px white-to-transparent gradient
-              at the very top of the window. Mimics the subtle highlight
-              where light catches the top edge of a real Windows 11 floating
-              OS window. `from-white/15` (bumped from /8) so the key-light
-              edge reads clearly even against the dark liquid-glass surface.
-              pointer-events-none so it never intercepts clicks. Sits above
-              the title bar (z-10) so it overlaps the WindowChrome's top edge. */}
+          {/* Filo de luz superior — la hairline donde una ventana real de
+              Windows 11 recoge la luz del borde de arriba. Al 8 %: al 15 %
+              leía como reflejo de cristal, no como canto de ventana. El
+              filo inferior se ha retirado — la app no lo tiene y le daba a
+              la ventana un aspecto de tarjeta flotante. */}
           <div
             aria-hidden="true"
-            className="absolute top-0 left-0 right-0 h-px bg-gradient-to-b from-white/15 to-transparent pointer-events-none z-10"
-          />
-          {/* Window bottom reflection — mirror of the top key-light, an
-              even softer 1px hairline at the bottom of the window. Gives
-              the demo window a machined-feel on both top AND bottom edges
-              (the bottom edge currently relies only on the StatusBar's
-              own border, which reads flat by comparison). Sits above the
-              StatusBar (z-10) and never intercepts clicks. */}
-          <div
-            aria-hidden="true"
-            className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-t from-white/[0.06] to-transparent pointer-events-none z-10"
+            className="absolute top-0 left-0 right-0 h-px bg-[rgb(var(--divider)/0.08)] pointer-events-none z-10"
           />
         </div>
         </div>

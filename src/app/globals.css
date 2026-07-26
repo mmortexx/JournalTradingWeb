@@ -2054,3 +2054,114 @@ button.icon-btn:hover > svg,
     transparent 62%
   );
 }
+
+/* ============================================================
+   MATERIAL DE LA VENTANA DE LA DEMO
+   Réplica del sistema de materiales de la app de escritorio, que es de
+   tres niveles y va de MENOS a MÁS presente (Oro.xaml:21-24 y 59-61):
+
+     canvas  <  chrome  <  card
+
+   La diferencia entre los tres es deliberadamente MÍNIMA — en la app
+   real el marco apenas se distingue del lienzo, y la tarjeta apenas se
+   distingue del marco. Lo que separa una superficie de otra es el filo,
+   no el relleno. Por eso la demo NO debe usar `.liquid-glass` aquí: esa
+   clase pinta un contorno blanco al 30 % arriba y abajo que grita
+   "cristal de web", cuando la app enseña superficies casi planas.
+
+   El acento aparece en UN solo sitio de cada tarjeta: el filo. Es la
+   firma visual de la app — todas sus tarjetas llevan un borde teñido con
+   el color de la paleta activa, biselado de arriba (luz) a abajo
+   (sombra). Ver HeroCardBorderBrush en Oro.xaml:50-55 y 84-89.
+   ============================================================ */
+
+/* Nivel 0 — el lienzo de la ventana. En la app es acrílico de escritorio
+   real; aquí es opaco, porque detrás no hay escritorio sino la página. */
+.demo-window {
+  background: rgb(var(--tint) / 0.97);
+}
+:root[data-theme="light"] .demo-window {
+  background: rgb(var(--tint) / 0.985);
+}
+
+/* Nivel 1 — el marco: barra de título, menú superior y barra de estado.
+   Un velo apenas perceptible por encima del lienzo (ChromeFillBrush). */
+.demo-chrome {
+  background: rgb(var(--divider) / 0.028);
+}
+
+/* Nivel 2 — la tarjeta (GlassCardBrush + HeroCardBorderBrush). El relleno
+   lo da el tinte de la paleta; el filo, el degradado de acento. */
+.demo-card {
+  position: relative;
+  border-radius: 8px;
+  background: rgb(var(--divider) / 0.022);
+}
+.demo-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  /* Los cuatro topes y sus opacidades salen tal cual del XAML: 0x99 =
+     0.60 (filo de luz), 0x80 = 0.50 (cuerpo), 0x66 = 0.40 (canto en
+     sombra). El bisel es lo que hace que la tarjeta parezca torneada. */
+  background: linear-gradient(
+    180deg,
+    rgb(var(--accent-hover) / 0.6) 0%,
+    rgb(var(--accent-base) / 0.5) 35%,
+    rgb(var(--accent-base) / 0.5) 72%,
+    rgb(var(--accent-pressed) / 0.4) 100%
+  );
+  /* El ORDEN importa: `mask` es la propiedad abreviada y reinicia
+     `mask-composite`. Declararla después de `mask-composite: exclude` lo
+     devolvía a `add`, y entonces el pseudo-elemento se pintaba RELLENO de
+     degradado dorado en vez de recortado a un filo de 1 px. Verificado en
+     el navegador: `getComputedStyle(card, "::before").maskComposite`
+     tiene que decir "exclude". */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+/* En claro el filo de arriba NO puede ser el tono casi blanco: se funde
+   con el fondo y el borde desaparece. Se sube la opacidad del cuerpo y
+   se usa el acento medio arriba — misma corrección que hizo la app. */
+:root[data-theme="light"] .demo-card {
+  background: rgb(var(--divider) / 0.03);
+}
+:root[data-theme="light"] .demo-card::before {
+  background: linear-gradient(
+    180deg,
+    rgb(var(--accent-base) / 0.45) 0%,
+    rgb(var(--accent-base) / 0.38) 35%,
+    rgb(var(--accent-base) / 0.38) 72%,
+    rgb(var(--accent-pressed) / 0.34) 100%
+  );
+}
+
+/* Hairline de la app (DividerStrokeColorDefaultBrush): el separador de
+   las franjas de KPIs y los bordes del chrome. */
+.demo-hairline {
+  border-color: rgb(var(--divider) / 0.09);
+}
+
+/* La app NO ESCRIBE NADA EN VERSALITAS. Ni una etiqueta, ni un eyebrow,
+   ni una cabecera de tabla: se ha verificado en Typography.xaml, donde no
+   existe ninguna transformación a mayúsculas — el eyebrow se distingue
+   por tracking (CharacterSpacing 100) y peso, no por gritar.
+
+   La demo, en cambio, ponía en mayúsculas casi todas sus etiquetas
+   ("P&L TOTAL", "WIN RATE", "RIESGO EN $"...), que es el tic tipográfico
+   de una landing, no de una aplicación de escritorio. Con 88 sitios
+   afectados repartidos por cinco páginas, la regla se aplica una vez
+   aquí, sobre el contenido de la ventana, en vez de editarlos uno a uno:
+   así tampoco puede volver a colarse en código nuevo.
+
+   Alcance deliberado: solo el panel de contenido. Las siglas escritas
+   como tales (UTC, R, ES) no se ven afectadas — son literales, no
+   transformaciones. */
+#demo-tabpanel * {
+  text-transform: none;
+}

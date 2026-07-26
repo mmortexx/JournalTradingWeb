@@ -5,32 +5,45 @@ import { useLang } from "@/lib/i18n";
 import { useDemo } from "./DemoContext";
 
 /* ------------------------------------------------------------------ */
-/* Compact MarketClock chip for the title bar                         */
+/* Reloj de mercado                                                    */
 /* ------------------------------------------------------------------ */
 
 /*
- * The four major FX/equity trading sessions (UTC open/close minutes
- * from midnight). Mirrors the SESSIONS array in
- * @/components/tj/MarketClock (kept here as a private duplicate so the
- * title bar doesn't pull the full MarketClock bundle — which renders
- * a wide horizontal strip + SlowMoChart canvas — into the demo's
- * always-mounted chrome).
+ * Las cuatro plazas, con su apertura y cierre en minutos desde la
+ * medianoche UTC. Mismos valores que el control MarketClock de la app
+ * (Controls/MarketClock.xaml) y que @/components/tj/MarketClock; se
+ * duplican aquí a propósito para no arrastrar al chrome de la demo —
+ * que está montado siempre — el bundle del control grande, que además
+ * pinta un canvas.
  */
 const SESSIONS = [
-  { id: "sydney", name: "Sydney", open: 21 * 60, close: 6 * 60 },
-  { id: "tokyo", name: "Tokyo", open: 23 * 60, close: 8 * 60 },
-  { id: "london", name: "London", open: 8 * 60, close: 16 * 60 + 30 },
-  { id: "newyork", name: "New York", open: 13 * 60 + 30, close: 20 * 60 },
+  // `offset` = minutos respecto a UTC, para pintar la hora local de cada
+  // plaza junto a su nombre igual que hace la app.
+  { id: "sydney", nameEs: "Sídney", nameEn: "Sydney", open: 21 * 60, close: 6 * 60, offset: 600 },
+  { id: "tokyo", nameEs: "Tokio", nameEn: "Tokyo", open: 23 * 60, close: 8 * 60, offset: 540 },
+  { id: "london", nameEs: "Londres", nameEn: "London", open: 8 * 60, close: 16 * 60 + 30, offset: 60 },
+  {
+    id: "newyork",
+    nameEs: "Nueva York",
+    nameEn: "New York",
+    open: 13 * 60 + 30,
+    close: 20 * 60,
+    offset: -240,
+  },
 ] as const;
 
-function sessionIsOpen(
-  open: number,
-  close: number,
-  utcMin: number
-): boolean {
+function sessionIsOpen(open: number, close: number, utcMin: number): boolean {
   if (open < close) return utcMin >= open && utcMin < close;
-  // Overnight session (wraps midnight UTC).
+  // Sesión que cruza la medianoche UTC.
   return utcMin >= open || utcMin < close;
+}
+
+/** Avance 0–100 de la ventana de mercado — la barrita bajo cada plaza. */
+function sessionProgress(open: number, close: number, utcMin: number): number {
+  const span = open < close ? close - open : 1440 - open + close;
+  if (span <= 0) return 0;
+  const elapsed = open < close ? utcMin - open : (utcMin - open + 1440) % 1440;
+  return Math.max(0, Math.min(100, (elapsed / span) * 100));
 }
 
 function pad2(n: number): string {
@@ -38,71 +51,100 @@ function pad2(n: number): string {
 }
 
 /**
- * MarketClockChip — the title bar's compact market-clock indicator,
- * mirroring the real app's `controls:MarketClock` control (XAML L117
- * in MainWindow.xaml). The real app shows UTC time + the four sessions
- * (Sydney / Tokyo / London / NY) with an open/closed dot, name, local
- * time and progress bar — too wide for our 36px-tall title bar. This
- * chip is the same idea, scaled down: UTC HH:MM + 4 small
- * open/closed dots. Each dot carries a tooltip with the session name +
- * status so the user can recover the full info on hover.
+ * MarketClock — el reloj de la barra de título, réplica del control
+ * `controls:MarketClock` de la app (Controls/MarketClock.xaml).
  *
- * Updates every 30 s (the title bar doesn't need second-resolution —
- * the StatusBar's HH:MM:SS clock already shows the live time, and the
- * session open/close transitions happen on the minute, not the
- * second).
+ * La versión anterior de la demo reducía esto a cuatro puntitos de
+ * colores sin nombre ni hora: se perdía justo lo que hace reconocible
+ * la barra de título de la app. Aquí está lo que enseña de verdad:
+ * la hora UTC con SEGUNDOS y, tras una hairline vertical, las cuatro
+ * plazas con su punto abierto/cerrado, su nombre, su hora local y una
+ * barra de 2 px con el avance de su ventana de mercado.
+ *
+ * Al estrechar la ventana la app deja solo el bloque UTC
+ * (AdjustTitleBarDensity); aquí lo hace el breakpoint `lg`.
  */
-function MarketClockChip() {
+function MarketClock() {
   const { lang } = useLang();
   const es = lang === "es";
-  const [now, setNow] = useState<Date>(() => new Date());
+  // `null` hasta que monta: la hora del cliente y la del servidor no
+  // coinciden nunca, y renderizarla en SSR rompe la hidratación.
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(id);
   }, []);
 
+  if (!now) return <div className="hidden md:block" aria-hidden="true" />;
+
   const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-  const utcTime = `${pad2(now.getUTCHours())}:${pad2(now.getUTCMinutes())}`;
-  const openCount = SESSIONS.filter((s) =>
-    sessionIsOpen(s.open, s.close, utcMin)
-  ).length;
+  const utcTime = `${pad2(now.getUTCHours())}:${pad2(now.getUTCMinutes())}:${pad2(
+    now.getUTCSeconds()
+  )}`;
 
   return (
-    <div
-      className="hidden md:flex items-center gap-2"
-      role="status"
-      aria-label={
-        es
-          ? `Reloj de mercado · UTC ${utcTime} · ${openCount} sesiones abiertas`
-          : `Market clock · UTC ${utcTime} · ${openCount} sessions open`
-      }
-      title={
-        es
-          ? `UTC ${utcTime} · ${openCount} ${openCount === 1 ? "sesión abierta" : "sesiones abiertas"}`
-          : `UTC ${utcTime} · ${openCount} ${openCount === 1 ? "session open" : "sessions open"}`
-      }
-    >
-      <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
-        UTC
-      </span>
-      <span className="text-xs tnum tabular-nums text-secondary font-medium">
-        {utcTime}
-      </span>
-      <div className="flex items-center gap-1">
+    <div className="hidden md:flex items-center gap-3">
+      {/* Bloque UTC — nunca desaparece: es la referencia con la que se
+          anota una operación. */}
+      <div className="flex items-center gap-1.5">
+        <span className="text-[11px] text-tertiary">UTC</span>
+        <span
+          className="text-[13px] font-semibold text-primary tabular-nums"
+          style={{
+            fontFamily: '"Cascadia Mono", Consolas, "Courier New", monospace',
+          }}
+        >
+          {utcTime}
+        </span>
+      </div>
+
+      <span
+        aria-hidden="true"
+        className="hidden lg:block w-px h-[18px] bg-[rgb(var(--divider)/0.12)]"
+      />
+
+      <div className="hidden lg:flex items-center gap-3.5">
         {SESSIONS.map((s) => {
           const open = sessionIsOpen(s.open, s.close, utcMin);
+          const name = es ? s.nameEs : s.nameEn;
+          const localMin = (((utcMin + s.offset) % 1440) + 1440) % 1440;
+          const localTime = `${pad2(Math.floor(localMin / 60))}:${pad2(localMin % 60)}`;
           return (
-            <span
+            <div
               key={s.id}
-              title={`${s.name} · ${open ? (es ? "Abierta" : "Open") : (es ? "Cerrada" : "Closed")}`}
-              className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                open
-                  ? "bg-pnl-pos shadow-[0_0_4px_rgb(var(--pnl-pos)/0.6)]"
-                  : "bg-pnl-neg/40"
-              }`}
-              aria-hidden="true"
-            />
+              className="min-w-[86px]"
+              title={`${name} · ${open ? (es ? "Abierta" : "Open") : es ? "Cerrada" : "Closed"}`}
+            >
+              <div className="flex items-center gap-1.5">
+                <span
+                  aria-hidden="true"
+                  className={`w-[7px] h-[7px] rounded-full shrink-0 ${
+                    open ? "bg-pnl-pos" : "bg-pnl-neg opacity-50"
+                  }`}
+                />
+                <span className="text-[11px] text-secondary">{name}</span>
+                <span className="text-[11px] text-tertiary tabular-nums">
+                  {localTime}
+                </span>
+              </div>
+              {/* Avance de la ventana de mercado (el ProgressBar de 2 px
+                  del XAML). Solo se pinta cuando la plaza está abierta —
+                  una barra a medias en una plaza cerrada se lee como un
+                  dato, y no lo es. */}
+              <div className="mt-[3px] h-[2px] rounded-full bg-[rgb(var(--divider)/0.10)] overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: open
+                      ? `${sessionProgress(s.open, s.close, utcMin)}%`
+                      : "0%",
+                    background: "rgb(var(--accent-base))",
+                  }}
+                />
+              </div>
+            </div>
           );
         })}
       </div>
@@ -111,183 +153,91 @@ function MarketClockChip() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Local-first LED                                                    */
+/* Barra de título                                                     */
 /* ------------------------------------------------------------------ */
 
 /**
- * LocalFirstLED — green dot + "Local-first" label, mirroring the real
- * app's LocalFirstPanel (XAML L120-128). The real app uses a solid
- * Ellipse (no pulse) since the LED is a state indicator (always "on"
- * in the local-first app), not a heartbeat. We match that — no
- * animation, just a steady green dot. Tooltip carries the longer
- * "Local-first · sin nube / no cloud" string from the real app's
- * TitleBar_LocalFirstLed resource (Strings/{es-ES,en-GB}/Resources.resw
- * L12).
- */
-function LocalFirstLED() {
-  const { t } = useLang();
-  return (
-    <div
-      className="hidden sm:flex items-center gap-1.5 px-3 h-full"
-      title={t("titleLocalFirstLed")}
-      aria-label={t("titleLocalFirstLed")}
-    >
-      <span
-        className="w-1.5 h-1.5 rounded-full bg-pnl-pos shadow-[0_0_5px_rgb(var(--pnl-pos)/0.55)]"
-        aria-hidden="true"
-      />
-      <span className="text-[11px] text-tertiary truncate">
-        {t("localFirst")}
-      </span>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* WindowChrome (Windows 11 title bar — restructured to match the     */
-/* real app's MainWindow.xaml L76-128)                                */
-/* ------------------------------------------------------------------ */
-
-/**
- * Windows 11 / WinUI 3 title bar, restructured (R25-1a) to match the
- * real app's title bar (MainWindow.xaml L76-128). The pre-R25-1a
- * version had a Win11 doc-title centered between the app name + DEMO
- * chip on the left and the caption buttons on the right — the real
- * app's title bar is asymmetric and richer:
+ * Barra de título de la app, réplica de MainWindow.xaml L76-168.
  *
- *   ┌──────────────────────────────────────────────────────────────────────┐
- *   │ ◧ Trading Journal    [DEMO · 10.000 $]  UTC 14:32 ●●●○    ●  ⤢  ✕  │
- *   │                                              Local-first             │
- *   └──────────────────────────────────────────────────────────────────────┘
+ * Es asimétrica a propósito, igual que la real: identidad a la
+ * izquierda, cuenta pegada a ella como chip de terminal, reloj de
+ * mercado empujado a la derecha, y el estado local-first justo antes de
+ * los botones de ventana.
  *
- * Three regions (mirrors the real app's 4-column Grid):
- *   • LEFT (col 0):   16×16 app icon + "Trading Journal" name. No
- *                     DEMO chip — the DEMO marker lives in the account
- *                     chip's text ("DEMO · 10.000 $") per the real app.
- *   • CENTER (col 2): Account demo chip (terminal-style pill with a
- *                     small account icon + monospace "DEMO · 10.000 $"
- *                     text, left-aligned) + MarketClockChip (right-
- *                     aligned: UTC time + 4 open/closed session dots).
- *   • RIGHT (col 3):  Local-first LED + "Local-first" label, then the
- *                     Win11 caption buttons (Min / Max / Close) at the
- *                     far right.
+ *   ┌──────────────────────────────────────────────────────────────────┐
+ *   │ ▣ Trading Journal  ▭ DEMO · 10.000 $   UTC 15:25:47 │ ●Sídney…  │
+ *   │                                          ● Local-first  ─ □ ✕   │
+ *   └──────────────────────────────────────────────────────────────────┘
  *
- * Caption-button styling is unchanged from pre-R25-1a — Windows 11
- * authentic: each button 46px wide × full title-bar height so the hover
- * wash reaches the top & bottom edges, Min = 10px stroke, Max = 10px
- * square outline (flips to "Restore" two-overlapping-squares glyph in
- * fullscreen), Close = 10px × glyph with the Win11 close-red #C42B1C
- * on hover. Close exits fullscreen when active; otherwise visual-only
- * (the demo can't be "closed" — there's no parent shell to return to).
- *
- * The `viewLabel` prop is removed (R25-1a) — the real app's title bar
- * doesn't have a centered doc-title (it has the account chip +
- * MarketClock instead). The pre-R25-1a caller `RealScreenshotDemo.tsx`
- * was updated to stop passing it.
+ * Los botones de ventana siguen el estilo de Windows 11: 46 px de ancho
+ * por el alto completo, para que el lavado del hover llegue a los bordes;
+ * el de cerrar vira al rojo #C42B1C. Maximizar alterna el modo pantalla
+ * completa de la demo; minimizar es decorativo (no hay analogía web).
  */
 export function WindowChrome() {
   const { t } = useLang();
   const { fullscreen, setFullscreen } = useDemo();
 
   return (
-    <div className="liquid-glass border-b border-white/10 flex items-center justify-between h-9 text-xs shrink-0 relative cursor-default select-none">
-      {/* Subtle draggable-area texture — a 2px machined top edge that
-          reads as the top rim of a real WinUI 3 title bar. The accent
-          tint at the very top ties the chrome to the demo's accent
-          identity; the white/10 below it is the machined-edge specular.
-          Sits under the caption buttons so they stay crisp. The texture
-          is pointer-events-none so it never blocks clicks. */}
-      <div
-        aria-hidden="true"
-        className="absolute top-0 left-0 right-0 h-[2px] pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgb(var(--accent-base) / 0.40) 0%, rgb(255 255 255 / 0.10) 50%, transparent 100%)",
-        }}
-      />
-
-      {/* ── LEFT: app icon + name ── */}
-      <div className="flex items-center px-3 min-w-0 relative z-[1]">
-        <AppIcon />
-        <span
-          className="text-xs font-medium text-secondary ml-2 hidden sm:inline truncate"
-          style={{
-            fontFamily:
-              '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
-          }}
-        >
-          {t("appName")}
-        </span>
-      </div>
-
-      {/* ── CENTER: account demo chip + market clock ──
-          Absolutely centered so the layout doesn't shift when the account
-          text changes. The account chip is left-aligned within the center
-          cluster (per the real app's HorizontalAlignment="Left"), the
-          market clock right-aligned (HorizontalAlignment="Right") — both
-          pinned to the center axis so they don't drift toward the edges.
-          Hidden below md to avoid colliding with the icon/name + caption
-          buttons on narrow viewports. pointer-events-none on the cluster
-          wrapper so it never intercepts the title-bar's hover texture or
-          caption clicks (the chip itself is non-interactive, matching
-          the real app's IsHitTestVisible="False"). */}
-      <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-4 pointer-events-none z-[1]">
+    <div className="demo-chrome demo-hairline border-b flex items-center h-10 text-xs shrink-0 relative cursor-default select-none">
+      {/* Identidad + cuenta */}
+      <div className="flex items-center gap-3 px-3 min-w-0 shrink-0">
+        <div className="flex items-center gap-2">
+          <AppIcon />
+          <span
+            className="text-[13px] font-semibold text-primary hidden sm:inline truncate"
+            style={{
+              fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
+            }}
+          >
+            {t("appName")}
+          </span>
+        </div>
         <AccountChip />
-        <MarketClockChip />
       </div>
 
-      {/* ── RIGHT: Local-first LED + Windows 11 caption buttons ── */}
-      <div className="flex items-stretch h-full relative z-[1]">
+      {/* Reloj — empujado contra el estado local-first, como en la app. */}
+      <div className="flex-1 min-w-0 flex justify-end pr-3">
+        <MarketClock />
+      </div>
+
+      {/* Estado local-first + botones de ventana */}
+      <div className="flex items-stretch h-full shrink-0">
         <LocalFirstLED />
-        {/* Vertical hairline divider — visual grouping so the Win11
-            caption buttons read as a distinct cluster. Mirrors the
-            subtle separator the real app shows between the title-bar
-            content and the caption buttons. Hidden on <sm alongside
-            the Local-first LED so the divider never appears alone. */}
-        <div
-          aria-hidden="true"
-          className="hidden sm:block w-px h-full bg-white/10"
-        />
-        {/* Minimize — visual only (no web analog to "minimize window"). */}
         <button
           type="button"
           aria-label={t("winMinimize")}
           tabIndex={-1}
-          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-white/10 hover:text-primary transition-colors duration-150 rounded-none"
+          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-150"
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
             <line x1="0.5" y1="5" x2="9.5" y2="5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
           </svg>
         </button>
-        {/* Maximize / Restore — toggles the demo fullscreen state. */}
         <button
           type="button"
           aria-label={fullscreen ? t("winRestore") : t("winMaximize")}
           onClick={() => setFullscreen(!fullscreen)}
-          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-white/10 hover:text-primary transition-colors duration-150 rounded-none"
+          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-150"
         >
           {fullscreen ? (
-            // Restore glyph — two overlapping squares (Win11 "Restore" icon).
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <rect x="0.5" y="2.5" width="6" height="6" stroke="currentColor" strokeWidth="1" fill="none" />
               <path d="M2.5 2.5V1.5A1 1 0 0 1 3.5 0.5H8.5A1 1 0 0 1 9.5 1.5V6.5A1 1 0 0 1 8.5 7.5H7.5" stroke="currentColor" strokeWidth="1" fill="none" strokeLinejoin="round" />
             </svg>
           ) : (
-            // Maximize glyph — square outline.
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" strokeWidth="1" fill="none" />
             </svg>
           )}
         </button>
-        {/* Close — Win11 close-red hover (#C42B1C) with a white glyph.
-            Exits fullscreen when active; otherwise visual-only. */}
         <button
           type="button"
           aria-label={t("winClose")}
           onClick={() => {
             if (fullscreen) setFullscreen(false);
           }}
-          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[#C42B1C] hover:text-primary transition-colors duration-150 rounded-none"
+          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[#C42B1C] hover:text-white transition-colors duration-150"
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
             <line x1="0.5" y1="0.5" x2="9.5" y2="9.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
@@ -300,49 +250,47 @@ export function WindowChrome() {
 }
 
 /* ------------------------------------------------------------------ */
-/* AccountChip — terminal-style DEMO account pill (center cluster)   */
-/* ------------------------------------------------------------------ */
 
 /**
- * AccountChip — the centered terminal-style account pill that mirrors
- * the real app's title-bar account chip (XAML L102-113). The real app
- * uses PillBorderStyle + a FontIcon (E8C7) + monospace "DEMO · 10.000 $"
- * text. We replicate the same shape: a hairline-bordered pill with a
- * small account/wallet icon + monospace tabular-figures text. The
- * "DEMO" prefix in the text is what flags this as a demo account —
- * the real app doesn't have a separate DEMO badge on the left of the
- * title bar (the pre-R25-1a version did; that was wrong).
- *
- * Non-interactive (pointer-events-none on the parent cluster) so the
- * title bar's drag texture and caption buttons stay clickable —
- * matches the real app's IsHitTestVisible="False" on the chip.
+ * LED local-first — punto verde + etiqueta, réplica del LocalFirstPanel
+ * (XAML L159-167). La app usa un Ellipse fijo, sin pulso: es un
+ * indicador de estado (siempre "encendido" en una app local-first), no
+ * un latido. Aquí igual: sin animación.
+ */
+function LocalFirstLED() {
+  const { t } = useLang();
+  return (
+    <div
+      className="hidden sm:flex items-center gap-2 px-3 h-full"
+      title={t("titleLocalFirstLed")}
+      aria-label={t("titleLocalFirstLed")}
+    >
+      <span className="w-1.5 h-1.5 rounded-full bg-pnl-pos" aria-hidden="true" />
+      <span className="text-[11px] text-tertiary truncate">{t("localFirst")}</span>
+    </div>
+  );
+}
+
+/**
+ * Chip de cuenta — la píldora de terminal con hairline y texto
+ * monoespaciado de la barra de título (XAML L119-130). No es
+ * interactivo: en la app lleva IsHitTestVisible="False" para que el
+ * arrastre de la ventana pase a través de él.
  */
 function AccountChip() {
   const { t } = useLang();
   return (
-    <span className="pill bg-white/5 border border-white/15 text-secondary flex items-center gap-1.5">
-      {/* Live-terminal accent dot — a tiny accent-tinted LED that reads
-          as a "connected / live" indicator, matching the Bloomberg /
-          terminal aesthetic of the chip's monospace text. Sits before
-          the wallet icon so the dot reads as the chip's status, not
-          part of the account icon. */}
-      <span
-        aria-hidden="true"
-        className="w-1 h-1 rounded-full bg-[rgb(var(--accent-base))] shadow-[0_0_4px_rgb(var(--accent-base)/0.7)]"
-      />
-      {/* Account/wallet icon — small (10px) so it reads as a leading
-          glyph, not a feature icon. Matches the real app's FontIcon
-          FontSize="12" E8C7. */}
+    <span className="hidden sm:inline-flex items-center gap-2 h-[24px] px-2.5 rounded-[4px] border border-[rgb(var(--divider)/0.12)] pointer-events-none">
       <svg
-        width="10"
-        height="10"
+        width="12"
+        height="12"
         viewBox="0 0 16 16"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.4"
+        strokeWidth="1.3"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-tertiary"
+        className="text-tertiary shrink-0"
         aria-hidden="true"
       >
         <path d="M2 5a1 1 0 011-1h10a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V5z" />
@@ -350,7 +298,7 @@ function AccountChip() {
         <circle cx="11" cy="9.5" r="0.6" fill="currentColor" />
       </svg>
       <span
-        className="text-[11px] tabular-nums"
+        className="text-[11px] text-secondary tabular-nums whitespace-nowrap"
         style={{ fontFamily: '"Cascadia Mono", Consolas, "Courier New", monospace' }}
       >
         {t("demoAccount")}
@@ -360,28 +308,25 @@ function AccountChip() {
 }
 
 /**
- * AppIcon — 16×16 trading-journal mark. A rounded-square accent gradient
- * tile with three white candlestick bars of varying heights, evoking a
- * chart at a glance. Inline SVG (no external asset) so it inherits the
- * active accent palette (oro / esmeralda / onix / aurora / seda) and
- * stays crisp at 16px on HiDPI displays. The accent gradient + 1px white
- * inner ring gives the tile a tactile "keycap" feel that reads as a real
- * app icon (not a flat colored square).
+ * Icono de la app — la Q de la marca con tres velas en escalera, el
+ * mismo motivo que Assets/app-logo.png. En SVG en línea para que herede
+ * el acento de la paleta activa y quede nítido a 18 px en pantallas
+ * HiDPI.
  */
 function AppIcon() {
   return (
     <span
-      className="w-4 h-4 rounded-[3px] flex items-center justify-center shrink-0 shadow-[0_0_0_1px_rgb(255_255_255_/_0.10),inset_0_0_0_1px_rgb(255_255_255_/_0.18),inset_0_1px_0_rgb(255_255_255_/_0.35)]"
+      className="w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0"
       style={{
         background:
-          "linear-gradient(135deg, rgb(var(--accent-base)) 0%, rgb(var(--accent-hover)) 100%)",
+          "linear-gradient(135deg, rgb(var(--accent-base)) 0%, rgb(var(--accent-pressed)) 100%)",
       }}
       aria-hidden="true"
     >
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-        <rect x="1" y="5.5" width="1.4" height="3" fill="white" opacity="0.95" />
-        <rect x="4.3" y="3" width="1.4" height="5.5" fill="white" opacity="0.95" />
-        <rect x="7.6" y="4" width="1.4" height="4.5" fill="white" opacity="0.95" />
+      <svg width="11" height="11" viewBox="0 0 10 10" fill="none">
+        <rect x="1" y="5.5" width="1.4" height="3" fill="#1A1917" opacity="0.9" />
+        <rect x="4.3" y="3" width="1.4" height="5.5" fill="#1A1917" opacity="0.9" />
+        <rect x="7.6" y="4" width="1.4" height="4.5" fill="#1A1917" opacity="0.9" />
       </svg>
     </span>
   );

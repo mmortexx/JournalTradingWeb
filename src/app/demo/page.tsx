@@ -40,13 +40,13 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: "Demo en vivo",
   description:
-    "La app recreada en tu navegador. 9 páginas clickeables con datos de muestra realistas. No es un vídeo: es la app.",
+    "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra realistas. No es un vídeo: es la app.",
   alternates: {
     canonical: `${SITE_URL}/demo/`,
   },
   openGraph: {
     title: "Demo en vivo — Trading Journal",
-    description: "La app recreada en tu navegador. 9 páginas clickeables con datos de muestra.",
+    description: "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra.",
     url: `${SITE_URL}/demo/`,
     type: "website",
     siteName: "Trading Journal",
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Demo en vivo — Trading Journal",
     description:
-      "La app recreada en tu navegador. 9 páginas clickeables con datos de muestra realistas. No es un vídeo: es la app.",
+      "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra realistas. No es un vídeo: es la app.",
     images: [OG_IMAGE],
   },
 };

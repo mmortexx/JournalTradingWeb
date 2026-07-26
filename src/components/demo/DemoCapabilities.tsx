@@ -134,11 +134,14 @@ const capabilities: Capability[] = [
     descEn: "Cost of indiscipline and plan compliance.",
   },
   {
+    // El playbook ya no sale en la demo (se dejó fuera al recortarla a
+    // cuatro secciones); esta tarjeta apunta ahora al detalle de una
+    // operación, que sí se puede abrir desde la lista.
     icon: <BookIcon />,
-    titleEs: "Consulta tu playbook",
-    titleEn: "Check your playbook",
-    descEs: "Setups con expectancy y win rate en vivo.",
-    descEn: "Setups with live expectancy and win rate.",
+    titleEs: "Abre una operación",
+    titleEn: "Open a trade",
+    descEs: "Su ficha completa: gráfico, riesgo, nota y cumplimiento.",
+    descEn: "Its full record: chart, risk, note and compliance.",
   },
   {
     icon: <PaletteIcon />,

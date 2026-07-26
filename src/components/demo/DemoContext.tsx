@@ -9,17 +9,20 @@ import {
 } from "react";
 import type { Direction, Compliance } from "@/lib/trading/data";
 
+/**
+ * Páginas que expone la demo. La app real tiene 8 secciones + Ajustes; la
+ * demo enseña solo las CUATRO primeras del NavigationView real (Resumen,
+ * Operaciones, Analítica, Diario) más el detalle de una operación como
+ * profundización desde la lista. Playbook, Experimentos, Fiscal, Negocio y
+ * Ajustes se quedan fuera a propósito: una demo que lo enseña todo no
+ * enseña nada, y esas cinco no son lo que decide una compra.
+ */
 export type DemoPage =
   | "dashboard"
   | "trades"
   | "detail"
   | "analytics"
-  | "journal"
-  | "playbook"
-  | "experiments"
-  | "fiscal"
-  | "business"
-  | "settings";
+  | "journal";
 
 export interface DemoFilters {
   instrument: string;

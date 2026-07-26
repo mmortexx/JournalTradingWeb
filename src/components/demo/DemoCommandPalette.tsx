@@ -49,7 +49,7 @@ interface Command {
  * Refined styling: `.liquid-glass depth-4 rounded-card` modal with a
  * search input (magnifier icon + Esc kbd) + a list of commands. Each row
  * has an icon + label + optional kbd hint. Active row highlighted with
- * `bg-white/10` + an accent-color left border (`inset 2px 0 0 ...`).
+ * `bg-[rgb(var(--divider)/0.1)]` + an accent-color left border (`inset 2px 0 0 ...`).
  *
  * Keyboard: ArrowUp/Down to navigate, Enter to execute, Esc to close.
  * Filtering: case-insensitive substring match on label or id.
@@ -159,24 +159,6 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
         section: "nav",
         icon: <JournalIcon />,
         run: () => setPage("journal"),
-      },
-      {
-        id: "go-playbook",
-        labelEs: "Ir a Playbook",
-        labelEn: "Go to Playbook",
-        hint: "5",
-        section: "nav",
-        icon: <PlaybookIcon />,
-        run: () => setPage("playbook"),
-      },
-      {
-        id: "go-settings",
-        labelEs: "Ir a Ajustes",
-        labelEn: "Go to Settings",
-        hint: "6",
-        section: "nav",
-        icon: <SettingsIcon />,
-        run: () => setPage("settings"),
       },
     ];
 
@@ -308,7 +290,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* Search input row */}
-            <div className="flex items-center gap-2.5 px-3 h-11 border-b border-white/10">
+            <div className="flex items-center gap-2.5 px-3 h-11 border-b border-[rgb(var(--divider)/0.1)]">
               <SearchIcon />
               <input
                 ref={inputRef}
@@ -324,7 +306,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
                 autoComplete="off"
                 spellCheck={false}
               />
-              <kbd className="bg-white/10 border border-white/15 rounded px-1.5 py-0.5 text-[10px] font-mono tnum text-tertiary">
+              <kbd className="bg-[rgb(var(--divider)/0.1)] border border-[rgb(var(--divider)/0.15)] rounded px-1.5 py-0.5 text-[10px] font-mono tnum text-tertiary">
                 Esc
               </kbd>
             </div>
@@ -351,8 +333,8 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
                         aria-current={isActive ? "true" : undefined}
                         className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${
                           isActive
-                            ? "bg-white/10 text-primary"
-                            : "text-secondary hover:bg-white/[0.04]"
+                            ? "bg-[rgb(var(--divider)/0.1)] text-primary"
+                            : "text-secondary hover:bg-[rgb(var(--divider)/0.04)]"
                         }`}
                         style={
                           isActive
@@ -370,7 +352,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
                         </span>
                         <span className="flex-1 text-[13px] truncate">{label}</span>
                         {cmd.hint ? (
-                          <kbd className="bg-white/10 border border-white/15 rounded px-1.5 py-0.5 text-[10px] font-mono tnum text-tertiary">
+                          <kbd className="bg-[rgb(var(--divider)/0.1)] border border-[rgb(var(--divider)/0.15)] rounded px-1.5 py-0.5 text-[10px] font-mono tnum text-tertiary">
                             {cmd.hint}
                           </kbd>
                         ) : null}
@@ -382,7 +364,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
             </ul>
 
             {/* Footer hint */}
-            <div className="flex items-center justify-between gap-2 px-3 py-2 border-t border-white/10 text-[10px] text-tertiary">
+            <div className="flex items-center justify-between gap-2 px-3 py-2 border-t border-[rgb(var(--divider)/0.1)] text-[10px] text-tertiary">
               <span className="flex items-center gap-1.5">
                 <Kbd>↑</Kbd>
                 <Kbd>↓</Kbd>
@@ -410,7 +392,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
 
 function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="inline-flex items-center justify-center min-w-[18px] h-5 px-1.5 rounded bg-white/[0.06] border border-white/15 text-[10px] font-mono tnum text-secondary">
+    <kbd className="inline-flex items-center justify-center min-w-[18px] h-5 px-1.5 rounded bg-[rgb(var(--divider)/0.06)] border border-[rgb(var(--divider)/0.15)] text-[10px] font-mono tnum text-secondary">
       {children}
     </kbd>
   );
@@ -457,17 +439,6 @@ function AnalyticsIcon() {
 }
 function JournalIcon() {
   return svgBase(<path d="M5 4h14v16l-7-3-7 3V4z" />);
-}
-function PlaybookIcon() {
-  return svgBase(<path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM8 8h8M8 12h8M8 16h5" />);
-}
-function SettingsIcon() {
-  return svgBase(
-    <>
-      <path d="M12 8a4 4 0 100 8 4 4 0 000-8z" />
-      <path d="M19.4 13a7.5 7.5 0 000-2l2-1.5-2-3.5-2.4 1a7.5 7.5 0 00-1.7-1l-.4-2.5h-4l-.4 2.5a7.5 7.5 0 00-1.7 1l-2.4-1-2 3.5L4.6 11a7.5 7.5 0 000 2l-2 1.5 2 3.5 2.4-1a7.5 7.5 0 001.7 1l.4 2.5h4l.4-2.5a7.5 7.5 0 001.7-1l2.4 1 2-3.5-2-1.5z" />
-    </>
-  );
 }
 function LangIcon() {
   return svgBase(

@@ -60,7 +60,7 @@ function FilterChip({
       {active && (
         <motion.span
           layoutId={`analytics-filter-${group}`}
-          className="pointer-events-none absolute inset-0 rounded-full border border-white/20 bg-white/8"
+          className="pointer-events-none absolute inset-0 rounded-full border border-[rgb(var(--divider)/0.2)] bg-[rgb(var(--divider)/0.08)]"
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
         />
       )}
@@ -90,7 +90,7 @@ function SectionCard({
 }) {
   return (
     <Reveal delay={delay} className={className}>
-      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full">
+      <div className="demo-card p-5 h-full">
         {(eyebrow || title || hint) && (
           <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
             {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
@@ -148,7 +148,7 @@ function KpiStripCell({
 }) {
   return (
     <div className="flex items-stretch flex-1 min-w-0">
-      <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2 sm:px-3 items-center text-center rounded-md transition-colors hover:bg-white/[0.03]">
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2 sm:px-3 items-center text-center rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
         <div className="text-[10px] uppercase tracking-[0.14em] text-tertiary truncate">
           {label}
         </div>
@@ -383,7 +383,7 @@ function WeekdayBars({ trades }: { trades: Trade[] }) {
         return (
           <div key={r.day} className="flex items-center gap-3">
             <div className="w-8 text-[11px] text-tertiary tnum">{r.day}</div>
-            <div className="flex-1 h-5 bg-white/[0.03] rounded-sm overflow-hidden relative">
+            <div className="flex-1 h-5 bg-[rgb(var(--divider)/0.03)] rounded-sm overflow-hidden relative">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: `${pct}%` }}
@@ -525,7 +525,7 @@ function RankingCard({
 
   return (
     <Reveal className="h-full">
-      <div className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5 h-full">
+      <div className="demo-card p-5 h-full">
         <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em] mb-3">
           {title}
         </h3>
@@ -563,7 +563,7 @@ function RankingCard({
                     </span>
                   </div>
                 </div>
-                <div className="h-2 bg-white/[0.03] rounded-sm overflow-hidden ml-5">
+                <div className="h-2 bg-[rgb(var(--divider)/0.03)] rounded-sm overflow-hidden ml-5">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${pct}%` }}
@@ -952,13 +952,18 @@ const dayMs = 86_400_000;
  * Visual-only: the demo doesn't actually swap content per tab,
  * but the strip reads as the page's primary navigation.
  * ============================================================ */
+/* Secciones de Analítica. El número que va tras el nombre es la CANTIDAD
+   de bloques que trae esa sección — así lo hace la app, y es lo que
+   convierte la barra en un índice ("Riesgo tiene 12 cosas que mirar") en
+   vez de en una fila de pestañas mudas. Antes la demo pintaba ahí el
+   número de orden (1, 2, 3...), que no informaba de nada. */
 const SECTIONS = [
-  { id: "summary", labelEs: "Resumen", labelEn: "Summary" },
-  { id: "risk", labelEs: "Riesgo", labelEn: "Risk" },
-  { id: "distributions", labelEs: "Distribuciones", labelEn: "Distributions" },
-  { id: "time", labelEs: "Tiempo", labelEn: "Time" },
-  { id: "attribution", labelEs: "Atribución", labelEn: "Attribution" },
-  { id: "behaviour", labelEs: "Conducta", labelEn: "Behaviour" },
+  { id: "summary", labelEs: "Resumen", labelEn: "Summary", count: 6 },
+  { id: "risk", labelEs: "Riesgo", labelEn: "Risk", count: 5 },
+  { id: "distributions", labelEs: "Distribuciones", labelEn: "Distributions", count: 4 },
+  { id: "time", labelEs: "Tiempo y cadencia", labelEn: "Timing & cadence", count: 4 },
+  { id: "attribution", labelEs: "Atribución", labelEn: "Attribution", count: 3 },
+  { id: "behaviour", labelEs: "Comportamiento", labelEn: "Behaviour", count: 4 },
 ] as const;
 
 function SectionBar({
@@ -989,19 +994,19 @@ function SectionBar({
               className={`relative whitespace-nowrap px-3 py-1.5 text-xs font-medium transition-colors rounded-md ${
                 isActive
                   ? "text-primary"
-                  : "text-tertiary hover:text-secondary hover:bg-white/5"
+                  : "text-tertiary hover:text-secondary hover:bg-[rgb(var(--divider)/0.05)]"
               }`}
             >
               <span className="flex items-center gap-1.5">
                 {lang === "es" ? s.labelEs : s.labelEn}
                 <span className="text-[9px] text-tertiary tnum">
-                  · {i + 1}
+                  · {s.count}
                 </span>
               </span>
               {isActive && (
                 <motion.span
                   layoutId="analytics-section-underline"
-                  className="absolute left-2 right-2 -bottom-0.5 h-[2px] rounded-full bg-[rgb(var(--accent-base))] shadow-[0_0_8px_rgb(var(--accent-base)/0.5)]"
+                  className="absolute left-2 right-2 -bottom-0.5 h-[2px] rounded-full bg-[rgb(var(--accent-base))]"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
@@ -1042,7 +1047,7 @@ function FilterSelect({
           aria-label={header}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-md h-8 pl-2.5 pr-7 text-xs text-primary tnum focus:outline-none focus:border-white/30 transition-colors appearance-none cursor-pointer w-full"
+          className="bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md h-8 pl-2.5 pr-7 text-xs text-primary tnum focus:outline-none focus:border-[rgb(var(--divider)/0.3)] transition-colors appearance-none cursor-pointer w-full"
         >
           {children}
         </select>
@@ -1158,23 +1163,18 @@ export function AnalyticsPage() {
   return (
     <div className="p-5 md:p-6 space-y-5">
       {/* ============ HEADER ============ */}
-      <section className="relative overflow-hidden rounded-card">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-16 -left-10 w-56 h-32 rounded-full opacity-50"
-          style={{
-            background:
-              "radial-gradient(closest-side, rgb(var(--accent-base) / 0.16), transparent 70%)",
-          }}
-        />
-        <Reveal className="relative">
+      {/* Cabecera desnuda: eyebrow + titular y nada más, como en la app
+          (AnalyticsPage.xaml L27-30). Se han retirado el halo radial de
+          acento — la app no ilumina sus cabeceras — y el párrafo
+          descriptivo, que la pantalla real no tiene: en Analítica el
+          espacio va a las pestañas de sección, que empiezan justo
+          debajo del titular. */}
+      <section>
+        <Reveal>
           <Eyebrow>{t("analyticsEyebrow")}</Eyebrow>
           <h1 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-3xl">
             {t("analyticsTitle")}
           </h1>
-          <p className="text-sm text-tertiary mt-1.5 max-w-2xl leading-relaxed">
-            {t("analyticsDesc")}
-          </p>
         </Reveal>
       </section>
 
@@ -1234,6 +1234,7 @@ export function AnalyticsPage() {
           >
             <option value="all">{t("all")}</option>
             <option value="yes">{t("complied")}</option>
+            <option value="partial">{t("partial")}</option>
             <option value="no">{t("notComplied")}</option>
           </FilterSelect>
 
@@ -1241,7 +1242,7 @@ export function AnalyticsPage() {
             <button
               type="button"
               onClick={clearFilters}
-              className="text-xs text-tertiary hover:text-secondary transition-colors px-2 py-1 rounded-md hover:bg-white/5 mb-0.5"
+              className="text-xs text-tertiary hover:text-secondary transition-colors px-2 py-1 rounded-md hover:bg-[rgb(var(--divider)/0.05)] mb-0.5"
               aria-label={t("clearFilters")}
             >
               ✕ {t("clearFilters")}
@@ -1277,7 +1278,7 @@ export function AnalyticsPage() {
             <button
               type="button"
               onClick={clearFilters}
-              className="px-3 py-1.5 rounded-md text-xs font-medium border border-white/10 hover:bg-white/5 transition-colors text-secondary"
+              className="px-3 py-1.5 rounded-md text-xs font-medium border border-[rgb(var(--divider)/0.1)] hover:bg-[rgb(var(--divider)/0.05)] transition-colors text-secondary"
             >
               {t("clearFilters")}
             </button>
@@ -1299,10 +1300,10 @@ export function AnalyticsPage() {
                       {lang === "es" ? "Periodo" : "Period"}
                     </th>
                     <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
-                      {lang === "es" ? "Ops" : "Trades"}
+                      {lang === "es" ? "Ops." : "Trades"}
                     </th>
                     <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
-                      {lang === "es" ? "P&L neto" : "Net P&L"}
+                      {lang === "es" ? "Neto" : "Net"}
                     </th>
                     <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
                       {t("winRate")}
@@ -1311,7 +1312,7 @@ export function AnalyticsPage() {
                       {t("profitFactor")}
                     </th>
                     <th className="px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-tertiary font-medium text-right">
-                      {lang === "es" ? "Max DD" : "Max DD"}
+                      {lang === "es" ? "Máx. caída" : "Max fall"}
                     </th>
                   </tr>
                 </thead>
@@ -1319,18 +1320,18 @@ export function AnalyticsPage() {
                   {periodRows.map((row, i) => (
                     <tr
                       key={row.label}
-                      className={`border-t border-white/[0.06] ${
-                        i === periodRows.length - 1 ? "bg-white/[0.02]" : ""
+                      className={`border-t border-[rgb(var(--divider)/0.06)] ${
+                        i === periodRows.length - 1 ? "bg-[rgb(var(--divider)/0.02)]" : ""
                       }`}
                     >
                       <td className="px-2 py-2.5 font-medium text-primary text-sm">
                         {row.label === "Mes"
-                          ? lang === "es" ? "Mes" : "Month"
+                          ? lang === "es" ? "Este mes" : "This month"
                           : row.label === "Trimestre"
-                          ? lang === "es" ? "Trimestre" : "Quarter"
+                          ? lang === "es" ? "Este trimestre" : "This quarter"
                           : row.label === "Año"
-                          ? lang === "es" ? "Año" : "Year"
-                          : lang === "es" ? "Histórico" : "All-time"}
+                          ? lang === "es" ? "Este año" : "This year"
+                          : lang === "es" ? "Todo el histórico" : "Whole history"}
                       </td>
                       <td className="px-2 py-2.5 tnum text-tertiary text-xs text-right">
                         {fmtInt(row.count, lang)}
@@ -1357,9 +1358,9 @@ export function AnalyticsPage() {
           {/* ============ KPI STRIP — loose, vertical hairlines ============ */}
           <div className="space-y-2">
             <Eyebrow>
-              {lang === "es" ? "Resumen del universo filtrado" : "Filtered universe summary"}
+              {lang === "es" ? "Resumen del periodo filtrado" : "Filtered period summary"}
             </Eyebrow>
-            <div className="flex items-stretch rounded-card liquid-glass depth-1 p-4">
+            <div className="flex items-stretch py-2">
               <KpiStripCell
                 label={lang === "es" ? "Operaciones" : "Trades"}
                 showHairline
@@ -1649,7 +1650,7 @@ export function AnalyticsPage() {
                 )}
               </p>
               <div className="space-y-3">
-                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-white/[0.03]">
+                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
                       R²
@@ -1663,7 +1664,7 @@ export function AnalyticsPage() {
                   </div>
                 </div>
                 <div className="h-px bg-[rgb(var(--divider)/0.18)]" />
-                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-white/[0.03]">
+                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
                       K-Ratio
@@ -1677,7 +1678,7 @@ export function AnalyticsPage() {
                   </div>
                 </div>
                 <div className="h-px bg-[rgb(var(--divider)/0.18)]" />
-                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-white/[0.03]">
+                <div className="space-y-1.5 rounded-md p-2 -mx-2 transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
                       {lang === "es" ? "Pendiente" : "Slope"}

@@ -16,7 +16,6 @@ import { Chip } from "@/components/tj/Chip";
 import { Money } from "@/components/tj/Money";
 import { CountUp } from "@/components/tj/CountUp";
 import { Reveal } from "@/components/tj/Reveal";
-import { PremiumCard } from "@/components/tj/PremiumCard";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -166,9 +165,9 @@ function ChecklistRow({
           className={`shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
             checked
               ? accent
-                ? "bg-white/10 border-white/20 text-primary"
+                ? "bg-[rgb(var(--divider)/0.1)] border-[rgb(var(--divider)/0.2)] text-primary"
                 : "bg-pnl-pos/20 border-pnl-pos/60 text-pnl-pos"
-              : "border-white/15 text-transparent group-hover:border-white/30"
+              : "border-[rgb(var(--divider)/0.15)] text-transparent group-hover:border-[rgb(var(--divider)/0.3)]"
           }`}
         >
           <CheckMark checked={checked} />
@@ -236,7 +235,7 @@ function DayScoreDots({
             {isSelected && (
               <motion.span
                 layoutId={`${idPrefix}-day-score-ring`}
-                className="absolute -inset-1 rounded-full border border-white/30"
+                className="absolute -inset-1 rounded-full border border-[rgb(var(--divider)/0.3)]"
                 transition={{ type: "spring", stiffness: 320, damping: 26 }}
               />
             )}
@@ -289,7 +288,7 @@ function RitualColumn({
           />
           <h3 className="font-medium text-primary">{title}</h3>
         </div>
-        <span className="pill bg-white/5 text-tertiary border border-white/10 tnum">
+        <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.1)] tnum">
           {checkedCount}/{items.length}
         </span>
       </div>
@@ -330,7 +329,7 @@ function RitualColumn({
           onChange={(e) => onNoteChange(e.target.value)}
           rows={3}
           placeholder={placeholder}
-          className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-sm text-primary placeholder:text-tertiary focus:border-white/20 focus:bg-white/8 outline-none transition-colors resize-none custom-scroll"
+          className="w-full bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-md p-3 text-sm text-primary placeholder:text-tertiary focus:border-[rgb(var(--divider)/0.2)] focus:bg-[rgb(var(--divider)/0.08)] outline-none transition-colors resize-none custom-scroll"
         />
       </div>
     </div>
@@ -459,7 +458,7 @@ function TrafficLight({ level }: { level: "green" | "amber" | "red" }) {
       role="status"
       aria-label={label}
     >
-      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 border border-white/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]">
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 border border-[rgb(var(--divider)/0.1)] shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]">
         {lights.map((l) => {
           const active = l.key === level;
           return (
@@ -491,7 +490,7 @@ function TrafficLight({ level }: { level: "green" | "amber" | "red" }) {
               />
               <span
                 aria-hidden
-                className="absolute top-[1px] left-[1px] w-[3px] h-[3px] rounded-full bg-white/55 pointer-events-none"
+                className="absolute top-[1px] left-[1px] w-[3px] h-[3px] rounded-full bg-[rgb(var(--divider)/0.55)] pointer-events-none"
                 style={{ opacity: active ? 0.85 : 0.18 }}
               />
             </div>
@@ -520,8 +519,8 @@ function DivergingBar({
   const inPct = (Math.abs(inPlan) / maxAbs) * 50;
   const outPct = (Math.abs(outPlan) / maxAbs) * 50;
   return (
-    <div className="relative h-2.5 rounded-full bg-white/5 overflow-hidden">
-      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/25 z-10" />
+    <div className="relative h-2.5 rounded-full bg-[rgb(var(--divider)/0.05)] overflow-hidden">
+      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[rgb(var(--divider)/0.25)] z-10" />
       <motion.div
         className="absolute top-0 bottom-0 right-1/2 bg-pnl-pos/80"
         initial={{ width: 0 }}
@@ -562,7 +561,7 @@ function PnlBarChart({ data }: { data: { label: string; pnl: number }[] }) {
             }
           >
             <div className="relative w-full flex-1">
-              <div className="absolute left-0 right-0 top-1/2 h-px bg-white/10 -translate-y-1/2" />
+              <div className="absolute left-0 right-0 top-1/2 h-px bg-[rgb(var(--divider)/0.1)] -translate-y-1/2" />
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: `${pct / 2}%`, opacity: 1 }}
@@ -704,7 +703,7 @@ function SegmentedMeter({
               {isSelected && (
                 <motion.span
                   layoutId={`segmented-ring-${label}`}
-                  className="absolute -inset-px rounded-md border border-white/30 pointer-events-none"
+                  className="absolute -inset-px rounded-md border border-[rgb(var(--divider)/0.3)] pointer-events-none"
                   transition={{ type: "spring", stiffness: 320, damping: 26 }}
                 />
               )}
@@ -739,7 +738,7 @@ function SleepStepper({
           whileTap={{ scale: 0.9 }}
           onClick={onMinus}
           aria-label={lang === "es" ? "Restar 0,5 h" : "Subtract 0.5 h"}
-          className="shrink-0 w-9 h-9 rounded-full border border-white/15 text-secondary hover:text-primary hover:border-white/30 transition-colors flex items-center justify-center"
+          className="shrink-0 w-9 h-9 rounded-full border border-[rgb(var(--divider)/0.15)] text-secondary hover:text-primary hover:border-[rgb(var(--divider)/0.3)] transition-colors flex items-center justify-center"
         >
           <svg
             width="14"
@@ -759,7 +758,7 @@ function SleepStepper({
             {hours.toFixed(1)}
             <span className="text-xs text-tertiary font-normal ml-1">h</span>
           </div>
-          <div className="relative h-1.5 rounded-full bg-white/8 overflow-hidden">
+          <div className="relative h-1.5 rounded-full bg-[rgb(var(--divider)/0.08)] overflow-hidden">
             <motion.div
               className="absolute inset-y-0 left-0 rounded-full bg-[rgb(var(--accent-base))]"
               initial={reduce ? undefined : { width: 0 }}
@@ -773,7 +772,7 @@ function SleepStepper({
           whileTap={{ scale: 0.9 }}
           onClick={onPlus}
           aria-label={lang === "es" ? "Sumar 0,5 h" : "Add 0.5 h"}
-          className="shrink-0 w-9 h-9 rounded-full border border-white/15 text-secondary hover:text-primary hover:border-white/30 transition-colors flex items-center justify-center"
+          className="shrink-0 w-9 h-9 rounded-full border border-[rgb(var(--divider)/0.15)] text-secondary hover:text-primary hover:border-[rgb(var(--divider)/0.3)] transition-colors flex items-center justify-center"
         >
           <svg
             width="14"
@@ -1079,7 +1078,7 @@ export function JournalPage() {
           with low/high averages and the 30-day streak strip.
           =========================================================== */}
       <Reveal delay={0.05}>
-        <PremiumCard className="depth-2 hover:depth-3 transition-shadow duration-300 p-5 md:p-6">
+        <div className="demo-card p-5 md:p-6">
           <div className="space-y-5">
             <div className="space-y-1">
               <Eyebrow>
@@ -1117,7 +1116,7 @@ export function JournalPage() {
             {/* Cross-comparison grid — mirrors the real app's
                 Sleep×Expectancy + Mental×Result + Physical×Result +
                 Plan×Result cross row. */}
-            <div className="pt-4 border-t border-white/10">
+            <div className="pt-4 border-t border-[rgb(var(--divider)/0.1)]">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <CrossCell
                   label={L("Sueño × resultado", "Sleep × result")}
@@ -1156,7 +1155,7 @@ export function JournalPage() {
 
             {/* 30-day streak strip — mirrors the real app's
                 CheckinStrip with current/best streak counts. */}
-            <div className="pt-4 border-t border-white/10">
+            <div className="pt-4 border-t border-[rgb(var(--divider)/0.1)]">
               <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
                 <span className="text-[10px] uppercase tracking-[0.14em] text-tertiary">
                   {L("Constancia del check-in · 30 días", "Check-in consistency · 30 days")}
@@ -1176,7 +1175,7 @@ export function JournalPage() {
                     </span>
                   </span>
                   {/* Best streak — neutral pill. */}
-                  <span className="inline-flex items-center gap-1.5 px-2.5 h-7 rounded-full bg-white/[0.04] border border-white/10">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 h-7 rounded-full bg-[rgb(var(--divider)/0.04)] border border-[rgb(var(--divider)/0.1)]">
                     <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
                       {L("Mejor", "Best")}
                     </span>
@@ -1208,12 +1207,12 @@ export function JournalPage() {
               </div>
             </div>
           </div>
-        </PremiumCard>
+        </div>
       </Reveal>
 
       {/* Daily ritual card */}
       <Reveal delay={0.05}>
-        <PremiumCard className="depth-2 hover:depth-3 transition-shadow duration-300 p-5 md:p-6">
+        <div className="demo-card p-5 md:p-6">
           <div className="flex items-center justify-between gap-3 mb-5">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-1 h-5 bg-white rounded-full shrink-0" />
@@ -1221,7 +1220,7 @@ export function JournalPage() {
                 {t("ritualTitle")}
               </h2>
             </div>
-            <span className="pill bg-white/8 text-primary border border-white/20 shrink-0">
+            <span className="pill bg-[rgb(var(--divider)/0.08)] text-primary border border-[rgb(var(--divider)/0.2)] shrink-0">
               {L("Hoy", "Today")}
             </span>
           </div>
@@ -1273,12 +1272,12 @@ export function JournalPage() {
               <div className="h-full w-px bg-gradient-to-b from-transparent via-white/15 to-transparent" />
             </div>
           </div>
-        </PremiumCard>
+        </div>
       </Reveal>
 
       {/* Discipline report — HERO + INVOICE */}
       <Reveal delay={0.1}>
-        <PremiumCard className="depth-3 hover:depth-4 transition-shadow duration-300 relative overflow-hidden p-5 md:p-6">
+        <div className="demo-card relative overflow-hidden p-5 md:p-6">
           <div className="relative space-y-6">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2 min-w-0">
@@ -1382,7 +1381,7 @@ export function JournalPage() {
             {/* ============ DISCIPLINE INVOICE — KEY FEATURE ============
                 Invoice-style breakdown of each indiscipline type with
                 count, % of total mistakes, and dollar cost. */}
-            <div className="pt-5 border-t border-white/10">
+            <div className="pt-5 border-t border-[rgb(var(--divider)/0.1)]">
               <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="w-1 h-4 bg-pnl-neg rounded-full shrink-0" />
@@ -1399,7 +1398,7 @@ export function JournalPage() {
               </div>
 
               {/* Table header row */}
-              <div className="grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 pb-2 text-[10px] uppercase tracking-[0.14em] text-tertiary border-b border-white/10 font-mono">
+              <div className="grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 pb-2 text-[10px] uppercase tracking-[0.14em] text-tertiary border-b border-[rgb(var(--divider)/0.1)] font-mono">
                 <div>{L("Tipo", "Type")}</div>
                 <div className="text-right">#</div>
                 <div className="text-right">%</div>
@@ -1424,8 +1423,8 @@ export function JournalPage() {
                         delay: i * 0.05,
                         ease: EASE,
                       }}
-                      className={`grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-2.5 items-center text-sm border-b border-dashed border-white/10 hover:bg-white/[0.025] transition-colors font-mono ${
-                        i % 2 === 1 ? "bg-white/[0.012]" : ""
+                      className={`grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-2.5 items-center text-sm border-b border-dashed border-[rgb(var(--divider)/0.1)] hover:bg-[rgb(var(--divider)/0.025)] transition-colors font-mono ${
+                        i % 2 === 1 ? "bg-[rgb(var(--divider)/0.012)]" : ""
                       }`}
                     >
                       <div className="text-secondary min-w-0 truncate flex items-center gap-2">
@@ -1459,7 +1458,7 @@ export function JournalPage() {
               </div>
 
               {/* Total row */}
-              <div className="grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-3 items-center mt-1 border-t-2 border-white/15 font-mono">
+              <div className="grid grid-cols-[1fr_2.5rem_3rem_5.5rem] gap-x-3 px-2 py-3 items-center mt-1 border-t-2 border-[rgb(var(--divider)/0.15)] font-mono">
                 <div
                   className={`text-[11px] uppercase tracking-[0.15em] font-bold ${
                     totalMistakeCost < 0 ? "text-pnl-pos" : "text-pnl-neg"
@@ -1492,7 +1491,7 @@ export function JournalPage() {
             {/* ============ COMPLIANCE TREND (monthly) — mirrors the
                 real app's "evolution mensual del cumplimiento" with a
                 labeled progress-bar per month. */}
-            <div className="pt-5 border-t border-white/10">
+            <div className="pt-5 border-t border-[rgb(var(--divider)/0.1)]">
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-1 h-4 bg-white rounded-full shrink-0" />
                 <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em]">
@@ -1512,7 +1511,7 @@ export function JournalPage() {
                     <span className="text-[11px] text-secondary tnum">
                       {row.label}
                     </span>
-                    <div className="relative h-1.5 rounded-full bg-white/8 overflow-hidden">
+                    <div className="relative h-1.5 rounded-full bg-[rgb(var(--divider)/0.08)] overflow-hidden">
                       <motion.div
                         className="absolute inset-y-0 left-0 rounded-full"
                         style={{
@@ -1537,12 +1536,12 @@ export function JournalPage() {
               </ul>
             </div>
           </div>
-        </PremiumCard>
+        </div>
       </Reveal>
 
       {/* Review tabs */}
       <Reveal delay={0.15}>
-        <PremiumCard className="depth-2 hover:depth-3 transition-shadow duration-300 p-5 md:p-6">
+        <div className="demo-card p-5 md:p-6">
           <div className="flex items-center justify-between gap-3 flex-wrap mb-5">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-1 h-5 bg-white rounded-full shrink-0" />
@@ -1553,7 +1552,7 @@ export function JournalPage() {
             <div
               role="tablist"
               aria-label={t("review2")}
-              className="relative inline-flex bg-white/5 border border-white/10 rounded-full p-1"
+              className="relative inline-flex bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] rounded-full p-1"
             >
               {(["weekly", "monthly"] as const).map((key) => {
                 const active = tab === key;
@@ -1570,7 +1569,7 @@ export function JournalPage() {
                     {active && (
                       <motion.span
                         layoutId="review-tab-pill"
-                        className="absolute inset-0 rounded-full bg-white/10 border border-white/20"
+                        className="absolute inset-0 rounded-full bg-[rgb(var(--divider)/0.1)] border border-[rgb(var(--divider)/0.2)]"
                         transition={{
                           type: "spring",
                           stiffness: 360,
@@ -1620,12 +1619,12 @@ export function JournalPage() {
               {L("Negativo", "Negative")}
             </span>
           </div>
-        </PremiumCard>
+        </div>
       </Reveal>
 
       {/* History timeline */}
       <Reveal delay={0.2}>
-        <PremiumCard className="depth-1 hover:depth-2 transition-shadow duration-300 p-5 md:p-6">
+        <div className="demo-card p-5 md:p-6">
           <div className="flex items-center gap-2 mb-5">
             <span className="w-1 h-5 bg-white rounded-full shrink-0" />
             <h2 className="font-medium text-primary text-base md:text-lg">
@@ -1671,11 +1670,11 @@ export function JournalPage() {
                     ease: EASE,
                   }}
                   whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                  className={`liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 rounded-card border-l-2 ${borderColor} p-4`}
+                  className={`demo-card border-l-2 ${borderColor} p-4`}
                 >
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div className="flex flex-col items-center justify-center w-11 h-11 rounded-md bg-white/5 border border-white/10 shrink-0">
+                      <div className="flex flex-col items-center justify-center w-11 h-11 rounded-md bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)] shrink-0">
                         <div className="text-[9px] uppercase tracking-[0.14em] text-tertiary leading-none">
                           {entry.date
                             .toLocaleDateString(
@@ -1734,7 +1733,7 @@ export function JournalPage() {
               );
             })}
           </ul>
-        </PremiumCard>
+        </div>
       </Reveal>
 
       <div className="h-2" aria-hidden="true" />

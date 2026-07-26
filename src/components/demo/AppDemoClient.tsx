@@ -52,7 +52,7 @@ const AppDemo = dynamic(
  *
  * The outer container uses the EXACT same two-layer material + shadow
  * classes as the live demo window — outer wrapper carries
- * `rounded-xl overflow-hidden border border-white/10 shadow-[...]` (a
+ * `rounded-xl overflow-hidden border border-[rgb(var(--divider)/0.1)] shadow-[...]` (a
  * 4-layer shadow stack: depth-3's key/fill/accent glow + the task's
  * heavier `0 24px 80px -12px rgb(0 0 0/0.6)` drop shadow; kept off the
  * `.liquid-glass` element so it isn't overridden by the class's own
@@ -64,7 +64,7 @@ const AppDemo = dynamic(
 function DemoSkeleton() {
   return (
     <div
-      className="rounded-xl overflow-hidden border border-white/10 shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)] h-[588px] sm:h-[668px] md:h-[748px]"
+      className="rounded-xl overflow-hidden border border-[rgb(var(--divider)/0.1)] shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)] h-[588px] sm:h-[668px] md:h-[748px]"
       aria-hidden="true"
     >
       <div className="liquid-glass rounded-xl overflow-hidden h-full flex flex-col">
@@ -73,11 +73,11 @@ function DemoSkeleton() {
             Local-first LED skeleton on the right, Min/Max/Close caption
             buttons at the far right. Matches the live WindowChrome (post
             R25-1a) so hydration is visually seamless. */}
-        <div className="liquid-glass border-b border-white/10 flex items-center justify-between h-9 shrink-0">
+        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] flex items-center justify-between h-9 shrink-0">
           <div className="flex items-center px-3 min-w-0">
             {/* App icon placeholder — same 16×16 rounded square as the real
                 AppIcon, kept grey so it doesn't read as a brand mark yet. */}
-            <span className="w-4 h-4 rounded-[3px] bg-white/10 shrink-0" />
+            <span className="w-4 h-4 rounded-[3px] bg-[rgb(var(--divider)/0.1)] shrink-0" />
             <Skeleton className="h-3 w-28 ml-2 hidden sm:block" />
           </div>
           {/* Center — account chip + market clock skeletons. */}
@@ -105,12 +105,12 @@ function DemoSkeleton() {
 
         {/* ---- Top nav (h-11) — 9 skeleton tabs (8 main + Settings, matches
             the post-R25-1a TopNav). ---- */}
-        <div className="liquid-glass border-b border-white/10 flex items-center gap-1 px-2 h-11 shrink-0">
+        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] flex items-center gap-1 px-2 h-11 shrink-0">
           {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
               className={`h-9 px-3 rounded-md flex items-center gap-2 ${
-                i === 0 ? "bg-white/5 border border-white/10" : ""
+                i === 0 ? "bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)]" : ""
               }`}
             >
               <Skeleton className="h-3.5 w-3.5 rounded-sm" />
@@ -131,7 +131,7 @@ function DemoSkeleton() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-card border border-white/10 bg-white/[0.03] p-4 space-y-2"
+                className="rounded-card border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.03)] p-4 space-y-2"
               >
                 <Skeleton className="h-2.5 w-16" />
                 <Skeleton className="h-6 w-24" />
@@ -140,7 +140,7 @@ function DemoSkeleton() {
             ))}
           </div>
           {/* Chart block — wide + tall. */}
-          <div className="rounded-card border border-white/10 bg-white/[0.03] p-4 h-[180px] md:h-[220px] flex items-end gap-2">
+          <div className="rounded-card border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.03)] p-4 h-[180px] md:h-[220px] flex items-end gap-2">
             {Array.from({ length: 12 }).map((_, i) => (
               <Skeleton
                 key={i}
@@ -151,8 +151,8 @@ function DemoSkeleton() {
             ))}
           </div>
           {/* Table block — rows + columns. */}
-          <div className="rounded-card border border-white/10 bg-white/[0.03] p-4 space-y-2">
-            <div className="flex gap-4 pb-2 border-b border-white/5">
+          <div className="rounded-card border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.03)] p-4 space-y-2">
+            <div className="flex gap-4 pb-2 border-b border-[rgb(var(--divider)/0.05)]">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className="h-2.5 flex-1 max-w-[80px]" />
               ))}
@@ -168,7 +168,7 @@ function DemoSkeleton() {
         </div>
 
         {/* ---- Status bar (h-7) ---- */}
-        <div className="liquid-glass border-t border-white/10 flex items-center justify-between px-3 h-7 shrink-0 mt-auto">
+        <div className="liquid-glass border-t border-[rgb(var(--divider)/0.1)] flex items-center justify-between px-3 h-7 shrink-0 mt-auto">
           <Skeleton className="h-2.5 w-32" />
           <Skeleton className="h-2.5 w-40 hidden sm:block" />
           <Skeleton className="h-2.5 w-16" />

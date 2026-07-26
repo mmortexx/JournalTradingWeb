@@ -284,8 +284,8 @@ function ExcursionBar({ mae, mfe }: { mae: number; mfe: number }) {
   const maePct = (Math.abs(mae) / maxAbs) * 50;
   const mfePct = (Math.abs(mfe) / maxAbs) * 50;
   return (
-    <div className="relative h-2 rounded-full bg-white/5 overflow-hidden">
-      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/25 z-10" />
+    <div className="relative h-2 rounded-full bg-[rgb(var(--divider)/0.05)] overflow-hidden">
+      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[rgb(var(--divider)/0.25)] z-10" />
       <motion.div
         className="absolute top-0 bottom-0 right-1/2 bg-pnl-neg/80"
         initial={{ width: 0 }}
@@ -302,17 +302,27 @@ function ExcursionBar({ mae, mfe }: { mae: number; mfe: number }) {
   );
 }
 
-/* ---------- Risk:Reward planned bar ---------- */
-function RiskRewardBar({ plannedRr }: { plannedRr: number }) {
+/* ---------- Barra de riesgo : recompensa planificado ----------
+   Rotulada como en la app ("Riesgo · 1R" / "Recompensa · 2,0R"): estaba
+   en inglés dentro de una demo en español. */
+function RiskRewardBar({
+  plannedRr,
+  lang,
+}: {
+  plannedRr: number;
+  lang: "es" | "en";
+}) {
   const riskFraction = 1 / (1 + plannedRr);
   const rewardFraction = plannedRr / (1 + plannedRr);
   return (
     <div>
-      <div className="flex items-center justify-between mb-2 text-[10px] uppercase tracking-[0.15em] text-tertiary tnum">
-        <span>Risk · 1R</span>
-        <span>Reward · {plannedRr.toFixed(1)}R</span>
+      <div className="flex items-center justify-between mb-2 text-[10px] tracking-[0.15em] text-tertiary tnum">
+        <span>{lang === "es" ? "Riesgo" : "Risk"} · 1R</span>
+        <span>
+          {lang === "es" ? "Recompensa" : "Reward"} · {fmtNum(plannedRr, lang, 1)}R
+        </span>
       </div>
-      <div className="relative h-2.5 rounded-full bg-white/5 overflow-hidden flex">
+      <div className="relative h-2.5 rounded-full bg-[rgb(var(--divider)/0.05)] overflow-hidden flex">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${riskFraction * 100}%` }}
@@ -367,7 +377,7 @@ function TagPill({
           type="button"
           onClick={onRemove}
           aria-label="Remove tag"
-          className="ml-0.5 -mr-0.5 w-4 h-4 rounded-sm hover:bg-white/10 inline-flex items-center justify-center"
+          className="ml-0.5 -mr-0.5 w-4 h-4 rounded-sm hover:bg-[rgb(var(--divider)/0.1)] inline-flex items-center justify-center"
         >
           <svg
             width="9"
@@ -432,7 +442,7 @@ export function TradeDetailPage() {
         <button
           type="button"
           onClick={goBack}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-secondary hover:text-primary liquid-glass border border-white/10 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-secondary hover:text-primary border border-[rgb(var(--divider)/0.10)] transition-colors"
         >
           <svg
             width="14"
@@ -503,7 +513,7 @@ export function TradeDetailPage() {
         <button
           type="button"
           onClick={goBack}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-secondary hover:text-primary liquid-glass border border-white/10 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-secondary hover:text-primary border border-[rgb(var(--divider)/0.10)] transition-colors"
         >
           <svg
             width="14"
@@ -541,7 +551,7 @@ export function TradeDetailPage() {
           <button
             type="button"
             aria-label={t("back")}
-            className="w-8 h-8 rounded-md border border-white/10 text-tertiary hover:text-primary hover:border-white/25 transition-colors inline-flex items-center justify-center"
+            className="w-8 h-8 rounded-md border border-[rgb(var(--divider)/0.1)] text-tertiary hover:text-primary hover:border-[rgb(var(--divider)/0.25)] transition-colors inline-flex items-center justify-center"
           >
             <svg
               width="14"
@@ -560,7 +570,7 @@ export function TradeDetailPage() {
           <button
             type="button"
             aria-label={t("back")}
-            className="w-8 h-8 rounded-md border border-white/10 text-tertiary hover:text-primary hover:border-white/25 transition-colors inline-flex items-center justify-center"
+            className="w-8 h-8 rounded-md border border-[rgb(var(--divider)/0.1)] text-tertiary hover:text-primary hover:border-[rgb(var(--divider)/0.25)] transition-colors inline-flex items-center justify-center"
           >
             <svg
               width="14"
@@ -586,55 +596,62 @@ export function TradeDetailPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: EASE }}
-        className="relative overflow-hidden liquid-glass depth-3 hover:depth-4 transition-shadow duration-300 rounded-card p-6"
+        className="relative overflow-hidden demo-card p-6"
       >
         <div className="relative space-y-6">
           {/* Hero stat row: Net | R | Risk | Planned RR (with hairlines) */}
           <div className="flex flex-wrap items-center gap-x-2 gap-y-5">
-            <HeroStat label={t("colClosed")}>
+            {/* Las cuatro cifras de cabecera son, con sus nombres, las de
+                la app (TradeDetailPage.xaml): "P&L neto", "R múltiplo",
+                "Riesgo" y "RR planeado". La demo las llamaba "Cierre",
+                "R" y "Entrada + stop" — nombres que no dicen lo que hay
+                debajo: la primera cifra no es la fecha de cierre, es el
+                resultado neto de la operación. */}
+            <HeroStat label={lang === "es" ? "P&L neto" : "Net P&L"}>
               <div className="flex items-baseline gap-2">
                 <CountUp
                   key={trade.id}
                   to={Math.abs(trade.netPnl)}
                   from={0}
                   decimals={2}
-                  prefix={trade.netPnl >= 0 ? "+$" : "−$"}
+                  prefix={trade.netPnl >= 0 ? "+" : "−"}
+                  suffix=" US$"
                   tone={tone}
                   duration={1.6}
                   className="text-3xl md:text-4xl font-bold tracking-tight"
                 />
               </div>
             </HeroStat>
-            <HeroStat label="R" divider>
+            <HeroStat label={lang === "es" ? "R múltiplo" : "R multiple"} divider>
               <span
                 className={`text-2xl md:text-3xl font-bold tnum ${
                   trade.rMultiple >= 0 ? "text-pnl-pos" : "text-pnl-neg"
                 }`}
               >
                 {trade.rMultiple > 0 ? "+" : ""}
-                {trade.rMultiple.toFixed(2)}R
+                {fmtNum(trade.rMultiple, lang, 2)}R
               </span>
             </HeroStat>
-            <HeroStat label={t("entryStop")} divider>
+            <HeroStat label={lang === "es" ? "Riesgo" : "Risk"} divider>
               <div className="flex flex-col">
                 <Money
                   value={riskAmount}
                   className="text-2xl md:text-3xl font-semibold"
                 />
                 <span className="text-[10px] text-tertiary tnum">
-                  {riskPct.toFixed(2)}% {lang === "es" ? "del capital" : "of capital"}
+                  {fmtNum(riskPct, lang, 2)} % {lang === "es" ? "del capital" : "of capital"}
                 </span>
               </div>
             </HeroStat>
             <HeroStat label={t("plannedRr")} divider>
               <span className="text-2xl md:text-3xl font-semibold tnum text-primary">
-                1:{trade.plannedRr.toFixed(2)}
+                {fmtNum(trade.plannedRr, lang, 2)}R
               </span>
             </HeroStat>
           </div>
 
           {/* MAE/MFE excursion diverging bar */}
-          <div className="space-y-2 pt-2 border-t border-white/10">
+          <div className="space-y-2 pt-2 border-t border-[rgb(var(--divider)/0.1)]">
             <div className="flex items-center justify-between">
               <Eyebrow>
                 {lang === "es" ? "Recorrido de la operación" : "Trade journey"}
@@ -662,8 +679,8 @@ export function TradeDetailPage() {
           </div>
 
           {/* Planned risk:reward bar */}
-          <div className="space-y-2 pt-2 border-t border-white/10">
-            <RiskRewardBar plannedRr={trade.plannedRr} />
+          <div className="space-y-2 pt-2 border-t border-[rgb(var(--divider)/0.1)]">
+            <RiskRewardBar plannedRr={trade.plannedRr} lang={lang} />
           </div>
         </div>
       </motion.section>
@@ -683,7 +700,7 @@ export function TradeDetailPage() {
               y: -2,
               transition: { type: "spring", stiffness: 300, damping: 24 },
             }}
-            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            className="demo-card p-5"
           >
             <Eyebrow className="mb-4">{t("execution")}</Eyebrow>
             <dl className="grid grid-cols-3 gap-y-3.5 gap-x-4">
@@ -724,18 +741,18 @@ export function TradeDetailPage() {
               y: -2,
               transition: { type: "spring", stiffness: 300, damping: 24 },
             }}
-            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            className="demo-card p-5"
           >
             <div className="flex items-center gap-3 mb-4">
               <Eyebrow>
                 {lang === "es" ? "Anatomía" : "Anatomy"}
               </Eyebrow>
-              <span className="pill bg-white/5 text-tertiary border border-white/10 text-[10px] tnum">
+              <span className="pill bg-[rgb(var(--divider)/0.05)] text-tertiary border border-[rgb(var(--divider)/0.1)] text-[10px] tnum">
                 {fills.length} {lang === "es" ? "fills" : "fills"}
               </span>
             </div>
             {/* Table header */}
-            <div className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 pb-2 text-[10px] uppercase tracking-[0.14em] text-tertiary border-b border-white/10">
+            <div className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 pb-2 text-[10px] uppercase tracking-[0.14em] text-tertiary border-b border-[rgb(var(--divider)/0.1)]">
               <div>{lang === "es" ? "Lado" : "Side"}</div>
               <div>{lang === "es" ? "Hora" : "Time"}</div>
               <div className="text-right">Qty</div>
@@ -796,7 +813,7 @@ export function TradeDetailPage() {
               y: -2,
               transition: { type: "spring", stiffness: 300, damping: 24 },
             }}
-            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            className="demo-card p-5"
           >
             <Eyebrow className="mb-4">
               {lang === "es" ? "Dónde cayó dentro del día" : "Where it fell in the day"}
@@ -853,7 +870,7 @@ export function TradeDetailPage() {
                 y: -2,
                 transition: { type: "spring", stiffness: 300, damping: 24 },
               }}
-              className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+              className="demo-card p-5"
             >
               <Eyebrow className="mb-4">{t("plan")}</Eyebrow>
               <dl className="grid grid-cols-2 gap-y-3.5 gap-x-4">
@@ -888,7 +905,7 @@ export function TradeDetailPage() {
                 y: -2,
                 transition: { type: "spring", stiffness: 300, damping: 24 },
               }}
-              className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+              className="demo-card p-5"
             >
               <Eyebrow className="mb-4">{t("context")}</Eyebrow>
               <dl className="grid grid-cols-2 gap-y-3.5 gap-x-4">
@@ -950,10 +967,10 @@ export function TradeDetailPage() {
               y: -2,
               transition: { type: "spring", stiffness: 300, damping: 24 },
             }}
-            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            className="demo-card p-5"
           >
             <Eyebrow className="mb-4">{t("screenshots")}</Eyebrow>
-            <div className="border-2 border-dashed border-white/10 rounded-md p-4 text-center text-xs text-tertiary mb-3 transition-colors hover:border-white/20 hover:bg-white/[0.02]">
+            <div className="border-2 border-dashed border-[rgb(var(--divider)/0.1)] rounded-md p-4 text-center text-xs text-tertiary mb-3 transition-colors hover:border-[rgb(var(--divider)/0.2)] hover:bg-[rgb(var(--divider)/0.02)]">
               <svg
                 className="mx-auto mb-2 opacity-60"
                 width="22"
@@ -971,10 +988,10 @@ export function TradeDetailPage() {
               {t("dropScreens")}
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="aspect-[4/3] rounded-md overflow-hidden liquid-glass border border-white/10 p-1.5">
+              <div className="aspect-[4/3] rounded-md overflow-hidden border border-[rgb(var(--divider)/0.10)] p-1.5">
                 <MiniCandles seed={trade.id * 7 + 1} win={isWin} />
               </div>
-              <div className="aspect-[4/3] rounded-md overflow-hidden liquid-glass border border-white/10 p-1.5">
+              <div className="aspect-[4/3] rounded-md overflow-hidden border border-[rgb(var(--divider)/0.10)] p-1.5">
                 <MiniCandles seed={trade.id * 13 + 5} win={isWin} />
               </div>
             </div>
@@ -990,7 +1007,7 @@ export function TradeDetailPage() {
               y: -2,
               transition: { type: "spring", stiffness: 300, damping: 24 },
             }}
-            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            className="demo-card p-5"
           >
             <Eyebrow className="mb-4">
               {lang === "es" ? "Etiquetas" : "Tags"}
@@ -1017,7 +1034,7 @@ export function TradeDetailPage() {
                     },
                   ])
                 }
-                className="pill inline-flex items-center gap-1 text-[11px] border border-dashed border-white/15 text-tertiary hover:text-primary hover:border-white/30 transition-colors"
+                className="pill inline-flex items-center gap-1 text-[11px] border border-dashed border-[rgb(var(--divider)/0.15)] text-tertiary hover:text-primary hover:border-[rgb(var(--divider)/0.3)] transition-colors"
                 aria-label={lang === "es" ? "Añadir etiqueta" : "Add tag"}
               >
                 <svg
@@ -1047,7 +1064,7 @@ export function TradeDetailPage() {
               y: -2,
               transition: { type: "spring", stiffness: 300, damping: 24 },
             }}
-            className="liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-5"
+            className="demo-card p-5"
           >
             <Eyebrow className="mb-4">{t("review")}</Eyebrow>
 
@@ -1057,7 +1074,7 @@ export function TradeDetailPage() {
                 <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
                   {t("entryNote")}
                 </div>
-                <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
+                <blockquote className="border-l-2 border-solid border-[rgb(var(--divider)/0.25)] pl-3 py-1 text-sm text-secondary italic leading-relaxed">
                   {trade.entryNote}
                 </blockquote>
               </div>
@@ -1065,7 +1082,7 @@ export function TradeDetailPage() {
                 <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
                   {t("manageNote")}
                 </div>
-                <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
+                <blockquote className="border-l-2 border-solid border-[rgb(var(--divider)/0.25)] pl-3 py-1 text-sm text-secondary italic leading-relaxed">
                   {lang === "es"
                     ? `MFE alcanzó ${trade.mfe.toFixed(2)}R; salí en ${trade.rMultiple.toFixed(2)}R.`
                     : `MFE reached ${trade.mfe.toFixed(2)}R; exited at ${trade.rMultiple.toFixed(2)}R.`}
@@ -1075,7 +1092,7 @@ export function TradeDetailPage() {
                 <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary mb-1">
                   {t("closeNote")}
                 </div>
-                <blockquote className="border-l-2 border-solid border-white/25 pl-3 py-1 text-sm text-secondary italic leading-relaxed">
+                <blockquote className="border-l-2 border-solid border-[rgb(var(--divider)/0.25)] pl-3 py-1 text-sm text-secondary italic leading-relaxed">
                   {trade.closeNote}
                 </blockquote>
               </div>
@@ -1102,13 +1119,13 @@ export function TradeDetailPage() {
                     className={`relative h-10 rounded-md text-sm font-medium transition-colors ${
                       active
                         ? "text-primary"
-                        : "text-tertiary hover:text-secondary hover:bg-white/5"
+                        : "text-tertiary hover:text-secondary hover:bg-[rgb(var(--divider)/0.05)]"
                     }`}
                   >
                     {active && (
                       <motion.span
                         layoutId="review-pill"
-                        className="absolute inset-0 rounded-md bg-white/5 border border-white/20"
+                        className="absolute inset-0 rounded-md bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.2)]"
                         transition={{
                           type: "spring",
                           stiffness: 400,
@@ -1125,7 +1142,7 @@ export function TradeDetailPage() {
             </div>
 
             {/* Summary */}
-            <div className="space-y-2.5 border-t border-white/10 pt-4">
+            <div className="space-y-2.5 border-t border-[rgb(var(--divider)/0.1)] pt-4">
               <SummaryRow
                 label={t("rr")}
                 tone={trade.rMultiple >= 0 ? "pos" : "neg"}
