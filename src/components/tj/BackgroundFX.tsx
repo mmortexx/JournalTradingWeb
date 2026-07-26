@@ -912,7 +912,7 @@ export function BackgroundFX() {
               width: "min(78vmin, 1040px)",
               height: "min(78vmin, 1040px)",
               background:
-                "radial-gradient(circle, transparent 38%, rgb(52 211 153 / 0.12) 52%, rgb(52 211 153 / 0.04) 62%, transparent 72%)",
+                "radial-gradient(circle, transparent 38%, rgb(199 167 107 / 0.12) 52%, rgb(199 167 107 / 0.04) 62%, transparent 72%)",
             }}
           />
           <div
@@ -921,7 +921,7 @@ export function BackgroundFX() {
               width: "min(54vmin, 720px)",
               height: "min(54vmin, 720px)",
               background:
-                "repeating-conic-gradient(from 2deg, rgb(52 211 153 / 0.55) 0deg 0.5deg, transparent 0.5deg 2.1deg), radial-gradient(circle, rgb(255 244 224 / 0.9) 13.5%, rgb(239 68 68 / 0.85) 17%, rgb(200 90 40 / 0.5) 26%, rgb(52 211 153 / 0.38) 44%, rgb(10 40 28 / 0.25) 58%, transparent 62%)",
+                "repeating-conic-gradient(from 2deg, rgb(199 167 107 / 0.55) 0deg 0.5deg, transparent 0.5deg 2.1deg), radial-gradient(circle, rgb(255 244 224 / 0.9) 13.5%, rgb(239 68 68 / 0.85) 17%, rgb(200 90 40 / 0.5) 26%, rgb(199 167 107 / 0.38) 44%, rgb(92 71 24 / 0.25) 58%, transparent 62%)",
               WebkitMaskImage:
                 "radial-gradient(circle, #000 12%, #000 60%, transparent 64%)",
               maskImage:

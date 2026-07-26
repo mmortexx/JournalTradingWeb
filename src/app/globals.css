@@ -201,9 +201,11 @@
   --pnl-neg: 153 27 27;   /* #991B1B — was 239 68 68 (#EF4444) */
   --pnl-warn: 146 64 14;  /* #92400E — was 224 147 43 (#E0932B) */
 
-  --sig-green: 52 211 153;
-  --sig-amber: 224 147 43;
-  --sig-red: 229 103 90;
+  /* Semáforo en claro — valores de la app (Colors.xaml:77-79). El verde
+     seguía siendo el #34D399 del tema oscuro, ilegible sobre papel. */
+  --sig-green: 30 122 76;  /* #1E7A4C */
+  --sig-amber: 173 90 0;   /* #AD5A00 */
+  --sig-red: 178 59 46;    /* #B23B2E */
 
   /* Papel CÁLIDO #F7F4EE — el valor real de la app (Oro.xaml:22-24).
      Sustituye al azulado #F8FAFC: el claro debe ser el mismo papel
