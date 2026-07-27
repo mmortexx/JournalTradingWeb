@@ -254,7 +254,13 @@ export function ComparisonSlider() {
                   {es ? "Después" : "After"}
                 </span>
               </div>
-              <ul className="absolute inset-0 flex flex-col justify-center gap-4 px-8 md:px-12 pl-16 md:pl-20">
+              {/* La lista del DESPUÉS vive en la MITAD DERECHA, que es la
+                  parte que esta capa deja ver (el overlay del "antes" tapa
+                  la izquierda). Antes ocupaba `inset-0` con `pl-16`, es
+                  decir, el texto caía en la mitad izquierda — justo debajo
+                  del overlay opaco del "antes". Resultado: el lado verde
+                  salía vacío y el comparador parecía al revés. */}
+              <ul className="absolute inset-y-0 right-0 w-1/2 flex flex-col justify-center gap-4 px-6 md:px-8">
                 {after.map((line, i) => (
                   <motion.li
                     key={i}
@@ -317,7 +323,10 @@ export function ComparisonSlider() {
                   {es ? "Antes" : "Before"}
                 </span>
               </div>
-              <ul className="absolute inset-0 flex flex-col justify-center gap-4 px-8 md:px-12 pr-16 md:pr-20">
+              {/* La lista del ANTES vive en la MITAD IZQUIERDA, que es la
+                  parte que el recorte de esta capa deja ver. Simétrica a la
+                  del después. */}
+              <ul className="absolute inset-y-0 left-0 w-1/2 flex flex-col justify-center gap-4 px-6 md:px-8">
                 {before.map((line, i) => (
                   <li
                     key={i}
@@ -434,8 +443,12 @@ export function ComparisonSlider() {
                   it's ~7:1. The hint still reads as subtle/tertiary-tier
                   vs the primary after-items and the chip labels, preserving
                   the "quiet invitation to interact" intent. */}
+              {/* Flecha doble, no "→": arrastrar a la derecha descubre más
+                  del ANTES y a la izquierda más del DESPUÉS. Una flecha
+                  sencilla hacia la derecha sugería "avanzar" cuando lo que
+                  hace es retroceder al pasado. */}
               <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary font-semibold">
-                {es ? "Arrastra →" : "Drag →"}
+                {es ? "← Arrastra →" : "← Drag →"}
               </span>
             </div>
           </div>
