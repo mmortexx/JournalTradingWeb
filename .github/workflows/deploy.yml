@@ -60,6 +60,11 @@ jobs:
           # que han enviado. Se configura en:
           #   Settings → Secrets and variables → Actions → WEB3FORMS_KEY
           NEXT_PUBLIC_WEB3FORMS_KEY: ${{ secrets.WEB3FORMS_KEY }}
+          # ID de la lista de espera (GetWaitlist). Mismo criterio: sin él
+          # el sitio se publica igual, pero el formulario de la lista avisa
+          # del fallo en vez de fingir que ha registrado a nadie.
+          #   Settings → Secrets and variables → Actions → WAITLIST_ID
+          NEXT_PUBLIC_WAITLIST_ID: ${{ secrets.WAITLIST_ID }}
 
       - name: Disable Jekyll + add nojekyll
         # GitHub Pages procesa el contenido con Jekyll por defecto.

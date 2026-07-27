@@ -18,6 +18,9 @@
 
 const ENDPOINT = "https://api.web3forms.com/submit";
 
+/** Alta en la lista de espera (GetWaitlist). Ver `joinWaitlist`. */
+const WAITLIST_ENDPOINT = "https://api.getwaitlist.com/api/v1/signup";
+
 /** Cortamos a los 15 s: más allá, el usuario ya ha asumido que no va. */
 const TIMEOUT_MS = 15_000;
 
@@ -33,6 +36,17 @@ const ACCESS_KEY = (process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "").trim();
  * fingir un envío correcto.
  */
 export const formsConfigured = ACCESS_KEY.length > 0;
+
+/**
+ * ID numérico de la lista de espera en GetWaitlist. Igual que la access
+ * key de Web3Forms: viaja en el cliente por diseño (identifica a qué lista
+ * apuntar, no autoriza a leerla) y se declara en next.config.ts para que
+ * Next siempre lo sustituya por un literal en el bundle.
+ */
+const WAITLIST_ID = (process.env.NEXT_PUBLIC_WAITLIST_ID ?? "").trim();
+
+/** `false` mientras no se haya configurado el ID de la lista. */
+export const waitlistConfigured = WAITLIST_ID.length > 0;
 
 /** Buzón de respaldo que se le ofrece al usuario si el envío falla. */
 export const SUPPORT_EMAIL = "soporte@tradingjournal.app";
@@ -64,6 +78,37 @@ export type FormFields = {
 };
 
 /**
+ * POST de JSON con timeout, compartido por los dos envíos.
+ *
+ * Devuelve `null` cuando la petición ni siquiera llegó a completarse (red
+ * caída, CORS, timeout); en ese caso el llamante reporta "network". Si hubo
+ * respuesta, entrega el status y el cuerpo ya parseado para que cada
+ * servicio aplique su propio criterio de éxito.
+ */
+async function postJson(
+  url: string,
+  payload: unknown
+): Promise<{ status: number; ok: boolean; data: unknown } | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    const data = await res.json().catch(() => null);
+    return { status: res.status, ok: res.ok, data };
+  } catch {
+    // AbortError, TypeError de red, CORS bloqueado por una extensión…
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
  * Envía un formulario y responde si salió o no.
  *
  * No lanza excepciones: cualquier fallo vuelve como `{ ok: false, reason }`
@@ -78,40 +123,66 @@ export async function submitForm(fields: FormFields): Promise<SubmitResult> {
   // el filtro si el campo está presente en el payload.
   const { botcheck = "", ...rest } = fields;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const res = await postJson(ENDPOINT, {
+    access_key: ACCESS_KEY,
+    botcheck,
+    // Remitente visible en el email; cae al nombre del sitio si el
+    // formulario no pide nombre.
+    from_name: rest.name?.trim() || "Trading Journal Web",
+    ...rest,
+  });
 
-  try {
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        access_key: ACCESS_KEY,
-        botcheck,
-        // Remitente visible en el email; cae al nombre del sitio si el
-        // formulario no pide nombre (el boletín, por ejemplo).
-        from_name: rest.name?.trim() || "Trading Journal Web",
-        ...rest,
-      }),
-      signal: controller.signal,
-    });
+  if (!res) return { ok: false, reason: "network" };
 
-    // Web3Forms devuelve 200 con `success: false` en algunos rechazos, así
-    // que no basta con mirar el status HTTP.
-    const data = (await res.json().catch(() => null)) as { success?: boolean } | null;
+  // Web3Forms devuelve 200 con `success: false` en algunos rechazos, así
+  // que no basta con mirar el status HTTP.
+  const data = res.data as { success?: boolean } | null;
+  if (!res.ok || !data?.success) return { ok: false, reason: "rejected" };
 
-    if (!res.ok || !data?.success) {
-      return { ok: false, reason: "rejected" };
-    }
+  return { ok: true };
+}
 
-    return { ok: true };
-  } catch {
-    // AbortError, TypeError de red, CORS bloqueado por una extensión…
-    return { ok: false, reason: "network" };
-  } finally {
-    clearTimeout(timer);
+export type WaitlistResult =
+  | { ok: true; priority: number | null }
+  | { ok: false; reason: SubmitFailure };
+
+/**
+ * Da de alta un email en la lista de espera y devuelve su puesto en la cola.
+ *
+ * `priority` es el número de orden que asigna GetWaitlist. Puede volver
+ * `null` si la respuesta no lo trae: en ese caso el alta ES válida y la UI
+ * simplemente no enseña el puesto, en vez de inventarse uno.
+ *
+ * Misma regla que `submitForm`: nunca `ok: true` si el alta no se registró.
+ */
+export async function joinWaitlist(email: string): Promise<WaitlistResult> {
+  if (!waitlistConfigured) {
+    return { ok: false, reason: "unconfigured" };
   }
+
+  const id = Number(WAITLIST_ID);
+  // La API exige un entero. Un ID mal copiado es un fallo de configuración
+  // nuestro, no del visitante, y se reporta como tal.
+  if (!Number.isFinite(id) || id <= 0) {
+    return { ok: false, reason: "unconfigured" };
+  }
+
+  const res = await postJson(WAITLIST_ENDPOINT, {
+    email: email.trim(),
+    waitlist_id: id,
+    // Permite que GetWaitlist atribuya invitaciones si algún día se activan
+    // los enlaces de referido. En el navegador siempre hay `location`.
+    referral_link: typeof window === "undefined" ? undefined : window.location.href,
+  });
+
+  if (!res) return { ok: false, reason: "network" };
+  if (!res.ok) return { ok: false, reason: "rejected" };
+
+  const data = res.data as { priority?: number } | null;
+  const priority =
+    typeof data?.priority === "number" && Number.isFinite(data.priority)
+      ? data.priority
+      : null;
+
+  return { ok: true, priority };
 }

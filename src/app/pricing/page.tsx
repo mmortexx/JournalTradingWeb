@@ -5,7 +5,7 @@ import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 
 // Estimated reading time (pricing cards + comparison + pricing FAQ +
-// trust strip + testimonials + stats + newsletter + download CTA).
+// trust strip + stats + lista de espera + download CTA).
 // ~850 words at 220 wpm = ~4 min.
 const READING_TIME_MIN = 4;
 
@@ -106,19 +106,8 @@ const productSchema = {
     "Diario de trading nativo de Windows. Métricas institucionales, disciplina que actúa, datos 100% locales. Pago único, sin suscripciones.",
   brand: { "@type": "Brand", name: "Trading Journal" },
   category: "Software",
-  // AggregateRating — enables star-rating rich-results on the SERP.
-  // Mirrors the testimonial sentiment on /about (TestimonialsWall +
-  // ValueTestimonials). The rating value and count are representative
-  // of the early-user feedback collected via the newsletter + support
-  // channel; update with real verified reviews once a review platform
-  // (G2/Capterra/Trustpilot) is integrated.
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    reviewCount: "47",
-    bestRating: "5",
-    worstRating: "1",
-  },
+  // Sin `aggregateRating` a propósito: no hay reseñas reales todavía.
+  // Ver la nota equivalente en src/app/layout.tsx.
   offers: [
     {
       "@type": "Offer",
@@ -196,16 +185,14 @@ const TrustStrip = dynamic(
   () => import("@/components/marketing/TrustStrip").then((m) => m.TrustStrip),
   { loading: () => sectionFallback }
 );
-const ValueTestimonials = dynamic(
-  () => import("@/components/marketing/ValueTestimonials").then((m) => m.ValueTestimonials),
-  { loading: () => sectionFallback }
-);
+// ValueTestimonials retirado: sus tres testimonios eran personas
+// inventadas. Vuelve cuando haya reseñas reales de usuarios.
 const StatsBandNew = dynamic(
   () => import("@/components/marketing/StatsBandNew").then((m) => m.StatsBandNew),
   { loading: () => sectionFallback }
 );
-const Newsletter = dynamic(
-  () => import("@/components/marketing/Newsletter").then((m) => m.Newsletter),
+const Waitlist = dynamic(
+  () => import("@/components/marketing/Waitlist").then((m) => m.Waitlist),
   { loading: () => sectionFallback }
 );
 const DownloadCTA = dynamic(
@@ -251,13 +238,10 @@ export default function PricingPage() {
           multi-computer and lost license. */}
       <PricingFAQ />
       <TrustStrip />
-      {/* Compact 3-testimonial row focused on value-for-money (ROI,
-          "paid for itself", one-time vs subscription). */}
-      <ValueTestimonials />
       <StatsBandNew />
-      <Newsletter />
+      <Waitlist />
       {/* Download CTA — Windows-app installer button. Sits between the
-          Newsletter and the soft close so visitors leave with a concrete
+          la lista de espera y el cierre suave, para que el visitante se vaya con una
           next action (download the desktop app). */}
       <DownloadCTA />
       <FinalCTANew />

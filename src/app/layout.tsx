@@ -116,20 +116,13 @@ const softwareApplicationSchema = {
     "Multi-cuenta y multi-activo (acciones, futuros, forex, crypto)",
     "Exportación a CSV/JSON y backups locales",
   ],
-  // aggregateRating — kept in sync with the Product schema on /pricing
-  // (ratingValue 4.8 / reviewCount 47, bestRating 5 / worstRating 1).
-  // Previously this emitted 4.9/312 which CONFLICTED with the Product
-  // schema's 4.8/47 on /pricing — same entity, two different ratings
-  // triggers a Google structured-data manual-action flag. Canonical
-  // rating is 4.8/47 (the Product schema is more specific to the
-  // pricing page). See worklog Task R20-1d (E1) + R20-2d.
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    reviewCount: "47",
-    bestRating: "5",
-    worstRating: "1",
-  },
+  // Sin `aggregateRating` a propósito: no hay reseñas reales todavía.
+  // Aquí se emitía 4,8/47 inventado. Las directrices de datos
+  // estructurados de Google exigen que la valoración proceda de usuarios
+  // reales, así que publicarla era arriesgar una acción manual además de
+  // engañar a quien la viera en el buscador. Se vuelve a poner cuando
+  // haya reseñas verificables (G2/Capterra/Trustpilot), tomando el valor
+  // de esa plataforma.
   publisher: {
     "@type": "Organization",
     name: "Trading Journal",

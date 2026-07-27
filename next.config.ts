@@ -29,6 +29,9 @@ const nextConfig: NextConfig = {
     // bundle y lanza "process is not defined" en el navegador, tumbando el
     // módulo entero. Sin valor queda "" y los formularios avisan del fallo.
     NEXT_PUBLIC_WEB3FORMS_KEY: process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "",
+    // ID de la lista de espera en GetWaitlist. Mismo motivo para declararlo
+    // aquí que la clave de arriba.
+    NEXT_PUBLIC_WAITLIST_ID: process.env.NEXT_PUBLIC_WAITLIST_ID ?? "",
   },
   images: {
     // No loader needed for static export; we use SVG/unoptimized images only.

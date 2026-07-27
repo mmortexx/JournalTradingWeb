@@ -6,29 +6,25 @@ import { useLang } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/tj/Eyebrow";
-import { submitForm, SUPPORT_EMAIL, type SubmitFailure } from "@/lib/forms";
+import { joinWaitlist, SUPPORT_EMAIL, type SubmitFailure } from "@/lib/forms";
 import { useHydrated } from "@/hooks/use-hydrated";
 
 /**
- * Newsletter signup — bilingual liquid-glass card with email capture, regex
- * validation, and a real subscription request.
+ * Waitlist — alta en la lista de espera de acceso anticipado.
  *
- * The address is POSTed through `@/lib/forms` (Web3Forms) and lands in the
- * support inbox tagged as a newsletter signup; the thank-you state only
- * appears once the endpoint confirms delivery. A failed send surfaces the
- * reason instead of a fake checkmark.
+ * Sustituye a la antigua sección de boletín. El motivo no es estético: el
+ * boletín prometía "1–2 emails al mes" y "cancela cuando quieras" mientras
+ * dejaba las altas en un buzón, sin lista real ni forma de darse de baja —
+ * un incumplimiento del RGPD además de una promesa vacía. Una lista de
+ * espera es lo que de verdad encaja antes del lanzamiento, y GetWaitlist sí
+ * mantiene la lista, confirma por email y permite exportarla.
  *
- * Nota pendiente: esto entrega altas a un buzón, no a una lista con bajas
- * automáticas. Cuando haya plataforma de boletines real (Buttondown, Kit…),
- * hay que cambiar el destino aquí y cubrir la baja del RGPD.
+ * El alta viaja por `@/lib/forms` (joinWaitlist), que nunca devuelve éxito
+ * si el registro no se guardó: sin ID configurado, con la red caída o si la
+ * API rechaza, aquí se ve el motivo, no un ✓ falso.
  *
- * Premium motion layer:
- *  - Card scales in on scroll-into-view (0.94 → 1 with eased spring).
- *  - On submit success, AnimatePresence cross-fades the form out and an animated
- *    SVG checkmark (circle + path drawn via pathLength) in, with the thank-you
- *    message fading up underneath.
- *  - Error state: invalid email slides a small red helper in below the input;
- *    typing again clears it.
+ * En el éxito se enseña el puesto en la cola cuando la API lo devuelve. Si
+ * no viene, se confirma el alta sin número — antes que inventarse uno.
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,20 +46,21 @@ function failureCopy(reason: SubmitFailure, es: boolean): string {
   }
 }
 
-export function Newsletter() {
+export function Waitlist() {
   const { lang } = useLang();
   const es = lang === "es";
+
   const [email, setEmail] = useState("");
-  const [botcheck, setBotcheck] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [priority, setPriority] = useState<number | null>(null);
 
   const sending = status === "sending";
 
   /**
-   * Igual que en ContactForm: sin `action` en el <form>, un submit nativo
-   * previo a la hidratación recargaría la página y perdería el alta. El botón
-   * no se habilita hasta que React puede interceptar el envío.
+   * Sin `action` en el <form>, un submit nativo previo a la hidratación
+   * recargaría la página y perdería el alta. El botón no se habilita hasta
+   * que React puede interceptar el envío.
    */
   const ready = useHydrated();
 
@@ -84,16 +81,10 @@ export function Newsletter() {
     setErrorMsg(null);
     setStatus("sending");
 
-    const result = await submitForm({
-      subject: es ? "Alta en el boletín" : "Newsletter signup",
-      email: email.trim(),
-      message: es
-        ? `Nueva suscripción al boletín: ${email.trim()}`
-        : `New newsletter subscription: ${email.trim()}`,
-      botcheck,
-    });
+    const result = await joinWaitlist(email.trim());
 
     if (result.ok) {
+      setPriority(result.priority);
       setStatus("success");
       return;
     }
@@ -104,8 +95,8 @@ export function Newsletter() {
 
   return (
     <section
-      id="newsletter"
-      aria-label={es ? "Boletín" : "Newsletter"}
+      id="waitlist"
+      aria-label={es ? "Lista de espera" : "Waitlist"}
       className="section relative overflow-hidden"
     >
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
@@ -122,27 +113,25 @@ export function Newsletter() {
         >
           <div className="flex flex-col items-center text-center">
             <div className="flex justify-center">
-              <Eyebrow>{es ? "Boletín" : "Newsletter"}</Eyebrow>
+              <Eyebrow>{es ? "Acceso anticipado" : "Early access"}</Eyebrow>
             </div>
 
-            <h2
-              className="mt-5 t-h2 text-primary"
-            >
+            <h2 className="mt-5 t-h2 text-primary">
               {es ? (
                 <>
-                  Mantente al <span className="text-gradient">día</span>
+                  Entra en la <span className="text-gradient">lista</span>
                 </>
               ) : (
                 <>
-                  Stay in the <span className="text-gradient">loop</span>
+                  Join the <span className="text-gradient">waitlist</span>
                 </>
               )}
             </h2>
 
             <p className="mt-4 text-secondary leading-relaxed max-w-md">
               {es
-                ? "Recibe consejos de trading, actualizaciones del producto y noticias exclusivas. Sin spam, 1–2 emails al mes."
-                : "Get trading tips, product updates and exclusive news. No spam, 1–2 emails per month."}
+                ? "Te avisamos en cuanto abramos el acceso. Un solo correo, cuando toque — ni antes ni de más."
+                : "We'll let you know the moment access opens. One email, when it matters — no filler."}
             </p>
 
             <div className="w-full mt-7">
@@ -155,7 +144,7 @@ export function Newsletter() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.96 }}
                       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                      className="flex flex-col items-center gap-4 py-3"
+                      className="flex flex-col items-center gap-3 py-3"
                     >
                       <motion.svg
                         width="68"
@@ -163,8 +152,6 @@ export function Newsletter() {
                         viewBox="0 0 64 64"
                         fill="none"
                         aria-hidden="true"
-                        initial="hidden"
-                        animate="shown"
                       >
                         <motion.circle
                           cx="32"
@@ -197,8 +184,22 @@ export function Newsletter() {
                         aria-live="polite"
                         role="status"
                       >
-                        {es ? "¡Gracias! Revisa tu email." : "Thank you! Check your email."}
+                        {es ? "Estás dentro." : "You're in."}
                       </motion.p>
+                      {/* El puesto solo se enseña si la API lo devolvió. */}
+                      {priority !== null && (
+                        <motion.p
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.68 }}
+                          className="tnum text-sm text-secondary"
+                        >
+                          {es ? "Tu puesto: " : "Your spot: "}
+                          <span className="font-semibold text-[rgb(var(--accent-base))]">
+                            #{priority}
+                          </span>
+                        </motion.p>
+                      )}
                     </motion.div>
                   ) : (
                     <motion.form
@@ -211,18 +212,6 @@ export function Newsletter() {
                       className="flex flex-col sm:flex-row gap-3 sm:items-center"
                     >
                       <div className="flex-1 text-left">
-                        {/* Email input — focus state restored to the design-system
-                            accent ring (border 0.50 accent + 3px 0.12 accent
-                            halo) so the field lights up green on focus instead
-                            of just dim-grey. The previous `focus-visible:border-
-                            [rgb(var(--divider)/0.30)]` was overriding the
-                            global input focus rule from globals.css (L467-474)
-                            with a flat neutral border, stripping the accent
-                            affordance entirely. Adds `hover:border-...0.25` to
-                            match the FAQ search + ContactForm inputs (a subtle
-                            pre-focus affordance) and `rounded-lg` to match the
-                            submit Button's radius for visual harmony when the
-                            two sit side-by-side on ≥sm. */}
                         <Input
                           type="email"
                           inputMode="email"
@@ -239,32 +228,14 @@ export function Newsletter() {
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Correo electrónico" : "Email address"}
                           aria-invalid={status === "error"}
-                          aria-describedby={status === "error" ? "newsletter-error" : undefined}
+                          aria-describedby={status === "error" ? "waitlist-error" : undefined}
                           required
                           className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)] disabled:opacity-60"
                         />
-
-                        {/* Honeypot — fuera de pantalla, ignorado por personas.
-                            Si un bot lo rellena, Web3Forms tira el envío. */}
-                        <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
-                          <label htmlFor="newsletter-botcheck">
-                            {es ? "No rellenar" : "Do not fill"}
-                            <input
-                              id="newsletter-botcheck"
-                              type="text"
-                              name="botcheck"
-                              tabIndex={-1}
-                              autoComplete="off"
-                              value={botcheck}
-                              onChange={(e) => setBotcheck(e.target.value)}
-                            />
-                          </label>
-                        </div>
-
                         <AnimatePresence>
                           {status === "error" && errorMsg && (
                             <motion.p
-                              id="newsletter-error"
+                              id="waitlist-error"
                               initial={{ opacity: 0, y: -4 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -4 }}
@@ -278,17 +249,13 @@ export function Newsletter() {
                         </AnimatePresence>
                       </div>
                       <motion.div
-                        whileTap={sending || !ready ? undefined : { scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                        whileTap={
+                          sending || !ready
+                            ? undefined
+                            : { scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }
+                        }
                         className="shrink-0"
                       >
-                        {/* Submit button — was `bg-white text-black hover:bg-gray-100`
-                            (constraint violation: hardcoded text-white/bg-white/
-                            text-gray). Replaced with the brand's canonical CTA
-                            palette: accent-green bg + dark-on-accent ink
-                            (#06130d, the same constant Hero's primary CTA uses
-                            on the same accent green — passes WCAG AAA at 7.8:1).
-                            Hover brightens to --accent-hover and adds a soft
-                            accent glow + 1px lift so the affordance feels alive. */}
                         <Button
                           type="submit"
                           disabled={sending || !ready}
@@ -296,8 +263,8 @@ export function Newsletter() {
                           className="h-12 px-6 w-full sm:w-auto rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform,opacity] duration-200 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                         >
                           {sending
-                            ? es ? "Enviando…" : "Sending…"
-                            : es ? "Suscribirme" : "Subscribe"}
+                            ? es ? "Apuntando…" : "Joining…"
+                            : es ? "Apuntarme" : "Join"}
                         </Button>
                       </motion.div>
                     </motion.form>
@@ -305,12 +272,6 @@ export function Newsletter() {
                 </AnimatePresence>
               </div>
 
-              {/* Trust microcopy — a 9px lock glyph + the privacy promise.
-                  The glyph uses --pnl-pos (the same green the success
-                  checkmark uses) so the trust signal reads as a positive
-                  reassurance, not a generic lock icon. Sits inline with the
-                  text so it doesn't break the centered rhythm. Stroke bumped
-                  1.4 → 1.5 so the lock body + shackle read crisper at 9px. */}
               <p className="mt-4 text-xs text-tertiary text-center flex items-center justify-center gap-1.5">
                 <svg
                   width="9"
@@ -324,8 +285,8 @@ export function Newsletter() {
                   <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="rgb(var(--pnl-pos))" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
                 {es
-                  ? "Tu email nunca se comparte. Cancela cuando quieras."
-                  : "Your email is never shared. Unsubscribe anytime."}
+                  ? "Tu email nunca se comparte. Puedes salir de la lista cuando quieras."
+                  : "Your email is never shared. You can leave the list anytime."}
               </p>
             </div>
           </div>
@@ -334,4 +295,3 @@ export function Newsletter() {
     </section>
   );
 }
-

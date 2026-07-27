@@ -7,7 +7,7 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 
 // Estimated reading time (story + values + social proof + testimonials +
-// changelog + milestones + newsletter). ~700 words at 220 wpm = ~4 min.
+// changelog + milestones + lista de espera). ~700 words at 220 wpm = ~4 min.
 const READING_TIME_MIN = 4;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
@@ -78,14 +78,8 @@ export const metadata: Metadata = {
 const sectionFallback = (
   <div className="section" aria-hidden="true" style={{ minHeight: 360 }} />
 );
-const SocialProof = dynamic(
-  () => import("@/components/marketing/SocialProof").then((m) => m.SocialProof),
-  { loading: () => sectionFallback }
-);
-const TestimonialsWall = dynamic(
-  () => import("@/components/marketing/TestimonialsWall").then((m) => m.TestimonialsWall),
-  { loading: () => sectionFallback }
-);
+// SocialProof y TestimonialsWall se han retirado: sus testimonios eran
+// personas inventadas. Vuelven cuando haya reseñas reales de usuarios.
 const Changelog = dynamic(
   () => import("@/components/marketing/Changelog").then((m) => m.Changelog),
   { loading: () => sectionFallback }
@@ -94,8 +88,8 @@ const Milestones = dynamic(
   () => import("@/components/marketing/Milestones").then((m) => m.Milestones),
   { loading: () => sectionFallback }
 );
-const Newsletter = dynamic(
-  () => import("@/components/marketing/Newsletter").then((m) => m.Newsletter),
+const Waitlist = dynamic(
+  () => import("@/components/marketing/Waitlist").then((m) => m.Waitlist),
   { loading: () => sectionFallback }
 );
 
@@ -121,11 +115,9 @@ export default function AboutPage() {
       />
       <Story />
       <Values />
-      <SocialProof />
-      <TestimonialsWall />
       <Changelog />
       <Milestones />
-      <Newsletter />
+      <Waitlist />
       <FinalCTANew />
       <TableOfContents />
     </>
