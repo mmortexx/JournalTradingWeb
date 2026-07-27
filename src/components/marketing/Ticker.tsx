@@ -127,7 +127,11 @@ export function Ticker() {
     <div
       role="marquee"
       aria-label="Market ticker"
-      className="relative border-y border-[rgb(var(--divider)/0.14)] py-3 liquid-glass overflow-hidden select-none"
+      /* `glass-band`: la cinta va a sangre, así que el rim de liquid-glass
+         no debe recorrer los cantos laterales — ahí se leerían como dos
+         rayas verticales pegadas al borde del navegador. Solo la luz de
+         arriba; las dos hairlines ya las pone `border-y`. */
+      className="relative border-y border-[rgb(var(--divider)/0.14)] py-3 liquid-glass glass-band overflow-hidden select-none"
     >
       {/* Left edge gradient fade — R27-1b: switched from hardcoded
           `rgba(0, 0, 0, ...)` to `color-mix(in srgb, var(--bg) ...,

@@ -62,9 +62,17 @@ const SOCIAL_LINKS: SocialLink[] = [
  *
  * Material — `liquid-glass` (rgba(0,0,0,0.4) + 4px blur + machined inset
  * edges + `::before` rim gradient) — the same surface language as the
- * Navbar's scrolled state, demo chrome, and floating cards. `rounded-t-xl`
- * softens the top edge so the footer meets the page with a quiet radius.
+ * Navbar's scrolled state, demo chrome, and floating cards.
  * `safe-bottom` clears the iOS home indicator via env(safe-area-inset-bottom).
+ *
+ * SIN RADIO EN LA ESQUINA SUPERIOR. Llevaba `rounded-t-xl`, y el resultado
+ * era que una banda a sangre completa —pegada a los dos bordes de la
+ * ventana y al inferior— se redondeaba solo por arriba. Eso no lee como
+ * "cerrar la página con suavidad": lee como una tarjeta gigante mal
+ * recortada, porque el rim de `liquid-glass::before` hereda el radio y
+ * dibuja el contorno curvo contra un elemento que no tiene margen donde
+ * apoyarlo. Un elemento a sangre no se redondea; se separa con un filete,
+ * que es lo que hace ya el `border-t`.
  *
  * Accessibility — `<footer>` landmark with three `<nav aria-label="...">`
  * subsections (one per link column) so screen-reader users can navigate
@@ -134,7 +142,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="relative mt-auto liquid-glass rounded-t-xl border-t border-[rgb(var(--divider)/0.1)] safe-bottom">
+    <footer className="relative mt-auto liquid-glass glass-band border-t border-[rgb(var(--divider)/0.1)] safe-bottom">
       <div className="relative max-w-page mx-auto px-5 md:px-8 py-12 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-8 md:gap-10">
           {/* Brand column — candlestick mark + wordmark lockup (mirrors

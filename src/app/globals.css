@@ -52,10 +52,32 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* ---- Radios: DOS valores, no siete ----------------------------------
+     Estos cuatro tokens son los que consumen `rounded-sm/md/lg/xl`. Salían
+     de la escala por defecto de shadcn derivada de --radius (0.625rem), y
+     daban 6 / 8 / 10 / 14 px. Sumados al 4 px que usan los controles y al
+     8 px de `.rounded-card`, la página acababa con SIETE radios distintos
+     conviviendo — auditado en /demo: 8 px ×70, 6 px ×31, 4 px ×30,
+     14 px ×16, 10 px ×9, 3 px ×1, más las píldoras.
+
+     Siete radios no es una escala, es ruido: el ojo no llega a leerlos
+     como categorías, solo nota que nada encaja del todo. La referencia
+     además es una aplicación de escritorio de Windows, donde el radio es
+     pequeño y constante; los 14 px hacían que la ventana de la demo
+     pareciera una tarjeta de móvil y no una ventana del sistema.
+
+     Se colapsan a la escala real del producto:
+       4 px — controles (botones, chips, iconos), el radio de control de
+              la propia app.
+       8 px — superficies: tarjetas, paneles y ventanas.
+     Y la píldora, que se pide siempre a mano con `rounded-full` para los
+     puntos de estado. `lg` y `xl` valen lo mismo que `md` a propósito: no
+     hay una tercera categoría de superficie que justifique un tercer
+     radio, y dejarlos abiertos es lo que reabre la puerta al ruido. */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
 
   /* ---- Trading Journal brand tokens mapped to Tailwind ----
      NOTE: `--color-tj-accent*` mappings removed (R1-a) — they auto-
@@ -1898,6 +1920,23 @@ button.icon-btn:hover > svg,
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.6),
     inset 0 -1px 0 rgb(0 0 0 / 0.06);
+}
+
+/* Variante para superficies A SANGRE (el pie de página).
+   El rim de `::before` recorre los cuatro cantos, lo cual es correcto
+   cuando la pieza flota y tiene aire alrededor. Pegada a los bordes de la
+   ventana no: los cantos izquierdo y derecho caen justo sobre el filo del
+   navegador y se leen como dos rayas verticales sueltas a los lados de la
+   página, no como el canto de un material. Aquí se deja solo la luz
+   superior, que es la que de verdad separa la banda del contenido. */
+.liquid-glass.glass-band::before {
+  display: none;
+}
+.liquid-glass.glass-band::after {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+:root[data-theme="light"] .liquid-glass.glass-band::after {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
 }
 
 /* WindowFrame (src/components/tj/WindowFrame.tsx) light-theme shadow
