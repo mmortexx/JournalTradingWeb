@@ -188,18 +188,30 @@
 
 /* ===== Light theme ===== */
 :root[data-theme="light"] {
-  /* R21-2d — Light-theme P&L tokens DARKENED. The dark-theme values
-     (#34D399 / #EF4444 / #E0932B) are calibrated for near-black
-     backgrounds; on the light backdrop (#f3f2ec, L≈0.97) they barely
-     cleared 1.5-2.5:1 — the root cause of "secciones que no se pueden
-     leer" (Wrapped big numbers, Comparison Sí/Parcial cells, Chip
-     pos/warn variants, GuardianNew alerts). The darker values below
-     (#0B8B4B / #991B1B / #92400E) pass WCAG AA on white at ≥5:1 for
-     normal text and ≥7:1 for the tinted backgrounds (bg-pnl-pos/15 etc).
-     Dark theme keeps its bright values — they are correct there. */
-  --pnl-pos: 11 138 75;   /* #0B8B4B — was 52 211 153 (#34D399) */
-  --pnl-neg: 153 27 27;   /* #991B1B — was 239 68 68 (#EF4444) */
-  --pnl-warn: 146 64 14;  /* #92400E — was 224 147 43 (#E0932B) */
+  /* Tokens de P&L en claro. Los del tema oscuro (#00F5A0 / #FF4D4D) están
+     calibrados para un fondo casi negro y sobre papel apenas llegan a
+     2:1, así que aquí van sus equivalentes oscuros.
+
+     EL VERDE ES EL DE LA APP (#1E7A4C, Colors.xaml:69) y no por
+     fidelidad: es que además CONTRASTA MÁS. Medido sobre el papel real
+     de la ventana (#F7F4EE):
+         #0B8B4B (el que había)  → 3,98:1   ✗ no llega a AA
+         #1E7A4C (el de la app)  → 4,85:1   ✓
+     El valor anterior se eligió creyendo que era "más accesible", pero
+     bajaba el rojo y SUBÍA el verde: más saturado, no más oscuro. Con el
+     lienzo de la demo ya al color de la app, se quedaba corto en las
+     cifras de 12-18 px de los KPIs y del calendario.
+
+     El ROJO sí se aparta de la app a propósito: el suyo (#D6332A) da
+     4,38:1 y no llega; #991B1B da 7,57:1. Aquí manda la legibilidad. */
+  --pnl-pos: 30 122 76;   /* #1E7A4C — el verde de la app (Colors.xaml:69) */
+  --pnl-neg: 153 27 27;   /* #991B1B — más oscuro que el de la app, por contraste */
+  --pnl-warn: 146 64 14;  /* #92400E */
+
+  /* Tope del tinte de las celdas del calendario. Sobre papel, el 0.5 del
+     tema oscuro ensucia la celda lo justo para que la cifra en verde o
+     rojo deje de leerse encima; con 0.22 el papel sigue mandando. */
+  --cal-tint-max: 0.22;
 
   /* Semáforo en claro — valores de la app (Colors.xaml:77-79). El verde
      seguía siendo el #34D399 del tema oscuro, ilegible sobre papel. */
@@ -2128,8 +2140,15 @@ button.icon-btn:hover > svg,
 /* En claro el filo de arriba NO puede ser el tono casi blanco: se funde
    con el fondo y el borde desaparece. Se sube la opacidad del cuerpo y
    se usa el acento medio arriba — misma corrección que hizo la app. */
+/* En claro la tarjeta ACLARA, no oscurece. GlassCardBrush es el papel
+   (#F7F4EE) al 55 % sobre el fondo, no un velo negro: la tarjeta es la
+   superficie MÁS alta de la jerarquía y en un tema claro lo más alto es
+   lo más claro. Traducirlo como "negro al 3 %", que es lo que hacía esta
+   regla, invertía el relieve y además restaba contraste a todo lo que
+   vive dentro — las cifras de los KPIs se quedaban en 4,4:1, a un pelo
+   de AA, por culpa del fondo. */
 :root[data-theme="light"] .demo-card {
-  background: rgb(var(--divider) / 0.03);
+  background: rgb(255 255 255 / 0.55);
 }
 :root[data-theme="light"] .demo-card::before {
   background: linear-gradient(
@@ -2164,4 +2183,27 @@ button.icon-btn:hover > svg,
    transformaciones. */
 #demo-tabpanel * {
   text-transform: none;
+}
+
+/* Celdas del calendario de P&L. El color del resultado lo lleva el FONDO
+   de la celda; el texto solo tiene que leerse encima.
+   · Oscuro: el tinte es casi negro y el texto puede ir en el color P&L
+     (verde neón / rojo), que es como se ve en la app.
+   · Claro: el tinte y el color del texto son el MISMO #1E7A4C, así que
+     el número se disolvía sobre su propia celda (medido: 2,2:1). Pasa a
+     texto primario — el signo lo siguen dando el fondo y el + / −. */
+.cal-day-num {
+  color: rgb(var(--txt-secondary));
+}
+.cal-day-pnl {
+  color: rgb(var(--pnl-pos));
+}
+.cal-day-pnl.neg,
+.cal-day-pnl[data-neg="true"] {
+  color: rgb(var(--pnl-neg));
+}
+:root[data-theme="light"] .cal-day-num,
+:root[data-theme="light"] .cal-day-pnl,
+:root[data-theme="light"] .cal-day-pnl[data-neg="true"] {
+  color: rgb(var(--txt-primary));
 }

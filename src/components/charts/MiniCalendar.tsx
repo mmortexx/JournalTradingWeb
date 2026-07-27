@@ -63,7 +63,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
     >
       <div className="flex items-center justify-between mb-3">
         <div>
-          <div className="t-h4 text-white">{monthName} {year}</div>
+          <div className="t-h4 text-primary">{monthName} {year}</div>
           <div className={`text-xs tnum mt-0.5 ${monthPnl >= 0 ? "text-pnl-pos" : "text-pnl-neg"}`}>
             {fmtMoney(monthPnl, lang, { sign: true, decimals: 0 })}
           </div>
@@ -71,14 +71,14 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
         <div className="flex gap-1">
           <button
             onClick={() => setOffset((o) => o - 1)}
-            className="w-7 h-7 rounded-md flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/8 transition-colors"
+            className="w-7 h-7 rounded-md flex items-center justify-center text-tertiary hover:text-primary hover:bg-[rgb(var(--divider)/0.08)] transition-colors"
             aria-label={lang === "es" ? "Mes anterior" : "Previous month"}
           >
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
           <button
             onClick={() => setOffset((o) => o + 1)}
-            className="w-7 h-7 rounded-md flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/8 transition-colors"
+            className="w-7 h-7 rounded-md flex items-center justify-center text-tertiary hover:text-primary hover:bg-[rgb(var(--divider)/0.08)] transition-colors"
             aria-label={lang === "es" ? "Mes siguiente" : "Next month"}
           >
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -88,7 +88,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
 
       <div className="grid grid-cols-7 gap-1 mb-1">
         {WEEKDAY_HEADERS_ES.map((d) => (
-          <div key={d} className="text-[9px] text-gray-400 text-center font-medium">{d}</div>
+          <div key={d} className="text-[9px] text-tertiary text-center font-medium">{d}</div>
         ))}
       </div>
       <div className="grid grid-cols-7 gap-1">
@@ -101,8 +101,8 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
             pnl === undefined
               ? "transparent"
               : pos
-              ? `rgb(var(--pnl-pos) / ${0.08 + intensity * 0.5})`
-              : `rgb(var(--pnl-neg) / ${0.08 + intensity * 0.5})`;
+              ? `rgb(var(--pnl-pos) / calc(0.08 + ${intensity} * var(--cal-tint-max, 0.5)))`
+              : `rgb(var(--pnl-neg) / calc(0.08 + ${intensity} * var(--cal-tint-max, 0.5)))`;
           return (
             <motion.div
               key={i}
@@ -125,9 +125,19 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
               }}
               onMouseLeave={() => setHovered(null)}
             >
-              <span className={pnl !== undefined ? "text-gray-300" : "text-gray-400"}>{day}</span>
+              <span className={pnl !== undefined ? "cal-day-num" : "text-tertiary"}>{day}</span>
               {pnl !== undefined && intensity > 0.25 && (
-                <span className={`text-[8px] leading-none ${pos ? "text-pnl-pos" : "text-pnl-neg"}`} style={{ filter: "brightness(1.5)" }}>
+                /* El importe va con la clase `cal-day-pnl`, no con el token
+                   de P&L directamente. Motivo: en una celda TINTADA del
+                   color del resultado, escribir el importe en ese MISMO
+                   color es contraste imposible por construcción — verde
+                   sobre verde. En oscuro funciona porque el verde del texto
+                   es neón (#00F5A0) y el tinte es casi negro; en claro los
+                   dos son el mismo #1E7A4C y el número caía a 2,2:1. La
+                   clase deja el color del token en oscuro y pasa a texto
+                   primario en claro, donde el signo lo sigue dando el fondo
+                   de la celda (y el + / − escrito). */
+                <span className="text-[8px] leading-none cal-day-pnl" data-neg={!pos}>
                   {pos ? "+" : "−"}{Math.abs(pnl) >= 1000 ? `${(Math.abs(pnl) / 1000).toFixed(1)}k` : Math.round(Math.abs(pnl))}
                 </span>
               )}
@@ -146,7 +156,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
             transform: "translate(-50%, -100%)",
           }}
         >
-          <div className="text-gray-400 text-[10px]">
+          <div className="text-tertiary text-[10px]">
             {hovered.day} {monthName} {year}
           </div>
           {dailyPnl.get(String(hovered.day)) !== undefined ? (
@@ -158,7 +168,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
               {fmtMoney(dailyPnl.get(String(hovered.day)) ?? 0, lang, { sign: true })}
             </div>
           ) : (
-            <div className="text-gray-400 mt-0.5">
+            <div className="text-tertiary mt-0.5">
               {lang === "es" ? "Sin operaciones" : "No trades"}
             </div>
           )}
