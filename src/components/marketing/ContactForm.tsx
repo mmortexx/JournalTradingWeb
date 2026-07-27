@@ -6,19 +6,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { submitForm, SUPPORT_EMAIL, type SubmitFailure } from "@/lib/forms";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 /**
- * ContactForm — compact, non-functional contact form (ES/EN).
+ * ContactForm — compact contact form (ES/EN) wired to a real endpoint.
  *
  * Behaviour:
  *  - Three controlled fields: name, email, message (textarea).
  *  - Client-side validation: required fields + simple email regex.
  *      On error, a small helper line lists the offending fields.
+ *  - On submit the message is POSTed through `@/lib/forms` (Web3Forms) and
+ *    lands in the support inbox. The success state is only shown once the
+ *    endpoint confirms delivery — a failed send shows the reason plus a
+ *    mailto fallback, never a fake checkmark.
  *  - On success: AnimatePresence cross-fades the form out and an animated
  *    SVG checkmark (circle + path drawn via pathLength) in, with the
  *    confirmation copy fading up underneath.
- *  - Visual only — no network request. Designed to be wired to a real
- *    endpoint later without changing the component shape.
  *
  * Style: `liquid-glass rounded-card p-6 max-w-xl mx-auto`, inputs styled like the
  * rest of the app (`rgb(var(--divider)/0.05)` fill + `rgb(var(--divider)/0.10)` border,
@@ -27,6 +31,23 @@ import { Reveal } from "@/components/tj/Reveal";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+type Status = "idle" | "sending" | "sent";
+
+/** Copy por tipo de fallo. El usuario necesita saber si reintentar o escribir directo. */
+function failureCopy(reason: SubmitFailure, es: boolean): string {
+  switch (reason) {
+    case "network":
+      return es
+        ? "No hemos podido conectar. Revisa tu conexión e inténtalo de nuevo."
+        : "We couldn't connect. Check your connection and try again.";
+    case "unconfigured":
+    case "rejected":
+      return es
+        ? "El envío ha fallado por un problema nuestro. Escríbenos directamente:"
+        : "The send failed on our side. Email us directly:";
+  }
+}
+
 export function ContactForm() {
   const { lang } = useLang();
   const es = lang === "es";
@@ -34,12 +55,26 @@ export function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const [botcheck, setBotcheck] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
+  /** Cuando el fallo es nuestro, ofrecemos el buzón de soporte como salida. */
+  const [showFallback, setShowFallback] = useState(false);
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  /**
+   * El envío depende por completo de JS: el <form> no tiene `action`, así que
+   * un submit nativo (antes de hidratar, o con JS caído) recargaría la página
+   * y perdería el mensaje sin avisar. El botón sigue deshabilitado hasta que
+   * React puede interceptar el submit.
+   */
+  const ready = useHydrated();
+
+  const sent = status === "sent";
+  const sending = status === "sending";
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (sent) return;
+    if (sent || sending) return;
 
     const missing: string[] = [];
     if (!name.trim()) missing.push(es ? "nombre" : "name");
@@ -48,6 +83,7 @@ export function ContactForm() {
     if (!message.trim()) missing.push(es ? "mensaje" : "message");
 
     if (missing.length) {
+      setShowFallback(false);
       setError(
         es
           ? `Revisa: ${missing.join(", ")}.`
@@ -57,7 +93,29 @@ export function ContactForm() {
     }
 
     setError(null);
-    setSent(true);
+    setShowFallback(false);
+    setStatus("sending");
+
+    const result = await submitForm({
+      subject: es
+        ? `Nuevo mensaje de ${name.trim()} — Trading Journal`
+        : `New message from ${name.trim()} — Trading Journal`,
+      name: name.trim(),
+      email: email.trim(),
+      message: message.trim(),
+      botcheck,
+    });
+
+    if (result.ok) {
+      setStatus("sent");
+      return;
+    }
+
+    // Vuelta a "idle": el formulario sigue relleno para que se pueda
+    // reintentar sin volver a escribirlo todo.
+    setStatus("idle");
+    setError(failureCopy(result.reason, es));
+    setShowFallback(result.reason !== "network");
   }
 
   return (
@@ -211,9 +269,27 @@ export function ContactForm() {
                         />
                       </Field>
 
+                      {/* Honeypot — invisible para personas, tentador para bots.
+                          Si llega relleno, Web3Forms descarta el envío. No usa
+                          `display:none` porque algunos bots ignoran esos campos. */}
+                      <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+                        <label htmlFor="cf-botcheck">
+                          {es ? "No rellenar" : "Do not fill"}
+                          <input
+                            id="cf-botcheck"
+                            type="text"
+                            name="botcheck"
+                            tabIndex={-1}
+                            autoComplete="off"
+                            value={botcheck}
+                            onChange={(e) => setBotcheck(e.target.value)}
+                          />
+                        </label>
+                      </div>
+
                       <AnimatePresence>
                         {error && (
-                          <motion.p
+                          <motion.div
                             id="cf-error"
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -223,16 +299,31 @@ export function ContactForm() {
                             role="alert"
                           >
                             {error}
-                          </motion.p>
+                            {showFallback && (
+                              <>
+                                {" "}
+                                <a
+                                  href={`mailto:${SUPPORT_EMAIL}`}
+                                  className="underline underline-offset-2 hover:text-[rgb(var(--accent-base))] transition-colors"
+                                >
+                                  {SUPPORT_EMAIL}
+                                </a>
+                              </>
+                            )}
+                          </motion.div>
                         )}
                       </AnimatePresence>
 
                       <motion.button
                         type="submit"
-                        whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                        className="w-full sm:w-auto bg-[rgb(var(--txt-primary))] text-[var(--bg)] px-6 py-2.5 rounded-[4px] text-sm font-semibold transition-[background-color,transform] duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                        disabled={sending || !ready}
+                        aria-busy={sending}
+                        whileTap={sending || !ready ? undefined : { scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                        className="w-full sm:w-auto bg-[rgb(var(--txt-primary))] text-[var(--bg)] px-6 py-2.5 rounded-[4px] text-sm font-semibold transition-[background-color,transform,opacity] duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                       >
-                        {es ? "Enviar" : "Send"}
+                        {sending
+                          ? es ? "Enviando…" : "Sending…"
+                          : es ? "Enviar" : "Send"}
                       </motion.button>
 
                       <p className="text-[11px] text-tertiary text-center">

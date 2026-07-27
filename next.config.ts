@@ -22,6 +22,13 @@ const nextConfig: NextConfig = {
   // with "/" under output:export + basePath).
   env: {
     NEXT_PUBLIC_BASE_PATH: IS_DEV ? "" : BASE_PATH,
+    // Destino de los formularios (ver src/lib/forms.ts). Se declara aquí, y
+    // no solo en el entorno, para que Next SIEMPRE lo sustituya por un
+    // literal en el bundle del cliente. Si se deja sin declarar y la
+    // variable no está definida, `process.env.X` sobrevive tal cual al
+    // bundle y lanza "process is not defined" en el navegador, tumbando el
+    // módulo entero. Sin valor queda "" y los formularios avisan del fallo.
+    NEXT_PUBLIC_WEB3FORMS_KEY: process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "",
   },
   images: {
     // No loader needed for static export; we use SVG/unoptimized images only.

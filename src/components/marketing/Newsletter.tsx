@@ -6,10 +6,21 @@ import { useLang } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/tj/Eyebrow";
+import { submitForm, SUPPORT_EMAIL, type SubmitFailure } from "@/lib/forms";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 /**
- * Newsletter signup — bilingual liquid-glass card with email capture, regex validation,
- * and a non-functional success animation (checkmark draw-in + cross-fade copy).
+ * Newsletter signup — bilingual liquid-glass card with email capture, regex
+ * validation, and a real subscription request.
+ *
+ * The address is POSTed through `@/lib/forms` (Web3Forms) and lands in the
+ * support inbox tagged as a newsletter signup; the thank-you state only
+ * appears once the endpoint confirms delivery. A failed send surfaces the
+ * reason instead of a fake checkmark.
+ *
+ * Nota pendiente: esto entrega altas a un buzón, no a una lista con bajas
+ * automáticas. Cuando haya plataforma de boletines real (Buttondown, Kit…),
+ * hay que cambiar el destino aquí y cubrir la baja del RGPD.
  *
  * Premium motion layer:
  *  - Card scales in on scroll-into-view (0.94 → 1 with eased spring).
@@ -22,22 +33,73 @@ import { Eyebrow } from "@/components/tj/Eyebrow";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Status = "idle" | "error" | "success";
+type Status = "idle" | "sending" | "error" | "success";
+
+/** Copy por tipo de fallo. Distingue "reinténtalo" de "el problema es nuestro". */
+function failureCopy(reason: SubmitFailure, es: boolean): string {
+  switch (reason) {
+    case "network":
+      return es
+        ? "No hemos podido conectar. Revisa tu conexión e inténtalo de nuevo."
+        : "We couldn't connect. Check your connection and try again.";
+    case "unconfigured":
+    case "rejected":
+      return es
+        ? `El alta ha fallado por un problema nuestro. Escríbenos a ${SUPPORT_EMAIL}.`
+        : `Signup failed on our side. Email us at ${SUPPORT_EMAIL}.`;
+  }
+}
 
 export function Newsletter() {
   const { lang } = useLang();
   const es = lang === "es";
   const [email, setEmail] = useState("");
+  const [botcheck, setBotcheck] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  const sending = status === "sending";
+
+  /**
+   * Igual que en ContactForm: sin `action` en el <form>, un submit nativo
+   * previo a la hidratación recargaría la página y perdería el alta. El botón
+   * no se habilita hasta que React puede interceptar el envío.
+   */
+  const ready = useHydrated();
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (status === "success") return;
+    if (status === "success" || sending) return;
+
     if (!EMAIL_RE.test(email.trim())) {
+      setErrorMsg(
+        es
+          ? "Email no válido. Revísalo e inténtalo de nuevo."
+          : "Invalid email. Please check and try again."
+      );
       setStatus("error");
       return;
     }
-    setStatus("success");
+
+    setErrorMsg(null);
+    setStatus("sending");
+
+    const result = await submitForm({
+      subject: es ? "Alta en el boletín" : "Newsletter signup",
+      email: email.trim(),
+      message: es
+        ? `Nueva suscripción al boletín: ${email.trim()}`
+        : `New newsletter subscription: ${email.trim()}`,
+      botcheck,
+    });
+
+    if (result.ok) {
+      setStatus("success");
+      return;
+    }
+
+    setErrorMsg(failureCopy(result.reason, es));
+    setStatus("error");
   }
 
   return (
@@ -168,17 +230,39 @@ export function Newsletter() {
                           value={email}
                           onChange={(e) => {
                             setEmail(e.target.value);
-                            if (status === "error") setStatus("idle");
+                            if (status === "error") {
+                              setStatus("idle");
+                              setErrorMsg(null);
+                            }
                           }}
+                          disabled={sending}
                           placeholder={es ? "tu@email.com" : "you@email.com"}
                           aria-label={es ? "Correo electrónico" : "Email address"}
                           aria-invalid={status === "error"}
                           aria-describedby={status === "error" ? "newsletter-error" : undefined}
                           required
-                          className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)]"
+                          className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)] disabled:opacity-60"
                         />
+
+                        {/* Honeypot — fuera de pantalla, ignorado por personas.
+                            Si un bot lo rellena, Web3Forms tira el envío. */}
+                        <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+                          <label htmlFor="newsletter-botcheck">
+                            {es ? "No rellenar" : "Do not fill"}
+                            <input
+                              id="newsletter-botcheck"
+                              type="text"
+                              name="botcheck"
+                              tabIndex={-1}
+                              autoComplete="off"
+                              value={botcheck}
+                              onChange={(e) => setBotcheck(e.target.value)}
+                            />
+                          </label>
+                        </div>
+
                         <AnimatePresence>
-                          {status === "error" && (
+                          {status === "error" && errorMsg && (
                             <motion.p
                               id="newsletter-error"
                               initial={{ opacity: 0, y: -4 }}
@@ -188,13 +272,13 @@ export function Newsletter() {
                               className="mt-2 text-xs text-pnl-neg"
                               role="alert"
                             >
-                              {es ? "Email no válido. Revísalo e inténtalo de nuevo." : "Invalid email. Please check and try again."}
+                              {errorMsg}
                             </motion.p>
                           )}
                         </AnimatePresence>
                       </div>
                       <motion.div
-                        whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                        whileTap={sending || !ready ? undefined : { scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
                         className="shrink-0"
                       >
                         {/* Submit button — was `bg-white text-black hover:bg-gray-100`
@@ -207,9 +291,13 @@ export function Newsletter() {
                             accent glow + 1px lift so the affordance feels alive. */}
                         <Button
                           type="submit"
-                          className="h-12 px-6 w-full sm:w-auto rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform] duration-200 shrink-0"
+                          disabled={sending || !ready}
+                          aria-busy={sending}
+                          className="h-12 px-6 w-full sm:w-auto rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform,opacity] duration-200 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                         >
-                          {es ? "Suscribirme" : "Subscribe"}
+                          {sending
+                            ? es ? "Enviando…" : "Sending…"
+                            : es ? "Suscribirme" : "Subscribe"}
                         </Button>
                       </motion.div>
                     </motion.form>

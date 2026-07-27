@@ -52,6 +52,14 @@ jobs:
         # standalone; para Pages lo descartamos (los assets ya están
         # copiados a ./out/_next/ por el export).
         run: bun run build
+        env:
+          # Destino de los formularios de contacto y boletín. Al ser un
+          # sitio estático, Next incrusta el valor en el JS durante el
+          # build: si el secret no está definido, el sitio se publica
+          # igual pero los formularios avisan del fallo en vez de fingir
+          # que han enviado. Se configura en:
+          #   Settings → Secrets and variables → Actions → WEB3FORMS_KEY
+          NEXT_PUBLIC_WEB3FORMS_KEY: ${{ secrets.WEB3FORMS_KEY }}
 
       - name: Disable Jekyll + add nojekyll
         # GitHub Pages procesa el contenido con Jekyll por defecto.
