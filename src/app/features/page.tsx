@@ -3,13 +3,13 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
+import { OG_IMAGE } from "@/lib/og";
 
 // Estimated reading time (features bento + gallery + how it works + more
 // features). ~620 words across four sections at 220 wpm = ~3 min.
 const READING_TIME_MIN = 3;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
-const OG_IMAGE = `${SITE_URL}/og.png`;
 
 /**
  * Breadcrumb structured data — page-specific. [Home, Features] so Google
@@ -48,7 +48,7 @@ const articleSchema = {
   datePublished: "2025-01-01",
   dateModified: "2025-01-01",
   // Reuse the OG image (1200×630 PNG, meets Google's 1.91:1 spec).
-  image: `${SITE_URL}/og.png`,
+  image: OG_IMAGE,
   // about[] as canonical Thing objects (not plain strings) — slightly
   // improves classification signals.
   about: [

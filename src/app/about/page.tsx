@@ -5,6 +5,7 @@ import { Story } from "@/components/marketing/Story";
 import { Values } from "@/components/marketing/Values";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
+import { OG_IMAGE } from "@/lib/og";
 
 // Estimated reading time (story + values + social proof + testimonials +
 // changelog + milestones + lista de espera). ~700 words at 220 wpm = ~4 min.
@@ -13,7 +14,6 @@ const READING_TIME_MIN = 4;
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
-const OG_IMAGE = `${SITE_URL}/og.png`;
 
 /**
  * Breadcrumb structured data — page-specific. Lists just [Home, About]

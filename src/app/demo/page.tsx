@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
+import { OG_IMAGE } from "@/lib/og";
 
 // Estimated reading time (capabilities + demo + gallery + stats + ready-to-buy).
 // ~400 words at 220 wpm = ~2 min.
@@ -11,7 +12,6 @@ const READING_TIME_MIN = 2;
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
-const OG_IMAGE = `${SITE_URL}/og.png`;
 
 /**
  * Breadcrumb structured data — page-specific. Lists just [Home, Demo]

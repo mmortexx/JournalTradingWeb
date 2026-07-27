@@ -16,6 +16,7 @@ import { BackgroundFX } from "@/components/tj/BackgroundFX";
 import { IntroSequence } from "@/components/tj/IntroSequence";
 import { SectionReveal } from "@/components/tj/SectionReveal";
 import { DecorFX } from "@/components/tj/DecorFX";
+import { OG_IMAGE } from "@/lib/og";
 
 /**
  * Viewport — `viewport-fit=cover` lets the layout extend into the notch /
@@ -25,12 +26,18 @@ import { DecorFX } from "@/components/tj/DecorFX";
  * is a no-op. `themeColor` colours the Android Chrome tab bar / Safari
  * status-bar background to match the brand palette (matches the
  * `theme_color` declared in `manifest.ts`).
+ *
+ * El valor es `--bg` del tema oscuro (globals.css). Antes eran dos
+ * colores distintos y ninguno de la marca: aquí un gris cálido claro
+ * (#B9B2A6) y en manifest.ts un verde (#34B476), de modo que el navegador
+ * teñía su barra de un color que no aparece en ninguna parte del sitio y
+ * además cada superficie decía una cosa.
  */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#B9B2A6",
+  themeColor: "#0b0c0d",
 };
 
 const geistSans = Geist({
@@ -70,12 +77,24 @@ const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // `.../JournalTradingWeb/JournalTradingWeb/og.png`). Absolute URLs bypass
 // that resolution entirely and emit verbatim.
 //
-// PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
-// silently fail to render SVG OG images, showing a broken/generic card.
-// A 1200×630 PNG (generated from `public/og.svg` via sharp) is the only
-// format that reliably renders across every social platform.
-const OG_IMAGE = `${SITE_URL}/og.png`;
-const LOGO_URL = `${SITE_URL}/logo.svg`;
+// PNG (no SVG) — Twitter/X, Facebook, LinkedIn, Slack y Discord fallan en
+// silencio con imágenes OG en SVG y enseñan una tarjeta rota o genérica.
+// Un PNG de 1200×630 es el único formato que renderiza en todas.
+//
+// La tarjeta se genera con `python scripts/generate-og.py`, que compone el
+// PNG con las fuentes reales de la marca (Instrument Sans) y con el
+// logotipo real de la app. NO se rasteriza desde un SVG: el SVG anterior
+// pedía 'Segoe UI Variable', el rasterizador no la tenía y la miniatura
+// publicada salía en Arial. Si se cambia el texto o la marca de la
+// tarjeta, hay que volver a lanzar ese script y subir el `?v=` de
+// `@/lib/og` — de ahí sale `OG_IMAGE`, la misma URL para todas las
+// páginas.
+//
+// `logo.png` es el mismo archivo que usa la aplicación de escritorio
+// (Assets/app-logo.png): el ojo de trazo champagne. Va en el dato
+// estructurado de Organization, que es de donde Google saca el logotipo
+// del sitio.
+const LOGO_URL = `${SITE_URL}/logo.png`;
 
 const softwareApplicationSchema = {
   "@context": "https://schema.org",

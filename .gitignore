@@ -71,3 +71,6 @@ db/custom.db
 .zscripts/dev.log
 .zscripts/dev.pid
 .zscripts/start-dev-persistent.sh
+
+# fuentes que scripts/generate-og.py descarga y cachea (no se versionan)
+/scripts/.fonts/

@@ -4,13 +4,13 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
+import { OG_IMAGE } from "@/lib/og";
 
 // Estimated reading time (security + tech specs + integrations).
 // ~520 words across three sections at 220 wpm = ~3 min.
 const READING_TIME_MIN = 3;
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
-const OG_IMAGE = `${SITE_URL}/og.png`;
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -44,7 +44,7 @@ const articleSchema = {
   dateModified: "2025-01-01",
   // Reuse the OG image (1200×630 PNG, meets Google's 1.91:1 spec).
   // See worklog Task R20-1d (E3) + R20-2d.
-  image: `${SITE_URL}/og.png`,
+  image: OG_IMAGE,
   // about[] as canonical Thing objects (not plain strings) — slightly
   // improves classification signals. See worklog Task R20-1d (E7).
   about: [

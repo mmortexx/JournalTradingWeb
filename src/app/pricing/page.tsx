@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
+import { OG_IMAGE } from "@/lib/og";
 
 // Estimated reading time (pricing cards + comparison + pricing FAQ +
 // trust strip + stats + lista de espera + download CTA).
@@ -12,7 +13,6 @@ const READING_TIME_MIN = 4;
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
-const OG_IMAGE = `${SITE_URL}/og.png`;
 
 /**
  * Breadcrumb structured data — page-specific. Lists just [Home, Pricing]

@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 import { Ticker } from "@/components/marketing/Ticker";
 import { Hero } from "@/components/marketing/Hero";
 import { SideRail } from "@/components/tj/SideRail";
+import { OG_IMAGE } from "@/lib/og";
 
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — see layout.tsx for the rationale (social platforms
 // silently fail to render SVG OG images). Absolute URL bypasses the
 // metadataBase + basePath double-resolution issue (also see layout.tsx).
-const OG_IMAGE = `${SITE_URL}/og.png`;
 
 const PAGE_DESCRIPTION =
   "Diario de trading nativo de Windows. Métricas institucionales, disciplina que frena el error y datos 100% locales. Pago único desde 29 $. Sin suscripciones.";

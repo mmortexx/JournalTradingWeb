@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQ } from "@/components/marketing/FAQ";
 import { TableOfContents } from "@/components/tj/TableOfContents";
+import { OG_IMAGE } from "@/lib/og";
 
 // Estimated reading time (16 Q&A entries + contact sections). ~650 words
 // across all answers at 220 wpm = ~3 min.
@@ -11,7 +12,6 @@ const READING_TIME_MIN = 3;
 const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
-const OG_IMAGE = `${SITE_URL}/og.png`;
 
 /**
  * Breadcrumb structured data — page-specific. Lists just [Home, FAQ]
