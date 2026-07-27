@@ -51,9 +51,12 @@ export function Waitlist() {
   const es = lang === "es";
 
   const [email, setEmail] = useState("");
+  const [botcheck, setBotcheck] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [priority, setPriority] = useState<number | null>(null);
+  /** El email ya estaba en la lista: se confirma, no se trata como error. */
+  const [duplicate, setDuplicate] = useState(false);
 
   const sending = status === "sending";
 
@@ -81,10 +84,11 @@ export function Waitlist() {
     setErrorMsg(null);
     setStatus("sending");
 
-    const result = await joinWaitlist(email.trim());
+    const result = await joinWaitlist(email.trim(), { lang, botcheck });
 
     if (result.ok) {
       setPriority(result.priority);
+      setDuplicate(result.duplicate);
       setStatus("success");
       return;
     }
@@ -184,7 +188,9 @@ export function Waitlist() {
                         aria-live="polite"
                         role="status"
                       >
-                        {es ? "Estás dentro." : "You're in."}
+                        {duplicate
+                          ? es ? "Ya estabas dentro." : "You were already in."
+                          : es ? "Estás dentro." : "You're in."}
                       </motion.p>
                       {/* El puesto solo se enseña si la API lo devolvió. */}
                       {priority !== null && (
@@ -232,6 +238,24 @@ export function Waitlist() {
                           required
                           className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)] disabled:opacity-60"
                         />
+                        {/* Campo trampa — fuera de pantalla, ignorado por
+                            personas. Si un bot lo rellena, el script de
+                            Google descarta el alta sin decírselo. */}
+                        <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+                          <label htmlFor="waitlist-botcheck">
+                            {es ? "No rellenar" : "Do not fill"}
+                            <input
+                              id="waitlist-botcheck"
+                              type="text"
+                              name="botcheck"
+                              tabIndex={-1}
+                              autoComplete="off"
+                              value={botcheck}
+                              onChange={(e) => setBotcheck(e.target.value)}
+                            />
+                          </label>
+                        </div>
+
                         <AnimatePresence>
                           {status === "error" && errorMsg && (
                             <motion.p

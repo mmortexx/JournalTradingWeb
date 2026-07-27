@@ -18,9 +18,6 @@
 
 const ENDPOINT = "https://api.web3forms.com/submit";
 
-/** Alta en la lista de espera (GetWaitlist). Ver `joinWaitlist`. */
-const WAITLIST_ENDPOINT = "https://api.getwaitlist.com/api/v1/signup";
-
 /** Cortamos a los 15 s: más allá, el usuario ya ha asumido que no va. */
 const TIMEOUT_MS = 15_000;
 
@@ -38,15 +35,18 @@ const ACCESS_KEY = (process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "").trim();
 export const formsConfigured = ACCESS_KEY.length > 0;
 
 /**
- * ID numérico de la lista de espera en GetWaitlist. Igual que la access
- * key de Web3Forms: viaja en el cliente por diseño (identifica a qué lista
- * apuntar, no autoriza a leerla) y se declara en next.config.ts para que
- * Next siempre lo sustituya por un literal en el bundle.
+ * URL del script de Google que guarda las altas en la hoja de cálculo
+ * (la que devuelve Apps Script al implementar; termina en /exec). El
+ * script vive en docs/waitlist-apps-script.js, con sus instrucciones.
+ *
+ * Es pública por el mismo motivo que la clave de Web3Forms: viaja en el
+ * cliente porque el navegador tiene que llamarla. Sólo permite añadir
+ * filas, nunca leer la hoja.
  */
-const WAITLIST_ID = (process.env.NEXT_PUBLIC_WAITLIST_ID ?? "").trim();
+const WAITLIST_URL = (process.env.NEXT_PUBLIC_WAITLIST_URL ?? "").trim();
 
-/** `false` mientras no se haya configurado el ID de la lista. */
-export const waitlistConfigured = WAITLIST_ID.length > 0;
+/** `false` mientras no se haya configurado la URL de la lista. */
+export const waitlistConfigured = WAITLIST_URL.length > 0;
 
 /** Buzón de respaldo que se le ofrece al usuario si el envío falla. */
 export const SUPPORT_EMAIL = "soporte@tradingjournal.app";
@@ -87,14 +87,21 @@ export type FormFields = {
  */
 async function postJson(
   url: string,
-  payload: unknown
+  payload: unknown,
+  /**
+   * `text/plain` convierte la petición en "simple" para el navegador: no
+   * hay comprobación previa (OPTIONS) y la respuesta se puede leer. Es
+   * obligatorio para Google Apps Script, que no sabe responder a esa
+   * comprobación. El cuerpo sigue siendo JSON en ambos casos.
+   */
+  contentType: "application/json" | "text/plain;charset=utf-8" = "application/json"
 ): Promise<{ status: number; ok: boolean; data: unknown } | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: { "Content-Type": contentType, Accept: "application/json" },
       body: JSON.stringify(payload),
       signal: controller.signal,
     });
@@ -143,46 +150,54 @@ export async function submitForm(fields: FormFields): Promise<SubmitResult> {
 }
 
 export type WaitlistResult =
-  | { ok: true; priority: number | null }
+  | { ok: true; priority: number | null; duplicate: boolean }
   | { ok: false; reason: SubmitFailure };
 
 /**
  * Da de alta un email en la lista de espera y devuelve su puesto en la cola.
  *
- * `priority` es el número de orden que asigna GetWaitlist. Puede volver
- * `null` si la respuesta no lo trae: en ese caso el alta ES válida y la UI
+ * `priority` es el número de fila en la hoja. Puede volver `null` si la
+ * respuesta no lo trae: en ese caso el alta ES válida y la interfaz
  * simplemente no enseña el puesto, en vez de inventarse uno.
+ *
+ * `duplicate` indica que ese email ya estaba apuntado. No es un error —
+ * el resultado deseado (estar en la lista) se cumple igual —, pero
+ * permite darle un mensaje distinto a quien se apunta dos veces.
  *
  * Misma regla que `submitForm`: nunca `ok: true` si el alta no se registró.
  */
-export async function joinWaitlist(email: string): Promise<WaitlistResult> {
+export async function joinWaitlist(
+  email: string,
+  opts: { lang?: string; botcheck?: string } = {}
+): Promise<WaitlistResult> {
   if (!waitlistConfigured) {
     return { ok: false, reason: "unconfigured" };
   }
 
-  const id = Number(WAITLIST_ID);
-  // La API exige un entero. Un ID mal copiado es un fallo de configuración
-  // nuestro, no del visitante, y se reporta como tal.
-  if (!Number.isFinite(id) || id <= 0) {
-    return { ok: false, reason: "unconfigured" };
-  }
-
-  const res = await postJson(WAITLIST_ENDPOINT, {
-    email: email.trim(),
-    waitlist_id: id,
-    // Permite que GetWaitlist atribuya invitaciones si algún día se activan
-    // los enlaces de referido. En el navegador siempre hay `location`.
-    referral_link: typeof window === "undefined" ? undefined : window.location.href,
-  });
+  const res = await postJson(
+    WAITLIST_URL,
+    {
+      email: email.trim(),
+      lang: opts.lang ?? "",
+      botcheck: opts.botcheck ?? "",
+      // Desde qué página se apuntó, para saber qué sección convierte.
+      source: typeof window === "undefined" ? "" : window.location.pathname,
+    },
+    "text/plain;charset=utf-8"
+  );
 
   if (!res) return { ok: false, reason: "network" };
   if (!res.ok) return { ok: false, reason: "rejected" };
 
-  const data = res.data as { priority?: number } | null;
+  // El script responde `{ ok, position, duplicate }`. Un `ok: false` ahí
+  // significa que llegó pero no guardó (email inválido, error de la hoja).
+  const data = res.data as { ok?: boolean; position?: number; duplicate?: boolean } | null;
+  if (!data?.ok) return { ok: false, reason: "rejected" };
+
   const priority =
-    typeof data?.priority === "number" && Number.isFinite(data.priority)
-      ? data.priority
+    typeof data.position === "number" && Number.isFinite(data.position)
+      ? data.position
       : null;
 
-  return { ok: true, priority };
+  return { ok: true, priority, duplicate: data.duplicate === true };
 }
