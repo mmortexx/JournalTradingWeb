@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLang, type Lang } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
+import { BrandGlyph } from "@/components/tj/BrandGlyph";
 
 /**
  * Navbar — barra edge-to-edge con material acrylic premium.
@@ -582,7 +583,7 @@ export function Navbar() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm backdrop-saturate-150 md:hidden"
               aria-hidden="true"
             />
             <motion.aside
@@ -597,7 +598,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="liquid-glass safe-top fixed top-0 right-0 bottom-0 z-[60] flex w-[300px] max-w-[84vw] flex-col border-l border-[rgb(var(--divider)/0.1)] outline-none backdrop-blur-xl md:hidden"
+              className="liquid-glass safe-top fixed top-0 right-0 bottom-0 z-[60] flex w-[300px] max-w-[84vw] flex-col border-l border-[rgb(var(--divider)/0.1)] outline-none backdrop-blur-xl backdrop-saturate-150 md:hidden"
             >
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-[rgb(var(--divider)/0.05)] px-5">
                 <Link
@@ -938,10 +939,14 @@ function UtcClock() {
 }
 
 /**
- * BrandMark — trío de velas sobre un cuadrado de vidrio (32 px, blur +
- * hairline + inset highlight). Los cuerpos ascienden y las mechas
- * quedan al 45 % para que el trío lea como marca y no como gráfico
- * genérico.
+ * BrandMark — el ojo de la marca sobre un cuadrado de vidrio (32 px,
+ * blur + hairline + inset highlight).
+ *
+ * El glifo llevaba un trío de velas en escalera que no existe en la
+ * aplicación: el logotipo real es el ojo, y ahora sale de `BrandGlyph`,
+ * el mismo componente que usan el pie, la intro y el cromo de la demo.
+ * La placa de vidrio se conserva — es el material de la web y hace de
+ * equivalente a la placa oscura sobre la que va el icono en la app.
  */
 function BrandMark() {
   return (
@@ -952,23 +957,12 @@ function BrandMark() {
         height: 32,
         borderColor: "rgb(var(--divider) / 0.13)",
         background: "color-mix(in srgb, var(--surface) 66%, transparent)",
-        backdropFilter: "blur(18px) saturate(1.4)",
         WebkitBackdropFilter: "blur(18px) saturate(1.4)",
+        backdropFilter: "blur(18px) saturate(1.4)",
         boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06)",
       }}
     >
-      <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path
-          d="M3 1.8v12.4M8 1.8v12.4M13 1.8v12.4"
-          stroke="rgb(var(--accent-base))"
-          strokeWidth="1"
-          strokeLinecap="round"
-          opacity="0.45"
-        />
-        <rect x="2" y="7" width="2" height="5" rx="0.4" fill="rgb(var(--accent-base))" />
-        <rect x="7" y="4.5" width="2" height="5" rx="0.4" fill="rgb(var(--accent-base))" />
-        <rect x="12" y="2.6" width="2" height="5" rx="0.4" fill="rgb(var(--accent-base))" />
-      </svg>
+      <BrandGlyph size={17} />
     </span>
   );
 }

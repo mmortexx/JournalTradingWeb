@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { useLang } from "@/lib/i18n";
 import { useDemo } from "./DemoContext";
+import { BrandGlyph } from "@/components/tj/BrandGlyph";
 
 /* ------------------------------------------------------------------ */
 /* Reloj de mercado                                                    */
@@ -335,26 +336,23 @@ function AccountChip() {
 }
 
 /**
- * Icono de la app — la Q de la marca con tres velas en escalera, el
- * mismo motivo que Assets/app-logo.png. En SVG en línea para que herede
- * el acento de la paleta activa y quede nítido a 18 px en pantallas
- * HiDPI.
+ * Icono de la app en la barra de título de la ventana simulada.
+ *
+ * El comentario anterior afirmaba que estas tres velas eran "el mismo
+ * motivo que Assets/app-logo.png". No lo eran: ese archivo es el ojo de
+ * trazo champagne sobre placa oscura. Esta barra imita la de la
+ * aplicación real, así que ahora lleva el icono real — placa oscura y
+ * ojo en acento, exactamente el orden de colores de la app, y no una
+ * placa de acento con el glifo recortado en oscuro.
  */
 function AppIcon() {
   return (
     <span
       className="w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0"
-      style={{
-        background:
-          "linear-gradient(135deg, rgb(var(--accent-base)) 0%, rgb(var(--accent-pressed)) 100%)",
-      }}
+      style={{ background: "#1A1917" }}
       aria-hidden="true"
     >
-      <svg width="11" height="11" viewBox="0 0 10 10" fill="none">
-        <rect x="1" y="5.5" width="1.4" height="3" fill="#1A1917" opacity="0.9" />
-        <rect x="4.3" y="3" width="1.4" height="5.5" fill="#1A1917" opacity="0.9" />
-        <rect x="7.6" y="4" width="1.4" height="4.5" fill="#1A1917" opacity="0.9" />
-      </svg>
+      <BrandGlyph size={12} />
     </span>
   );
 }

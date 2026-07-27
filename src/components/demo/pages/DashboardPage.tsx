@@ -258,9 +258,13 @@ export function DashboardPage() {
               <Eyebrow>{t("captureEyebrow")}</Eyebrow>
             </Reveal>
             <Reveal delay={0.04}>
-              <h1 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-[28px] leading-tight">
+              {/* h2 y no h1: esta es una pantalla SIMULADA dentro de la página de
+                  la demo. El h1 del documento es el titular de esa página, y dos
+                  h1 rompen el esquema de encabezados —lectores de pantalla y
+                  buscadores lo usan para entender la jerarquía—. */}
+              <h2 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-[28px] leading-tight">
                 {t("captureHeadline")}
-              </h1>
+              </h2>
             </Reveal>
           </div>
           {/* Riesgo en vivo: una sola cifra protagonista por pantalla.
@@ -1337,10 +1341,15 @@ function DirectionChip({
   const isLong = direction === "long";
   return (
     <span
+      /* El rojo usa `--pnl-neg-on-tint` y no el token normal: el texto va
+         sobre un fondo teñido de su MISMO color, y ahí el #FF4D4D se
+         quedaba en 4,03:1 para 10 px (hace falta 4,5:1). Ver la nota del
+         token en globals.css con las alternativas medidas. El verde no lo
+         necesita: sobre su tinte va sobrado. */
       className={`inline-flex items-center gap-1 px-1.5 h-5 rounded text-[10px] font-medium uppercase tracking-wider ${
         isLong
           ? "bg-pnl-pos/15 text-pnl-pos"
-          : "bg-pnl-neg/15 text-pnl-neg"
+          : "bg-pnl-neg/15 text-[rgb(var(--pnl-neg-on-tint))]"
       }`}
     >
       <span

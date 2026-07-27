@@ -275,7 +275,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
               accent ring + glow already framing the Pro card, so the whole
               Pro surface reads as a single premium object (R20-3c). */}
           <span
-            className="pill !rounded-[4px] border uppercase tracking-[0.1em] backdrop-blur-md"
+            className="pill !rounded-[4px] border uppercase tracking-[0.1em] backdrop-blur-md backdrop-saturate-150"
             style={{
               /* Fondo champagne PLANO y texto casi negro.
                  Antes el texto era `--accent-pressed` (#B0905A) sobre un

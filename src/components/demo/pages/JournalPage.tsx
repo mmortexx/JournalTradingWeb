@@ -1057,9 +1057,13 @@ export function JournalPage() {
           />
           <div className="relative">
             <Eyebrow>{t("journalEyebrow")}</Eyebrow>
-            <h1 className="font-medium tracking-[-0.02em] text-primary text-2xl md:text-3xl">
+            {/* h2 y no h1: esta es una pantalla SIMULADA dentro de la página de
+                la demo. El h1 del documento es el titular de esa página, y dos
+                h1 rompen el esquema de encabezados —lectores de pantalla y
+                buscadores lo usan para entender la jerarquía—. */}
+            <h2 className="font-medium tracking-[-0.02em] text-primary text-2xl md:text-3xl">
               {t("journalTitle")}
-            </h1>
+            </h2>
             <p className="text-sm text-tertiary mt-1.5 max-w-2xl leading-relaxed">
               {L(
                 "Ritual diario, coste real de la indisciplina y semáforo de cumplimiento.",

@@ -93,7 +93,15 @@ export function WindowFrame({
         <span
           className="tnum flex-1 min-w-0 flex items-center pl-3 text-[11px] truncate"
           style={{
-            color: "var(--ink-3)",
+            // `--txt-tertiary` y no `--ink-3`. Medido: el título salía a
+            // 4,17:1 contra la barra, por debajo del 4,5:1 que pide WCAG AA
+            // para texto de 11 px. El motivo es que `--ink-3` está calibrado
+            // contra el fondo de la página, y esta barra es una superficie
+            // MÁS CLARA (--surface-2): el mismo gris que allí sobra, aquí se
+            // queda corto. `--txt-tertiary` es justo el token pensado para
+            // texto pequeño y apagado que aun así tiene que leerse sobre las
+            // capas de cristal — sube a 6,3:1 sin dejar de ser una leyenda.
+            color: "rgb(var(--txt-tertiary))",
             letterSpacing: "0.02em",
           }}
         >

@@ -120,7 +120,7 @@ export function Comparison() {
                     scroll on mobile); a split-table or JS-synced
                     header restructure would unlock it but is out of
                     scope for this polish round. The strong backdrop bg
-                    (`bg-[rgb(var(--bg)/0.92)] backdrop-blur-md`) on
+                    (`bg-[rgb(var(--bg)/0.92)] backdrop-blur-md backdrop-saturate-150`) on
                     every th makes the header read as a deliberate
                     anchored row in both themes regardless of sticky,
                     and is ready to obscure scrolling rows the moment a
@@ -128,14 +128,14 @@ export function Comparison() {
                     (R24-1d). */}
                 <thead className="sticky top-0 z-20">
                   <tr className="border-b border-[rgb(var(--divider)/0.15)]">
-                    <th scope="col" className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom bg-[rgb(var(--bg)/0.92)] backdrop-blur-md">
+                    <th scope="col" className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom bg-[rgb(var(--bg)/0.92)] backdrop-blur-md backdrop-saturate-150">
                       {es ? "Característica" : "Feature"}
                     </th>
                     {cols.map((c) => (
                       <th
                         key={c.key}
                         scope="col"
-                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 bg-[rgb(var(--bg)/0.92)] backdrop-blur-md ${
+                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 bg-[rgb(var(--bg)/0.92)] backdrop-blur-md backdrop-saturate-150 ${
                           c.highlight
                             ? "shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),inset_0_-1px_0_0_rgb(var(--accent-base)/0.18)]"
                             : ""

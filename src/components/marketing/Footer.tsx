@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { GlossaryModal } from "@/components/tj/GlossaryModal";
 import { MagneticButton } from "@/components/tj/MagneticButton";
+import { BrandGlyph } from "@/components/tj/BrandGlyph";
 
 /**
  * Social link definition — icon + accessible label.
@@ -213,7 +214,14 @@ export function Footer() {
               can jump between sections. */}
           {cols.map((col) => (
             <nav key={col.title} aria-label={col.title}>
-              <h4 className="eyebrow mb-3.5">{col.title}</h4>
+              {/* h3, no h4. El último encabezado de contenido de cualquier
+                  página es un h2, así que un h4 aquí saltaba de 2 a 4 y
+                  dejaba un hueco en el esquema: quien navega por
+                  encabezados percibe un nivel que no existe y no sabe si
+                  se ha perdido algo por el camino. El tamaño no depende de
+                  la etiqueta —lo pone `.eyebrow`—, así que el aspecto no
+                  cambia. */}
+              <h3 className="eyebrow mb-3.5">{col.title}</h3>
               <ul className="space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
@@ -323,10 +331,14 @@ export function Footer() {
 }
 
 /**
- * BrandMark — three ascending candlesticks drawn as inline SVG in
- * `--accent-base` (gold default), sitting on a precision-machined glass
- * square. Mirrors `Navbar.BrandMark` verbatim so the lockup reads as one
- * product across the navbar + footer chrome.
+ * BrandMark — el ojo de la marca (`BrandGlyph`, el mismo glifo que la
+ * barra superior, la intro y el cromo de la demo) sobre un cuadrado de
+ * vidrio mecanizado.
+ *
+ * Antes dibujaba aquí su propio trío de velas, "idéntico" al de la barra
+ * superior salvo que no lo era: las mechas iban a 0,5 de opacidad en vez
+ * de 0,45 y los cuerpos a otras alturas. Dos copias de una marca que ya
+ * no era la marca. Ahora hay un único glifo y esto solo pone la placa.
  *
  * The container pairs:
  *  - `bg-black/40` dark glass base so the gold pops,
@@ -360,27 +372,7 @@ function BrandMark() {
             "radial-gradient(120% 120% at 50% 0%, rgb(var(--accent-base) / 0.35) 0%, rgb(var(--accent-base) / 0) 60%)",
         }}
       />
-      <svg
-        className="relative w-4 h-4 text-[rgb(var(--accent-base))]"
-        viewBox="0 0 16 16"
-        fill="none"
-        aria-hidden="true"
-      >
-        {/* Wicks — full-height verticals at 0.5 opacity so the bodies
-            read as the focal element. */}
-        <path
-          d="M3 1.5v13M8 1.5v13M13 1.5v13"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeLinecap="round"
-          opacity="0.5"
-        />
-        {/* Bodies — three ascending candlesticks, all bullish
-            (uniform 5-unit height, ascending tops: y=6 → y=4 → y=3). */}
-        <rect x="2" y="6" width="2" height="5" rx="0.4" fill="currentColor" />
-        <rect x="7" y="4" width="2" height="5" rx="0.4" fill="currentColor" />
-        <rect x="12" y="3" width="2" height="5" rx="0.4" fill="currentColor" />
-      </svg>
+      <BrandGlyph size={16} className="relative text-[rgb(var(--accent-base))]" />
     </span>
   );
 }

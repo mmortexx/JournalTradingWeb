@@ -275,7 +275,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
         >
           {/* Backdrop — subtle blur + fade-in. Click anywhere to close. */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm backdrop-saturate-150"
             onClick={onClose}
             aria-hidden="true"
           />

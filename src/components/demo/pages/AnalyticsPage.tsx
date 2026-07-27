@@ -1172,9 +1172,13 @@ export function AnalyticsPage() {
       <section>
         <Reveal>
           <Eyebrow>{t("analyticsEyebrow")}</Eyebrow>
-          <h1 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-3xl">
+          {/* h2 y no h1: esta es una pantalla SIMULADA dentro de la página de
+              la demo. El h1 del documento es el titular de esa página, y dos
+              h1 rompen el esquema de encabezados —lectores de pantalla y
+              buscadores lo usan para entender la jerarquía—. */}
+          <h2 className="mt-2 font-medium tracking-[-0.02em] text-primary text-2xl md:text-3xl">
             {t("analyticsTitle")}
-          </h1>
+          </h2>
         </Reveal>
       </section>
 

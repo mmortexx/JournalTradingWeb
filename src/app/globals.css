@@ -139,6 +139,33 @@
   --pnl-neg: 255 77 77; /* #FF4D4D */
   --pnl-warn: 224 147 43; /* #E0932B */
 
+  /* Tope del tinte de las celdas del calendario de P&L.
+     Este token SOLO estaba declarado para el tema claro, donde ya se
+     detectó que un tinte fuerte se come la cifra escrita encima. En
+     oscuro nadie lo declaró, así que MiniCalendar caía a su valor de
+     reserva (0.5) y pasaba lo mismo: el fondo de la celda se tiñe del
+     color del resultado y el importe va en ESE MISMO color, así que
+     cuanto mayor es el día, más verde sobre verde queda. El defecto se
+     agravaba justo en los días que más importa leer.
+     Medido sobre las celdas reales de la portada: con 0.5 el peor caso
+     daba 2,79:1 —muy por debajo del 4,5:1 de WCAG AA— y con 0.3 sube a
+     5,31:1 conservando casi todo el recorrido del degradado. Por debajo
+     de 0.3 la ganancia se estanca (0.22 → 5,58 y 0.10 → 5,82) y solo se
+     pierde señal visual, así que 0.3 es el punto de corte. */
+  --cal-tint-max: 0.3;
+
+  /* Rojo de P&L para cuando el texto va SOBRE UN FONDO TEÑIDO DE SU MISMO
+     COLOR (la insignia Long/Short: `bg-pnl-neg/15 text-pnl-neg`). Ahí el
+     #FF4D4D del token normal se queda en 4,03:1 —medido sobre la insignia
+     real—, por debajo del 4,5:1 de WCAG AA para sus 10 px.
+     Comprobadas las tres salidas: quitar el tinte sube a 4,81 pero deja
+     la insignia sin relleno, un tinte neutro al 5 % apenas mueve la aguja
+     (4,14) y al 8 % empeora (3,79). Aclarar el texto es lo único que
+     arregla el contraste conservando el relleno de color, que es lo que
+     hace que la insignia se lea de un vistazo. #FF6B6B da 4,75:1.
+     El verde no necesita gemelo: sobre su propio tinte va a 9,14:1. */
+  --pnl-neg-on-tint: 255 107 107; /* #FF6B6B */
+
   /* Semáforo — tercera familia independiente del P&L en la app
      (Colors.xaml:116-118): estado/veredicto, no dinero. */
   --sig-green: 61 174 115; /* #3DAE73 */
@@ -234,6 +261,12 @@
      tema oscuro ensucia la celda lo justo para que la cifra en verde o
      rojo deje de leerse encima; con 0.22 el papel sigue mandando. */
   --cal-tint-max: 0.22;
+
+  /* En claro el problema no existe: el rojo del tema (#991B1B) es oscuro
+     y el tinte al 15 % apenas aclara el papel, así que el gemelo vale lo
+     mismo que el token normal. Se declara igualmente para que la clase de
+     la insignia no herede el rojo del tema oscuro al cambiar de tema. */
+  --pnl-neg-on-tint: 153 27 27; /* #991B1B */
 
   /* Semáforo en claro — valores de la app (Colors.xaml:77-79). El verde
      seguía siendo el #34D399 del tema oscuro, ilegible sobre papel. */
@@ -1969,7 +2002,19 @@ button.icon-btn:hover > svg,
   --raised: #212427;
   --ink: #f1f2ef;
   --ink-2: #a7abac;
-  --ink-3: #797d80;
+  /* Era #797d80. Ese valor despeja 4,75:1 contra el fondo de la página,
+     pero --ink-3 no se usa solo ahí: se usa dentro de tarjetas y paneles
+     de cristal, que son superficies MÁS CLARAS. Medido sobre el fondo
+     efectivo más claro en el que aparece —rgb(21,24,26), una tarjeta
+     elevada de /features— caía a 4,30:1, por debajo del 4,5:1 que exige
+     WCAG AA para texto normal. Fechas, marcas de tiempo y leyendas de
+     tarjeta quedaban justo por debajo del listón.
+
+     #818588 es el gris más oscuro que despeja ese peor caso con margen
+     (4,8:1), buscado por barrido sobre el fondo real, no a ojo. Ocho
+     pasos más claro que antes: sigue leyéndose como texto terciario
+     apagado, ya no como texto que cuesta leer. */
+  --ink-3: #818588;
   --line: rgba(255, 255, 255, 0.06);
   --line-2: rgba(255, 255, 255, 0.13);
 }

@@ -531,12 +531,16 @@ export function TradeDetailPage() {
           {t("back")}
         </button>
         <div className="flex items-center gap-3 flex-1 min-w-0 justify-center">
-          <h1
+          {/* h2 y no h1: esta es una pantalla SIMULADA dentro de la página de
+              la demo. El h1 del documento es el titular de esa página, y dos
+              h1 rompen el esquema de encabezados —lectores de pantalla y
+              buscadores lo usan para entender la jerarquía—. */}
+          <h2
             className="text-2xl md:text-3xl font-medium tracking-[-0.01em] text-primary tnum"
             style={{ fontFamily: "'Cascadia Mono', Consolas, monospace" }}
           >
             {trade.instrument}
-          </h1>
+          </h2>
           <Chip variant={isLong ? "pos" : "neg"}>
             {t(isLong ? "long" : "short")}
           </Chip>
