@@ -37,9 +37,11 @@ const nextConfig: NextConfig = {
     // No loader needed for static export; we use SVG/unoptimized images only.
     unoptimized: true,
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // Sin `typescript.ignoreBuildErrors`: estaba en `true`, lo que dejaba
+  // publicar el sitio con errores de tipos dentro. Se puso para tolerar
+  // examples/websocket/, que no compilaba porque le faltaban sus librerías;
+  // ese directorio ya no existe, así que la excusa tampoco. Ahora un error
+  // de tipos rompe el build y no llega a producción.
   reactStrictMode: false,
   ...(IS_DEV ? {} : { trailingSlash: true }),
 };

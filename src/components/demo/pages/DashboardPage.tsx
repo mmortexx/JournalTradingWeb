@@ -14,6 +14,7 @@ import {
 } from "@/lib/trading/data";
 import { addTrade, useAllTrades } from "@/lib/trading/demoStore";
 import { useToast } from "@/hooks/use-toast";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { fmtNum, fmtPct } from "@/lib/trading/format";
 import { Reveal } from "@/components/tj/Reveal";
 import { Eyebrow } from "@/components/tj/Eyebrow";
@@ -1162,13 +1163,15 @@ function KpiCell({
 function TodayBriefing() {
   const { lang } = useLang();
   const es = lang === "es";
-  const [weekday, setWeekday] = useState<string | null>(null);
-
-  useEffect(() => {
-    setWeekday(
-      new Date().toLocaleDateString(es ? "es-ES" : "en-GB", { weekday: "long" })
-    );
-  }, [es]);
+  // `useHydrated` en vez de estado + efecto: el día de la semana es un
+  // valor derivado del cliente, no estado propio. Con el efecto había que
+  // guardarlo en useState y eso disparaba un render en cascada al montar
+  // (regla react-hooks/set-state-in-effect). Así se calcula durante el
+  // render, pero sólo cuando ya estamos en el navegador.
+  const hydrated = useHydrated();
+  const weekday = hydrated
+    ? new Date().toLocaleDateString(es ? "es-ES" : "en-GB", { weekday: "long" })
+    : null;
 
   // Operaciones de la muestra que cayeron en el mismo día de la semana:
   // es la cifra con la que la app decide si puede afirmar algo o no.

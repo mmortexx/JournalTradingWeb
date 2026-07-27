@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useLang } from "@/lib/i18n";
 import { useDemo } from "./DemoContext";
 
@@ -50,6 +50,29 @@ function pad2(n: number): string {
   return n < 10 ? `0${n}` : String(n);
 }
 
+/* --- Fuente de tiempo para useSyncExternalStore --------------------- */
+
+/** Avisa a React una vez por segundo. */
+function subscribeToSecond(onChange: () => void): () => void {
+  const id = window.setInterval(onChange, 1000);
+  return () => window.clearInterval(id);
+}
+
+/**
+ * Segundos enteros desde época. Se redondea a segundo a propósito: React
+ * llama a esta función en cada render y debe devolver el MISMO valor
+ * mientras no haya cambiado de verdad; con milisegundos cambiaría en cada
+ * llamada y provocaría un bucle de renders.
+ */
+function getSecondSnapshot(): number {
+  return Math.floor(Date.now() / 1000);
+}
+
+/** En servidor no hay hora que enseñar. */
+function getServerSecondSnapshot(): number {
+  return 0;
+}
+
 /**
  * MarketClock — el reloj de la barra de título, réplica del control
  * `controls:MarketClock` de la app (Controls/MarketClock.xaml).
@@ -67,17 +90,21 @@ function pad2(n: number): string {
 function MarketClock() {
   const { lang } = useLang();
   const es = lang === "es";
-  // `null` hasta que monta: la hora del cliente y la del servidor no
-  // coinciden nunca, y renderizarla en SSR rompe la hidratación.
-  const [now, setNow] = useState<Date | null>(null);
+  // El reloj es una fuente externa a React (el tiempo), así que se lee con
+  // `useSyncExternalStore`, que es la herramienta prevista para eso y
+  // distingue servidor de cliente sin efectos: la hora del visitante y la
+  // del servidor no coinciden nunca y renderizarla en SSR rompería la
+  // hidratación. La versión anterior usaba useState + useEffect, lo que
+  // provocaba un render en cascada al montar (react-hooks/set-state-in-effect).
+  const epochSeconds = useSyncExternalStore(
+    subscribeToSecond,
+    getSecondSnapshot,
+    getServerSecondSnapshot
+  );
 
-  useEffect(() => {
-    setNow(new Date());
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  if (!now) return <div className="hidden md:block" aria-hidden="true" />;
+  // 0 = todavía en servidor/hidratación: no pintamos hora aún.
+  if (epochSeconds === 0) return <div className="hidden md:block" aria-hidden="true" />;
+  const now = new Date(epochSeconds * 1000);
 
   const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
   const utcTime = `${pad2(now.getUTCHours())}:${pad2(now.getUTCMinutes())}:${pad2(
