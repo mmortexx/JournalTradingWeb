@@ -9,8 +9,9 @@ import { asset } from "@/lib/asset";
  * un marco elegante, sin recortes.
  *
  * Composición:
- *  - Barra de título (32 px) con tres semáforos macOS-style sutiles a la
- *    izquierda + caption centrada en mono. La barra usa `--surface-2`
+ *  - Barra de título (32 px) al estilo Windows 11: caption en mono pegada
+ *    a la izquierda y los tres botones de ventana (minimizar, maximizar,
+ *    cerrar) a la derecha, decorativos. La barra usa `--surface-2`
  *    (theme-aware) para leerse bien en oscuro Y claro.
  *  - Cuerpo: fondo `--surface` (theme-aware) sobre el que la captura se
  *    muestra con `object-contain` (letterbox), de modo que la pantalla
@@ -72,7 +73,7 @@ export function WindowFrame({
           edge of a real WinUI/Acrylic title bar (matches the .liquid-glass
           ::after inset highlight convention used across the site). */}
       <div
-        className="flex items-center gap-2 px-3 h-8 select-none border-b relative"
+        className="flex items-stretch h-8 select-none border-b relative"
         style={{
           background: "color-mix(in srgb, var(--surface-2) 80%, transparent)",
           // 0.12 (up from 0.08) — a clearer hairline between the title
@@ -84,42 +85,13 @@ export function WindowFrame({
           boxShadow: "inset 0 1px 0 rgb(var(--divider) / 0.10)",
         }}
       >
-        {/* Traffic lights — three subtle P&L-tinted dots, each with a
-            1px inset highlight + faint ring so they read as glassy beads
-            instead of flat color swatches. */}
-        <span className="flex items-center gap-1.5" aria-hidden="true">
-          <span
-            className="block w-2.5 h-2.5 rounded-full"
-            style={{
-              background: "rgb(var(--pnl-neg) / 0.7)",
-              // 0.14 ring (up from 0.08) — a slightly firmer bead edge
-              // so the dots read as discrete glassy beads against the
-              // title bar fill in both themes (at 0.08 the ring was
-              // imperceptible and the dots looked pasted on).
-              boxShadow:
-                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.14)",
-            }}
-          />
-          <span
-            className="block w-2.5 h-2.5 rounded-full"
-            style={{
-              background: "rgb(var(--pnl-warn) / 0.7)",
-              boxShadow:
-                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.14)",
-            }}
-          />
-          <span
-            className="block w-2.5 h-2.5 rounded-full"
-            style={{
-              background: "rgb(var(--pnl-pos) / 0.7)",
-              boxShadow:
-                "inset 0 1px 0 rgb(255 255 255 / 0.30), 0 0 0 1px rgb(var(--divider) / 0.14)",
-            }}
-          />
-        </span>
-        {/* Centered caption */}
+        {/* Título a la IZQUIERDA — Trading Journal es una app nativa de
+            Windows, y en Windows el título va pegado al borde izquierdo,
+            no centrado. Antes esta barra llevaba los tres semáforos de
+            macOS y una caption centrada: vendía la app como si fuera de
+            Mac, justo lo contrario de lo que promete la página. */}
         <span
-          className="tnum flex-1 text-center text-[11px] truncate"
+          className="tnum flex-1 min-w-0 flex items-center pl-3 text-[11px] truncate"
           style={{
             color: "var(--ink-3)",
             letterSpacing: "0.02em",
@@ -127,10 +99,11 @@ export function WindowFrame({
         >
           {caption}
         </span>
-        {/* Live indicator (optional) */}
-        {live ? (
+
+        {/* Indicador en vivo (opcional), antes de los botones. */}
+        {live && (
           <span
-            className="inline-flex items-center gap-1 tnum text-[10px] font-semibold"
+            className="inline-flex items-center gap-1 px-3 tnum text-[10px] font-semibold"
             style={{ color: "rgb(var(--pnl-pos))", letterSpacing: "0.1em" }}
           >
             <span
@@ -139,10 +112,41 @@ export function WindowFrame({
             />
             LIVE
           </span>
-        ) : (
-          // Spacer to balance the traffic lights on the left.
-          <span className="block w-[42px]" aria-hidden="true" />
         )}
+
+        {/* Botones de ventana de Windows 11 — minimizar, maximizar, cerrar,
+            a la derecha y a alto completo, con el mismo lenguaje que el
+            chrome real de la demo (WindowChrome.tsx). Son decorativos: van
+            como <span aria-hidden>, no como <button>, porque este marco
+            envuelve una captura estática y unos botones que no hacen nada
+            no deben aparecer en el árbol de accesibilidad ni recibir foco. */}
+        <span className="flex items-stretch shrink-0" aria-hidden="true">
+          <span
+            className="w-[34px] flex items-center justify-center"
+            style={{ color: "var(--ink-3)" }}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <line x1="0.5" y1="5" x2="9.5" y2="5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+            </svg>
+          </span>
+          <span
+            className="w-[34px] flex items-center justify-center"
+            style={{ color: "var(--ink-3)" }}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" strokeWidth="1" fill="none" />
+            </svg>
+          </span>
+          <span
+            className="w-[34px] flex items-center justify-center"
+            style={{ color: "var(--ink-3)" }}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <line x1="0.5" y1="0.5" x2="9.5" y2="9.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+              <line x1="9.5" y1="0.5" x2="0.5" y2="9.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+            </svg>
+          </span>
+        </span>
       </div>
       {/* Body — the screenshot lives here, whole and crisp. Default
           aspect-[1500/856] matches the screenshots' actual resolution
