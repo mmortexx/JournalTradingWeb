@@ -301,7 +301,16 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
           <WindowChrome />
           <TopNav />
 
-          {/* Page content */}
+          {/* Page content.
+              El panel tiene alto fijo y desplazamiento propio, como la
+              ventana de una app de escritorio. El problema era que el
+              corte se producía a media tarjeta —el campo "Nota" quedaba
+              seccionado justo contra la barra de estado— sin ningún
+              indicio de que allí hubiera más contenido: a primera vista
+              parecía un fallo de dibujado. El degradado de abajo es esa
+              señal, y desaparece al llegar al final del desplazamiento
+              (`scroll-timeline` no tiene soporte suficiente todavía, así
+              que se mantiene constante y muy sutil: 40 px). */}
           <div className="relative">
             <div
               role="tabpanel"
@@ -329,6 +338,14 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
                 </motion.div>
               </AnimatePresence>
             </div>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-10"
+              style={{
+                background:
+                  "linear-gradient(180deg, transparent, color-mix(in oklab, var(--surface) 92%, transparent))",
+              }}
+            />
           </div>
 
           {/* Status bar — restructured in R25-1a to match the real app's

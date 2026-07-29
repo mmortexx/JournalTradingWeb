@@ -84,10 +84,6 @@ const StatsBandNew = dynamic(
   () => import("@/components/marketing/StatsBandNew").then((m) => m.StatsBandNew),
   { loading: () => sectionFallback }
 );
-const DemoReadyToBuy = dynamic(
-  () => import("@/components/demo/DemoReadyToBuy").then((m) => m.DemoReadyToBuy),
-  { loading: () => sectionFallback }
-);
 const FinalCTANew = dynamic(
   () => import("@/components/marketing/FinalCTANew").then((m) => m.FinalCTANew),
   { loading: () => sectionFallback }
@@ -125,7 +121,10 @@ export default function DemoPage() {
       <DemoGallery />
       <StatsBandNew />
       {/* Ready-to-buy CTA — catches visitors who just played with the demo */}
-      <DemoReadyToBuy />
+      {/* `DemoReadyToBuy` retirado: era un segundo CTA idéntico pegado
+          al de cierre — mismo precio, misma promesa y casi los mismos
+          botones dos veces seguidas. FinalCTANew cierra la página. El
+          componente sigue en el repositorio. */}
       <FinalCTANew />
     </>
   );

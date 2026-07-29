@@ -168,10 +168,19 @@ function buildCal() {
     // Intensity scaled to a $200 typical 1R win at the demo's risk
     // profile (0.5–1.5 % of $10–15 k balance ≈ $75–225 per R).
     const intensity = Math.min(1, Math.abs(pnl) / 200);
-    const opacity = pnl === 0 ? 0 : 0.18 + intensity * 0.42;
-    const bg = isPos
-      ? `rgb(var(--accent-base) / ${opacity.toFixed(2)})`
-      : `rgb(var(--pnl-neg) / ${opacity.toFixed(2)})`;
+    const opacity = 0.18 + intensity * 0.42;
+    // Un día del mes sin operaciones es un dato, no un agujero. Antes se
+    // pintaba con opacidad 0: dieciocho de los treinta días de julio
+    // desaparecían y las dos últimas filas del calendario quedaban en
+    // blanco, de modo que el desfase del primer día no significaba nada.
+    // Ahora la celda existe siempre, en gris neutro, y sólo el color
+    // distingue ganancia de pérdida.
+    const bg =
+      pnl === 0
+        ? "rgb(var(--divider) / 0.07)"
+        : isPos
+          ? `rgb(var(--accent-base) / ${opacity.toFixed(2)})`
+          : `rgb(var(--pnl-neg) / ${opacity.toFixed(2)})`;
     const style = `background:${bg};border-radius:5px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px`;
     return {
       day: String(dayNum),

@@ -825,6 +825,68 @@
     line-height: 1.4;
   }
 
+  /* ------------------------------------------------------------
+     .terms-bar — placa de condiciones: pares etiqueta/valor
+     separados por filete, como la ficha técnica de un contrato.
+
+     Sustituye al conmutador falso "Pago único / Suscripción" de la
+     página de precios. La retícula es `1fr` por columna en escritorio
+     y una columna apilada en móvil; los filetes son bordes reales
+     (no pseudo-elementos posicionados) para que colapsen solos al
+     cambiar de eje sin necesidad de media queries duplicadas.
+     ------------------------------------------------------------ */
+  .terms-bar {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-inline: auto;
+    max-width: 46rem;
+    list-style: none;
+    padding: 0;
+    border: 1px solid rgb(var(--divider) / 0.12);
+    border-radius: 8px;
+    background: rgb(var(--divider) / 0.03);
+    overflow: hidden;
+  }
+  .terms-bar__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.95rem 1.25rem;
+    text-align: center;
+    border-top: 1px solid rgb(var(--divider) / 0.09);
+  }
+  .terms-bar__item:first-child {
+    border-top: 0;
+  }
+  .terms-bar__key {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgb(var(--txt-tertiary));
+  }
+  .terms-bar__value {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgb(var(--txt-primary));
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 640px) {
+    .terms-bar {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .terms-bar__item {
+      border-top: 0;
+      border-left: 1px solid rgb(var(--divider) / 0.09);
+    }
+    .terms-bar__item:first-child {
+      border-left: 0;
+    }
+  }
+
 }
 
 /* ============================================================
@@ -1005,10 +1067,18 @@
      como el mismo negro institucional de antes. En tema claro cubre
      al 82 % para que el ojo quede como marca de agua. */
   .bg-veil {
-    background-color: color-mix(in srgb, var(--bg) 74%, transparent);
+    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
   }
+  /* En tema claro el iris ILUMINA en lugar de oscurecer, y al 82 % el
+     18 % restante bastaba para que la zona más brillante del ojo
+     asomara como un halo rosado en los aires entre tarjetas: dos
+     secciones veladas seguidas mostraban un resplandor en la costura
+     que se leía como un fallo de fondo, no como una marca de agua.
+     Al 90 % el ojo sigue estando —se intuye la forma detrás de todo el
+     sitio, que es lo que se busca— pero deja de competir con el
+     contenido. */
   :root[data-theme="light"] .bg-veil {
-    background-color: color-mix(in srgb, var(--bg) 82%, transparent);
+    background-color: color-mix(in srgb, var(--bg) 90%, transparent);
   }
 
   /* Container-query wrapper — establece un contexto de contenedor
@@ -1029,16 +1099,88 @@
      Claro → halo claro (el texto es oscuro sobre papel, pero el iris
      ahora lleva color real y puede oscurecer el fondo puntualmente). */
   .tj-legible-text {
+    /* Dos capas, no tres: una sombra de contacto a 1 px que separa la
+       letra del fondo y una difusa muy abierta que apaga los brillos
+       del iris. La versión anterior apilaba un tercer resplandor a 8 px
+       de radio y 0.45 de opacidad — a esa distancia el halo deja de leer
+       como sombra y empieza a leer como neón alrededor de la letra. */
     text-shadow:
-      0 2px 20px rgb(0 0 0 / 0.55),
-      0 0 8px rgb(0 0 0 / 0.45),
-      0 1px 3px rgb(0 0 0 / 0.4);
+      0 1px 2px rgb(0 0 0 / 0.55),
+      0 0 28px rgb(0 0 0 / 0.42);
   }
   :root[data-theme="light"] .tj-legible-text {
     text-shadow:
-      0 2px 20px rgb(255 255 255 / 0.75),
-      0 0 8px rgb(255 255 255 / 0.6),
-      0 1px 3px rgb(255 255 255 / 0.55);
+      0 1px 2px rgb(255 255 255 / 0.62),
+      0 0 28px rgb(255 255 255 / 0.55);
+  }
+
+  /* El halo es una red de seguridad para TEXTO SUELTO sobre el lienzo.
+     `text-shadow` se hereda, así que también caía sobre todo lo que vive
+     dentro del bloque: botones, píldoras, insignias, campos. Un botón
+     dorado con letra casi negra ya trae su propio contraste (~9:1); el
+     halo blanco heredado le dibujaba un cerco difuso alrededor de cada
+     letra — el "brillo" que delataba la plantilla. Aquí se corta la
+     herencia en todo lo que aporta su propia superficie.
+
+     `:where()` mantiene la especificidad en 0, de modo que cualquier
+     regla posterior que SÍ quiera halo dentro de un enlace puede
+     recuperarlo sin pelear con !important. */
+  .tj-legible-text
+    :where(
+      a,
+      button,
+      input,
+      select,
+      textarea,
+      summary,
+      [role="button"],
+      [role="radio"],
+      .pill,
+      .chip,
+      .glass,
+      .liquid-glass,
+      code,
+      kbd
+    ) {
+    text-shadow: none;
+  }
+
+  /* .page-header-scrim — velo de las cabeceras de subpágina.
+     ------------------------------------------------------------------
+     La versión anterior cubría al 76 % en el borde izquierdo y ya
+     estaba en el 30 % a mitad de ancho. Los titulares de estas páginas
+     ("Lo compras una vez. Tuyo para siempre.") ocupan el 85 % del ancho
+     a 1440 px, así que su segunda mitad —justo la palabra en dorado—
+     caía sobre las fibras rojas del iris a plena saturación. El fondo
+     medido bajo una misma línea de texto oscilaba entre 87 y 245 de
+     luminancia: el contraste cambiaba letra a letra.
+
+     Ahora el velo se mantiene alto hasta el 62 % del ancho, que es
+     donde acaba la columna de texto, y sólo entonces se abre. El iris
+     sigue viéndose entero en el tercio derecho, que es donde la
+     composición lo quiere. En tema claro se cubre más que en oscuro:
+     el texto es oscuro sobre papel, y ahí el iris ilumina en vez de
+     oscurecer, que es el caso que rompe la lectura. */
+  .page-header-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--bg) 88%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 82%, transparent) 45%,
+      color-mix(in srgb, var(--bg) 52%, transparent) 62%,
+      transparent 85%
+    );
+  }
+  :root[data-theme="light"] .page-header-scrim {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--bg) 94%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 90%, transparent) 45%,
+      color-mix(in srgb, var(--bg) 62%, transparent) 62%,
+      transparent 88%
+    );
   }
 
   /* .hero-side-scrim — R21-2d. Hero's left-side protective gradient over

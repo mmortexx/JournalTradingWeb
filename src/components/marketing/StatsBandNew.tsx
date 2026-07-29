@@ -42,9 +42,15 @@ export function StatsBandNew() {
       className="section-tight border-b relative overflow-hidden bg-veil"
     >
       <div className="max-w-page mx-auto px-5 md:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-7 md:gap-8">
+        {/* Filete superior + divisores verticales. La banda eran tres
+            cifras sueltas flotando en el aire, sin tarjeta ni estructura:
+            se leía como el hueco entre dos secciones y no como el bloque
+            de credenciales que es. Los divisores son bordes reales, así
+            que desaparecen solos al apilarse en móvil. */}
+        <div className="h-px w-full bg-[rgb(var(--divider)/0.12)]" aria-hidden="true" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-8 pt-8 sm:divide-x sm:divide-[rgb(var(--divider)/0.10)]">
           {stats.map((s, i) => (
-            <Reveal key={s.v} delay={i * 0.08} y={14} className="flex flex-col">
+            <Reveal key={s.v} delay={i * 0.08} y={14} className="flex flex-col sm:px-7 md:px-9 sm:first:pl-0 sm:last:pr-0">
               {/* Accent dot — small credential marker above the number,
                   ties the band to the accent palette used across the
                   rest of the pricing page (R24-1d). */}
@@ -63,7 +69,7 @@ export function StatsBandNew() {
               >
                 {s.v}
               </div>
-              <div className="mt-2 text-[13.5px] text-tertiary leading-snug">
+              <div className="mt-2 text-[13.5px] text-secondary leading-snug">
                 {s.l}
               </div>
             </Reveal>

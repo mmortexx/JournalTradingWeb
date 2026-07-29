@@ -36,7 +36,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
       // equipo. Nunca." heading + body copy + the TJ/cloud comparison
       // rows. `bg-veil` (82 % bg in light / 74 % in dark) occludes
       // the eye; the `border-t` top hairline is preserved.
-      className="section border-t border-[rgb(var(--divider)/0.06)] bg-veil"
+      className="section border-t border-[rgb(var(--divider)/0.06)] bg-veil scroll-mt-24"
     >
       <div className="max-w-[1240px] mx-auto px-5 md:px-8">
         <div className="max-w-[760px] mx-auto text-center mb-12">

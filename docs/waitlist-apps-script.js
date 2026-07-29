@@ -4,8 +4,9 @@
  * ============================================================
  *
  * Este archivo NO forma parte de la web. Es el trozo que vive en tu
- * cuenta de Google y guarda cada inscripción como una fila de una hoja
- * de cálculo tuya.
+ * cuenta de Google y hace dos cosas: guardar cada inscripción como una
+ * fila de una hoja de cálculo tuya, y decirle a la web cuánta gente hay
+ * apuntada para poder enseñar el contador en vivo.
  *
  * ------------------------------------------------------------
  *  CÓMO INSTALARLO (una sola vez, ~5 minutos)
@@ -36,24 +37,48 @@
  *     tienda.
  *
  *  6. Al terminar te da una "URL de la aplicación web", que acaba en
- *     /exec. CÓPIALA y pásamela — o guárdala tú como secret
- *     WAITLIST_URL en GitHub. Eso es lo único que necesita la web.
+ *     /exec. CÓPIALA: es lo único que necesita la web.
+ *
+ *       · En tu ordenador, para probar en local: pégala en el archivo
+ *         `.env.local` de la web, en la línea
+ *         NEXT_PUBLIC_WAITLIST_URL=
+ *
+ *       · Para la web publicada: GitHub → el repositorio →
+ *         Settings → Secrets and variables → Actions →
+ *         "New repository secret" → Name: WAITLIST_URL,
+ *         Secret: la URL. El siguiente despliegue ya la usa.
+ *
+ *  7. COMPROBACIÓN: abre la URL en el navegador tal cual. Debe
+ *     responder algo como {"ok":true,"count":0}. Si responde eso, está
+ *     bien puesto.
  *
  *  Si algún día cambias este script, hay que volver a "Implementar" →
- *  "Gestionar implementaciones" → editar → "Nueva versión", o la web
- *  seguirá hablando con la versión antigua.
+ *  "Gestionar implementaciones" → editar (el lápiz) → Versión: "Nueva
+ *  versión" → "Implementar", o la web seguirá hablando con la versión
+ *  antigua. La URL no cambia al hacerlo.
  *
  * ------------------------------------------------------------
  *  QUÉ HACE
  * ------------------------------------------------------------
  *
+ *  ALTAS (POST)
  *  · Añade una fila por inscripción: fecha, email, idioma y de qué
  *    página venía.
  *  · Si el email YA estaba, no lo duplica: devuelve el puesto que ya
  *    tenía.
- *  · Devuelve el puesto en la cola para poder enseñárselo a quien se
- *    apunta.
+ *  · Devuelve el puesto en la cola y el total, para poder enseñarlos.
  *  · Descarta lo que llegue con el campo trampa relleno (bots).
+ *  · Usa un candado (LockService): dos altas simultáneas ya no pueden
+ *    pisarse la fila ni repartir el mismo puesto a dos personas.
+ *
+ *  CONTADOR (GET)
+ *  · Devuelve {"ok":true,"count":N} — el número real de inscritos.
+ *  · La respuesta se guarda 30 segundos en caché, así el contador de
+ *    la web puede refrescarse a menudo sin agotar la cuota diaria de
+ *    Apps Script ni ralentizar la hoja.
+ *  · Acepta `?callback=nombre` (JSONP) porque algunos navegadores y
+ *    extensiones bloquean la lectura directa entre dominios. La web
+ *    intenta primero la vía limpia y sólo recurre a esta si falla.
  *
  *  Sobre CORS, que es lo que suele romper esto: la web envía el cuerpo
  *  como `text/plain` a propósito. Con `application/json` el navegador
@@ -70,7 +95,18 @@ var HOJA = "Inscripciones";
 /** Cabeceras de la tabla. Se escriben solas la primera vez. */
 var CABECERAS = ["Fecha", "Email", "Idioma", "Origen"];
 
+/** Segundos que se guarda el total en caché antes de volver a contar. */
+var CACHE_SEGUNDOS = 30;
+
+/** Clave con la que se guarda el total en la caché del script. */
+var CACHE_CLAVE = "waitlist_total";
+
+/* ============================================================
+   ALTAS
+   ============================================================ */
+
 function doPost(e) {
+  var candado = LockService.getScriptLock();
   try {
     var datos = JSON.parse(e.postData.contents);
 
@@ -78,22 +114,37 @@ function doPost(e) {
     // Si llega con contenido, respondemos "ok" sin guardar nada — así
     // el bot no aprende que ha sido detectado.
     if (datos.botcheck) {
-      return responder({ ok: true, position: null });
+      return responder(e, { ok: true, position: null });
     }
 
     var email = String(datos.email || "").trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return responder({ ok: false, error: "email_invalido" });
+      return responder(e, { ok: false, error: "email_invalido" });
+    }
+
+    // Sin candado, dos altas a la vez leen el mismo `getLastRow()` y
+    // una sobrescribe a la otra. 20 s es de sobra para una escritura;
+    // si no se consigue, es mejor devolver un fallo honesto que
+    // arriesgarse a perder el alta en silencio.
+    if (!candado.tryLock(20000)) {
+      return responder(e, { ok: false, error: "ocupado" });
     }
 
     var hoja = obtenerHoja();
+    var totalPrevio = Math.max(hoja.getLastRow() - 1, 0);
 
     // ¿Ya estaba? Devolvemos su puesto en vez de crear un duplicado.
-    var columnaEmail = hoja.getRange(2, 2, Math.max(hoja.getLastRow() - 1, 1), 1)
-      .getValues();
-    for (var i = 0; i < columnaEmail.length; i++) {
-      if (String(columnaEmail[i][0]).trim().toLowerCase() === email) {
-        return responder({ ok: true, position: i + 1, duplicate: true });
+    if (totalPrevio > 0) {
+      var columnaEmail = hoja.getRange(2, 2, totalPrevio, 1).getValues();
+      for (var i = 0; i < columnaEmail.length; i++) {
+        if (String(columnaEmail[i][0]).trim().toLowerCase() === email) {
+          return responder(e, {
+            ok: true,
+            position: i + 1,
+            duplicate: true,
+            count: totalPrevio,
+          });
+        }
       }
     }
 
@@ -104,20 +155,63 @@ function doPost(e) {
       String(datos.source || "").slice(0, 200),
     ]);
 
-    // Fila 1 son las cabeceras, así que el puesto es la fila menos una.
-    return responder({ ok: true, position: hoja.getLastRow() - 1 });
+    var total = hoja.getLastRow() - 1; // Fila 1 son las cabeceras.
+    guardarEnCache(total);
+
+    return responder(e, { ok: true, position: total, count: total });
   } catch (err) {
-    return responder({ ok: false, error: String(err) });
+    return responder(e, { ok: false, error: String(err) });
+  } finally {
+    // `releaseLock` sobre un candado no adquirido no hace nada, así que
+    // es seguro llamarlo siempre.
+    candado.releaseLock();
   }
 }
 
+/* ============================================================
+   CONTADOR
+   ============================================================ */
+
 /**
- * Responder a un GET sirve para comprobar de un vistazo, abriendo la URL
- * en el navegador, que la implementación está viva.
+ * Abrir la URL en el navegador devuelve el total. Sirve a la vez de
+ * comprobación de que la implementación está viva y de fuente del
+ * contador en vivo de la web.
  */
-function doGet() {
-  return responder({ ok: true, alive: true });
+function doGet(e) {
+  try {
+    return responder(e, { ok: true, count: contarInscritos() });
+  } catch (err) {
+    return responder(e, { ok: false, error: String(err) });
+  }
 }
+
+function contarInscritos() {
+  var cache = CacheService.getScriptCache();
+  var guardado = cache.get(CACHE_CLAVE);
+  if (guardado !== null) {
+    var n = parseInt(guardado, 10);
+    if (!isNaN(n)) return n;
+  }
+  var total = Math.max(obtenerHoja().getLastRow() - 1, 0);
+  guardarEnCache(total);
+  return total;
+}
+
+function guardarEnCache(total) {
+  try {
+    CacheService.getScriptCache().put(
+      CACHE_CLAVE,
+      String(total),
+      CACHE_SEGUNDOS
+    );
+  } catch (err) {
+    // La caché es un lujo, no un requisito: si falla, se cuenta a mano.
+  }
+}
+
+/* ============================================================
+   AUXILIARES
+   ============================================================ */
 
 function obtenerHoja() {
   var libro = SpreadsheetApp.getActiveSpreadsheet();
@@ -132,8 +226,26 @@ function obtenerHoja() {
   return hoja;
 }
 
-function responder(objeto) {
-  return ContentService
-    .createTextOutput(JSON.stringify(objeto))
-    .setMimeType(ContentService.MimeType.JSON);
+/**
+ * Devuelve JSON normal o, si la petición trae `?callback=nombre`, el
+ * mismo JSON envuelto en una llamada a esa función (JSONP).
+ *
+ * El nombre se filtra a identificadores de JavaScript (letras, dígitos,
+ * `_`, `$` y puntos) antes de escribirlo en la respuesta. Sin ese
+ * filtro, cualquiera podría meter código arbitrario en el parámetro y
+ * hacer que este script se lo sirviera a un tercero.
+ */
+function responder(e, objeto) {
+  var cuerpo = JSON.stringify(objeto);
+  var callback = e && e.parameter ? String(e.parameter.callback || "") : "";
+
+  if (callback && /^[A-Za-z_$][A-Za-z0-9_$.]{0,63}$/.test(callback)) {
+    return ContentService.createTextOutput(
+      callback + "(" + cuerpo + ");"
+    ).setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
+  return ContentService.createTextOutput(cuerpo).setMimeType(
+    ContentService.MimeType.JSON
+  );
 }

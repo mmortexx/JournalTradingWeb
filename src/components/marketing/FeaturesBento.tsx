@@ -140,8 +140,40 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             >
               {es ? "Cada día, en un vistazo" : "Every day, at a glance"}
             </h3>
+            {/* Mes + iniciales de los días. `cal.label` y `cal.chip` se
+                calculaban en las fixtures pero no se pintaban en ninguna
+                parte: sin mes ni cabecera de semana, el desfase del
+                primer día era un hueco sin explicación. */}
+            <div className="mt-4 flex items-baseline justify-between gap-3">
+              <span
+                className="tnum"
+                style={{ fontSize: 11.5, letterSpacing: "0.06em", color: "var(--ink-2)", textTransform: "capitalize" }}
+              >
+                {cal.label}
+              </span>
+              <span
+                className="tnum"
+                style={{ fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}
+              >
+                {cal.chip}
+              </span>
+            </div>
             <div
-              className="mt-5 grid grid-cols-7 gap-1.5"
+              className="mt-2.5 grid grid-cols-7 gap-1.5 tnum"
+              style={{ fontSize: 9, letterSpacing: "0.06em", color: "var(--ink-3)" }}
+              aria-hidden
+            >
+              {(es
+                ? ["L", "M", "X", "J", "V", "S", "D"]
+                : ["M", "T", "W", "T", "F", "S", "S"]
+              ).map((d, i) => (
+                <span key={i} className="text-center">
+                  {d}
+                </span>
+              ))}
+            </div>
+            <div
+              className="mt-1.5 grid grid-cols-7 gap-1.5"
             >
               {cal.cells.map((c, i) => {
                 const cellStyle = c.style
@@ -263,6 +295,57 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               >
                 {es ? "+27 % sobre media" : "+27% over average"}
               </span>
+            </div>
+
+            {/* Eje de horas. Sin él, 24 barras sin etiquetar no dicen a
+                qué hora corresponde el pico: era un adorno con forma de
+                gráfico, no un gráfico. */}
+            <div
+              className="mt-2 flex items-center justify-between tnum"
+              style={{ fontSize: 9, letterSpacing: "0.08em", color: "var(--ink-3)" }}
+              aria-hidden
+            >
+              {["00", "06", "12", "18", "23"].map((h) => (
+                <span key={h}>{h}</span>
+              ))}
+            </div>
+
+            {/* Las peores ventanas. Esta tarjeta terminaba aquí y el
+                `minHeight: 360` que la iguala con el calendario dejaba
+                ~390 px de vacío absoluto debajo del chip: al lado de una
+                tarjeta densa se leía como un bloque a medio hacer. La
+                otra cara del dato —cuándo NO operar— es justo lo que
+                promete el titular y llena el hueco con información. */}
+            <div
+              className="mt-5 pt-4 border-t"
+              style={{ borderColor: "rgb(var(--divider) / 0.12)" }}
+            >
+              <div
+                className="tnum"
+                style={{ fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}
+              >
+                {es ? "Ventanas a evitar" : "Windows to avoid"}
+              </div>
+              <ul className="mt-2.5 flex flex-col gap-2">
+                {[
+                  { w: "14:00 – 15:00", n: es ? "18 ops" : "18 trades", r: "−0,8 R" },
+                  { w: "17:00 – 18:00", n: es ? "11 ops" : "11 trades", r: "−1,2 R" },
+                  { w: "21:00 – 22:00", n: es ? "7 ops" : "7 trades", r: "−0,4 R" },
+                ].map((row) => (
+                  <li
+                    key={row.w}
+                    className="flex items-center justify-between gap-3 tnum"
+                    style={{ fontSize: 12 }}
+                  >
+                    <span style={{ color: "var(--ink-2)" }}>{row.w}</span>
+                    <span className="flex-1 h-px" style={{ background: "rgb(var(--divider) / 0.10)" }} aria-hidden />
+                    <span style={{ color: "var(--ink-3)", fontSize: 11 }}>{row.n}</span>
+                    <span style={{ color: "rgb(var(--pnl-neg))", fontWeight: 600, minWidth: 44, textAlign: "right" }}>
+                      {row.r}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </motion.div>
 

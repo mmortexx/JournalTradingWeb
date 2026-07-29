@@ -39,7 +39,7 @@ export function OverviewApp() {
       // halo (applied on the inner wrapper below) so any residual
       // brightening from the section's own accent halo (right-side
       // radial at top:-160) doesn't wash out the text.
-      className="section relative overflow-hidden bg-veil"
+      className="section relative overflow-hidden bg-veil scroll-mt-24"
     >
       {/* Halo derecho superior */}
       <div
@@ -113,11 +113,16 @@ export function OverviewApp() {
                    tiene que decir. */
                 style={{ width: 5, height: 5, background: "rgb(var(--pnl-pos))" }}
               />
+              {/* Aquí vivía un reloj fijo, "18:04:22", mientras la barra
+                  de navegación enseña la hora real en UTC a tres dedos de
+                  distancia: dos horas que se contradicen en la misma
+                  pantalla, en una página que vende rigor con los datos.
+                  Se sustituye por el dato que sí es cierto siempre. */}
               <span
-                className="tnum"
+                className="tnum uppercase"
                 style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--ink-2)" }}
               >
-                18:04:22
+                {es ? "Datos locales" : "Local data"}
               </span>
             </span>
           </div>
@@ -228,8 +233,8 @@ export function OverviewApp() {
               }}
             >
               {es
-                ? "El diario que mide con el rigor de una mesa profesional: las métricas que de verdad importan, disciplina que te frena antes del error y tus datos —siempre— en tu máquina."
-                : "The journal that measures with the rigour of a professional desk: the metrics that actually matter, discipline that brakes you before the error, and your data —always— on your machine."}
+                ? "Una sola pantalla con el estado real de la cuenta: resultado del periodo, curva de capital, riesgo abierto y qué operación toca revisar. Sin abrir informes ni cruzar hojas de cálculo."
+                : "One screen with the account's real state: period result, equity curve, open risk, and which trade needs reviewing. No reports to open, no spreadsheets to cross-check."}
             </p>
             {/* CTAs — calcados del hero tras el rediseño institucional:
                 rectángulos de 4 px, sin sheen, sin sombra de acento, sin
@@ -305,7 +310,11 @@ export function OverviewApp() {
               // column has room for them) keeps them on-canvas.
               className="absolute z-10 hidden lg:block"
               style={{
-                left: -64,
+                // Antes `left: -64`: la ficha se salía 64 px del mockup y
+                // aterrizaba encima del párrafo de la columna izquierda,
+                // tapando media línea de texto. 24 px basta para que
+                // "flote" sobre el borde sin invadir la columna vecina.
+                left: -24,
                 top: 150,
                 border: "1px solid rgb(var(--divider) / 0.13)",
                 borderRadius: 8,

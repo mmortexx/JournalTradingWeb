@@ -20,7 +20,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
   return (
     <section
       id="metrics"
-      className="section bg-veil relative border-t border-b border-[rgb(var(--divider)/0.06)]"
+      className="section bg-veil relative border-t border-b border-[rgb(var(--divider)/0.06)] scroll-mt-24"
     >
       <div className="max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>

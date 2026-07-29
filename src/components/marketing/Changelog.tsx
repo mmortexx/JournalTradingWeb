@@ -222,7 +222,7 @@ export function Changelog() {
                         className={`liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                           isPast
                             ? "hover:border-[rgb(var(--accent-base)/0.30)]"
-                            : "opacity-90 hover:opacity-100 hover:border-[rgb(var(--divider)/0.25)]"
+                            : "hover:border-[rgb(var(--divider)/0.25)]"
                         }`}
                       >
                           <div
@@ -247,11 +247,14 @@ export function Changelog() {
                             )}
                           </div>
 
-                          <h3
-                            className={`mt-3 t-h4 ${
-                              isPast ? "text-primary" : "text-primary/90"
-                            }`}
-                          >
+                          {/* Título siempre a pleno contraste. Las
+                              entregas futuras se atenuaban por triplicado
+                              —tarjeta al 90 %, título al 90 % y descripción
+                              en gris terciario—, así que media sección se
+                              leía como deshabilitada. El chip "Próximo" y
+                              el borde discontinuo ya dicen que aún no está;
+                              no hace falta apagar el texto. */}
+                          <h3 className="mt-3 t-h4 text-primary">
                             {entry.title}
                           </h3>
                           <p

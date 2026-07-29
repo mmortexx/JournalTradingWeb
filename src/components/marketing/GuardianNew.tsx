@@ -17,7 +17,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
   return (
     <section
       id="guardian"
-      className="section bg-veil relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)]"
+      className="section bg-veil relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)] scroll-mt-24"
     >
       <div className="relative max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Mockup tarjeta "Comprobación previa" */}

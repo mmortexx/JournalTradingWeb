@@ -121,7 +121,10 @@ export function ContactForm() {
   return (
     <section
       aria-label={es ? "Formulario de contacto" : "Contact form"}
-      className="section-tight relative overflow-hidden"
+      /* `bg-veil` — esta sección se quedó fuera de la pasada de velos:
+         el eyebrow, el titular y el subtítulo caían sobre el punto más
+         brillante del iris y el subtítulo resultaba casi ilegible. */
+      className="section-tight relative overflow-hidden bg-veil"
     >
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
@@ -319,7 +322,7 @@ export function ContactForm() {
                         disabled={sending || !ready}
                         aria-busy={sending}
                         whileTap={sending || !ready ? undefined : { scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                        className="w-full sm:w-auto bg-[rgb(var(--txt-primary))] text-[var(--bg)] px-6 py-2.5 rounded-[4px] text-sm font-semibold transition-[background-color,transform,opacity] duration-200 hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                        className="w-full sm:w-auto bg-[rgb(var(--accent-base))] text-[#1A1917] px-6 py-2.5 rounded-[4px] text-sm font-semibold transition-[background-color,transform,opacity] duration-200 hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                       >
                         {sending
                           ? es ? "Enviando…" : "Sending…"

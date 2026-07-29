@@ -141,66 +141,35 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
           )}
         </Reveal>
 
-        {/* Visual-only pricing model toggle — reinforces the "no subscription"
-            value prop. The active option is "Pago único" (one-time, since the
-            app is genuinely one-time payment). The "Suscripción" pill is
-            rendered disabled with a strikethrough label and a "No disponible"
-            chip so the contrast is explicit rather than implied. This pattern
-            is commonly used on one-time-payment product pages to pre-empt the
-            "is this a subscription?" question. */}
+        {/* Barra de condiciones — sustituye al antiguo conmutador
+            "Pago único / Suscripción". Aquel conmutador dibujaba una
+            opción de suscripción tachada y deshabilitada: introducía en
+            pantalla justo el concepto que el producto niega, fingía un
+            control interactivo que no lo era (role="radiogroup" sin
+            estado) y obligaba al visitante a descartar una alternativa
+            inexistente. Aquí las tres condiciones comerciales se
+            afirman de una vez, sin negaciones ni controles falsos:
+            estructura de datos, no de interfaz. */}
         <Reveal delay={0.08} y={20}>
-          <div
-            role="radiogroup"
-            aria-label={es ? "Modelo de pago" : "Payment model"}
-            className="mt-10 mx-auto max-w-md liquid-glass rounded-lg p-1.5 flex items-stretch gap-1"
-          >
-            {/* Active: One-time */}
-            <div
-              role="radio"
-              aria-checked="true"
-              tabIndex={0}
-              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[4px] px-3 sm:px-4 py-2.5 cursor-default outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--divider)/0.40)]"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgb(var(--accent-base) / 0.18), rgb(var(--accent-base) / 0.08))",
-                boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.45)",
-              }}
-            >
-              <span
-                className="size-1.5 rounded-full bg-[rgb(var(--divider))]"
-                aria-hidden="true"
-              />
-              <span className="text-sm font-semibold text-primary tnum">
-                {es ? "Pago único" : "One-time"}
-              </span>
-              <span className="hidden sm:inline-flex pill !rounded-[4px] bg-[rgb(var(--divider)/0.10)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
-                {es ? "Activo" : "Active"}
-              </span>
-            </div>
-
-            {/* Disabled: Subscription */}
-            <div
-              role="radio"
-              aria-checked="false"
-              aria-disabled="true"
-              tabIndex={-1}
-              className="relative flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2.5 cursor-not-allowed select-none"
-              title={
-                es
-                  ? "No disponible — esta app no es suscripción"
-                  : "Not available — this app is not a subscription"
-              }
-            >
-              <span className="inline-flex flex-col items-center gap-0.5">
-                <span className="text-sm font-medium text-tertiary line-through decoration-1">
-                  {es ? "Suscripción" : "Subscription"}
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary font-semibold">
-                  {es ? "No disponible" : "Not available"}
-                </span>
-              </span>
-            </div>
-          </div>
+          <ul className="terms-bar mt-10" aria-label={es ? "Condiciones de compra" : "Purchase terms"}>
+            {(es
+              ? [
+                  { k: "Licencia", v: "Pago único" },
+                  { k: "Vigencia", v: "Sin caducidad" },
+                  { k: "Actualizaciones", v: "1.x incluidas" },
+                ]
+              : [
+                  { k: "License", v: "One-time payment" },
+                  { k: "Term", v: "Never expires" },
+                  { k: "Updates", v: "1.x included" },
+                ]
+            ).map((item) => (
+              <li key={item.k} className="terms-bar__item">
+                <span className="terms-bar__key">{item.k}</span>
+                <span className="terms-bar__value">{item.v}</span>
+              </li>
+            ))}
+          </ul>
         </Reveal>
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-7 md:gap-6 max-w-4xl mx-auto items-stretch">

@@ -314,11 +314,22 @@ export function Navbar() {
           // el material gana cuerpo. Un solo gesto, dos señales.
           height: scrolled ? 56 : 68,
           borderColor: "rgb(var(--divider) / 0.1)",
+          // Al 92 % el material seguía dejando leer lo que pasaba por
+          // debajo: en tema claro se distinguían los filetes de la tabla
+          // comparativa y hasta palabras sueltas cruzando la barra. Un
+          // 8 % de transparencia es poco para una foto, pero muchísimo
+          // para un borde de 1 px de alto contraste. Con la página ya
+          // desplazada la barra pasa a ser prácticamente opaca (98 %) y
+          // conserva el desenfoque sólo como material, no como ventana.
+          // Arriba del todo, sobre el héroe, sí interesa que se vea el
+          // fondo: ahí se mantiene translúcida.
           background: scrolled
-            ? "color-mix(in srgb, var(--surface) 92%, transparent)"
-            : "color-mix(in srgb, var(--surface) 78%, transparent)",
-          backdropFilter: "blur(24px) saturate(1.8)",
-          WebkitBackdropFilter: "blur(24px) saturate(1.8)",
+            ? "color-mix(in srgb, var(--surface) 98%, transparent)"
+            : "color-mix(in srgb, var(--surface) 82%, transparent)",
+          // `saturate(1.8)` teñía de más lo que quedaba detrás y delataba
+          // el cristal. 1.35 basta para que el material tenga vida.
+          backdropFilter: "blur(20px) saturate(1.35)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.35)",
           boxShadow: scrolled
             ? "inset 0 1px 0 rgb(var(--divider) / 0.16), 0 14px 40px -16px rgb(0 0 0 / 0.55)"
             : "inset 0 1px 0 rgb(var(--divider) / 0.14), 0 6px 20px -12px rgb(0 0 0 / 0.4)",

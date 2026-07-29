@@ -75,7 +75,7 @@ export function SideRail() {
   return (
     <nav
       aria-label={es ? "Secciones de esta página" : "Sections on this page"}
-      className="fixed left-[22px] top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-[3px] min-[1100px]:flex"
+      className="fixed left-[22px] top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-[3px] min-[1420px]:flex"
     >
       {ANCHORS.map((s) => {
         const on = s.id === activeId;

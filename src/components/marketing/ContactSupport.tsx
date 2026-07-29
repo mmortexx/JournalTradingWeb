@@ -138,7 +138,7 @@ export function ContactSupport() {
                   whileHover={reduce ? undefined : { y: -4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                   aria-label={`${title} — ${cta}`}
-                  className="group relative block liquid-glass depth-2 rounded-card p-5 sm:p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
+                  className="group relative flex flex-col liquid-glass depth-2 rounded-card p-5 sm:p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
                 >
                   {/* Hover accent sweep */}
                   <span
@@ -179,7 +179,7 @@ export function ContactSupport() {
                     </div>
                   </div>
 
-                  <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+                  <div className="mt-auto pt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
                     {cta}
                     <ArrowRight className="size-4 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1" />
                   </div>

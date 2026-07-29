@@ -78,7 +78,7 @@ const faqSchema = {
       name: "¿Funciona en Mac o Linux?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Trading Journal es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos evaluando una versión web local-first para el futuro.",
+        text: "Trading Journal es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
       },
     },
     {
@@ -153,14 +153,6 @@ const faqSchema = {
         text: "Nada. Tu historial vive en un único archivo .sqlite portable. Cópialo al nuevo equipo (pendrive, disco externo, carpeta compartida) y seguirás trabajando como si no hubiera pasado nada. Tu licencia se asocia a tu correo, no a la máquina: reinstala la app en el equipo nuevo, activa con tu correo y listo.",
       },
     },
-    {
-      "@type": "Question",
-      name: "¿Hay versión nativa para Mac o Linux?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Por ahora Trading Journal es nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
-      },
-    },
   ],
 };
 
@@ -203,10 +195,8 @@ export const metadata: Metadata = {
 const sectionFallback = (
   <div className="section" aria-hidden="true" style={{ minHeight: 360 }} />
 );
-const StillHaveQuestions = dynamic(
-  () => import("@/components/marketing/StillHaveQuestions").then((m) => m.StillHaveQuestions),
-  { loading: () => sectionFallback }
-);
+// `StillHaveQuestions` retirado de esta página (ver el comentario junto
+// a <ContactSupport /> más abajo).
 const ContactSupport = dynamic(
   () => import("@/components/marketing/ContactSupport").then((m) => m.ContactSupport),
   { loading: () => sectionFallback }
@@ -245,7 +235,12 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <FAQ standalone />
-      <StillHaveQuestions />
+      {/* `StillHaveQuestions` retirado: la página encadenaba CUATRO
+          bloques seguidos diciendo lo mismo ("¿aún tienes dudas?",
+          "¿no encuentras tu respuesta?", el formulario y el cierre).
+          Aquel banner era además una caja de cristal a todo ancho con
+          una sola frase centrada, sin icono ni acción. El componente
+          sigue en el repositorio por si hace falta en otra página. */}
       <ContactSupport />
       <ContactForm />
       <FinalCTANew />

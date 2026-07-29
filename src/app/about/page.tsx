@@ -84,10 +84,6 @@ const Changelog = dynamic(
   () => import("@/components/marketing/Changelog").then((m) => m.Changelog),
   { loading: () => sectionFallback }
 );
-const Milestones = dynamic(
-  () => import("@/components/marketing/Milestones").then((m) => m.Milestones),
-  { loading: () => sectionFallback }
-);
 const Waitlist = dynamic(
   () => import("@/components/marketing/Waitlist").then((m) => m.Waitlist),
   { loading: () => sectionFallback }
@@ -116,7 +112,11 @@ export default function AboutPage() {
       <Story />
       <Values />
       <Changelog />
-      <Milestones />
+      {/* `Milestones` retirado: repetía en horizontal los cinco mismos
+          hitos que el Changelog acababa de contar dos pantallas antes
+          (v1.0, Playbook, Monte Carlo, Guardián, Importador). Dos líneas
+          de tiempo distintas para los mismos datos restan credibilidad
+          en vez de sumarla. El componente sigue en el repositorio. */}
       <Waitlist />
       <FinalCTANew />
       <TableOfContents />

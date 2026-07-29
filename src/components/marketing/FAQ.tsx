@@ -72,7 +72,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "¿Funciona en Mac o Linux?",
-          a: "Trading Journal es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos evaluando una versión web local-first para el futuro.",
+          a: "Trading Journal es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
         },
         {
           q: "¿Puedo importar de otro journal?",
@@ -110,10 +110,6 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
           q: "¿Qué pasa si cambio de ordenador?",
           a: "Nada. Tu historial vive en un único archivo .sqlite portable. Cópialo al nuevo equipo (pendrive, disco externo, carpeta compartida) y seguirás trabajando como si no hubiera pasado nada. Tu licencia se asocia a tu correo, no a la máquina: reinstala la app en el equipo nuevo, activa con tu correo y listo.",
         },
-        {
-          q: "¿Hay versión nativa para Mac o Linux?",
-          a: "Por ahora Trading Journal es nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
-        },
       ]
     : [
         {
@@ -130,7 +126,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "Does it work on Mac or Linux?",
-          a: "Trading Journal is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're evaluating a local-first web version for the future.",
+          a: "Trading Journal is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like to be a beta tester when it lands, drop us a line.",
         },
         {
           q: "Can I import from another journal?",
@@ -168,10 +164,6 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
           q: "What if I change computers?",
           a: "Nothing happens. Your history lives in a single portable .sqlite file. Copy it to the new machine (USB stick, external drive, shared folder) and keep working as if nothing happened. Your license is tied to your email, not the machine: reinstall the app on the new computer, activate with your email and you're done.",
         },
-        {
-          q: "Is there a native Mac or Linux version?",
-          a: "Right now Trading Journal is Windows-native (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like to be a beta tester when it lands, drop us a line.",
-        },
       ];
 
   // Real-time filter on question + answer text (active language).
@@ -190,7 +182,14 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
   const noResults = filtered.length === 0;
 
   return (
-    <section id="faq" className="section cv-auto bg-veil relative overflow-hidden scroll-mt-24">
+    <section
+      id="faq"
+      /* En `/faq` la cabecera de pagina ya titula, asi que aqui el h2 se
+         vuelve invisible (sigue existiendo para el indice y para SEO).
+         Con el padding completo de `.section` eso dejaba ~145 px de
+         vacio absoluto entre la regla del hero y el buscador. */
+      className={`${standalone ? "pt-10 pb-[clamp(4rem,8vw,7rem)]" : "section"} cv-auto bg-veil relative overflow-hidden scroll-mt-24`}
+    >
       <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
         {/* Encabezado interno — el h2 siempre se renderiza (necesario para
             el TOC + SEO); en modo standalone (/faq) se omite el eyebrow
@@ -278,13 +277,22 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
                 collapsible
                 key={hasQuery ? `search-${query.trim()}` : "default"}
                 defaultValue="item-0"
-                className="relative px-2 md:px-3"
+                className="relative"
               >
                 {filtered.map((item, i) => (
                   <AccordionItem
                     key={item.q}
                     value={`item-${i}`}
-                    className="border-[rgb(var(--divider)/0.08)] last:border-b-0 rounded-md transition-[border-color,box-shadow,background-color] duration-300 data-[state=closed]:hover:bg-[rgb(var(--divider)/0.04)] data-[state=open]:border-[rgb(var(--accent-base)/0.30)] data-[state=open]:bg-[rgb(var(--divider)/0.05)] data-[state=open]:shadow-[inset_3px_0_0_0_rgb(var(--accent-base))]"
+                    /* El raíl de acento del elemento abierto es un
+                       `border-left`, no un `box-shadow: inset`. La sombra
+                       interior se dibuja DENTRO de la caja, encima del
+                       texto: la pregunta abierta quedaba pegada al raíl y
+                       en la respuesta se comía la primera letra. Un borde
+                       ocupa espacio de verdad, así que empuja el
+                       contenido en vez de invadirlo. Se declara
+                       transparente en reposo para que abrir y cerrar no
+                       desplace nada horizontalmente. */
+                    className="border-b border-l-2 border-l-transparent border-b-[rgb(var(--divider)/0.08)] last:border-b-0 px-4 md:px-5 transition-[border-color,background-color] duration-300 data-[state=closed]:hover:bg-[rgb(var(--divider)/0.04)] data-[state=open]:border-l-[rgb(var(--accent-base))] data-[state=open]:bg-[rgb(var(--divider)/0.05)]"
                   >
                     <AccordionTrigger className="text-left text-base md:text-[1.05rem] font-medium text-primary hover:text-[rgb(var(--accent-hover))] hover:no-underline py-5 transition-colors [&[data-state=open]>svg]:rotate-180 [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:text-[rgb(var(--accent-base))]">
                       {/* Wrap the question in a min-w-0 span so the flex

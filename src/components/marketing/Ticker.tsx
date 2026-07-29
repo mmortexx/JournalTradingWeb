@@ -170,7 +170,7 @@ export function Ticker() {
           (notably Safari on macOS) re-rasterize the track each frame as
           the x value changes, which shows up as a faint sub-pixel jitter
           on the tabular figures. No behavior change, pure perf hint. */}
-      <motion.div ref={trackRef} className="flex w-max" style={{ x, willChange: "transform" }}>
+      <motion.div ref={trackRef} className="flex w-max gap-7 sm:gap-11" style={{ x, willChange: "transform" }}>
         <Row />
         <Row />
       </motion.div>

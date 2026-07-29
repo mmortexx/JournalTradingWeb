@@ -79,7 +79,7 @@ export function HowItWorks() {
               stacking) so the line passes behind the circles. */}
           <div
             aria-hidden
-            className="hidden md:block absolute top-[72px] left-0 right-0 h-px pointer-events-none"
+            className="hidden md:block absolute top-[72px] left-[16.66%] right-[16.66%] h-px pointer-events-none"
             style={{ background: "linear-gradient(90deg, transparent, rgb(var(--accent-base) / 0.30) 15%, rgb(var(--accent-base) / 0.30) 85%, transparent)" }}
           />
           <ol className="grid md:grid-cols-3 gap-6">

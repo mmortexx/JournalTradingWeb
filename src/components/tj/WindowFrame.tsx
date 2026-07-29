@@ -91,7 +91,7 @@ export function WindowFrame({
             macOS y una caption centrada: vendía la app como si fuera de
             Mac, justo lo contrario de lo que promete la página. */}
         <span
-          className="tnum flex-1 min-w-0 flex items-center pl-3 text-[11px] truncate"
+          className="tnum flex-1 min-w-0 self-center pl-3 text-[11px] truncate"
           style={{
             // `--txt-tertiary` y no `--ink-3`. Medido: el título salía a
             // 4,17:1 contra la barra, por debajo del 4,5:1 que pide WCAG AA

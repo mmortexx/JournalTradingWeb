@@ -1,12 +1,18 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
+import { fmtNum } from "@/lib/trading/format";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/tj/Eyebrow";
-import { joinWaitlist, SUPPORT_EMAIL, type SubmitFailure } from "@/lib/forms";
+import {
+  fetchWaitlistCount,
+  joinWaitlist,
+  SUPPORT_EMAIL,
+  type SubmitFailure,
+} from "@/lib/forms";
 import { useHydrated } from "@/hooks/use-hydrated";
 
 /**
@@ -29,7 +35,147 @@ import { useHydrated } from "@/hooks/use-hydrated";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Cada cuánto se vuelve a preguntar el total, con la pestaña visible. */
+const REFRESH_MS = 60_000;
+
 type Status = "idle" | "sending" | "error" | "success";
+
+/* ============================================================
+   CONTADOR EN VIVO
+   ============================================================ */
+
+/**
+ * Lee el total de inscritos y lo mantiene fresco.
+ *
+ * Reglas:
+ *  · `null` mientras no se sepa el número, y también si no se puede
+ *    saber. La interfaz entonces no enseña contador — antes eso que un
+ *    cero de relleno o una cifra inventada.
+ *  · Sólo refresca con la pestaña visible: un contador que sigue
+ *    llamando en segundo plano gasta la cuota diaria del script de
+ *    Google para nadie.
+ *  · `bump` permite subirlo al instante tras un alta propia, sin
+ *    esperar al siguiente ciclo.
+ */
+function useWaitlistCount() {
+  const [count, setCount] = useState<number | null>(null);
+  /** Evita `setState` sobre un componente ya desmontado. */
+  const alive = useRef(true);
+
+  const read = useCallback(async () => {
+    const value = await fetchWaitlistCount();
+    if (!alive.current || value === null) return;
+    // Nunca hacemos bajar el número: si una lectura llega tarde y trae
+    // un total anterior a un alta ya reflejada, el contador daría un
+    // salto hacia atrás que parece un fallo.
+    setCount((prev) => (prev === null || value > prev ? value : prev));
+  }, []);
+
+  useEffect(() => {
+    alive.current = true;
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const start = () => {
+      if (timer !== null) return;
+      void read();
+      timer = setInterval(() => void read(), REFRESH_MS);
+    };
+    const stop = () => {
+      if (timer === null) return;
+      clearInterval(timer);
+      timer = null;
+    };
+    const onVisibility = () =>
+      document.visibilityState === "visible" ? start() : stop();
+
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      alive.current = false;
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [read]);
+
+  const bump = useCallback((exact: number | null) => {
+    setCount((prev) => {
+      if (exact !== null) return prev === null ? exact : Math.max(prev, exact);
+      return prev === null ? prev : prev + 1;
+    });
+  }, []);
+
+  return { count, bump };
+}
+
+/**
+ * Cifra que rueda del valor anterior al nuevo en vez de saltar.
+ *
+ * No se reutiliza `CountUp` porque aquél reinicia desde 0 cada vez que
+ * cambia su destino: en un contador que se refresca solo, eso se vería
+ * como un desplome a cero cada minuto.
+ */
+function RollingNumber({ value, lang }: { value: number; lang: "es" | "en" }) {
+  const [shown, setShown] = useState(value);
+  const fromRef = useRef(value);
+
+  useEffect(() => {
+    const from = fromRef.current;
+    if (from === value) return;
+
+    // Respeta a quien ha pedido menos movimiento en su sistema: la
+    // duración se reduce a cero y la cifra aparece directamente en su
+    // sitio. Se resuelve dentro del propio ciclo de animación, no en el
+    // cuerpo del efecto, para no encadenar renders.
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const span = Math.abs(value - from);
+    const duration = reduce ? 0 : Math.min(1400, 320 + span * 6);
+    const start = performance.now();
+    let raf = 0;
+
+    const tick = (now: number) => {
+      const p = duration === 0 ? 1 : Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      setShown(Math.round(from + (value - from) * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else fromRef.current = value;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+
+  return <>{fmtNum(shown, lang, 0)}</>;
+}
+
+/**
+ * Placa "N ya en la lista". Ocupa alto fijo aunque no haya número, para
+ * que la tarjeta no dé un salto cuando la cifra llega de la red.
+ */
+function LiveCount({ count, es, lang }: { count: number | null; es: boolean; lang: "es" | "en" }) {
+  return (
+    <div className="mt-5 flex h-8 items-center justify-center" aria-live="polite">
+      <AnimatePresence>
+        {count !== null && count > 0 && (
+          <motion.p
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 rounded-[4px] border border-[rgb(var(--divider)/0.12)] bg-[rgb(var(--divider)/0.04)] px-3 py-1.5 text-xs text-secondary"
+          >
+            <span className="relative inline-flex size-1.5 shrink-0" aria-hidden="true">
+              <span className="absolute inset-0 animate-ping rounded-full bg-[rgb(var(--pnl-pos)/0.55)]" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-[rgb(var(--pnl-pos))]" />
+            </span>
+            <span className="tnum font-semibold text-primary">
+              <RollingNumber value={count} lang={lang} />
+            </span>
+            <span>{es ? "ya en la lista" : "already on the list"}</span>
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 /** Copy por tipo de fallo. Distingue "reinténtalo" de "el problema es nuestro". */
 function failureCopy(reason: SubmitFailure, es: boolean): string {
@@ -57,6 +203,8 @@ export function Waitlist() {
   const [priority, setPriority] = useState<number | null>(null);
   /** El email ya estaba en la lista: se confirma, no se trata como error. */
   const [duplicate, setDuplicate] = useState(false);
+
+  const { count, bump } = useWaitlistCount();
 
   const sending = status === "sending";
 
@@ -90,6 +238,12 @@ export function Waitlist() {
       setPriority(result.priority);
       setDuplicate(result.duplicate);
       setStatus("success");
+      // Si el script devolvió el total, se usa tal cual. Si no lo
+      // devolvió y el alta era nueva, se sube uno para que quien acaba
+      // de apuntarse se vea reflejado sin esperar al siguiente ciclo.
+      // Un alta repetida no añade a nadie: no toca el contador.
+      if (result.count !== null) bump(result.count);
+      else if (!result.duplicate) bump(null);
       return;
     }
 
@@ -101,7 +255,7 @@ export function Waitlist() {
     <section
       id="waitlist"
       aria-label={es ? "Lista de espera" : "Waitlist"}
-      className="section relative overflow-hidden"
+      className="section relative overflow-hidden scroll-mt-24"
     >
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
@@ -138,8 +292,22 @@ export function Waitlist() {
                 : "We'll let you know the moment access opens. One email, when it matters — no filler."}
             </p>
 
-            <div className="w-full mt-7">
-              <div className="min-h-[148px] flex flex-col justify-center">
+            {/* Contador en vivo. Sale del script de la hoja de cálculo,
+                no de una cifra escrita a mano: si no se puede leer, no
+                se enseña nada. */}
+            <LiveCount count={count} es={es} lang={lang} />
+
+            <div className="w-full mt-6">
+              {/* Sin alto mínimo reservado. Antes se apartaban 148 px
+                  fijos —lo que mide el estado de éxito— para que la
+                  tarjeta no diera un salto al confirmar; el precio era
+                  que el 100 % de los visitantes, que sólo ven el
+                  formulario, se encontraban 110 px de hueco muerto entre
+                  el campo y la nota legal. `layout` de framer-motion
+                  consigue lo mismo sin pagar ese precio: la tarjeta
+                  crece animada al cambiar de estado, y en reposo ocupa
+                  exactamente lo que ocupa el formulario. */}
+              <motion.div layout transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col">
                 <AnimatePresence mode="wait" initial={false}>
                   {status === "success" ? (
                     <motion.div
@@ -202,8 +370,16 @@ export function Waitlist() {
                         >
                           {es ? "Tu puesto: " : "Your spot: "}
                           <span className="font-semibold text-[rgb(var(--accent-base))]">
-                            #{priority}
+                            #{fmtNum(priority, lang, 0)}
                           </span>
+                          {count !== null && count >= priority && (
+                            <>
+                              {" "}
+                              <span className="text-tertiary">
+                                {es ? `de ${fmtNum(count, lang, 0)}` : `of ${fmtNum(count, lang, 0)}`}
+                              </span>
+                            </>
+                          )}
                         </motion.p>
                       )}
                     </motion.div>
@@ -294,7 +470,7 @@ export function Waitlist() {
                     </motion.form>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
 
               <p className="mt-4 text-xs text-tertiary text-center flex items-center justify-center gap-1.5">
                 <svg

@@ -78,14 +78,7 @@ export function PageHeader({
           legibilidad la garantiza un scrim lateral (mismo lenguaje que
           el hero de la home): el texto vive sobre la zona velada y el
           iris respira a la derecha. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(90deg, color-mix(in srgb, var(--bg) 76%, transparent), color-mix(in srgb, var(--bg) 30%, transparent) 46%, transparent 68%)",
-        }}
-      />
+      <div aria-hidden className="page-header-scrim" />
       {/* Fade inferior: entrega suave hacia la primera sección velada. */}
       <div
         aria-hidden

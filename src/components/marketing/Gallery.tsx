@@ -95,8 +95,11 @@ export function Gallery() {
 
       <div className="relative max-w-page mx-auto px-5 md:px-8">
         {/* Header */}
-        <Reveal className="text-center max-w-2xl mx-auto">
-          <Eyebrow className="justify-center">
+        {/* Alineada a la izquierda como Caracteristicas, Como funciona y Y
+            mucho mas: centrada, el eje de lectura saltaba al medio y
+            volvia, y rompia el ritmo editorial de la pagina. */}
+        <Reveal className="max-w-2xl">
+          <Eyebrow>
             {es ? "Galería" : "Gallery"}
           </Eyebrow>
           <h2 className="mt-5 t-h2 text-primary">
