@@ -165,7 +165,7 @@ const organizationSchema = {
   description:
     "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
   foundingDate: "2024",
-  sameAs: ["https://github.com/mmortexx/JournalTradingWeb"],
+  sameAs: ["https://github.com/mmortexx/CountPipsWeb"],
 };
 
 export const metadata: Metadata = {

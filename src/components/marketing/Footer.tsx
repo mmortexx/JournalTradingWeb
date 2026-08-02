@@ -18,7 +18,7 @@ import { BrandGlyph } from "@/components/tj/BrandGlyph";
 type SocialLink = { label: string; href: string; Icon: () => ReactElement };
 
 const SOCIAL_LINKS: SocialLink[] = [
-  { label: "GitHub", href: "https://github.com/mmortexx/JournalTradingWeb", Icon: GitHubIcon },
+  { label: "GitHub", href: "https://github.com/mmortexx/CountPipsWeb", Icon: GitHubIcon },
   // Placeholders — social accounts not yet created (see comment above).
   { label: "X / Twitter", href: "#", Icon: XIcon },
   { label: "YouTube", href: "#", Icon: YouTubeIcon },

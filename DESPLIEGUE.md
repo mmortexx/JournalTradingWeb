@@ -5,7 +5,7 @@ La web se publica en **dos sitios a la vez**, a propósito y de forma temporal:
 | Dónde | Dirección | Para qué |
 |---|---|---|
 | **Cloudflare Pages** | `https://countpips.com` | El sitio de verdad |
-| GitHub Pages | `https://mmortexx.github.io/JournalTradingWeb` | Copia antigua, mientras se comprueba la nueva |
+| GitHub Pages | `https://mmortexx.github.io/CountPipsWeb` | Copia antigua, mientras se comprueba la nueva |
 
 Los dos se compilan del mismo código. La diferencia es **desde dónde cuelgan las
 páginas**: Cloudflare las sirve en la raíz del dominio y GitHub desde un
@@ -88,8 +88,8 @@ ganan con este cambio.
 
 Dos pasos, y ninguno toca la configuración del proyecto:
 
-1. Borrar la línea `NEXT_PUBLIC_BASE_PATH: /JournalTradingWeb` de
-   `.github/workflows/deploy.yml`.
+1. Borrar las dos variables `NEXT_PUBLIC_BASE_PATH` y `NEXT_PUBLIC_SITE_URL`
+   de `.github/workflows/deploy.yml`.
 2. Desactivar Pages en el repositorio (*Settings → Pages → Source: None*).
 
 Aviso: GitHub Pages **no sabe hacer redirecciones reales**. Quien tenga
@@ -106,9 +106,9 @@ npx serve out      # y se abre en http://localhost:3000
 
 Para reproducir la compilación de GitHub Pages hay que definir la variable, y
 en Windows conviene hacerlo desde PowerShell: Git Bash convierte
-`/JournalTradingWeb` en una ruta de disco y el build falla con un error que
+`/CountPipsWeb` en una ruta de disco y el build falla con un error que
 despista (`basePath has to start with a /`).
 
 ```powershell
-$env:NEXT_PUBLIC_BASE_PATH = "/JournalTradingWeb"; bun run build
+$env:NEXT_PUBLIC_BASE_PATH = "/CountPipsWeb"; bun run build
 ```

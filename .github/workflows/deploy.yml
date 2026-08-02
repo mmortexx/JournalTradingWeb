@@ -65,15 +65,29 @@ jobs:
         run: bun run build
         env:
           # PREFIJO DE RUTAS — solo para GitHub Pages.
-          # Este sitio se publica en dos destinos: countpips.com, en la
-          # RAÍZ (Cloudflare Pages), y esta copia, que cuelga de
-          # /JournalTradingWeb. El prefijo se declara AQUÍ y en ningún
-          # sitio más: `next.config.ts` no lo lleva escrito, así que sin
-          # esta línea el sitio se compila para la raíz — que es lo que
-          # necesita el dominio propio y también el desarrollo local.
-          # Si algún día se apaga esta publicación, se borra esta línea y
-          # no hay que tocar la configuración.
-          NEXT_PUBLIC_BASE_PATH: /JournalTradingWeb
+          # Este sitio se publica en dos destinos: el dominio propio, en la
+          # RAÍZ (Cloudflare Pages), y esta copia, que cuelga de un
+          # subdirectorio con el nombre del repositorio. El prefijo se
+          # declara AQUÍ y en ningún sitio más: `next.config.ts` no lo
+          # lleva escrito, así que sin esta línea el sitio se compila para
+          # la raíz — que es lo que necesitan el dominio propio y el
+          # desarrollo local. Si se apaga esta publicación, se borran estas
+          # dos variables y no hay que tocar la configuración.
+          #
+          # El nombre NO se escribe a mano: sale del propio repositorio.
+          # Estaba fijo como "/JournalTradingWeb" y al renombrar el repo a
+          # CountPipsWeb la web publicada siguió pidiendo sus estilos y sus
+          # scripts a la ruta vieja — respondía 200 y se veía sin una sola
+          # hoja de estilo. Derivándolo, un renombrado futuro no puede
+          # volver a romperlo.
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          # Y la dirección pública de ESTA copia, por el mismo motivo: si
+          # se queda apuntando a un nombre viejo, el canónico y la tarjeta
+          # social señalan a una dirección que ya no existe.
+          # El día que el dominio propio esté comprado y apuntando, se
+          # cambia por él para que esta copia declare como canónica la
+          # dirección buena — ver DESPLIEGUE.md.
+          NEXT_PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
           # Destino de los formularios de contacto y boletín. Al ser un
           # sitio estático, Next incrusta el valor en el JS durante el
           # build: si el secret no está definido, el sitio se publica

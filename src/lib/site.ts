@@ -50,7 +50,7 @@
    —nadie ha configurado nada— habría dejado `SITE_URL` en blanco y
    publicado canónicos como `href="/pricing/"`, sin dominio delante. */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://mmortexx.github.io/JournalTradingWeb";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://mmortexx.github.io/CountPipsWeb";
 
 /** Nombre de la marca, tal cual debe aparecer en metadatos y esquemas. */
 export const SITE_NAME = "CountPips";
