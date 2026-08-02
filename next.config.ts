@@ -36,6 +36,13 @@ const nextConfig: NextConfig = {
     : {}),
   env: {
     NEXT_PUBLIC_BASE_PATH: BASE_PATH,
+    // Dirección pública del sitio (ver src/lib/site.ts). Se declara aquí
+    // por el mismo motivo que las de abajo: sin declararla, la expresión
+    // `process.env.X` sobrevive al empaquetado y revienta en el navegador.
+    // Vacía = se usa el valor por defecto, que es la dirección donde el
+    // sitio está publicado HOY. Se define con el dominio propio cuando
+    // exista y esté apuntando, no antes.
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? "",
     // Destino de los formularios (ver src/lib/forms.ts). Se declara aquí, y
     // no solo en el entorno, para que Next SIEMPRE lo sustituya por un
     // literal en el bundle del cliente. Si se deja sin declarar y la

@@ -13,11 +13,30 @@ subdirectorio. Por eso existe la variable `NEXT_PUBLIC_BASE_PATH`, que solo
 declara el flujo de GitHub Actions. Sin ella el sitio se compila para la raíz,
 que es lo que necesitan tanto Cloudflare como el desarrollo local.
 
-**La dirección canónica es siempre `countpips.com`**, se publique donde se
-publique. Es deliberado: para un buscador, el mismo contenido en dos
-direcciones es contenido duplicado y reparte entre las dos lo que debería ir a
-una. Con la canónica fija, la copia de GitHub sigue accesible para quien tenga
-el enlace, pero le dice a Google cuál es la buena.
+## La dirección oficial, y por qué NO está fijada todavía
+
+`countpips.com` **aún no está comprado**, así que el sitio declara como
+dirección oficial la de GitHub Pages, que es donde está publicado de verdad.
+
+Esto no es provisionalidad por pereza: un canónico que apunta a un dominio que
+no resuelve es **peor que no tener ninguno**. El buscador lo sigue, no encuentra
+nada, y lo razonable por su parte es dejar de indexar unas páginas que declaran
+"la buena es esta otra" señalando al vacío.
+
+El día que el dominio esté comprado y apuntando a Cloudflare, se activa con una
+variable de entorno y **no hay que tocar código**:
+
+```
+NEXT_PUBLIC_SITE_URL = https://countpips.com
+```
+
+En Cloudflare Pages → *Settings → Environment variables*. A partir de ahí, la
+canónica, el mapa del sitio, la tarjeta de redes y los datos estructurados pasan
+al dominio propio de golpe y en todas las páginas.
+
+Cuando eso ocurra, conviene definir esa MISMA variable también en GitHub
+Actions: así la copia antigua declarará como canónica la dirección buena, y el
+buscador concentrará en ella lo que ahora repartiría entre las dos.
 
 ---
 
@@ -37,11 +56,13 @@ con el repositorio de GitHub. Cuando pida la configuración de compilación:
 GitHub Pages; si la añades, Cloudflare compilará el sitio esperando un
 subdirectorio que no existe y **todos los enlaces y recursos darán 404**.
 
-Las que sí hay que añadir, en *Settings → Environment variables*, son las
-mismas dos que ya usa GitHub Actions:
+Las que sí hay que añadir, en *Settings → Environment variables*:
 
 - `NEXT_PUBLIC_WEB3FORMS_KEY` — destino de los formularios de contacto.
 - `NEXT_PUBLIC_WAITLIST_URL` — script que recoge las altas de la lista.
+- `NEXT_PUBLIC_SITE_URL` — **solo cuando el dominio esté comprado y
+  apuntando**. Antes de eso, déjala sin definir: el sitio usará la dirección
+  donde está publicado y todo seguirá siendo coherente.
 
 Si faltan, el sitio se publica igual pero los formularios avisan del fallo en
 vez de fingir que han enviado.
