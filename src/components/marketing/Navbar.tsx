@@ -538,6 +538,10 @@ export function Navbar() {
               </AnimatePresence>
             </IconButton>
 
+            {/* Aquí vivió un conmutador de estilo (Terminal / Clásico).
+                Retirado al fijar el clásico como estilo único: una
+                identidad no se elige desde un menú. */}
+
             <LanguagePicker />
 
             {/* CTA — rectángulo de 4 px, sin sheen ni sombra de color.
@@ -550,7 +554,7 @@ export function Navbar() {
                 height: 38,
                 padding: "0 18px",
                 background: "rgb(var(--accent-base))",
-                color: "#1A1917",
+                color: "rgb(var(--accent-ink))",
               }}
             >
               {es ? "Comprar" : "Buy"}
@@ -676,7 +680,7 @@ export function Navbar() {
                   className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[4px] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
                   style={{
                     background: "rgb(var(--accent-base))",
-                    color: "#1A1917",
+                    color: "rgb(var(--accent-ink))",
                   }}
                 >
                   {t("buyNow")}

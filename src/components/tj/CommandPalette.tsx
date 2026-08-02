@@ -325,35 +325,10 @@ export function CommandPalette() {
                   </CommandItem>
                 </CommandGroup>
 
-                {/* Accent palette */}
-                <CommandGroup heading={es ? "Acento" : "Accent palette"}>
-                  {PALETTES.map((p) => {
-                    const isCurrent = currentPalette === p.name;
-                    const label = es
-                      ? PALETTE_LABELS[p.name].es
-                      : PALETTE_LABELS[p.name].en;
-                    return (
-                      <CommandItem
-                        key={p.name}
-                        className={itemClass}
-                        value={`${p.name} ${PALETTE_LABELS[p.name].es} ${PALETTE_LABELS[p.name].en} ${
-                          es ? "paleta acento color" : "palette accent color"
-                        }`}
-                        onSelect={() => run(() => setPalette(p.name))}
-                      >
-                        <PaletteSwatch
-                          color={theme === "dark" ? p.dark : p.light}
-                        />
-                        <span className="text-primary">{label}</span>
-                        {isCurrent && (
-                          <CommandShortcut className="text-primary">
-                            ✓
-                          </CommandShortcut>
-                        )}
-                      </CommandItem>
-                    );
-                  })}
-                </CommandGroup>
+                {/* Aquí vivía un grupo "Estilo" para elegir entre dos
+                    estilos visuales. Retirado al quedar uno solo: un
+                    grupo con una única opción que ya está activa no es
+                    una elección, es ruido en el buscador. */}
 
                 <CommandSeparator />
 
@@ -401,12 +376,6 @@ export function CommandPalette() {
     </AnimatePresence>
   );
 }
-
-/* ---------- Bilingual palette labels (mirror i18n STR keys) ---------- */
-
-const PALETTE_LABELS: Record<PaletteName, { es: string; en: string }> = {
-  grafito: { es: "Grafito", en: "Graphite" },
-};
 
 /* ---------- Small inline icons (currentColor, no indigo/blue) ---------- */
 

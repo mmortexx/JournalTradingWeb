@@ -101,7 +101,7 @@ export function FinalCTANew() {
           <Link
             href="/pricing"
             className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] px-8 text-base font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-            style={{ background: "rgb(var(--accent-base))", color: "#1A1917" }}
+            style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
           >
             {es ? "Empieza hoy — 29 $" : "Start today — $29"}
             <ArrowRight size={17} aria-hidden />

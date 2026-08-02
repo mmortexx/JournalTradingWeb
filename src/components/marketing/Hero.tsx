@@ -141,15 +141,15 @@ export function Hero() {
           )}
         </h1>
 
-        {/* Hairline de ancho completo bajo el titular. Sustituye al
+        {/* Regla de ancho completo bajo el titular. Sustituye al
             subrayado de la palabra de acento: marca el bloque entero y
-            ata el titular a la rejilla en vez de decorar una palabra. */}
-        <div
-          data-seq
-          aria-hidden
-          className="mt-8 h-px w-full"
-          style={{ background: "rgb(var(--divider) / 0.14)" }}
-        />
+            ata el titular a la rejilla en vez de decorar una palabra.
+
+            `.tj-rule` la dibuja según el estilo activo: hairline de 1 px
+            en el estilo del producto —idéntica a la de antes— y filete
+            doble en el clásico, que es el remate con el que un libro
+            impreso cierra un bloque. Misma función, dos vocabularios. */}
+        <div data-seq aria-hidden className="tj-rule mt-8 w-full" />
 
         {/* ---- Entradilla + CTA, en dos columnas sobre la rejilla ---- */}
         <div className="mt-8 grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26em)]">
@@ -191,7 +191,7 @@ export function Hero() {
             <Link
               href="/pricing"
               className="inline-flex h-[50px] items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-              style={{ background: "rgb(var(--accent-base))", color: "#1A1917" }}
+              style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
             >
               {es ? "Comprar — desde 29 $" : "Buy — from $29"}
               <ArrowRight size={16} aria-hidden />

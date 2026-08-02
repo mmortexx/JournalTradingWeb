@@ -246,15 +246,18 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           <span
             className="pill !rounded-[4px] border uppercase tracking-[0.1em] backdrop-blur-md backdrop-saturate-150"
             style={{
-              /* Fondo champagne PLANO y texto casi negro.
+              /* Fondo de acento PLANO con la tinta que le corresponde.
                  Antes el texto era `--accent-pressed` (#B0905A) sobre un
                  degradado de `--accent-base` → `--accent-hover`: dorado
                  sobre dorado, ~1.4:1 de contraste. La insignia se veía
-                 como una barra dorada maciza y SIN TEXTO. El tono oscuro
-                 (#1A1917) es el mismo que usa la app real como texto
-                 sobre acento, y da ~9:1. */
+                 como una barra dorada maciza y SIN TEXTO.
+                 El color sale ahora de `--accent-ink` en vez de un
+                 #1A1917 fijo: ese valor solo despeja AA cuando el acento
+                 es claro, y hay dos temas (claro y estilo clásico) donde
+                 el acento es oscuro y hacía falta la tinta invertida.
+                 Cada tema declara la suya en globals.css. */
               background: "rgb(var(--accent-base))",
-              color: "#1A1917",
+              color: "rgb(var(--accent-ink))",
               borderColor: "rgb(var(--accent-base))",
             }}
           >

@@ -1,0 +1,69 @@
+"use client";
+
+import { useLang } from "@/lib/i18n";
+
+/**
+ * PlateInterlude — la lámina a página completa.
+ *
+ * Una franja de altura casi completa, sin contenido y sin velo, donde el
+ * atlas del fondo se ve ENTERO: marco, retícula, figura, graduación de
+ * margen y cartela. Es el momento que el fondo no tenía.
+ *
+ * ── Por qué esto y no un panel lateral ────────────────────────────────
+ * La alternativa era darle al atlas media pantalla fija. Se ve siempre,
+ * sí, pero deja de ser un fondo: pasa a ser una ilustración al margen, y
+ * el texto se queda encajonado en una columna durante todo el recorrido.
+ * Un tratado no hace eso. Intercala láminas a página completa entre los
+ * capítulos: el texto ocupa su página entera, la figura ocupa la suya. A
+ * eso responde este componente.
+ *
+ * ── El pie de figura ──────────────────────────────────────────────────
+ * Una pausa sin pie sería un hueco, y un hueco es un defecto. El pie es
+ * lo que la convierte en una página del libro: numeración, título y una
+ * línea que dice qué se está viendo y por qué importa. Va abajo, alineado
+ * a la mancha del texto, con el filete doble encima — la posición y el
+ * remate exactos de un pie de lámina impreso.
+ *
+ * ── `data-plate` ──────────────────────────────────────────────────────
+ * Cada pausa se marca con su índice. EngravedAtlas lee esas marcas y
+ * ajusta su progreso para que la lámina número N termine de dibujarse
+ * justo cuando la pausa número N llena la pantalla. Sin esa
+ * sincronización, la pausa podría caer en mitad de una transición y
+ * enseñar dos figuras a medias — que es justo lo contrario de lo que
+ * viene a hacer.
+ */
+export function PlateInterlude({
+  index,
+  roman,
+  titleEs,
+  titleEn,
+  noteEs,
+  noteEn,
+}: {
+  index: number;
+  roman: string;
+  titleEs: string;
+  titleEn: string;
+  noteEs: string;
+  noteEn: string;
+}) {
+  const { lang } = useLang();
+  const es = lang === "es";
+
+  return (
+    <section
+      className="tj-interlude"
+      data-plate={index}
+      aria-label={es ? `Lámina ${roman}` : `Plate ${roman}`}
+    >
+      <div className="tj-interlude-caption">
+        <div aria-hidden className="tj-interlude-rule" />
+        <span className="tj-interlude-num">
+          {es ? `Lámina ${roman}` : `Plate ${roman}`}
+        </span>
+        <h2 className="tj-interlude-title">{es ? titleEs : titleEn}</h2>
+        <p className="tj-interlude-note">{es ? noteEs : noteEn}</p>
+      </div>
+    </section>
+  );
+}

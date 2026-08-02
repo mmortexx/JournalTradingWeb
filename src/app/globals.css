@@ -131,6 +131,16 @@
   --accent-pressed: 176 144 90; /* #B0905A */
   --accent-soft: 199 167 107;
 
+  /* Tinta del texto que va ENCIMA del acento (botón primario, insignias
+     rellenas). Antes cada componente escribía #1A1917 a mano, y ese
+     valor solo funciona cuando el acento es CLARO: sobre el champagne
+     oscuro del tema claro (#8A6C35) se quedaba en 3,58:1, por debajo
+     del 4,5:1 de WCAG AA — el botón "Comprar" de la portada, en claro,
+     era el caso peor. Con el token, cada tema declara su propia tinta:
+     oscura sobre acento claro (7,68:1 aquí) y clara sobre acento
+     oscuro (4,91:1 en el tema claro). */
+  --accent-ink: 26 25 23; /* #1A1917 — 7,68:1 sobre el champagne */
+
   /* P&L — valores exactos de la app real (Resources/Colors.xaml:109-112,
      rama dark). Familia SEPARADA del acento: el acento es champagne y
      el P&L es verde/rojo, y nunca deben coincidir (ver la nota larga
@@ -256,6 +266,10 @@
   --pnl-pos: 30 122 76;   /* #1E7A4C — el verde de la app (Colors.xaml:69) */
   --pnl-neg: 153 27 27;   /* #991B1B — más oscuro que el de la app, por contraste */
   --pnl-warn: 146 64 14;  /* #92400E */
+
+  /* Aquí el acento es OSCURO (#8A6C35), así que su tinta se invierte:
+     blanco, 4,91:1. Ver la nota de --accent-ink en :root. */
+  --accent-ink: 255 255 255;
 
   /* Tope del tinte de las celdas del calendario. Sobre papel, el 0.5 del
      tema oscuro ensucia la celda lo justo para que la cifra en verde o
@@ -2448,4 +2462,740 @@ button.icon-btn:hover > svg,
 :root[data-theme="light"] .cal-day-pnl,
 :root[data-theme="light"] .cal-day-pnl[data-neg="true"] {
   color: rgb(var(--txt-primary));
+}
+
+/* ============================================================
+   ESTILO "CLÁSICO" — Papel
+   ============================================================
+   Segundo valor del eje `data-palette` (ver src/lib/theme.tsx). No es
+   un acento alternativo: redefine el juego COMPLETO de tokens y cambia
+   el tratamiento de tipografía, radios y ornamento. El producto es un
+   DIARIO, y este estilo lo trata como lo que su nombre dice: un objeto
+   impreso. Papel hueso, tinta cálida, acento arcilla, titulares en
+   serif y el ojo de la marca redibujado como grabado a buril.
+
+   Clásico y moderno a la vez, que es lo que se pidió: el material y la
+   tipografía de display vienen del libro; la retícula, el espaciado y
+   el cuerpo de texto (Instrument Sans) siguen siendo contemporáneos.
+   Es el mismo emparejamiento que usa Anthropic: serif editorial para
+   el display, sans neutra para todo lo demás.
+
+   CADA BLOQUE DECLARA EL JUEGO ENTERO a propósito. Los selectores de
+   estilo y de tema tienen la misma especificidad en un caso
+   (`:root[data-palette=...]` y `:root[data-theme="light"]`, ambos
+   0,2,0), así que un bloque incompleto dejaría fugas de tokens del
+   otro tema según el orden del archivo. Declarándolo todo, el bloque
+   combinado (0,3,0) gana siempre y no hay fugas posibles.
+
+   CONTRASTE: los 38 pares de esta paleta están medidos contra WCAG 2.1
+   AA (4,5:1 texto normal / 3:1 elementos de interfaz) sobre sus fondos
+   reales, incluidas las superficies elevadas, que es donde se cae el
+   contraste. Cuatro valores se apartaron del candidato inicial por
+   quedarse cortos ahí: la tinta terciaria del papel (#6E6555 → #635B4B,
+   4,32 → 5,05 sobre surface-2), la del modo tinta (#948B79 → #9E9583,
+   4,28 → 4,87 sobre raised), el ámbar (#AD5A00 → #964E00, 4,23 → 5,30)
+   y el verde de P&L (#1E7A4C → #1A6A42, 4,00 → 4,96 sobre surface-2).
+   Si se retoca un color aquí, hay que volver a medirlo sobre las
+   CUATRO superficies, no solo sobre el fondo de página.
+   ============================================================ */
+
+/* ---- Tokens · modo tinta (oscuro) ------------------------------------
+   La contraparte nocturna del papel no es "gris oscuro": es tinta de
+   imprenta sobre la que el texto va en crema. Todo el neutro está
+   sesgado a cálido para que el arcilla del acento no vire a salmón. */
+:root[data-palette="clasico"] {
+  --accent-base: 208 138 99; /* #D08A63 — arcilla clara, 6,62:1 sobre la tinta */
+  --accent-hover: 222 160 124; /* #DEA07C */
+  --accent-pressed: 184 116 80; /* #B87450 */
+  --accent-soft: 208 138 99;
+  /* Tinta del texto que va ENCIMA del acento (botón primario). Ver la
+     nota de `--accent-ink` en :root: el valor fijo que había antes en
+     los componentes no servía para un acento oscuro. */
+  --accent-ink: 36 26 18; /* #241A12 — 6,09:1 sobre el arcilla */
+
+  /* P&L atemperado. El #00F5A0 del estilo del producto es un verde de
+     fósforo: correcto en una terminal, imposible sobre un material que
+     imita papel entintado — al lado del arcilla lee como un error de
+     impresión. Estos son los mismos semáforos bajados a tono de tinta,
+     y siguen despejando AA con holgura (9,24:1 y 6,67:1). */
+  --pnl-pos: 63 206 146; /* #3FCE92 */
+  --pnl-neg: 240 119 106; /* #F0776A */
+  --pnl-warn: 224 147 43; /* #E0932B */
+  --pnl-neg-on-tint: 240 119 106;
+  --cal-tint-max: 0.3;
+  --sig-green: 63 206 146;
+  --sig-amber: 224 147 43;
+  --sig-red: 240 119 106;
+
+  --tint: 21 19 15; /* #15130F */
+  --canvas: 21 19 15;
+  --chrome: 21 19 15;
+  --card: 21 19 15;
+  --canvas-op: 0.12;
+  --chrome-op: 0.82;
+  --card-op: 0.58;
+
+  --txt-primary: 242 237 224; /* #F2EDE0 — 15,87:1 */
+  --txt-secondary: 192 183 164; /* #C0B7A4 — 9,32:1 */
+  --txt-tertiary: 158 149 131; /* #9E9583 — 4,87:1 en el peor fondo */
+  --divider: 242 237 224;
+
+  /* Vocabulario --bg/--surface/--ink del HTML de referencia. */
+  --bg: #15130f;
+  --surface: #1e1b15;
+  --surface-2: #26221a;
+  --raised: #2e2920;
+  --ink: #f2ede0;
+  --ink-2: #c0b7a4;
+  --ink-3: #9e9583;
+  --line: rgba(242, 237, 224, 0.09);
+  --line-2: rgba(242, 237, 224, 0.17);
+
+  /* Capa de compatibilidad shadcn. */
+  --background: #15130f;
+  --foreground: #f2ede0;
+  --card-foreground: #f2ede0;
+  --popover: #1e1b15;
+  --popover-foreground: #f2ede0;
+  --primary: rgb(var(--accent-base));
+  --primary-foreground: rgb(var(--accent-ink));
+  --secondary: #26221a;
+  --secondary-foreground: #f2ede0;
+  --muted: #26221a;
+  --muted-foreground: #9e9583;
+  --accent: rgb(var(--accent-base));
+  --accent-foreground: rgb(var(--accent-ink));
+  /* El rojo de shadcn es frío y aquí todo el neutro es cálido: sobre la
+     tinta leía como un color prestado de otra hoja de estilos. Se usa el
+     mismo rojo de P&L de este estilo, que ya está medido (6,67:1). */
+  --destructive: #f0776a;
+  --border: rgba(242, 237, 224, 0.12);
+  --input: rgba(242, 237, 224, 0.16);
+  --ring: rgb(var(--accent-base));
+  --sidebar: #1e1b15;
+  --sidebar-foreground: #f2ede0;
+  --sidebar-accent: #26221a;
+  --sidebar-accent-foreground: #f2ede0;
+  --sidebar-border: rgba(242, 237, 224, 0.12);
+}
+
+/* ---- Tokens · modo papel (claro) ------------------------------------
+   El estado natural de este estilo. #F0EDE4 es papel hueso de verdad,
+   no blanco roto: tiene el amarillo suficiente para que el arcilla se
+   asiente encima sin virar a rosa. */
+:root[data-theme="light"][data-palette="clasico"] {
+  --accent-base: 154 69 39; /* #9A4527 — arcilla quemada, 5,51:1 sobre el papel */
+  --accent-hover: 130 54 29; /* #82361D */
+  --accent-pressed: 107 44 23; /* #6B2C17 */
+  --accent-soft: 154 69 39;
+  --accent-ink: 247 243 233; /* #F7F3E9 — 5,82:1 sobre el arcilla */
+
+  --pnl-pos: 26 106 66; /* #1A6A42 — verde de tinta, 4,96:1 en el peor fondo */
+  --pnl-neg: 153 27 27; /* #991B1B */
+  --pnl-warn: 150 78 0; /* #964E00 */
+  --pnl-neg-on-tint: 153 27 27;
+  --cal-tint-max: 0.22;
+  --sig-green: 26 106 66;
+  --sig-amber: 150 78 0;
+  --sig-red: 153 27 27;
+
+  --tint: 240 237 228; /* #F0EDE4 */
+  --canvas: 240 237 228;
+  --chrome: 240 237 228;
+  --card: 240 237 228;
+  --canvas-op: 0.07;
+  --chrome-op: 0.8;
+  --card-op: 0.6;
+
+  --txt-primary: 26 23 20; /* #1A1714 — 15,25:1 */
+  --txt-secondary: 75 68 56; /* #4B4438 — 8,22:1 */
+  --txt-tertiary: 99 91 75; /* #635B4B — 5,05:1 en el peor fondo */
+  --divider: 26 23 20;
+
+  --bg: #f0ede4;
+  --surface: #f8f6ef;
+  --surface-2: #e4dfd2;
+  --raised: #fdfbf5;
+  --ink: #1a1714;
+  --ink-2: #4b4438;
+  --ink-3: #635b4b;
+  --line: rgba(26, 23, 20, 0.13);
+  --line-2: rgba(26, 23, 20, 0.24);
+
+  --background: #f0ede4;
+  --foreground: #1a1714;
+  --card-foreground: #1a1714;
+  --popover: #fdfbf5;
+  --popover-foreground: #1a1714;
+  --primary: rgb(var(--accent-base));
+  --primary-foreground: rgb(var(--accent-ink));
+  --secondary: #e4dfd2;
+  --secondary-foreground: #1a1714;
+  --muted: #e4dfd2;
+  --muted-foreground: #635b4b;
+  --accent: rgb(var(--accent-base));
+  --accent-foreground: rgb(var(--accent-ink));
+  --destructive: #991b1b;
+  --border: rgba(26, 23, 20, 0.14);
+  --input: rgba(26, 23, 20, 0.18);
+  --ring: rgb(var(--accent-base));
+  --sidebar: #f8f6ef;
+  --sidebar-foreground: #1a1714;
+  --sidebar-accent: #e4dfd2;
+  --sidebar-accent-foreground: #1a1714;
+  --sidebar-border: rgba(26, 23, 20, 0.14);
+}
+
+/* ---- Tipografía: el display pasa a serif -----------------------------
+   Aquí está el "clásico y moderno a la vez". Los titulares se ponen en
+   Instrument Serif en caja normal; el cuerpo, las etiquetas y las
+   cifras siguen en Instrument Sans. Ni la web entera en serif (que
+   sería disfraz de época) ni solo un cambio de color (que no sería un
+   estilo).
+
+   POR QUÉ `!important`: los titulares del sitio traen `font-weight`,
+   `letter-spacing` y `text-transform` en atributos `style` inline desde
+   los componentes, y un estilo inline gana a cualquier regla de hoja
+   por especificidad. Una capa de tema que no pueda sobreescribirlos no
+   es una capa de tema. Es el mismo recurso, y por el mismo motivo, que
+   usa el bloque `@media print` de este archivo. Se limita a las cuatro
+   propiedades tipográficas: no se toca ni color ni tamaño, que son los
+   que llevan el contraste y la retícula ya verificados.
+
+   Instrument Serif solo existe en peso 400. Pedirle 600 obligaría al
+   navegador a fingir la negrita engordando el trazo (synthetic bold), y
+   una serif de contraste alto engordada así se emborrona. De ahí el 400
+   fijo, compensado con un poco de tamaño óptico vía letter-spacing. */
+:root[data-palette="clasico"] h1,
+:root[data-palette="clasico"] h2,
+:root[data-palette="clasico"] h3 {
+  font-family: var(--font-serif), "Newsreader", Georgia, "Times New Roman", serif !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+  letter-spacing: -0.012em !important;
+}
+
+/* El display grande respira distinto que un h3: se cierra el interlineado
+   y se afina el tracking, que es lo que pide una serif a tamaño de
+   cartel. Solo el h1, para no aplanar la jerarquía. */
+:root[data-palette="clasico"] h1 {
+  line-height: 1.06 !important;
+  letter-spacing: -0.022em !important;
+}
+
+/* Las cifras y las etiquetas NO pasan a serif: son datos, y los datos se
+   leen mejor en la sans con cifras tabulares. Contrarresta la herencia
+   por si un dato vive dentro de un titular. */
+:root[data-palette="clasico"] .tnum,
+:root[data-palette="clasico"] .eyebrow,
+:root[data-palette="clasico"] .kbd {
+  font-family: var(--font-sans), var(--font-geist-sans), system-ui, sans-serif !important;
+}
+
+/* Antetítulos en versalitas anchas — la marca de sección de un libro.
+   Ya eran mayúsculas; aquí se les abre el tracking y se les baja el
+   peso para que acompañen a la serif en vez de competir con ella. */
+:root[data-palette="clasico"] .eyebrow {
+  letter-spacing: 0.2em;
+  font-weight: 500;
+}
+
+/* ---- Radios: el papel no tiene esquinas redondeadas ------------------
+   2 px, no 0. El cero es la cita de periódico, y esto no es un
+   periódico: es un cuaderno encuadernado, con troquel suave. Un solo
+   valor para todo — controles y superficies —, que es un radio MENOS
+   que la escala del estilo del producto (4 px / 8 px). */
+:root[data-palette="clasico"] {
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+}
+
+/* ---- Material: papel, no cristal -------------------------------------
+   El estilo del producto apila tres niveles de material translúcido con
+   desenfoque detrás — cristal líquido. El papel no se desenfoca: se
+   apila. Las tarjetas pasan a superficie opaca con un filete, y el
+   `backdrop-filter` se retira (además de ser lo correcto, quita el coste
+   de composición más caro de la página). */
+:root[data-palette="clasico"] .glass,
+:root[data-palette="clasico"] .glass.glass-thin {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  box-shadow: none;
+}
+:root[data-palette="clasico"] .glass::before,
+:root[data-palette="clasico"] .glass.glass-thin::before {
+  display: none;
+}
+
+/* `.liquid-glass` es la variante de material que usan las bandas de
+   ancho completo (la cinta de cotizaciones, la barra). Se quedó fuera
+   del tratamiento de papel en la primera pasada y era el último sitio
+   donde seguía habiendo cristal desenfocado: una banda esmerilada
+   cruzando una página de papel. La cinta sigue yendo de borde a borde
+   —una cinta de cotizaciones se lee así—, pero ahora es papel. */
+:root[data-palette="clasico"] .liquid-glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  box-shadow: none;
+}
+:root[data-palette="clasico"] .liquid-glass::before,
+:root[data-palette="clasico"] .liquid-glass::after {
+  display: none;
+}
+/* La barra y el cajón móvil son la excepción: por debajo de ellos pasa
+   el contenido al hacer scroll, así que necesitan tapar de verdad. Un
+   90 % dejaría ver los titulares cruzando por detrás de la navegación. */
+:root[data-palette="clasico"] header.liquid-glass,
+:root[data-palette="clasico"] aside.liquid-glass,
+:root[data-palette="clasico"] #mobile-nav-drawer {
+  background: color-mix(in srgb, var(--surface) 98%, transparent);
+}
+
+/* Las cuatro alturas de sombra se colapsan a una impresión plana con un
+   único filete. En papel la profundidad no la da la sombra, la da el
+   filete y el aire alrededor. */
+:root[data-palette="clasico"] .depth-1,
+:root[data-palette="clasico"] .depth-2,
+:root[data-palette="clasico"] .depth-3,
+:root[data-palette="clasico"] .depth-4,
+:root[data-palette="clasico"] .depth-1:hover,
+:root[data-palette="clasico"] .depth-2:hover,
+:root[data-palette="clasico"] .depth-3:hover,
+:root[data-palette="clasico"] .depth-4:hover {
+  box-shadow: none;
+  border: 1px solid var(--line-2);
+}
+
+/* ---- Ornamento: el filete doble --------------------------------------
+   El único adorno que se añade, y se añade porque significa algo: marca
+   el final de un bloque, que es exactamente para lo que se usa en un
+   libro impreso. Regla gruesa + regla fina, la proporción del filete
+   tipográfico clásico. Se pide a mano con `.tj-rule` allí donde hoy hay
+   una hairline suelta; no se reparte por decoración. */
+.tj-rule {
+  border: 0;
+  height: 3px;
+  border-top: 1px solid rgb(var(--divider) / 0.28);
+  border-bottom: 1px solid rgb(var(--divider) / 0.28);
+  background: transparent;
+}
+:root:not([data-palette="clasico"]) .tj-rule {
+  height: 1px;
+  border-top: 1px solid rgb(var(--divider) / 0.14);
+  border-bottom: 0;
+}
+
+/* ---- Textura: la fibra del papel -------------------------------------
+   El grano ya existe en el sitio al 2-3 %, calibrado para que no se note
+   sobre superficies de cristal. Sobre papel sí tiene que notarse: es lo
+   que separa "fondo beige" de "material". Sube a 5,5 % en papel y a 4 %
+   en tinta, que es el punto donde se lee como fibra y todavía no
+   ensucia el texto pequeño. */
+:root[data-palette="clasico"] .grain::after {
+  opacity: 0.04;
+}
+:root[data-theme="light"][data-palette="clasico"] .grain::after {
+  opacity: 0.055;
+}
+:root[data-theme="light"][data-palette="clasico"] body::before {
+  opacity: 0.035;
+}
+
+/* ---- Lo que se apaga --------------------------------------------------
+   Un estilo se define tanto por lo que quita como por lo que pone. Todo
+   esto es vocabulario de terminal —luz que late, barridos especulares,
+   focos que siguen al puntero— y sobre papel no solo sobra: delata que
+   el estilo es una capa de pintura encima de otra cosa.
+
+   El movimiento con sentido se queda: la revelación por scroll y la
+   secuencia de entrada siguen funcionando igual, porque ordenan la
+   lectura en vez de decorarla. */
+:root[data-palette="clasico"] .tj-spot::after {
+  display: none;
+}
+:root[data-palette="clasico"] [style*="tj-sheen"],
+:root[data-palette="clasico"] .tj-sheen {
+  display: none;
+}
+:root[data-palette="clasico"] [class*="animate-"][class*="glow"],
+:root[data-palette="clasico"] .aurora-bg {
+  animation: none;
+  opacity: 0.35;
+}
+
+/* ---- El atlas grabado (EngravedAtlas) --------------------------------
+   El canvas del fondo. Ocupa toda la ventana y no recibe eventos: la
+   página se usa por encima de él como si no estuviera.
+
+   La opacidad de reposo es distinta en papel y en tinta porque la
+   percepción no es simétrica: una línea oscura sobre fondo claro pesa
+   más que una clara sobre fondo oscuro, así que en papel el atlas va
+   más tenue para no competir con el texto que lleva encima. Estos dos
+   valores son el único mando del protagonismo del fondo — subirlos lo
+   trae al frente, bajarlos lo deja en textura.
+
+   El fundido de entrada es del canvas entero y ocurre una sola vez, al
+   cargar. A partir de ahí, lo que anima es el trazo, y lo gobierna el
+   scroll: el fondo nunca se mueve solo. */
+.tj-engraved-atlas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.84;
+  animation: tj-atlas-in 1.2s ease-out both;
+}
+:root[data-theme="light"] .tj-engraved-atlas {
+  opacity: 0.76;
+}
+
+/* ============================================================
+   EL PLIEGO: COLUMNA DE TEXTO + PANEL DE LÁMINA
+   ============================================================
+   Tres intentos anteriores atacaron esto bajando el velo, ensanchando
+   los márgenes y oscureciendo el lápiz. Todos fallaron por el mismo
+   motivo: el contenido y el fondo se disputaban el MISMO espacio. Da
+   igual lo transparente que sea el velo — si encima hay una sección de
+   700 px de alto, debajo no se ve una lámina, se ve una lámina tapada.
+
+   La solución no es de opacidad, es de reparto. En un tratado, el texto
+   y la lámina no se superponen: conviven en el pliego, cada uno con su
+   mitad. Aquí igual — a partir de 1280 px la página se divide:
+
+     · IZQUIERDA — la columna de texto. Todo el contenido baja por aquí.
+     · DERECHA   — el panel de lámina. Siempre despejado, siempre a la
+                   vista. El atlas se dibuja DENTRO de él, así que se ve
+                   la figura entera con su marco, su cartela y su
+                   graduación, no un trozo asomando por los lados.
+
+   Es además lo que el fondo pedía desde el principio: se graba con el
+   scroll, o sea que está contando algo mientras lees. Un elemento que
+   narra no puede vivir detrás del texto; tiene que estar al lado.
+
+   Por debajo de 1280 px no hay anchura para dos columnas, así que se
+   vuelve al reparto anterior: contenido centrado y atlas de fondo a
+   pantalla completa. */
+/* ---- Las pausas de lámina --------------------------------------------
+   El atlas es un FONDO a pantalla completa: esa es su naturaleza y no se
+   toca. El problema nunca fue dónde está, sino que no tenía un solo
+   momento para sí. Un tratado no resuelve esto poniendo la figura al
+   margen: intercala LÁMINAS A PÁGINA COMPLETA entre los capítulos.
+
+   Eso es una pausa: una franja de altura casi completa donde no hay
+   absolutamente nada de contenido y el fondo se ve entero, con su marco,
+   su graduación y su cartela. Ninguna sección la vela, ninguna tarjeta
+   la cruza.
+
+   No son huecos vacíos. Cada una lleva su pie de figura —numeración,
+   título y una línea de lectura— exactamente como el pie que acompaña a
+   una lámina impresa, y ese pie explica QUÉ se está viendo dibujar. Es
+   contenido, y del más pertinente que tiene la página: el producto
+   contado a través de sus propias figuras.
+
+   La altura es de 88 vh y no de 100 vh a propósito: dejar asomar el
+   borde de la sección siguiente es lo que le dice al lector que la
+   página continúa. A pantalla completa exacta, una pausa parece el
+   final del documento. */
+.tj-interlude {
+  position: relative;
+  min-height: 88vh;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+}
+.tj-interlude-caption {
+  pointer-events: auto;
+  width: 100%;
+  max-width: var(--page-w, 1080px);
+  margin-inline: auto;
+  padding: 0 1.25rem clamp(2rem, 5vh, 4rem);
+  display: grid;
+  gap: 0.55rem;
+}
+.tj-interlude-rule {
+  height: 3px;
+  border-top: 1px solid rgb(var(--divider) / 0.26);
+  border-bottom: 1px solid rgb(var(--divider) / 0.26);
+  margin-bottom: 0.9rem;
+}
+.tj-interlude-num {
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(var(--accent-base));
+}
+.tj-interlude-title {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  line-height: 1.15;
+  color: var(--ink);
+}
+.tj-interlude-note {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 44em;
+}
+@media (max-width: 900px) {
+  .tj-interlude {
+    min-height: 62vh;
+  }
+}
+
+/* ============================================================
+   LA CAJA DE LA PÁGINA
+   ============================================================
+   El motivo REAL por el que el atlas no se veía, y que las dos pasadas
+   anteriores no tocaron: la mancha de contenido mide 1240-1280 px y una
+   ventana normal de portátil mide ~1300. Los márgenes eran de TRECE
+   PÍXELES. No importaba lo oscuro que fuera el lápiz ni cuánto se
+   recortara el velo: no había sitio material donde el papel pudiera
+   verse. Se veía en las costuras entre secciones y en ningún otro sitio,
+   que es exactamente lo que se estaba reportando.
+
+   Un tratado no maqueta así. La mancha ocupa una parte del pliego y el
+   resto es margen — y el margen no es espacio sobrante, es donde vive el
+   papel. Aquí la mancha baja a 1080 px (o al 84 % en pantallas
+   estrechas), lo que en un portátil deja ~110 px de margen a cada lado y
+   en un monitor grande más de 300.
+
+   UNA SOLA MEDIDA gobierna las tres cosas que antes iban por su cuenta:
+   el ancho del contenido, dónde se desvanece el velo y dónde caen los
+   filetes de margen. Antes los filetes estaban en `min(11vw, 190px)`,
+   que en una ventana de 1306 px caía DENTRO del contenido: la línea que
+   debía marcar el margen cruzaba el texto. Con la variable no puede
+   volver a descuadrarse. */
+:root[data-palette="clasico"] {
+  --page-w: min(1080px, 84vw);
+  --page-margin: max(0px, calc((100% - var(--page-w)) / 2));
+}
+:root[data-palette="clasico"] .max-w-\[1240px\],
+:root[data-palette="clasico"] .max-w-\[1280px\],
+:root[data-palette="clasico"] .max-w-page {
+  max-width: var(--page-w);
+}
+
+/* La demo es una FIGURA DESPLEGABLE. En un tratado, la lámina que no
+   cabe en la caja se sale de ella y se dobla — no se encoge hasta que
+   deja de leerse. Aquí pasa igual: la ventana de la aplicación es una
+   reproducción a escala de una pantalla real, y al meterla en la mancha
+   de 1080 px su barra de husos horarios se apretaba tanto que "Nueva
+   York" partía en dos líneas. Se le concede su propio ancho, todavía con
+   más de 400 px de margen en un monitor grande.
+
+   Se implementa REDEFINIENDO la medida dentro de la sección, no con un
+   selector que repita las clases de ancho: es más corto, hereda a todo
+   lo que haya dentro, y evita reescribir los selectores escapados de
+   Tailwind (`.max-w-[1280px]`) — combinarlos con un id hacía que el
+   compilador descartara la regla sin avisar y el ancho no cambiaba. */
+:root[data-palette="clasico"] #demo {
+  --page-w: min(1240px, 92vw);
+}
+
+/* ---- Dejar respirar al atlas -----------------------------------------
+   Las secciones del sitio se velan con `.bg-veil` para aislarse del
+   fondo. Ese velo se calibró al 90 % contra el iris del estilo anterior,
+   que ILUMINABA: al 82 % la zona brillante del ojo asomaba entre
+   tarjetas como un halo rosado y se leía como un fallo de fondo.
+
+   El atlas no ilumina — son líneas finas de la misma tinta del texto—,
+   así que ese motivo desaparece, y al 90 % el velo tapaba justo lo que
+   hay que ver: si el fondo se graba con el scroll y nadie lo ve porque
+   cada sección lo cubre, el trabajo no existe. Al 66 % las láminas
+   atraviesan y el velo sigue haciendo su trabajo de aislar.
+
+   MARGEN DE CONTRASTE: el peor caso es texto terciario cayendo justo
+   encima de una línea del grabado. Con el atlas al 0,62 y el velo
+   dejando pasar un 16 %, la línea aporta como mucho un 10 % de tinta —y
+   eso solo si la línea va a opacidad plena, cosa que casi ninguna hace—,
+   lo que lleva el papel de #F0EDE4 a ≈#D9D6CD en ese punto exacto: el
+   terciario #635B4B se queda en 4,7:1, por encima del 4,5:1 de AA.
+
+   El velo SUBIÓ de 66 a 84 al oscurecer el lápiz, y ese es el
+   compromiso: el trazo se ve mucho más donde importa —el hero y los
+   aires entre secciones, que no llevan velo— sin comerse el margen de
+   contraste del texto pequeño, que sí lo lleva. Las dos cifras van
+   atadas: si se sube una hay que bajar la otra y rehacer la cuenta. */
+:root[data-palette="clasico"] .bg-veil,
+:root[data-theme="light"][data-palette="clasico"] .bg-veil {
+  background-color: color-mix(in srgb, var(--bg) 88%, transparent);
+  /* ---- El velo deja de ir a sangre ---------------------------------
+     Este es EL motivo por el que el atlas no se veía. Cada sección
+     pintaba su velo de borde a borde de la ventana, así que el fondo
+     solo asomaba en las costuras entre secciones: un fondo que se graba
+     con el scroll y que nadie llega a ver.
+
+     Ahora el velo se recorta por los cuatro lados con una máscara. Deja
+     de ser una banda opaca y pasa a ser lo que debía haber sido desde el
+     principio: la MANCHA de la página, con sus márgenes. El texto sigue
+     teniendo su superficie debajo —el contraste no se toca, porque en el
+     centro el velo es incluso más opaco que antes (88 %)— y el papel
+     grabado vuelve a existir alrededor, que es donde un libro lo enseña.
+
+     Los márgenes laterales son proporcionales al ancho (11 vw) con tope
+     de 190 px: en una pantalla ancha el margen es generoso y en un móvil
+     se reduce a casi nada, porque ahí no sobra sitio.
+
+     `mask-composite: intersect` combina las dos máscaras — la horizontal
+     y la vertical— en vez de superponerlas. Donde no se soporta, se
+     aplica solo la primera y el resultado sigue siendo correcto, solo
+     que sin el desvanecido superior e inferior. */
+  /* El velo se desvanece 30 px ANTES del borde de la mancha, no justo
+     encima: así el texto conserva un colchón de superficie a su
+     alrededor y el corte no cae nunca sobre una letra. */
+  --veil-x: max(0px, calc(var(--page-margin) - 30px));
+  /* El desvanecido VERTICAL lo hace el propio relleno, y el HORIZONTAL
+     una máscara de una sola capa.
+
+     Antes eran dos máscaras combinadas con `mask-composite: intersect`.
+     Se veía bien, pero una máscara compuesta obliga al navegador a
+     resolver dos capas y su intersección en CADA sección de pantalla
+     completa, y eso es trabajo de composición en cada repintado — una de
+     las causas de que el scroll no fuera fluido. Repartiendo el trabajo
+     entre el relleno (que es gratis) y una máscara simple, el resultado
+     visual es el mismo y desaparece el coste. */
+  background-color: transparent;
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--bg) 88%, transparent) 96px,
+    color-mix(in srgb, var(--bg) 88%, transparent) calc(100% - 96px),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--veil-x),
+    #000 calc(100% - var(--veil-x)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--veil-x),
+    #000 calc(100% - var(--veil-x)),
+    transparent
+  );
+}
+
+/* El pie era la única superficie que seguía yendo a sangre, y encima en
+   blanco puro (#FFF al 94 %) en una web cuyo material es papel hueso:
+   cortaba la página con una banda más clara que todo lo demás. Pasa al
+   papel y se recorta por los lados como las secciones, así que el atlas
+   sigue corriendo por debajo hasta el final del documento. */
+:root[data-palette="clasico"] footer.glass-band,
+:root[data-palette="clasico"] footer.liquid-glass {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 calc(var(--page-margin) - 30px),
+    #000 calc(100% - (var(--page-margin) - 30px)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 calc(var(--page-margin) - 30px),
+    #000 calc(100% - (var(--page-margin) - 30px)),
+    transparent
+  );
+}
+
+/* ---- Los filetes de margen -------------------------------------------
+   Dos líneas verticales finas a la altura de la mancha, de arriba abajo
+   del documento. Es el recurso con el que un libro impreso marca dónde
+   empieza y dónde acaba la caja de texto, y aquí hace un trabajo real:
+   ata las secciones —que hasta ahora flotaban una detrás de otra sin
+   nada en común— a una misma retícula, y da al ojo la referencia que
+   convierte el papel de los márgenes en margen y no en hueco.
+
+   Van en el fondo fijo, no en cada sección, así que son continuas: no se
+   cortan ni se desalinean al pasar de una sección a la siguiente. */
+:root[data-palette="clasico"] .tj-margin-rules {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+:root[data-palette="clasico"] .tj-margin-rules::before,
+:root[data-palette="clasico"] .tj-margin-rules::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgb(var(--divider) / 0.1);
+}
+:root[data-palette="clasico"] .tj-margin-rules::before {
+  left: calc(var(--page-margin) - 26px);
+}
+:root[data-palette="clasico"] .tj-margin-rules::after {
+  right: calc(var(--page-margin) - 26px);
+}
+
+/* ---- En pantalla estrecha no hay márgenes que enseñar -----------------
+   Todo lo de arriba se apoya en que sobre sitio a los lados de la
+   mancha. En un móvil no sobra: el contenido arranca a 24 px del borde,
+   mientras que el recorte del velo empezaría a 46 px (11 vw de 420 px).
+   Es decir, la primera columna de texto se quedaría SIN su superficie
+   debajo, justo en el sitio donde el atlas sigue dibujando — el peor
+   caso posible de contraste, y encima invisible desde un escritorio.
+
+   Por debajo de 900 px el velo vuelve a ir de borde a borde y los
+   filetes de margen se retiran: un margen de 20 px no es un margen, es
+   una línea pegada al borde de la pantalla. */
+@media (max-width: 900px) {
+  :root[data-palette="clasico"] .bg-veil {
+    --veil-x: 0px;
+  }
+  :root[data-palette="clasico"] footer.glass-band,
+  :root[data-palette="clasico"] footer.liquid-glass {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  :root[data-palette="clasico"] .tj-margin-rules {
+    display: none;
+  }
+}
+
+/* ---- El texto que flota sobre el atlas --------------------------------
+   En el hero y en los aires entre secciones no hay velo: ahí el atlas se
+   ve a plena fuerza, que es justo lo que se busca. El texto que cae
+   encima se protege con su propio halo (`.tj-legible-text`), y con el
+   lápiz oscurecido ese halo tiene que apretar más.
+
+   Es la solución CORRECTA aquí, no un parche: el contraste se mide
+   contra el fondo inmediato de cada letra, y el halo hace que ese fondo
+   sea papel aunque justo detrás pase una línea del grabado. La
+   alternativa —bajar el atlas o meter una caja opaca— apaga el fondo en
+   toda la superficie para resolver un problema que solo existe en los
+   pocos píxeles que rodean a las letras. */
+:root[data-theme="light"][data-palette="clasico"] .tj-legible-text {
+  text-shadow:
+    0 1px 2px rgb(240 237 228 / 0.92),
+    0 0 6px rgb(240 237 228 / 0.85),
+    0 0 22px rgb(240 237 228 / 0.7);
+}
+:root[data-palette="clasico"] .tj-legible-text {
+  text-shadow:
+    0 1px 2px rgb(21 19 15 / 0.9),
+    0 0 6px rgb(21 19 15 / 0.82),
+    0 0 22px rgb(21 19 15 / 0.68);
+}
+@keyframes tj-atlas-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tj-engraved-atlas {
+    animation: none;
+  }
 }

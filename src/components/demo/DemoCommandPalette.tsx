@@ -106,9 +106,9 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
     return () => cancelAnimationFrame(id);
   }, [open]);
 
-  /* ---- Palette cycle order — una sola paleta tras el pivote grafito;
+  /* ---- Palette cycle order — el sitio tiene un solo estilo, así que
      el comando de ciclo queda como no-op elegante. ---- */
-  const paletteOrder: PaletteName[] = useMemo(() => ["grafito"], []);
+  const paletteOrder: PaletteName[] = useMemo(() => ["clasico"], []);
 
   /* ---- Command list ---- */
   const commands = useMemo<Command[]>(() => {

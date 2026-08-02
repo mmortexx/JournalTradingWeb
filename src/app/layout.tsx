@@ -90,10 +90,13 @@ const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // `@/lib/og` — de ahí sale `OG_IMAGE`, la misma URL para todas las
 // páginas.
 //
-// `logo.png` es el mismo archivo que usa la aplicación de escritorio
-// (Assets/app-logo.png): el ojo de trazo champagne. Va en el dato
+// `logo.png` es el logotipo de la marca —el libro mayor— rasterizado
+// desde la misma geometría del glifo vectorial. Va en el dato
 // estructurado de Organization, que es de donde Google saca el logotipo
-// del sitio.
+// del sitio. Se regenera con `python scripts/generate-brand.py`, que
+// produce además el apple-icon y el favicon.ico; si se toca el glifo de
+// `BrandGlyph.tsx` hay que volver a lanzarlo o la marca se parte entre
+// la web y lo que ven el buscador y el sistema operativo.
 const LOGO_URL = `${SITE_URL}/logo.png`;
 
 const softwareApplicationSchema = {
@@ -247,12 +250,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning className="dark" data-theme="dark" data-palette="grafito">
+    <html lang="es" suppressHydrationWarning data-theme="light" data-palette="clasico">
       <head>
         <script
           // Prevent FOUC: apply saved theme/palette before paint
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('tj-theme')||'dark';var p=localStorage.getItem('tj-palette')||'grafito';document.documentElement.dataset.theme=t;document.documentElement.dataset.palette=p;if(t==='dark')document.documentElement.classList.add('dark');}catch(e){document.documentElement.dataset.theme='dark';document.documentElement.dataset.palette='grafito';}})();`,
+            // El estilo es único ("clasico") y se fija aquí sin consultar
+            // el localStorage: así un valor antiguo guardado en el
+            // navegador de un visitante ("grafito", "verde", "oro"…) no
+            // puede aplicarse al <html> y dejar el primer paint sin
+            // ningún bloque de tokens que lo respalde. Lo único que se
+            // recuerda del visitante es si prefiere papel o tinta.
+            __html: `(function(){try{var t=localStorage.getItem('tj-theme');if(t!=='dark'&&t!=='light')t='light';document.documentElement.dataset.theme=t;document.documentElement.dataset.palette='clasico';document.documentElement.classList.toggle('dark',t==='dark');}catch(e){document.documentElement.dataset.theme='light';document.documentElement.dataset.palette='clasico';}})();`,
           }}
         />
         <script

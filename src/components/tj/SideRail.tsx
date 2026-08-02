@@ -12,21 +12,30 @@ import { useLang } from "@/lib/i18n";
  * atajos `g`+letra de GlobalShortcuts. Duplicarlas aquí era justo lo que
  * generaba la sensación de "índice con secciones que no existen".
  *
- * Quedan 2 anclas locales:
- *   01 · Inicio  (#top)      → Hero
- *   02 · Vistazo (#overview) → OverviewApp
+ * Anclas locales:
+ *   01 · Inicio    (#top)      → Hero
+ *   02 · Métricas  (#metrics)  → MetricsShowcaseNew
+ *   03 · Guardián  (#guardian) → GuardianNew
+ *   04 · Principios(#values)   → Values
  *
- * La sección HomeDemo (#demo) sigue siendo alcanzable haciendo scroll,
- * pero no la indexamos: llamarla "Demo" colisionaba con la ruta /demo
- * (página independiente). Un índice honesto de 2 puntos es mejor que
- * uno inflado y ambiguo de 7.
+ * Antes había un ancla `#overview` apuntando a la sección del mockup de
+ * la aplicación. Esa sección salió de la home —junto con la demo, que
+ * ahora vive solo en /demo—, así que el ancla apuntaba a un id
+ * inexistente: el raíl se quedaba con un punto muerto que nunca se
+ * activaba. Se sustituye por las tres secciones reales que sí quedan.
+ *
+ * La ruta /demo NO se indexa aquí a propósito: este raíl lista tramos de
+ * ESTA página, no destinos del sitio. Mezclar ambas cosas era lo que
+ * generaba la sensación de "índice con secciones que no existen".
  *
  * Oculto por debajo de 1100 px para no pisar el contenido en pantallas
  * estrechas.
  */
 const ANCHORS = [
   { id: "top", num: "01", es: "Inicio", en: "Home" },
-  { id: "overview", num: "02", es: "Vistazo", en: "Overview" },
+  { id: "metrics", num: "02", es: "Métricas", en: "Metrics" },
+  { id: "guardian", num: "03", es: "Guardián", en: "Guardian" },
+  { id: "values", num: "04", es: "Principios", en: "Principles" },
 ] as const;
 
 export function SideRail() {

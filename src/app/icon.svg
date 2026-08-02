@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- Favicon: el libro mayor, el mismo glifo que BrandGlyph.
+       Aquí los colores van FIJOS y no en currentColor: el icono vive en
+       la pestaña del navegador, fuera de la página, donde no hay ningún
+       tema del que heredar. El papel de fondo además lo despega tanto de
+       una barra clara como de una oscura; en transparente, la tinta
+       desaparecía sobre las pestañas oscuras.
+       El trazo es más grueso que en el glifo de la web porque un favicon
+       se dibuja a 16 px: a ese tamaño, la línea fina se rompe. -->
+  <rect width="48" height="48" rx="8" fill="#F0EDE4"/>
+  <g fill="none" stroke="#1A1714" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 15C20.5 12 16.5 10.5 10 10.5v24c6.5 0 10.5 1.5 14 4.5 3.5-3 7.5-4.5 14-4.5v-24c-6.5 0-10.5 1.5-14 4.5z" stroke-width="3.2"/>
+    <path d="M24 15v24" stroke-width="2.6"/>
+  </g>
+</svg>
