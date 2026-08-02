@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -41,6 +41,18 @@ const PREFERS_REDUCED_MOTION =
  * regardless of the active site language.
  *
  * Keyboard: ↑/↓ navigate (loop), ↵ select, ⎋ close, ⌘K/⌃K toggle.
+ *
+ * ── Componente CONTROLADO, y por qué ──────────────────────────────────
+ * La paleta ya no guarda su propio `open` ni escucha ⌘K: las dos cosas
+ * viven ahora en `OverlayHost`. El motivo es de peso: este componente
+ * arrastra `cmdk` y el árbol entero de `framer-motion`, y estaba montado
+ * en el layout, es decir, en TODAS las páginas del sitio. Todo visitante
+ * descargaba y ejecutaba la paleta aunque no llegara a pulsar ⌘K nunca.
+ *
+ * Con el estado fuera, `OverlayHost` puede escuchar el atajo con un
+ * listener de tres líneas y traerse este módulo con `import()` solo
+ * cuando de verdad se abre. El coste desaparece del arranque de todas
+ * las páginas y se paga una vez, y solo quien usa el atajo lo paga.
  */
 
 /* ------------------------------------------------------------------ */
@@ -74,8 +86,14 @@ const PAGES: Page[] = [
 /* Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export function CommandPalette() {
-  const [open, setOpen] = useState(false);
+export function CommandPalette({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const setOpen = onOpenChange;
   // Bilingual ES/EN based on browser language; default ES.
   /* El idioma de la paleta es el del SITIO, no el del navegador.
      ────────────────────────────────────────────────────────────────
@@ -99,17 +117,9 @@ export function CommandPalette() {
 
   /* ---------------- Keyboard listeners ---------------- */
 
-  // Global Cmd+K (Mac) / Ctrl+K (Win/Linux) toggler — always active.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setOpen((o) => !o);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  // El atajo ⌘K/⌃K vive en `OverlayHost`: es quien puede escucharlo sin
+  // haber descargado antes este módulo. Aquí solo queda el comportamiento
+  // de la paleta ya abierta.
 
   // Escape-to-close while open. Capture phase so we beat cmdk's internal
   // Escape handler (which only clears the search query).
@@ -193,14 +203,24 @@ export function CommandPalette() {
       // Cross-page — full navigation.
       window.location.href = asset(path);
     },
-    [pathname]
+    /* `setOpen` es ahora una PROP (`onOpenChange`), no el setter estable
+       de un `useState`, así que tiene que ir en las dependencias. Sin
+       ella estas dos funciones se quedarían con la versión del primer
+       render y cerrarían un panel que ya no es el que está en pantalla:
+       hoy funcionaría de milagro —porque el anfitrión pasa siempre la
+       misma referencia— y dejaría de hacerlo en cuanto alguien montara
+       la paleta desde otro sitio. */
+    [pathname, setOpen]
   );
 
   // Run a side-effecting action then close the palette.
-  const run = useCallback((fn: () => void) => {
-    fn();
-    setOpen(false);
-  }, []);
+  const run = useCallback(
+    (fn: () => void) => {
+      fn();
+      setOpen(false);
+    },
+    [setOpen]
+  );
 
   // Override cmdk's default selected-state styling with our accent.
   const itemClass =
@@ -209,11 +229,24 @@ export function CommandPalette() {
   return (
     <AnimatePresence>
       {open && (
-        <div
+        /* La `key` NO es opcional: `AnimatePresence` identifica por clave
+           qué hijo entra y cuál sale. Sin ella no llega a registrar que
+           este bloque existía, así que al pasar `open` a false nunca
+           ejecuta la salida y el panel se queda clavado en pantalla —
+           con ⌘K, con Escape y con el clic en el velo. Además, mientras
+           el panel siga en el DOM, `GlobalShortcuts` cree que hay un
+           overlay abierto y desactiva `?`, `t`, `l` y la navegación con
+           `g`: un fallo se llevaba por delante todos los atajos. */
+        <motion.div
+          key="command-palette"
           className="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-[15vh]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="command-palette-title"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Visible (sr-only) heading — anchors the dialog's accessible name
               to a real DOM node so screen readers can navigate to it as a
@@ -377,7 +410,7 @@ export function CommandPalette() {
               </span>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

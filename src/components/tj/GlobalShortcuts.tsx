@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 import { asset } from "@/lib/asset";
-import { openShortcutsHelp } from "@/components/tj/ShortcutsHelp";
+import { openShortcutsHelp } from "@/lib/overlays";
 
 /**
  * GlobalShortcuts — invisible global keyboard shortcut router.

@@ -1169,15 +1169,73 @@ export function EngravedAtlas() {
           .trim() || "#1a1714";
     };
 
-    const resize = () => {
-      const dpr = Math.min(devicePixelRatio || 1, 2);
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
+    /* ---- Tamaño del lienzo ---------------------------------------------
+       Tres cosas tenían que arreglarse aquí, y las tres se veían.
+
+       1) SE BORRABA Y REARRANCABA. Asignar `canvas.width` vacía el
+          bitmap, siempre, aunque le pongas el mismo número. La versión
+          anterior lo asignaba en cada evento de resize y, en lugar de
+          repintar ahí mismo, dejaba `shown = -1` para que lo hiciera el
+          siguiente fotograma. Pero `shown` no es una bandera: es el
+          progreso desde el que interpola el bucle. Ponerlo en -1
+          significaba "vuelve a grabar el atlas entero desde antes del
+          principio". Por eso al arrastrar el borde de la ventana el
+          fondo desaparecía y volvía a dibujarse solo. Ahora el
+          repintado es SÍNCRONO, dentro del mismo evento y con el
+          progreso real: el bitmap nunca llega vacío a pantalla.
+
+       2) SÓLO ESCUCHABA `window.resize`. El lienzo no ocupa la ventana:
+          ocupa su contenedor. Y ese contenedor cambia de ancho sin que
+          la ventana se mueva —cuando aparece o desaparece la barra de
+          scroll al cargarse las secciones diferidas, con el zoom del
+          navegador, o al arrastrar la ventana a un monitor de otra
+          densidad—. En todos esos casos el bitmap se quedaba con la
+          medida vieja y el navegador lo ESTIRABA para rellenar: de ahí
+          el marco descuadrado, con las esquinas fuera de sitio y los
+          filetes dobles. Un `ResizeObserver` sobre el propio lienzo se
+          entera de todos ellos; `window.resize` no.
+
+       3) MEDÍA EN ENTEROS. `clientWidth` redondea: un contenedor de
+          1306,4 px se declaraba de 1306, y el navegador estiraba esos
+          1306 px de bitmap sobre 1306,4 px de caja. Cuatro décimas de
+          píxel bastan para que un filete de una línea salga gris en vez
+          de negro y para que las esquinas del marco no cierren. El
+          rectángulo de `getBoundingClientRect` da la medida fraccional
+          y el estiramiento desaparece. */
+    let cssW = 0;
+    let cssH = 0;
+    let cssDpr = 0;
+    /* Hasta que el bucle no ha arrancado, `shown` todavía no significa
+       nada y no hay nada que repintar. */
+    let ready = false;
+
+    const applySize = (nextW: number, nextH: number, dpr: number) => {
+      if (nextW === cssW && nextH === cssH && dpr === cssDpr) return false;
+      cssW = nextW;
+      cssH = nextH;
+      cssDpr = dpr;
+      w = nextW;
+      h = nextH;
+      canvas.width = Math.max(1, Math.round(nextW * dpr));
+      canvas.height = Math.max(1, Math.round(nextH * dpr));
+      /* La transformación se pierde al redimensionar el bitmap; hay que
+         reponerla o el dibujo saldría a escala 1 en una pantalla 2×. */
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      shown = -1;
+      return true;
+    };
+
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const changed = applySize(r.width, r.height, dpr);
       measureAnchors();
+      if (changed && ready) {
+        /* El bitmap acaba de quedarse en blanco. Se rellena aquí mismo,
+           antes de devolver el control al navegador, para que no llegue
+           a componerse un solo fotograma vacío. */
+        target = scrollProgress();
+        draw(shown < 0 ? target : shown);
+      }
     };
 
     /* ---- Anclaje a las pausas de lámina --------------------------------
@@ -1350,17 +1408,49 @@ export function EngravedAtlas() {
 
     if (reduce) {
       shown = Math.max(target, span0 * 0.5);
+      ready = true;
       draw(shown);
     } else {
       shown = 0;
       introStart = performance.now();
       last = introStart;
+      ready = true;
       draw(shown);
       raf = requestAnimationFrame(frame);
     }
 
     addEventListener("scroll", onScroll, { passive: true });
-    addEventListener("resize", resize);
+
+    /* El observador vigila el LIENZO, no la ventana — ver el comentario
+       de `resize`. Se salta la primera notificación, que llega sola al
+       observar y repetiría la medida que ya se hizo al arrancar. */
+    let firstObservation = true;
+    const ro = new ResizeObserver(() => {
+      if (firstObservation) {
+        firstObservation = false;
+        return;
+      }
+      resize();
+    });
+    ro.observe(canvas);
+
+    /* Cambio de densidad de pantalla: arrastrar la ventana de un monitor
+       normal a uno de alta resolución no altera ni un píxel CSS del
+       lienzo, así que el observador de tamaño no se entera — pero el
+       bitmap se queda a la mitad de resolución y el trazo sale borroso.
+       La media query se reengancha en cada disparo porque el valor que
+       vigila cambia justo cuando salta. */
+    let dprQuery: MediaQueryList | null = null;
+    const watchDpr = () => {
+      dprQuery?.removeEventListener("change", onDprChange);
+      dprQuery = matchMedia(`(resolution: ${devicePixelRatio}dppx)`);
+      dprQuery.addEventListener("change", onDprChange);
+    };
+    function onDprChange() {
+      resize();
+      watchDpr();
+    }
+    watchDpr();
 
     const onVis = () => {
       visible = !document.hidden;
@@ -1381,7 +1471,8 @@ export function EngravedAtlas() {
     return () => {
       cancelAnimationFrame(raf);
       removeEventListener("scroll", onScroll);
-      removeEventListener("resize", resize);
+      ro.disconnect();
+      dprQuery?.removeEventListener("change", onDprChange);
       document.removeEventListener("visibilitychange", onVis);
       obs.disconnect();
     };

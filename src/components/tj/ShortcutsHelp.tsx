@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 
@@ -18,20 +18,25 @@ import { useLang } from "@/lib/i18n";
  * The `?` keyboard trigger itself lives in `GlobalShortcuts`, which performs
  * the input/textarea/select/contentEditable + CommandPalette-open guards
  * before dispatching the open event.
+ *
+ * ── Componente CONTROLADO ─────────────────────────────────────────────
+ * Igual que la paleta: el `open` y la escucha del evento de apertura
+ * viven en `OverlayHost`, que sabe abrir esta ventana sin haber cargado
+ * antes su código. Este overlay solo se ve cuando alguien pulsa `?`, así
+ * que no tiene por qué viajar en el arranque de todas las páginas.
  */
-export function ShortcutsHelp() {
+export function ShortcutsHelp({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const { lang } = useLang();
   const es = lang === "es";
-  const [open, setOpen] = useState(false);
+  const setOpen = onOpenChange;
 
   const panelRef = useRef<HTMLDivElement>(null);
-
-  // Open whenever any code dispatches `tj:open-shortcuts-help`.
-  useEffect(() => {
-    const onOpen = () => setOpen(true);
-    window.addEventListener("tj:open-shortcuts-help", onOpen);
-    return () => window.removeEventListener("tj:open-shortcuts-help", onOpen);
-  }, []);
 
   // While open: mark body so GlobalShortcuts can skip T/L, and capture Escape
   // on the way down (capture phase) so cmdk's or any other Escape handlers
@@ -229,11 +234,19 @@ export function ShortcutsHelp() {
   return (
     <AnimatePresence>
       {open && (
-        <div
+        /* `key` obligatoria — mismo motivo que en `CommandPalette`: sin
+           ella `AnimatePresence` no registra este bloque y la ventana no
+           se cierra nunca. */
+        <motion.div
+          key="shortcuts-help"
           className="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-[15vh]"
           role="dialog"
           aria-modal="true"
           aria-label={es ? "Atajos de teclado" : "Keyboard shortcuts"}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Backdrop — subtle blur + fade-in */}
           <motion.div
@@ -320,7 +333,7 @@ export function ShortcutsHelp() {
               </span>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
@@ -362,11 +375,7 @@ function getFocusables(container: HTMLElement): HTMLElement[] {
   });
 }
 
-/**
- * Convenience helper for opening the help overlay from anywhere (e.g. the
- * Navbar `?` button). Kept here so the event name has a single source of truth.
- */
-export function openShortcutsHelp() {
-  if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent("tj:open-shortcuts-help"));
-}
+/* `openShortcutsHelp` se mudó a `@/lib/overlays`. Importarlo desde aquí
+   obligaba a `GlobalShortcuts` —presente en todas las páginas— a cargar
+   esta ventana entera sólo para poder pedir su apertura. Ver el
+   encabezado de ese módulo. */

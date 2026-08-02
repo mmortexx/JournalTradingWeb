@@ -7,9 +7,8 @@ import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { CookieConsent } from "@/components/tj/CookieConsent";
 import { BackToTop } from "@/components/tj/BackToTop";
-import { CommandPalette } from "@/components/tj/CommandPalette";
 import { GlobalShortcuts } from "@/components/tj/GlobalShortcuts";
-import { ShortcutsHelp } from "@/components/tj/ShortcutsHelp";
+import { OverlayHost } from "@/components/tj/OverlayHost";
 import { ScrollToTop } from "@/components/tj/ScrollToTop";
 import { SkipLink } from "@/components/tj/SkipLink";
 import { BackgroundFX } from "@/components/tj/BackgroundFX";
@@ -298,9 +297,12 @@ export default function RootLayout({
             <SectionReveal />
             <DecorFX />
             <SkipLink />
-            <CommandPalette />
             <GlobalShortcuts />
-            <ShortcutsHelp />
+            {/* La paleta ⌘K y la ayuda de atajos `?` se cargan bajo
+                demanda: OverlayHost escucha las teclas y trae el código
+                de cada overlay la primera vez que se abre. Ver el
+                encabezado de OverlayHost.tsx para el porqué. */}
+            <OverlayHost />
             {/* Scrolls window to top on every client-side route change.
                 Next.js App Router handles scroll restoration for
                 browser back/forward automatically; this guarantees a

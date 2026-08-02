@@ -81,7 +81,8 @@ export function GlossaryModal({
   open: openProp,
   onOpenChange: onOpenChangeProp,
 }: {
-  trigger?: React.ReactNode;
+  /** Disparador propio. `false` = no pintar ninguno (control externo). */
+  trigger?: React.ReactNode | false;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
@@ -207,17 +208,24 @@ export function GlossaryModal({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-hover hover:underline"
-          >
-            <BookOpen className="size-4" aria-hidden="true" />
-            {es ? "Glosario" : "Glossary"}
-          </button>
-        )}
-      </DialogTrigger>
+      {/* `trigger={false}` = el disparador lo pone el llamante y vive
+          FUERA de este componente. Lo usa `GlossaryLauncher`, que pinta
+          el enlace sin cargar el glosario y sólo trae este módulo cuando
+          alguien lo abre de verdad. Sin este caso habría que renderizar
+          un disparador de mentira y esconderlo. */}
+      {trigger !== false && (
+        <DialogTrigger asChild>
+          {trigger ?? (
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-hover hover:underline"
+            >
+              <BookOpen className="size-4" aria-hidden="true" />
+              {es ? "Glosario" : "Glossary"}
+            </button>
+          )}
+        </DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
         {/* Header — accent eyebrow + bilingual title + subtitle */}

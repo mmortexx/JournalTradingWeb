@@ -3,7 +3,7 @@
 import { type ReactElement } from "react";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n";
-import { GlossaryModal } from "@/components/tj/GlossaryModal";
+import { GlossaryLauncher } from "@/components/tj/GlossaryLauncher";
 import { MagneticButton } from "@/components/tj/MagneticButton";
 import { BrandGlyph } from "@/components/tj/BrandGlyph";
 
@@ -226,16 +226,17 @@ export function Footer() {
                 {col.links.map((l) => (
                   <li key={l.label}>
                     {l.glossary ? (
-                      <GlossaryModal
-                        trigger={
-                          <button
-                            type="button"
-                            className="link-underline text-sm text-secondary hover:text-primary transition-colors duration-200 text-left"
-                          >
-                            {l.label}
-                          </button>
-                        }
-                      />
+                      /* El glosario se carga al pulsarlo, no al pintar el
+                         pie — que sale en las nueve rutas. Ver el
+                         encabezado de GlossaryLauncher. */
+                      <GlossaryLauncher>
+                        <button
+                          type="button"
+                          className="link-underline text-sm text-secondary hover:text-primary transition-colors duration-200 text-left"
+                        >
+                          {l.label}
+                        </button>
+                      </GlossaryLauncher>
                     ) : (
                       <Link
                         href={l.href}
