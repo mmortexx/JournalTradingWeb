@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * EngravedAtlas — el fondo del sitio: un atlas grabado a lápiz.
@@ -1137,10 +1138,637 @@ function plateGauge(ctx: Ctx, w: number, h: number, t: number) {
   ctx.restore();
 }
 
-const PLATES = [plateEquity, plateCalendar, plateDistribution, plateGauge];
+/* ======================================================================
+   LÁMINAS POR SECCIÓN
+   ======================================================================
+   Las cuatro primeras láminas cuentan la operativa: curva, calendario,
+   distribución y riesgo. Como fondo de la portada están bien, porque la
+   portada habla justo de eso. Repetidas en las nueve rutas, no: detrás
+   de la página de seguridad, una curva de resultados no dice nada — y
+   un fondo que no dice nada es decoración, que es exactamente lo que
+   este atlas no quiere ser.
+
+   Así que cada sección graba SUS figuras. Lo que se dibuja detrás de un
+   texto habla del mismo asunto que el texto.
+   ==================================================================== */
+
+/* ---- El mapa de calor de la sesión ----------------------------------
+   Días en horizontal, horas de mercado en vertical. Cuanto más apretada
+   la trama, más resultado deja esa casilla. Responde a una pregunta que
+   ningún promedio contesta: no cuánto ganas, sino CUÁNDO. */
+function plateHeatmap(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const x0 = m + w * 0.1;
+  const y0 = m + h * 0.16;
+  const gw = w - x0 - m - w * 0.08;
+  const gh = h - y0 - m - h * 0.2;
+  const cols = 10;
+  const rows = 7;
+  const cw = gw / cols;
+  const ch = gh / rows;
+
+  const gp = phase(t, 0.08, 0.34);
+  /* La retícula, en dos trazados: todas las verticales y todas las
+     horizontales. Una llamada por línea multiplicaría por 17 el coste
+     sin cambiar el resultado. */
+  for (let c = 0; c <= cols; c++) {
+    engraveLine(
+      ctx,
+      [
+        [x0 + c * cw, y0],
+        [x0 + c * cw, y0 + gh],
+      ],
+      gp,
+      0.4,
+      0.16,
+      c * 13 + 401
+    );
+  }
+  for (let r = 0; r <= rows; r++) {
+    engraveLine(
+      ctx,
+      [
+        [x0, y0 + r * ch],
+        [x0 + gw, y0 + r * ch],
+      ],
+      gp,
+      0.4,
+      0.16,
+      r * 17 + 431
+    );
+  }
+
+  /* Las casillas. La intensidad viene de una función determinista —
+     nunca `Math.random()`, que daría un dibujo distinto en el servidor y
+     en el navegador y rompería la hidratación. Las horas centrales
+     pesan más, como en una sesión de verdad. */
+  const cp = phase(t, 0.24, 0.52);
+  if (cp > 0.01) {
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c;
+        /* Sesgo por hora: la apertura y el cierre concentran el
+           movimiento, la mitad de la sesión se apaga. */
+        const hourBias = 1 - Math.abs(r - rows / 2) / (rows / 2);
+        const v = rnd(i * 7 + 91) * 0.65 + (1 - hourBias) * 0.5;
+        const shown = clamp01((cp - (i / (rows * cols)) * 0.5) * 2);
+        if (shown <= 0.02 || v < 0.34) continue;
+        const cx = x0 + c * cw + 1.6;
+        const cy = y0 + r * ch + 1.6;
+        const cwi = cw - 3.2;
+        const chi = ch - 3.2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(cx, cy, cwi, chi);
+        ctx.clip();
+        /* Cuanto mayor el valor, más junta la trama. El paso es lo que
+           codifica la magnitud: en grabado no hay escala de grises, hay
+           densidad de línea. */
+        const step = 5.2 - v * 3.1;
+        hatch(ctx, cx, cy, cwi, chi, Math.PI / 4, step, 0.42, 0.3 + v * 0.34, shown, i + 7);
+        /* Las casillas fuertes van cruzadas: dos direcciones de trama es
+           como una plancha dice "aquí hay más" sin cambiar de tinta. */
+        if (v > 0.82)
+          hatch(ctx, cx, cy, cwi, chi, -Math.PI / 4, step * 1.5, 0.34, 0.26, shown, i + 313);
+        ctx.restore();
+      }
+    }
+  }
+
+  /* Ejes: los días abajo, las horas a la izquierda. */
+  const lp = phase(t, 0.62, 0.3);
+  if (lp > 0.02) {
+    const dias = ["L", "M", "X", "J", "V", "L", "M", "X", "J", "V"];
+    for (let c = 0; c < cols; c++)
+      label(ctx, dias[c], x0 + c * cw + cw / 2, y0 + gh + 15, 8.5, 0.42, lp, "center");
+    for (let r = 0; r < rows; r++)
+      label(ctx, `${9 + r}h`, x0 - 12, y0 + r * ch + ch / 2, 8, 0.4, lp, "right");
+  }
+}
+
+/* ---- La curva rolling con su banda -----------------------------------
+   Un ratio medido sobre ventana móvil, con la franja de incertidumbre
+   rayada alrededor. La franja es el asunto: un número suelto parece un
+   hecho, y con pocas operaciones detrás es casi ruido. Dibujar el margen
+   de error es decir cuánto te puedes fiar. */
+function plateRolling(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const x0 = m + w * 0.1;
+  const y0 = m + h * 0.2;
+  const gw = w - x0 - m - w * 0.07;
+  const gh = h - y0 - m - h * 0.24;
+
+  const N = 68;
+  const mid: Pt[] = [];
+  const up: Pt[] = [];
+  const dn: Pt[] = [];
+  for (let i = 0; i < N; i++) {
+    const p = i / (N - 1);
+    /* Suma de tres senos de periodo distinto: se lee como una serie real
+       —sube, corrige, vuelve— y es reproducible en cada repintado. */
+    const base =
+      0.52 +
+      Math.sin(p * 5.1) * 0.12 +
+      Math.sin(p * 11.3 + 1.1) * 0.06 +
+      Math.sin(p * 2.2 + 0.4) * 0.14;
+    /* La banda se ESTRECHA hacia la derecha: cuantas más operaciones
+       acumuladas, menos margen de error. Es la forma de la estadística,
+       no un adorno. */
+    const band = 0.17 * (1 - p * 0.62) + 0.02;
+    const X = x0 + p * gw;
+    mid.push([X, y0 + (1 - base) * gh]);
+    up.push([X, y0 + (1 - base - band) * gh]);
+    dn.push([X, y0 + (1 - base + band) * gh]);
+  }
+
+  const ap = phase(t, 0.06, 0.26);
+  engraveLine(
+    ctx,
+    [
+      [x0, y0],
+      [x0, y0 + gh],
+      [x0 + gw, y0 + gh],
+    ],
+    ap,
+    0.9,
+    0.4,
+    701
+  );
+
+  /* La banda, rayada por dentro. Se recorta con el contorno cerrado
+     (arriba de ida, abajo de vuelta) y se traman las paralelas. */
+  const bp = phase(t, 0.2, 0.44);
+  if (bp > 0.01) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(up[0][0], up[0][1]);
+    for (const p of up) ctx.lineTo(p[0], p[1]);
+    for (let i = dn.length - 1; i >= 0; i--) ctx.lineTo(dn[i][0], dn[i][1]);
+    ctx.closePath();
+    ctx.clip();
+    hatch(ctx, x0, y0, gw, gh, Math.PI / 3, 6, 0.36, 0.2, bp, 733);
+    ctx.restore();
+    engraveLine(ctx, up, bp, 0.42, 0.24, 741);
+    engraveLine(ctx, dn, bp, 0.42, 0.24, 743);
+  }
+
+  /* La línea central, a lápiz insistido: es la que se lee. */
+  pencil(ctx, mid, phase(t, 0.3, 0.5), 1.15, 0.6, 751);
+
+  /* El umbral por debajo del cual el ratio no significa nada. */
+  const tp = phase(t, 0.66, 0.26);
+  if (tp > 0.02) {
+    const ty = y0 + (1 - 0.34) * gh;
+    const dash: Pt[] = [];
+    for (let X = x0; X < x0 + gw; X += 13) dash.push([X, ty], [X + 7, ty]);
+    for (let i = 0; i + 1 < dash.length; i += 2)
+      engraveLine(ctx, [dash[i], dash[i + 1]], tp, 0.5, 0.3, i + 761);
+    label(ctx, "UMBRAL", x0 + gw, ty - 7, 8, 0.42, tp, "right");
+  }
+}
+
+/* ---- La tablilla de reglas -------------------------------------------
+   Las condiciones que el operador se ha impuesto, una por renglón, con
+   su marca al margen: cumplida o no. Es literalmente lo que hace el
+   guardián de la aplicación antes de dejar abrir una posición. */
+function plateRules(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const pad = Math.min(w * 0.2, 210);
+  const x0 = m + pad;
+  const gw = w - (m + pad) * 2;
+  const rows = 6;
+  const y0 = m + h * 0.2;
+  const step = Math.min((h - y0 - m - h * 0.16) / rows, 62);
+
+  /* Cada regla: la casilla del margen, el renglón y el estado. Las
+     cuatro primeras se cumplen; la quinta no, y es la que importa —
+     un guardián que nunca frena no sirve de nada. */
+  for (let i = 0; i < rows; i++) {
+    const p = phase(t, 0.06 + i * 0.11, 0.3);
+    if (p <= 0.01) continue;
+    const y = y0 + i * step;
+    const bx = x0;
+    const bs = 15;
+
+    handRect(ctx, bx, y - bs / 2, bs, bs, p, 0.62, 0.36, i * 29 + 801, 2.4);
+
+    const fail = i === 4;
+    if (p > 0.4) {
+      const cp = clamp01((p - 0.4) / 0.5);
+      if (fail) {
+        /* Aspa: dos trazos cruzados. */
+        engraveLine(
+          ctx,
+          [
+            [bx + 3.5, y - bs / 2 + 3.5],
+            [bx + bs - 3.5, y + bs / 2 - 3.5],
+          ],
+          cp,
+          1.1,
+          0.62,
+          i + 811
+        );
+        engraveLine(
+          ctx,
+          [
+            [bx + bs - 3.5, y - bs / 2 + 3.5],
+            [bx + 3.5, y + bs / 2 - 3.5],
+          ],
+          cp,
+          1.1,
+          0.62,
+          i + 813
+        );
+      } else {
+        /* Marca de verificación, en dos tramos como se traza a mano. */
+        engraveLine(
+          ctx,
+          [
+            [bx + 3.2, y + 0.6],
+            [bx + 6.2, y + 4.4],
+            [bx + bs - 3, y - 4.6],
+          ],
+          cp,
+          1.1,
+          0.55,
+          i + 817
+        );
+      }
+    }
+
+    /* El renglón escrito: una línea de longitud variable insinúa texto
+       sin fingir palabras. Rotularlas de verdad competiría con el texto
+       real de la página, que es quien manda. */
+    const lw = gw * (0.42 + rnd(i + 821) * 0.4);
+    engraveLine(
+      ctx,
+      [
+        [bx + bs + 14, y + 1],
+        [bx + bs + 14 + lw, y + 1],
+      ],
+      p,
+      0.55,
+      fail ? 0.42 : 0.3,
+      i + 823
+    );
+
+    /* La regla incumplida se subraya con trama: es la que frena. */
+    if (fail && p > 0.6) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(bx + bs + 14, y - 9, lw, 18);
+      ctx.clip();
+      hatch(ctx, bx + bs + 14, y - 9, lw, 18, -Math.PI / 4, 5, 0.34, 0.2, clamp01((p - 0.6) / 0.4), 827);
+      ctx.restore();
+    }
+  }
+
+  /* El filete de cierre y el veredicto. */
+  const fp = phase(t, 0.74, 0.24);
+  if (fp > 0.02) {
+    const fy = y0 + rows * step - step * 0.35;
+    engraveLine(ctx, [[x0, fy], [x0 + gw, fy]], fp, 0.9, 0.4, 831);
+    label(ctx, "OPERACIÓN BLOQUEADA", x0, fy + 20, 9.5, 0.5, fp);
+  }
+}
+
+/* ---- La cerradura ----------------------------------------------------
+   Anillos concéntricos, guardas y un ojo de llave: el grabado con el que
+   un tratado ilustra un mecanismo cerrado. Va detrás de la página que
+   habla de dónde viven los datos, y dice lo mismo que ella: esto no se
+   abre desde fuera. */
+function plateVault(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const cx = w / 2;
+  const cy = h / 2;
+  const R = Math.min(w, h) * 0.3;
+
+  /* Los anillos, de fuera adentro. */
+  const rings = [1, 0.86, 0.66, 0.4];
+  rings.forEach((k, i) => {
+    const p = phase(t, 0.04 + i * 0.09, 0.32);
+    if (p <= 0.01) return;
+    const pts: Pt[] = [];
+    for (let a = 0; a <= 72; a++) {
+      const ang = (a / 72) * Math.PI * 2 - Math.PI / 2;
+      pts.push([cx + Math.cos(ang) * R * k, cy + Math.sin(ang) * R * k]);
+    }
+    engraveLine(ctx, pts, p, i === 0 ? 1.2 : 0.7, 0.44 - i * 0.05, i * 37 + 901);
+  });
+
+  /* Las guardas: radios cortos entre el anillo exterior y el siguiente,
+     como los dientes de una combinación. */
+  const gp = phase(t, 0.3, 0.34);
+  if (gp > 0.01) {
+    for (let i = 0; i < 24; i++) {
+      const ang = (i / 24) * Math.PI * 2 - Math.PI / 2;
+      const long = i % 3 === 0;
+      const r1 = R * 0.88;
+      const r2 = R * (long ? 0.99 : 0.94);
+      engraveLine(
+        ctx,
+        [
+          [cx + Math.cos(ang) * r1, cy + Math.sin(ang) * r1],
+          [cx + Math.cos(ang) * r2, cy + Math.sin(ang) * r2],
+        ],
+        gp,
+        long ? 0.85 : 0.5,
+        0.4,
+        i * 11 + 911
+      );
+    }
+  }
+
+  /* El ojo de la llave: círculo y talle trapezoidal, tramado por dentro.
+     Es la única masa oscura de la lámina y por eso ancla la figura. */
+  const kp = phase(t, 0.46, 0.36);
+  if (kp > 0.01) {
+    const kr = R * 0.13;
+    const ky = cy - R * 0.06;
+    const circ: Pt[] = [];
+    for (let a = 0; a <= 40; a++) {
+      const ang = (a / 40) * Math.PI * 2;
+      circ.push([cx + Math.cos(ang) * kr, ky + Math.sin(ang) * kr]);
+    }
+    engraveLine(ctx, circ, kp, 1, 0.5, 921);
+    engraveLine(
+      ctx,
+      [
+        [cx - kr * 0.5, ky + kr * 0.8],
+        [cx - kr * 0.95, ky + kr * 3.1],
+        [cx + kr * 0.95, ky + kr * 3.1],
+        [cx + kr * 0.5, ky + kr * 0.8],
+      ],
+      kp,
+      0.9,
+      0.46,
+      923
+    );
+    if (kp > 0.5) {
+      const fp = clamp01((kp - 0.5) / 0.5);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, ky, kr * 0.94, 0, Math.PI * 2);
+      ctx.clip();
+      hatch(ctx, cx - kr, ky - kr, kr * 2, kr * 2, Math.PI / 4, 2.6, 0.44, 0.5, fp, 927);
+      ctx.restore();
+      graphite(ctx, cx - kr, ky - kr, kr * 2, kr * 2, 46, 0.3, fp, 929);
+    }
+  }
+
+  /* Los cuatro cerrojos que salen del anillo mayor. */
+  const bp = phase(t, 0.66, 0.28);
+  if (bp > 0.01) {
+    for (let i = 0; i < 4; i++) {
+      const ang = (i / 4) * Math.PI * 2 + Math.PI / 4;
+      const r1 = R * 1.02;
+      const r2 = R * 1.2;
+      const nx = Math.cos(ang);
+      const ny = Math.sin(ang);
+      const px = -ny * 7;
+      const py = nx * 7;
+      engraveLine(
+        ctx,
+        [
+          [cx + nx * r1 + px, cy + ny * r1 + py],
+          [cx + nx * r2 + px, cy + ny * r2 + py],
+          [cx + nx * r2 - px, cy + ny * r2 - py],
+          [cx + nx * r1 - px, cy + ny * r1 - py],
+        ],
+        bp,
+        0.75,
+        0.4,
+        i * 19 + 931
+      );
+    }
+  }
+}
+
+/* ---- El libro mayor --------------------------------------------------
+   Dos páginas abiertas, con sus columnas y sus renglones. Es el objeto
+   del que sale el nombre del producto y el mismo que dibuja el
+   logotipo: el registro que se lleva a mano, operación por operación,
+   antes de que exista ninguna métrica. */
+function plateLedger(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const bw = Math.min(w - m * 2 - w * 0.1, 940);
+  const bh = Math.min(h - m * 2 - h * 0.24, 560);
+  const x0 = (w - bw) / 2;
+  const y0 = (h - bh) / 2;
+  const cx = x0 + bw / 2;
+
+  /* Las tapas: dos rectángulos y el lomo. */
+  const op = phase(t, 0.04, 0.3);
+  handRect(ctx, x0, y0, bw, bh, op, 1.25, 0.46, 1001, 7);
+  engraveLine(ctx, [[cx, y0], [cx, y0 + bh]], op, 1, 0.4, 1003);
+
+  /* La curvatura del papel junto al lomo — dos arcos suaves. Sin esto
+     son dos rectángulos, no un libro. */
+  const sp = phase(t, 0.14, 0.26);
+  if (sp > 0.01) {
+    for (const s of [-1, 1]) {
+      const arc: Pt[] = [];
+      for (let i = 0; i <= 20; i++) {
+        const p = i / 20;
+        arc.push([cx + s * (9 + Math.sin(p * Math.PI) * 7), y0 + p * bh]);
+      }
+      engraveLine(ctx, arc, sp, 0.5, 0.24, s > 0 ? 1005 : 1007);
+    }
+  }
+
+  /* Los renglones y las columnas de cada página. */
+  const pages: [number, number][] = [
+    [x0 + 26, cx - 26],
+    [cx + 26, x0 + bw - 26],
+  ];
+  pages.forEach(([a, b], pi) => {
+    const pw = b - a;
+    const rows = 11;
+    const top = y0 + 46;
+    const rh = (bh - 78) / rows;
+
+    /* La cabecera de la página: filete doble. */
+    const hp = phase(t, 0.24 + pi * 0.05, 0.24);
+    engraveLine(ctx, [[a, top - 12], [b, top - 12]], hp, 0.85, 0.4, pi + 1011);
+    engraveLine(ctx, [[a, top - 8], [b, top - 8]], hp, 0.45, 0.26, pi + 1013);
+
+    /* Tres columnas: concepto, cantidad, resultado. */
+    const colX = [a + pw * 0.54, a + pw * 0.76];
+    const cp = phase(t, 0.34 + pi * 0.04, 0.3);
+    for (let c = 0; c < colX.length; c++)
+      engraveLine(ctx, [[colX[c], top - 12], [colX[c], top + rows * rh]], cp, 0.4, 0.2, c + pi * 7 + 1021);
+
+    /* Los asientos. La longitud de cada renglón varía para que se lea
+       como escritura y no como una plantilla. */
+    for (let r = 0; r < rows; r++) {
+      const p = phase(t, 0.4 + pi * 0.03 + r * 0.028, 0.22);
+      if (p <= 0.01) continue;
+      const y = top + r * rh + rh * 0.6;
+      const i = r + pi * 40;
+      engraveLine(
+        ctx,
+        [[a + 6, y], [a + 6 + pw * 0.4 * (0.55 + rnd(i + 1031) * 0.45), y]],
+        p,
+        0.5,
+        0.28,
+        i + 1033
+      );
+      engraveLine(
+        ctx,
+        [[colX[0] + 8, y], [colX[0] + 8 + pw * 0.14 * (0.5 + rnd(i + 1041) * 0.5), y]],
+        p,
+        0.5,
+        0.26,
+        i + 1043
+      );
+      engraveLine(
+        ctx,
+        [[colX[1] + 8, y], [colX[1] + 8 + pw * 0.15 * (0.5 + rnd(i + 1051) * 0.5), y]],
+        p,
+        0.5,
+        0.3,
+        i + 1053
+      );
+    }
+
+    /* El renglón de suma, con su doble filete de cierre contable. */
+    const tp = phase(t, 0.78, 0.22);
+    if (tp > 0.02) {
+      const ty = top + rows * rh + 6;
+      engraveLine(ctx, [[colX[1], ty], [b, ty]], tp, 0.85, 0.44, pi + 1061);
+      engraveLine(ctx, [[colX[1], ty + 3.5], [b, ty + 3.5]], tp, 0.85, 0.44, pi + 1063);
+    }
+  });
+}
+
+/* ---- La racha --------------------------------------------------------
+   Sesiones consecutivas en columna, arriba las que suman y abajo las que
+   restan, con el tope diario cruzando el dibujo. La figura enseña lo que
+   ninguna media enseña: que las pérdidas no llegan repartidas, llegan
+   seguidas, y que el límite existe para el día en que eso pasa. */
+function plateStreak(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const x0 = m + w * 0.09;
+  const gw = w - x0 - m - w * 0.07;
+  const cy = h / 2;
+  const half = Math.min(h * 0.24, 190);
+  const N = 26;
+  const bw = (gw / N) * 0.64;
+
+  /* El eje cero, que es de donde nacen todas las barras. */
+  const zp = phase(t, 0.04, 0.24);
+  engraveLine(ctx, [[x0, cy], [x0 + gw, cy]], zp, 1, 0.44, 1101);
+
+  /* Una tirada determinista con una mala racha deliberada en el centro:
+     seis sesiones seguidas en pérdida, que es justo el caso que hunde
+     una cuenta de fondeo. */
+  for (let i = 0; i < N; i++) {
+    const p = phase(t, 0.12 + i * 0.023, 0.26);
+    if (p <= 0.01) continue;
+    const racha = i >= 12 && i <= 17;
+    const raw = rnd(i * 5 + 1111);
+    const v = racha ? -(0.35 + raw * 0.6) : raw > 0.36 ? 0.25 + raw * 0.72 : -(0.2 + raw * 0.5);
+    const bh = Math.abs(v) * half;
+    const bx = x0 + (i + 0.18) * (gw / N);
+    const by = v > 0 ? cy - bh : cy;
+
+    handRect(ctx, bx, by, bw, bh, p, 0.6, 0.34, i * 23 + 1121, 1.6);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(bx, by, bw, bh);
+    ctx.clip();
+    /* Las ganadoras se traman en un sentido y las perdedoras en el
+       contrario: se distinguen sin recurrir al color, que en una plancha
+       de una sola tinta no existe. */
+    hatch(ctx, bx, by, bw, bh, v > 0 ? Math.PI / 4 : -Math.PI / 4, 4.2, 0.4, 0.34, p, i + 1131);
+    if (racha) hatch(ctx, bx, by, bw, bh, Math.PI / 4, 4.2, 0.36, 0.28, p, i + 1141);
+    ctx.restore();
+  }
+
+  /* El tope diario: la línea que el guardián no deja cruzar. */
+  const lp = phase(t, 0.68, 0.28);
+  if (lp > 0.02) {
+    const ly = cy + half * 0.72;
+    const dash: Pt[] = [];
+    for (let X = x0; X < x0 + gw; X += 14) dash.push([X, ly], [X + 8, ly]);
+    for (let i = 0; i + 1 < dash.length; i += 2)
+      engraveLine(ctx, [dash[i], dash[i + 1]], lp, 0.7, 0.42, i + 1151);
+    label(ctx, "LÍMITE DIARIO", x0 + 4, ly + 17, 9, 0.48, lp);
+  }
+}
+
+/* ---- El reparto por ruta ---------------------------------------------
+   Cada entrada es el guion de una sección: qué se graba, en qué orden y
+   cuántas figuras. No todas llevan cuatro — el número sale de lo larga
+   que sea la página, no de rellenar una cuadrícula.
+
+   Las claves son rutas SIN barra final y sin el prefijo de despliegue;
+   `platesFor` normaliza antes de buscar. */
+const ATLAS: Record<string, PlateFn[]> = {
+  /* Portada — el recorrido completo: qué mides, cuándo, si hay ventaja
+     y cuánto arriesgas. */
+  "/": [plateEquity, plateCalendar, plateDistribution, plateGauge],
+
+  /* Características — de la anotación a mano al análisis: primero el
+     libro, después lo que el libro permite calcular. */
+  "/features": [plateLedger, plateEquity, plateHeatmap, plateRules],
+
+  /* Métricas — el instrumental estadístico, y la banda de error como
+     recordatorio de que un ratio sin muestra detrás no es un dato. */
+  "/features/metricas": [plateRolling, plateDistribution, plateHeatmap],
+
+  /* Disciplina — la regla, el freno y el límite. */
+  "/features/disciplina": [plateRules, plateGauge, plateStreak],
+
+  /* Seguridad — el mecanismo cerrado y el registro que no sale de aquí. */
+  "/features/seguridad": [plateVault, plateLedger],
+
+  /* Precios — el libro y lo que se acumula con él. Pago único: la figura
+     que crece es la cuenta, no la suscripción. */
+  "/pricing": [plateLedger, plateEquity],
+
+  /* Demo — una sola figura, y discreta: aquí manda la aplicación. */
+  "/demo": [plateHeatmap],
+
+  /* Preguntas — la distribución y el calendario, que son las dos que más
+     dudas generan. */
+  "/faq": [plateDistribution, plateCalendar],
+
+  /* Acerca de — de dónde viene esto: el libro mayor y la curva. */
+  "/about": [plateLedger, plateRolling],
+};
+
+type PlateFn = (ctx: Ctx, w: number, h: number, t: number) => void;
+
+/** Juego de láminas de una ruta; la portada como reserva. */
+function platesFor(pathname: string): PlateFn[] {
+  /* En producción el sitio cuelga de un subdirectorio, así que la ruta
+     que ve el router puede llegar con prefijo y con barra final. Se
+     normaliza antes de buscar o ninguna clave casaría fuera de local. */
+  let p = pathname.replace(/\/+$/, "");
+  const cut = p.indexOf("/features");
+  if (cut > 0) p = p.slice(cut);
+  else if (p && !ATLAS[p]) {
+    const last = "/" + p.split("/").filter(Boolean).pop();
+    if (ATLAS[last]) p = last;
+  }
+  return ATLAS[p || "/"] ?? ATLAS["/"];
+}
 
 export function EngravedAtlas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  /* El juego de láminas depende de la sección. Al cambiar de ruta cambia
+     el array y el efecto vuelve a montarse entero: se remiden las pausas
+     de la página nueva y el grabado arranca desde el principio, que es
+     lo que corresponde — entrar en una sección es abrir otro capítulo,
+     no continuar el anterior por la mitad. */
+  const pathname = usePathname();
+  const PLATES = useMemo(() => platesFor(pathname), [pathname]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1476,7 +2104,7 @@ export function EngravedAtlas() {
       document.removeEventListener("visibilitychange", onVis);
       obs.disconnect();
     };
-  }, []);
+  }, [PLATES]);
 
   return <canvas ref={canvasRef} aria-hidden className="tj-engraved-atlas" />;
 }

@@ -119,23 +119,30 @@ export function Comparison() {
                     (needed for the rounded-card clip + horizontal
                     scroll on mobile); a split-table or JS-synced
                     header restructure would unlock it but is out of
-                    scope for this polish round. The strong backdrop bg
-                    (`bg-[rgb(var(--bg)/0.92)] backdrop-blur-md backdrop-saturate-150`) on
-                    every th makes the header read as a deliberate
-                    anchored row in both themes regardless of sticky,
-                    and is ready to obscure scrolling rows the moment a
-                    future refactor removes the overflow ancestors
-                    (R24-1d). */}
+                    scope for this polish round.
+
+                    El fondo de cada `th` es OPACO y sin desenfoque.
+                    Antes era `--bg` al 92 % con `backdrop-blur-md`, y
+                    las dos cosas sobraban. El desenfoque contradice el
+                    material —el papel no se esmerila— y era lo último
+                    que quedaba con cristal en todo el sitio. Y la
+                    transparencia sólo tendría sentido si la cabecera
+                    llegara a flotar sobre las filas al hacer scroll,
+                    que es exactamente lo que estos ancestros con
+                    `overflow` impiden: se estaba pagando composición
+                    por difuminar un fondo que nunca se mueve. Una banda
+                    sólida con su filete es además como se ancla la
+                    cabecera de una tabla impresa. */}
                 <thead className="sticky top-0 z-20">
                   <tr className="border-b border-[rgb(var(--divider)/0.15)]">
-                    <th scope="col" className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom bg-[rgb(var(--bg)/0.92)] backdrop-blur-md backdrop-saturate-150">
+                    <th scope="col" className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom bg-[rgb(var(--bg))]">
                       {es ? "Característica" : "Feature"}
                     </th>
                     {cols.map((c) => (
                       <th
                         key={c.key}
                         scope="col"
-                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 bg-[rgb(var(--bg)/0.92)] backdrop-blur-md backdrop-saturate-150 ${
+                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 bg-[rgb(var(--bg))] ${
                           c.highlight
                             ? "shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),inset_0_-1px_0_0_rgb(var(--accent-base)/0.18)]"
                             : ""
