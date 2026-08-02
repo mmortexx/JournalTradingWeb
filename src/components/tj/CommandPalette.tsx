@@ -77,15 +77,21 @@ const PAGES: Page[] = [
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   // Bilingual ES/EN based on browser language; default ES.
-  // Lazy initializer — runs once on mount, never re-computes. SSR returns
-  // true (no navigator) which is fine because the palette renders nothing
-  // until open.
-  const [es] = useState<boolean>(() =>
-    typeof navigator !== "undefined"
-      ? navigator.language.toLowerCase().startsWith("es")
-      : true
-  );
-  const { toggle: toggleLang } = useLang();
+  /* El idioma de la paleta es el del SITIO, no el del navegador.
+     ────────────────────────────────────────────────────────────────
+     Antes se derivaba una sola vez de `navigator.language`, con el
+     argumento de que así "funciona independientemente del idioma activo
+     del sitio". El argumento está del revés: si el visitante ha elegido
+     español en el selector, el panel de comandos tiene que hablarle en
+     español. Con un navegador en inglés, la web entera salía en español
+     y el panel en inglés — dos idiomas en la misma pantalla, y el que
+     mandaba era el que el visitante NO había elegido.
+
+     Ahora sale de `useLang()`, la misma fuente que el resto del sitio,
+     así que cambiar el idioma en la barra también cambia el de la
+     paleta y el atajo `⌘K` deja de ser una isla. */
+  const { toggle: toggleLang, lang } = useLang();
+  const es = lang === "es";
   const { theme, toggleTheme, setPalette, palette: currentPalette } = useTheme();
   const pathname = usePathname();
 

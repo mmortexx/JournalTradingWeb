@@ -3109,6 +3109,51 @@ button.icon-btn:hover > svg,
   );
 }
 
+/* ---- Las superficies flotantes ---------------------------------------
+   Modales, cajón móvil, aviso de cookies y paleta de comandos. Se
+   quedaron fuera del cambio de estilo porque no viven en el flujo de la
+   página: solo aparecen al invocarlos, así que no salían en ninguna
+   captura. Arrastraban tres cosas del estilo anterior:
+
+   1. VELO NEGRO PURO (`bg-black/50`). Sobre un material que imita papel
+      hueso, un negro absoluto no es una sombra: es un agujero. La tinta
+      de este estilo es cálida (#15130F) y el velo tiene que serlo
+      también, o el modal parece recortado de otra web.
+   2. SOMBRAS GRANDES (`shadow-2xl`). El papel no proyecta sombras
+      difusas de 40 px; se apila. Un filete y un desplazamiento corto
+      dicen "esto está encima" sin inventar una fuente de luz.
+   3. DESENFOQUE DE FONDO. Lo mismo que ya se retiró del resto del
+      sitio: el papel no se esmerila.
+
+   Se resuelve aquí y no en cada componente porque son ocho ficheros
+   distintos que comparten exactamente el mismo problema; tocarlos uno a
+   uno multiplicaría por ocho las probabilidades de que el siguiente
+   modal vuelva a nacer con el velo negro. */
+:root[data-palette="clasico"] .bg-black\/50,
+:root[data-palette="clasico"] .bg-black\/60,
+:root[data-palette="clasico"] .bg-black\/45,
+:root[data-palette="clasico"] .bg-black\/40 {
+  background-color: rgb(21 19 15 / 0.5);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+:root[data-theme="light"][data-palette="clasico"] .bg-black\/50,
+:root[data-theme="light"][data-palette="clasico"] .bg-black\/60,
+:root[data-theme="light"][data-palette="clasico"] .bg-black\/45,
+:root[data-theme="light"][data-palette="clasico"] .bg-black\/40 {
+  /* En papel el velo va más suave: sobre un fondo claro, medio punto de
+     tinta ya separa el modal del resto y no apaga la página entera. */
+  background-color: rgb(26 23 20 / 0.38);
+}
+:root[data-palette="clasico"] .shadow-2xl,
+:root[data-palette="clasico"] .shadow-xl,
+:root[data-palette="clasico"] .shadow-lg {
+  box-shadow:
+    0 1px 0 rgb(var(--divider) / 0.1),
+    0 10px 24px -18px rgb(0 0 0 / 0.45);
+  border: 1px solid var(--line-2);
+}
+
 /* ---- Los filetes de margen -------------------------------------------
    Dos líneas verticales finas a la altura de la mancha, de arriba abajo
    del documento. Es el recurso con el que un libro impreso marca dónde

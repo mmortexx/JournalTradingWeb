@@ -38,7 +38,8 @@ import { useEffect, useRef } from "react";
  *     traza un rectángulo con regla, las líneas se cruzan un poco en las
  *     esquinas. Ese defecto es la firma de la mano y se dibuja a
  *     propósito; sin él, el marco delata la máquina.
- *   · CARTELA con el número de lámina en romanos y su filete.
+ *   · COLOFÓN de cierre: dos filetes y un rombo, sin rotular nada — a
+ *     la figura la nombra su pie, que vive en la página.
  *   · ROSETONES en las cuatro esquinas interiores.
  *   · DETALLE AMPLIADO: un círculo que agranda un fragmento de la figura
  *     y se une a su origen con dos líneas guía. Es EL recurso de la
@@ -413,17 +414,12 @@ function rosette(ctx: Ctx, x: number, y: number, sx: number, sy: number, r: numb
 }
 
 /**
- * El cromo completo: marco doble, rosetones, cartela con el número de
- * lámina y su título, y el filete de cierre.
+ * El cromo completo: marco de filete doble con las esquinas rebasadas,
+ * rosetones en las cuatro esquinas, colofón de cierre y las dos reglas
+ * de margen graduadas. Sin un solo rótulo: nombrar la figura es trabajo
+ * del pie que vive en la página, no del fondo.
  */
-function plateChrome(
-  ctx: Ctx,
-  w: number,
-  h: number,
-  t: number,
-  roman: string,
-  title: string
-) {
+function plateChrome(ctx: Ctx, w: number, h: number, t: number) {
   const m = Math.min(w, h) * 0.055;
   const x = m;
   const y = m;
@@ -440,37 +436,45 @@ function plateChrome(
   rosette(ctx, x + 14, y + ph - 14, 1, -1, rr, t);
   rosette(ctx, x + pw - 14, y + ph - 14, -1, -1, rr, t);
 
-  /* Cartela: el número de lámina, entre dos filetes cortos. */
+  /* ---- El colofón -----------------------------------------------------
+     Aquí iban el número de lámina en romanos y su título rotulado. Se
+     retiran: el fondo NO debe rotularse.
+
+     Dos motivos. Uno de lectura — un letrero grande detrás del texto
+     compite con él, y en el cruce entre láminas llegaban a verse dos
+     rótulos distintos superpuestos, que es la clase de detalle que
+     delata una plantilla. Otro de reparto: quien nombra la figura es su
+     PIE, que vive en la página (`PlateInterlude`) donde se puede leer de
+     verdad. Que el fondo se rotulara a sí mismo era decir dos veces lo
+     mismo, y una de las dos veces mal.
+
+     En su lugar, el remate que un impresor pone al cerrar una plancha:
+     dos filetes cortos con un rombo en medio. No dice nada — cierra. */
   const cy = y + ph + m * 0.42;
   const cp = phase(t, 0.5, 0.36);
   const cx = x + pw / 2;
   if (cp > 0) {
-    const half = Math.min(pw * 0.19, 190);
+    const half = Math.min(pw * 0.17, 170);
+    const gap = 22;
+    engraveLine(ctx, [[cx - half, cy], [cx - gap, cy]], cp, 0.8, 0.42, 101);
+    engraveLine(ctx, [[cx + gap, cy], [cx + half, cy]], cp, 0.8, 0.42, 103);
+    /* El rombo del centro, dibujado a línea como todo lo demás. */
+    const d = 4.5;
     engraveLine(
       ctx,
       [
-        [cx - half, cy],
-        [cx - 46, cy],
+        [cx, cy - d],
+        [cx + d, cy],
+        [cx, cy + d],
+        [cx - d, cy],
+        [cx, cy - d],
       ],
       cp,
-      0.8,
-      0.42,
-      101
+      0.85,
+      0.46,
+      105
     );
-    engraveLine(
-      ctx,
-      [
-        [cx + 46, cy],
-        [cx + half, cy],
-      ],
-      cp,
-      0.8,
-      0.42,
-      103
-    );
-    label(ctx, roman, cx, cy, 16, 0.62, cp, "center");
   }
-  label(ctx, title, x + 16, y - m * 0.34, 13, 0.48, phase(t, 0.62, 0.34));
 
   /* ---- Las reglas de margen -------------------------------------------
      Dos escalas milimetradas verticales pegadas al marco, con su marca
@@ -575,7 +579,7 @@ const SERIES = (() => {
 })();
 
 function plateEquity(ctx: Ctx, w: number, h: number, t: number) {
-  plateChrome(ctx, w, h, t, "LÁMINA I", "CURVA DE RENDIMIENTO");
+  plateChrome(ctx, w, h, t);
 
   /* La figura ocupa CASI TODO el ancho, no el 73 % central.
      Antes iba de 0,14 a 0,87 del ancho: justo el tramo que la mancha de
@@ -801,7 +805,7 @@ function plateEquity(ctx: Ctx, w: number, h: number, t: number) {
    LÁMINA II — El calendario de resultados
    ===================================================================== */
 function plateCalendar(ctx: Ctx, w: number, h: number, t: number) {
-  plateChrome(ctx, w, h, t, "LÁMINA II", "CALENDARIO DE RESULTADOS");
+  plateChrome(ctx, w, h, t);
 
   const cols = 7;
   const rows = 5;
@@ -912,7 +916,7 @@ const BARS = (() => {
 })();
 
 function plateDistribution(ctx: Ctx, w: number, h: number, t: number) {
-  plateChrome(ctx, w, h, t, "LÁMINA III", "DISTRIBUCIÓN DE R");
+  plateChrome(ctx, w, h, t);
 
   const x0 = w * 0.07;
   const x1 = w * 0.93;
@@ -1002,7 +1006,7 @@ function plateDistribution(ctx: Ctx, w: number, h: number, t: number) {
    LÁMINA IV — El cuadrante de riesgo
    ===================================================================== */
 function plateGauge(ctx: Ctx, w: number, h: number, t: number) {
-  plateChrome(ctx, w, h, t, "LÁMINA IV", "CUADRANTE DE RIESGO");
+  plateChrome(ctx, w, h, t);
 
   const cx = w / 2;
   const cy = h * 0.68;
