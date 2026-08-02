@@ -163,49 +163,21 @@ export default function Home() {
       <Hero />
       <StatsBandNew />
 
-      <PlateInterlude
-        index={0}
-        roman="I"
-        titleEs="La curva que de verdad importa"
-        titleEn="The curve that actually matters"
-        noteEs="No el beneficio: la distancia entre tu capital y su techo histórico. Esa franja rayada es el drawdown, y es la cifra que decide si una cuenta sigue viva."
-        noteEn="Not profit: the gap between your capital and its historic high. That hatched band is drawdown, and it is the number that decides whether an account survives."
-      />
+      <PlateInterlude index={0} />
 
       <MetricsShowcaseNew />
       <Ticker />
 
-      <PlateInterlude
-        index={1}
-        roman="II"
-        titleEs="Un mes, día a día"
-        titleEn="A month, day by day"
-        noteEs="Cada celda es una sesión. Cuanto más apretada la trama, mayor el resultado; las jornadas en pérdida van cruzadas. Un mes entero se lee de un vistazo, sin abrir un informe."
-        noteEn="Each cell is a session. The tighter the hatching, the bigger the result; losing days are cross-hatched. A whole month reads at a glance, with no report to open."
-      />
+      <PlateInterlude index={1} />
 
       <GuardianNew />
 
-      <PlateInterlude
-        index={2}
-        roman="III"
-        titleEs="¿Ventaja real o buena racha?"
-        titleEn="Real edge, or a good run?"
-        noteEs="La distribución de tus operaciones en múltiplos de riesgo. Si la cola derecha no pesa más que la izquierda, no hay ventaja: hay suerte, y la suerte revierte."
-        noteEn="Your trades distributed in risk multiples. If the right tail does not outweigh the left, there is no edge — there is luck, and luck reverts."
-      />
+      <PlateInterlude index={2} />
 
       <Values />
       <TrustStrip />
 
-      <PlateInterlude
-        index={3}
-        roman="IV"
-        titleEs="Cuánto queda antes del límite"
-        titleEn="How much is left before the limit"
-        noteEs="El guardián mide el riesgo abierto contra tu tope diario y te frena antes de cruzarlo. La zona rayada del cuadrante es el tramo donde una cuenta de fondeo se pierde."
-        noteEn="The guardian measures open risk against your daily cap and stops you before you cross it. The hatched arc is where a funded account gets lost."
-      />
+      <PlateInterlude index={3} />
 
       <FinalCTANew />
     </>

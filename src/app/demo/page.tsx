@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time (capabilities + demo + gallery + stats + ready-to-buy).
 // ~400 words at 220 wpm = ~2 min.
@@ -119,6 +120,8 @@ export default function DemoPage() {
       </section>
       {/* Screenshot gallery — all 8 optimized webp images */}
       <DemoGallery />
+
+      <PlateInterlude index={0} />
       <StatsBandNew />
       {/* Ready-to-buy CTA — catches visitors who just played with the demo */}
       {/* `DemoReadyToBuy` retirado: era un segundo CTA idéntico pegado

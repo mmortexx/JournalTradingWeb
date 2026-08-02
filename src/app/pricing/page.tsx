@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time (pricing cards + comparison + pricing FAQ +
 // trust strip + stats + lista de espera + download CTA).
@@ -237,8 +238,12 @@ export default function PricingPage() {
       {/* Pricing-specific FAQ — 4 bilingual Q&A focused on trial, payment,
           multi-computer and lost license. */}
       <PricingFAQ />
+
+      <PlateInterlude index={0} />
       <TrustStrip />
       <StatsBandNew />
+
+      <PlateInterlude index={1} />
       <Waitlist />
       {/* Download CTA — Windows-app installer button. Sits between the
           la lista de espera y el cierre suave, para que el visitante se vaya con una

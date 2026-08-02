@@ -5,6 +5,7 @@ import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time (security + tech specs + integrations).
 // ~520 words across three sections at 220 wpm = ~3 min.
@@ -127,7 +128,11 @@ export default function SeguridadPage() {
       />
       <SecuritySection num="01" />
       <TechSpecs />
+
+      <PlateInterlude index={0} />
       <Integrations />
+
+      <PlateInterlude index={1} />
       <FeaturePageNav current="seguridad" />
       <FinalCTANew />
       <TableOfContents />

@@ -6,6 +6,7 @@ import { Values } from "@/components/marketing/Values";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time (story + values + social proof + testimonials +
 // changelog + milestones + lista de espera). ~700 words at 220 wpm = ~4 min.
@@ -111,7 +112,11 @@ export default function AboutPage() {
       />
       <Story />
       <Values />
+
+      <PlateInterlude index={0} />
       <Changelog />
+
+      <PlateInterlude index={1} />
       {/* `Milestones` retirado: repetía en horizontal los cinco mismos
           hitos que el Changelog acababa de contar dos pantallas antes
           (v1.0, Playbook, Monte Carlo, Guardián, Importador). Dos líneas

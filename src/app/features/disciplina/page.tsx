@@ -5,6 +5,7 @@ import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time (guardian + discipline cost + before/after + comparison
 // slider). ~600 words across four sections at 220 wpm = ~3 min.
@@ -131,8 +132,14 @@ export default function DisciplinaPage() {
       />
       <GuardianNew num="01" />
       <DisciplineCost num="02" />
+
+      <PlateInterlude index={0} />
       <BeforeAfter />
+
+      <PlateInterlude index={1} />
       <ComparisonSlider />
+
+      <PlateInterlude index={2} />
       <FeaturePageNav current="disciplina" />
       <FinalCTANew />
       <TableOfContents />

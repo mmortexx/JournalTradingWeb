@@ -1,6 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useLang } from "@/lib/i18n";
+import { plateAt } from "@/lib/atlas";
 
 /**
  * PlateInterlude — la lámina a página completa.
@@ -32,23 +34,19 @@ import { useLang } from "@/lib/i18n";
  * enseñar dos figuras a medias — que es justo lo contrario de lo que
  * viene a hacer.
  */
-export function PlateInterlude({
-  index,
-  roman,
-  titleEs,
-  titleEn,
-  noteEs,
-  noteEn,
-}: {
-  index: number;
-  roman: string;
-  titleEs: string;
-  titleEn: string;
-  noteEs: string;
-  noteEn: string;
-}) {
+export function PlateInterlude({ index }: { index: number }) {
   const { lang } = useLang();
   const es = lang === "es";
+  const pathname = usePathname();
+  /* El pie NO se escribe en la página: se deduce de la ruta y del índice.
+     Antes cada `<PlateInterlude>` llevaba su título y su texto a mano, y
+     eso solo funciona mientras nadie reordene las láminas de esa
+     sección — el día que alguien las cambia, el pie sigue describiendo
+     la figura anterior y no hay nada que avise. La fuente única está en
+     `@/lib/atlas`, la misma que usa el canvas para dibujar. */
+  const meta = plateAt(pathname, index);
+  if (!meta) return null;
+  const { roman, titleEs, titleEn, noteEs, noteEn } = meta;
 
   return (
     <section

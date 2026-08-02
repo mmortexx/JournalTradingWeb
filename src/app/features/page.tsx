@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time (features bento + gallery + how it works + more
 // features). ~620 words across four sections at 220 wpm = ~3 min.
@@ -133,9 +134,17 @@ export default function FeaturesPage() {
       {/* Overview sections — broad strokes. Deep dives moved to
           /features/metricas, /features/disciplina, /features/seguridad. */}
       <FeaturesBento num="01" />
+
+      <PlateInterlude index={0} />
       <Gallery />
+
+      <PlateInterlude index={1} />
       <HowItWorks />
+
+      <PlateInterlude index={2} />
       <MoreFeatures />
+
+      <PlateInterlude index={3} />
       <FinalCTANew />
       <TableOfContents />
     </>

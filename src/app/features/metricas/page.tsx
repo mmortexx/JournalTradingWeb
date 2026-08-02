@@ -5,6 +5,7 @@ import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time for this page's body content (metrics showcase
 // + risk calculator + wrapped). Computed from the section copy density —
@@ -130,8 +131,14 @@ export default function MetricasPage() {
       />
       <MetricsShowcaseNew num="01" />
       <RiskCalculator num="02" />
+
+      <PlateInterlude index={0} />
       <Wrapped />
+
+      <PlateInterlude index={1} />
       <FeaturePageNav current="metricas" />
+
+      <PlateInterlude index={2} />
       <FinalCTANew />
       <TableOfContents />
     </>

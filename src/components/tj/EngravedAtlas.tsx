@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { platesForRoute, type PlateId } from "@/lib/atlas";
 
 /**
  * EngravedAtlas — el fondo del sitio: un atlas grabado a lápiz.
@@ -1709,55 +1710,31 @@ function plateStreak(ctx: Ctx, w: number, h: number, t: number) {
 
    Las claves son rutas SIN barra final y sin el prefijo de despliegue;
    `platesFor` normaliza antes de buscar. */
-const ATLAS: Record<string, PlateFn[]> = {
-  /* Portada — el recorrido completo: qué mides, cuándo, si hay ventaja
-     y cuánto arriesgas. */
-  "/": [plateEquity, plateCalendar, plateDistribution, plateGauge],
-
-  /* Características — de la anotación a mano al análisis: primero el
-     libro, después lo que el libro permite calcular. */
-  "/features": [plateLedger, plateEquity, plateHeatmap, plateRules],
-
-  /* Métricas — el instrumental estadístico, y la banda de error como
-     recordatorio de que un ratio sin muestra detrás no es un dato. */
-  "/features/metricas": [plateRolling, plateDistribution, plateHeatmap],
-
-  /* Disciplina — la regla, el freno y el límite. */
-  "/features/disciplina": [plateRules, plateGauge, plateStreak],
-
-  /* Seguridad — el mecanismo cerrado y el registro que no sale de aquí. */
-  "/features/seguridad": [plateVault, plateLedger],
-
-  /* Precios — el libro y lo que se acumula con él. Pago único: la figura
-     que crece es la cuenta, no la suscripción. */
-  "/pricing": [plateLedger, plateEquity],
-
-  /* Demo — una sola figura, y discreta: aquí manda la aplicación. */
-  "/demo": [plateHeatmap],
-
-  /* Preguntas — la distribución y el calendario, que son las dos que más
-     dudas generan. */
-  "/faq": [plateDistribution, plateCalendar],
-
-  /* Acerca de — de dónde viene esto: el libro mayor y la curva. */
-  "/about": [plateLedger, plateRolling],
-};
-
 type PlateFn = (ctx: Ctx, w: number, h: number, t: number) => void;
 
-/** Juego de láminas de una ruta; la portada como reserva. */
+/**
+ * De identificador a función de dibujo. El REPARTO por sección no está
+ * aquí: vive en `@/lib/atlas`, junto a los pies de figura, porque las
+ * pausas de la página tienen que nombrar exactamente la figura que se
+ * está grabando. Con las dos listas separadas bastaba reordenar una ruta
+ * para que el pie describiera otra cosa, y nada lo delataba.
+ */
+const PLATE_FN: Record<PlateId, PlateFn> = {
+  equity: plateEquity,
+  calendar: plateCalendar,
+  distribution: plateDistribution,
+  gauge: plateGauge,
+  heatmap: plateHeatmap,
+  rolling: plateRolling,
+  rules: plateRules,
+  streak: plateStreak,
+  vault: plateVault,
+  ledger: plateLedger,
+};
+
+/** Juego de láminas de una ruta, ya resuelto a funciones de dibujo. */
 function platesFor(pathname: string): PlateFn[] {
-  /* En producción el sitio cuelga de un subdirectorio, así que la ruta
-     que ve el router puede llegar con prefijo y con barra final. Se
-     normaliza antes de buscar o ninguna clave casaría fuera de local. */
-  let p = pathname.replace(/\/+$/, "");
-  const cut = p.indexOf("/features");
-  if (cut > 0) p = p.slice(cut);
-  else if (p && !ATLAS[p]) {
-    const last = "/" + p.split("/").filter(Boolean).pop();
-    if (ATLAS[last]) p = last;
-  }
-  return ATLAS[p || "/"] ?? ATLAS["/"];
+  return platesForRoute(pathname).map((id) => PLATE_FN[id]);
 }
 
 export function EngravedAtlas() {

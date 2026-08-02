@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQ } from "@/components/marketing/FAQ";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { OG_IMAGE } from "@/lib/og";
+import { PlateInterlude } from "@/components/tj/PlateInterlude";
 
 // Estimated reading time (16 Q&A entries + contact sections). ~650 words
 // across all answers at 220 wpm = ~3 min.
@@ -242,7 +243,11 @@ export default function FaqPage() {
           una sola frase centrada, sin icono ni acción. El componente
           sigue en el repositorio por si hace falta en otra página. */}
       <ContactSupport />
+
+      <PlateInterlude index={0} />
       <ContactForm />
+
+      <PlateInterlude index={1} />
       <FinalCTANew />
       <TableOfContents />
     </>
