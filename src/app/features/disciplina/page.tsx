@@ -6,12 +6,12 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { SITE_URL } from "@/lib/site";
 
 // Estimated reading time (guardian + discipline cost + before/after + comparison
 // slider). ~600 words across four sections at 220 wpm = ~3 min.
 const READING_TIME_MIN = 3;
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -32,8 +32,8 @@ const articleSchema = {
     "El Guardián frena antes del error: bloquea tamaños que exceden tu riesgo, te obliga a respetar el plan y audita cada excepción.",
   url: `${SITE_URL}/features/disciplina/`,
   mainEntityOfPage: `${SITE_URL}/features/disciplina/`,
-  author: { "@type": "Organization", name: "Trading Journal" },
-  publisher: { "@type": "Organization", name: "Trading Journal" },
+  author: { "@type": "Organization", name: "CountPips" },
+  publisher: { "@type": "Organization", name: "CountPips" },
   inLanguage: "es",
   timeRequired: `PT${READING_TIME_MIN}M`,
   // datePublished/dateModified use the frozen build date — same value
@@ -58,29 +58,29 @@ const articleSchema = {
 };
 
 export const metadata: Metadata = {
-  // `absolute` bypasses layout.tsx's `title.template: "%s · Trading Journal"`
-  // — a plain string would render "Disciplina — Trading Journal · Trading Journal"
+  // `absolute` bypasses layout.tsx's `title.template: "%s · CountPips"`
+  // — a plain string would render "Disciplina — CountPips · CountPips"
   // (double-branded). See worklog Task R22-1d (G1) + R23-2a.
-  title: { absolute: "Disciplina — Trading Journal" },
+  title: { absolute: "Disciplina — CountPips" },
   description:
     "El Guardián frena antes del error: bloquea tamaños sobre tu riesgo, te obliga a respetar el plan y audita cada excepción. Indisciplina medida en dinero.",
   alternates: { canonical: `${SITE_URL}/features/disciplina/` },
   openGraph: {
-    title: "Disciplina — Trading Journal",
+    title: "Disciplina — CountPips",
     description: "El Guardián frena antes del error. Disciplina que actúa, no que sermonea.",
     url: `${SITE_URL}/features/disciplina/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
     // Next.js shallow-merges child openGraph over layout's — layout's
     // default OG image is NOT inherited when the child omits `images`.
     // See worklog Task R22-1d (G2) + R23-2a.
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Disciplina — Trading Journal" }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Disciplina — CountPips" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Disciplina — Trading Journal",
+    title: "Disciplina — CountPips",
     description: "El Guardián frena antes del error. Disciplina que actúa, no que sermonea.",
     images: [OG_IMAGE],
   },

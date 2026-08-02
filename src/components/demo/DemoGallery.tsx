@@ -51,7 +51,7 @@ const shots: Shot[] = [
     altEn: "Overview screen: how your trading is going, with performance curve and P&L calendar",
     capEs: "Resumen",
     capEn: "Overview",
-    caption: "Trading Journal — Overview",
+    caption: "CountPips — Overview",
   },
   {
     src: "/img/app-operaciones.webp",
@@ -59,7 +59,7 @@ const shots: Shot[] = [
     altEn: "Trade log with 200 filterable trades",
     capEs: "Operaciones",
     capEn: "Trades",
-    caption: "Trading Journal — Trades",
+    caption: "CountPips — Trades",
   },
   {
     src: "/img/app-analitica.webp",
@@ -67,7 +67,7 @@ const shots: Shot[] = [
     altEn: "Analytics with the metrics-by-period table and institutional ratios",
     capEs: "Analítica",
     capEn: "Analytics",
-    caption: "Trading Journal — Analytics",
+    caption: "CountPips — Analytics",
   },
   {
     src: "/img/app-curva.webp",
@@ -75,7 +75,7 @@ const shots: Shot[] = [
     altEn: "Filtered performance curve with drawdown and curve quality",
     capEs: "Curva de rendimiento",
     capEn: "Performance curve",
-    caption: "Trading Journal — Performance",
+    caption: "CountPips — Performance",
   },
   {
     src: "/img/app-diario.webp",
@@ -83,7 +83,7 @@ const shots: Shot[] = [
     altEn: "Journal with the daily check-in: sleep, mental and physical state",
     capEs: "Diario",
     capEn: "Journal",
-    caption: "Trading Journal — Journal",
+    caption: "CountPips — Journal",
   },
   {
     src: "/img/app-playbook.webp",
@@ -91,7 +91,7 @@ const shots: Shot[] = [
     altEn: "Playbook with each setup card and its statistics",
     capEs: "Playbook",
     capEn: "Playbook",
-    caption: "Trading Journal — Playbook",
+    caption: "CountPips — Playbook",
   },
   {
     src: "/img/app-detalle.webp",
@@ -99,7 +99,7 @@ const shots: Shot[] = [
     altEn: "Trade detail with journey, execution, plan and review",
     capEs: "Detalle de operación",
     capEn: "Trade detail",
-    caption: "Trading Journal — Trade detail",
+    caption: "CountPips — Trade detail",
   },
   {
     src: "/img/app-nueva.webp",
@@ -107,7 +107,7 @@ const shots: Shot[] = [
     altEn: "New trade form with risk calculation",
     capEs: "Nueva operación",
     capEn: "New trade",
-    caption: "Trading Journal — New trade",
+    caption: "CountPips — New trade",
   },
 ];
 

@@ -28,7 +28,7 @@ import { asset } from "@/lib/asset";
  *
  * Props:
  *  - `caption`: texto mono centrado en la barra de título (p.ej. "Resumen
- *    — Trading Journal"). Si se omite, se usa el nombre de la app.
+ *    — CountPips"). Si se omite, se usa el nombre de la app.
  *  - `children`: el contenido del cuerpo (normalmente un <Image> o
  *    <FeatureImage fit="contain">).
  *  - `bodyClassName`: clases extra para el cuerpo (p.ej. aspect ratio).
@@ -44,7 +44,7 @@ interface WindowFrameProps {
 }
 
 export function WindowFrame({
-  caption = "Trading Journal",
+  caption = "CountPips",
   children,
   bodyClassName = "",
   className = "",
@@ -85,7 +85,7 @@ export function WindowFrame({
           boxShadow: "inset 0 1px 0 rgb(var(--divider) / 0.10)",
         }}
       >
-        {/* Título a la IZQUIERDA — Trading Journal es una app nativa de
+        {/* Título a la IZQUIERDA — CountPips es una app nativa de
             Windows, y en Windows el título va pegado al borde izquierdo,
             no centrado. Antes esta barra llevaba los tres semáforos de
             macOS y una caption centrada: vendía la app como si fuera de

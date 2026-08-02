@@ -6,13 +6,13 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { SITE_URL } from "@/lib/site";
 
 // Estimated reading time for this page's body content (metrics showcase
 // + risk calculator + wrapped). Computed from the section copy density —
 // ~480 words across the three sections at 220 wpm = ~3 min (rounded up).
 const READING_TIME_MIN = 3;
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -35,8 +35,8 @@ const articleSchema = {
     "40+ ratios institucionales calculados de tus operaciones. Sharpe, Sortino, Calmar, profit factor, expectancy en R.",
   url: `${SITE_URL}/features/metricas/`,
   mainEntityOfPage: `${SITE_URL}/features/metricas/`,
-  author: { "@type": "Organization", name: "Trading Journal" },
-  publisher: { "@type": "Organization", name: "Trading Journal" },
+  author: { "@type": "Organization", name: "CountPips" },
+  publisher: { "@type": "Organization", name: "CountPips" },
   inLanguage: "es",
   timeRequired: `PT${READING_TIME_MIN}M`,
   // datePublished/dateModified use the frozen build date — same value
@@ -61,29 +61,29 @@ const articleSchema = {
 };
 
 export const metadata: Metadata = {
-  // `absolute` bypasses layout.tsx's `title.template: "%s · Trading Journal"`
-  // — a plain string would render "Métricas — Trading Journal · Trading Journal"
+  // `absolute` bypasses layout.tsx's `title.template: "%s · CountPips"`
+  // — a plain string would render "Métricas — CountPips · CountPips"
   // (double-branded). See worklog Task R22-1d (G1) + R23-2a.
-  title: { absolute: "Métricas — Trading Journal" },
+  title: { absolute: "Métricas — CountPips" },
   description:
     "40+ ratios institucionales: Sharpe, Sortino, Calmar, profit factor, expectancy en R. Calculadora de riesgo. Métricas que correlacionan con la consistencia.",
   alternates: { canonical: `${SITE_URL}/features/metricas/` },
   openGraph: {
-    title: "Métricas — Trading Journal",
+    title: "Métricas — CountPips",
     description: "40+ ratios institucionales y calculadora de riesgo. Métricas que separan un edge real de una racha.",
     url: `${SITE_URL}/features/metricas/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
     // Next.js shallow-merges child openGraph over layout's — layout's
     // default OG image is NOT inherited when the child omits `images`.
     // See worklog Task R22-1d (G2) + R23-2a.
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Métricas — Trading Journal" }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Métricas — CountPips" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Métricas — Trading Journal",
+    title: "Métricas — CountPips",
     description: "40+ ratios institucionales y calculadora de riesgo interactiva.",
     images: [OG_IMAGE],
   },

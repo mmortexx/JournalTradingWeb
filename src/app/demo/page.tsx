@@ -5,12 +5,12 @@ import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
 import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { SITE_URL } from "@/lib/site";
 
 // Estimated reading time (capabilities + demo + gallery + stats + ready-to-buy).
 // ~400 words at 220 wpm = ~2 min.
 const READING_TIME_MIN = 2;
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
 
@@ -46,11 +46,11 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/demo/`,
   },
   openGraph: {
-    title: "Demo en vivo — Trading Journal",
+    title: "Demo en vivo — CountPips",
     description: "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra.",
     url: `${SITE_URL}/demo/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
     images: [
@@ -58,13 +58,13 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Demo en vivo — Trading Journal",
+        alt: "Demo en vivo — CountPips",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Demo en vivo — Trading Journal",
+    title: "Demo en vivo — CountPips",
     description:
       "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra realistas. No es un vídeo: es la app.",
     images: [OG_IMAGE],

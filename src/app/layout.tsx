@@ -16,6 +16,7 @@ import { IntroSequence } from "@/components/tj/IntroSequence";
 import { SectionReveal } from "@/components/tj/SectionReveal";
 import { DecorFX } from "@/components/tj/DecorFX";
 import { OG_IMAGE } from "@/lib/og";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * Viewport — `viewport-fit=cover` lets the layout extend into the notch /
@@ -68,7 +69,6 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // Use ABSOLUTE URLs for OG image and logo. Next.js resolves relative OG
 // image paths against `metadataBase`, but with a basePath the resolution
 // is fragile (a leading-slash path like "/JournalTradingWeb/og.png" gets
@@ -101,7 +101,7 @@ const LOGO_URL = `${SITE_URL}/logo.png`;
 const softwareApplicationSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Trading Journal",
+  name: "CountPips",
   applicationCategory: "FinanceApplication",
   operatingSystem: "Windows",
   url: SITE_URL,
@@ -146,7 +146,7 @@ const softwareApplicationSchema = {
   // de esa plataforma.
   publisher: {
     "@type": "Organization",
-    name: "Trading Journal",
+    name: "CountPips",
     url: SITE_URL,
   },
 };
@@ -159,7 +159,7 @@ const softwareApplicationSchema = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Trading Journal",
+  name: "CountPips",
   url: SITE_URL,
   logo: LOGO_URL,
   description:
@@ -171,8 +171,8 @@ const organizationSchema = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Trading Journal — Tu operativa, medida.",
-    template: "%s · Trading Journal",
+    default: "CountPips — Tu operativa, medida.",
+    template: "%s · CountPips",
   },
   description:
     "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina que te frena antes de la tontería y tus datos 100 % en tu máquina. Pago único. Sin suscripciones.",
@@ -206,17 +206,17 @@ export const metadata: Metadata = {
     "pago único",
     "sin suscripciones",
   ],
-  authors: [{ name: "Trading Journal" }],
-  creator: "Trading Journal",
+  authors: [{ name: "CountPips" }],
+  creator: "CountPips",
   alternates: {
     canonical: `${SITE_URL}/`,
   },
   openGraph: {
-    title: "Trading Journal — Tu operativa, medida.",
+    title: "CountPips — Tu operativa, medida.",
     description:
       "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único.",
     url: SITE_URL,
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     type: "website",
     locale: "es_ES",
     alternateLocale: ["en_US"],
@@ -225,13 +225,13 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Trading Journal — Tu operativa, medida.",
+        alt: "CountPips — Tu operativa, medida.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Trading Journal — Tu operativa, medida.",
+    title: "CountPips — Tu operativa, medida.",
     description:
       "Diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales.",
     images: [OG_IMAGE],

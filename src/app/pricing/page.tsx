@@ -5,13 +5,13 @@ import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { SITE_URL } from "@/lib/site";
 
 // Estimated reading time (pricing cards + comparison + pricing FAQ +
 // trust strip + stats + lista de espera + download CTA).
 // ~850 words at 220 wpm = ~4 min.
 const READING_TIME_MIN = 4;
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
 
@@ -77,7 +77,7 @@ const faqSchema = {
       name: "¿Puedo usarlo en varios ordenadores?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Una misma licencia te permite instalar Trading Journal en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Activaciones adicionales se gestionan escribiendo a soporte.",
+        text: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Activaciones adicionales se gestionan escribiendo a soporte.",
       },
     },
     {
@@ -102,17 +102,17 @@ const faqSchema = {
 const productSchema = {
   "@context": "https://schema.org",
   "@type": "Product",
-  name: "Trading Journal",
+  name: "CountPips",
   description:
     "Diario de trading nativo de Windows. Métricas institucionales, disciplina que actúa, datos 100% locales. Pago único, sin suscripciones.",
-  brand: { "@type": "Brand", name: "Trading Journal" },
+  brand: { "@type": "Brand", name: "CountPips" },
   category: "Software",
   // Sin `aggregateRating` a propósito: no hay reseñas reales todavía.
   // Ver la nota equivalente en src/app/layout.tsx.
   offers: [
     {
       "@type": "Offer",
-      name: "Trading Journal — Core",
+      name: "CountPips — Core",
       price: "29",
       priceCurrency: "USD",
       priceValidUntil: "2026-12-31",
@@ -123,7 +123,7 @@ const productSchema = {
     },
     {
       "@type": "Offer",
-      name: "Trading Journal — Pro",
+      name: "CountPips — Pro",
       price: "49",
       priceCurrency: "USD",
       priceValidUntil: "2026-12-31",
@@ -143,11 +143,11 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/pricing/`,
   },
   openGraph: {
-    title: "Precios — Trading Journal",
+    title: "Precios — CountPips",
     description: "Pago único. Sin suscripciones. Core $29 · Pro $49.",
     url: `${SITE_URL}/pricing/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
     images: [
@@ -155,13 +155,13 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Precios — Trading Journal",
+        alt: "Precios — CountPips",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Precios — Trading Journal",
+    title: "Precios — CountPips",
     description:
       "Pago único, sin suscripciones. Core $29 · Pro $49. Tus datos 100% locales para siempre.",
     images: [OG_IMAGE],

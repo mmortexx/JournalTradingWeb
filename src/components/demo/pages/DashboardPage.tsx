@@ -62,7 +62,7 @@ const labelCls =
   "block text-[11px] uppercase tracking-[0.15em] text-tertiary mb-1.5";
 
 /**
- * Dashboard / "Resumen" page of the native Trading Journal app,
+ * Dashboard / "Resumen" page of the native CountPips app,
  * recreated for the browser demo. Mirrors the WinUI DashboardPage.xaml
  * layout (post 17/07/2026 redesign):
  *

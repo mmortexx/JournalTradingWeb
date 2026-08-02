@@ -5,12 +5,12 @@ import { FAQ } from "@/components/marketing/FAQ";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { SITE_URL } from "@/lib/site";
 
 // Estimated reading time (16 Q&A entries + contact sections). ~650 words
 // across all answers at 220 wpm = ~3 min.
 const READING_TIME_MIN = 3;
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
 
@@ -79,7 +79,7 @@ const faqSchema = {
       name: "¿Funciona en Mac o Linux?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Trading Journal es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
+        text: "CountPips es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
       },
     },
     {
@@ -87,7 +87,7 @@ const faqSchema = {
       name: "¿Puedo importar de otro journal?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Aceptamos importación desde CSV (formato flexible con mapeo de columnas) y un importador dedicado para journals populares. Si tu journal actual exporta a CSV, lo tienes en tu Trading Journal en menos de 5 minutos.",
+        text: "Sí. Aceptamos importación desde CSV (formato flexible con mapeo de columnas) y un importador dedicado para journals populares. Si tu journal actual exporta a CSV, lo tienes en tu CountPips en menos de 5 minutos.",
       },
     },
     {
@@ -143,7 +143,7 @@ const faqSchema = {
       name: "¿Puedo usarlo en varios ordenadores?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Una misma licencia te permite instalar Trading Journal en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Tu archivo .sqlite es portable: cópialo a una carpeta compartida o llévalo en un pendrive y trabajarás desde cualquiera de los equipos como si fuera el mismo. Las activaciones adicionales se gestionan escribiendo a soporte.",
+        text: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Tu archivo .sqlite es portable: cópialo a una carpeta compartida o llévalo en un pendrive y trabajarás desde cualquiera de los equipos como si fuera el mismo. Las activaciones adicionales se gestionan escribiendo a soporte.",
       },
     },
     {
@@ -160,16 +160,16 @@ const faqSchema = {
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Preguntas frecuentes sobre Trading Journal: precio, privacidad, compatibilidad, importación, actualizaciones y más.",
+    "Preguntas frecuentes sobre CountPips: precio, privacidad, compatibilidad, importación, actualizaciones y más.",
   alternates: {
     canonical: `${SITE_URL}/faq/`,
   },
   openGraph: {
-    title: "FAQ — Trading Journal",
-    description: "Preguntas frecuentes sobre Trading Journal: precio, privacidad, compatibilidad y más.",
+    title: "FAQ — CountPips",
+    description: "Preguntas frecuentes sobre CountPips: precio, privacidad, compatibilidad y más.",
     url: `${SITE_URL}/faq/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
     images: [
@@ -177,15 +177,15 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "FAQ — Trading Journal",
+        alt: "FAQ — CountPips",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FAQ — Trading Journal",
+    title: "FAQ — CountPips",
     description:
-      "Preguntas frecuentes sobre Trading Journal: precio, privacidad, compatibilidad, importación, actualizaciones y más.",
+      "Preguntas frecuentes sobre CountPips: precio, privacidad, compatibilidad, importación, actualizaciones y más.",
     images: [OG_IMAGE],
   },
 };

@@ -72,11 +72,11 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "¿Funciona en Mac o Linux?",
-          a: "Trading Journal es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
+          a: "CountPips es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
         },
         {
           q: "¿Puedo importar de otro journal?",
-          a: "Sí. Aceptamos importación desde CSV (formato flexible con mapeo de columnas) y un importador dedicado para journals populares. Si tu journal actual exporta a CSV, lo tienes en tu Trading Journal en menos de 5 minutos.",
+          a: "Sí. Aceptamos importación desde CSV (formato flexible con mapeo de columnas) y un importador dedicado para journals populares. Si tu journal actual exporta a CSV, lo tienes en tu CountPips en menos de 5 minutos.",
         },
         {
           q: "¿Qué pasa si pierdo mi licencia?",
@@ -104,7 +104,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "¿Puedo usarlo en varios ordenadores?",
-          a: "Sí. Una misma licencia te permite instalar Trading Journal en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Tu archivo .sqlite es portable: cópialo a una carpeta compartida o llévalo en un pendrive y trabajarás desde cualquiera de los equipos como si fuera el mismo. Las activaciones adicionales se gestionan escribiendo a soporte.",
+          a: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Tu archivo .sqlite es portable: cópialo a una carpeta compartida o llévalo en un pendrive y trabajarás desde cualquiera de los equipos como si fuera el mismo. Las activaciones adicionales se gestionan escribiendo a soporte.",
         },
         {
           q: "¿Qué pasa si cambio de ordenador?",
@@ -126,11 +126,11 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "Does it work on Mac or Linux?",
-          a: "Trading Journal is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like to be a beta tester when it lands, drop us a line.",
+          a: "CountPips is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like to be a beta tester when it lands, drop us a line.",
         },
         {
           q: "Can I import from another journal?",
-          a: "Yes. We support CSV import (flexible format with column mapping) and a dedicated importer for popular journals. If your current journal exports to CSV, you'll have it in your Trading Journal in less than 5 minutes.",
+          a: "Yes. We support CSV import (flexible format with column mapping) and a dedicated importer for popular journals. If your current journal exports to CSV, you'll have it in your CountPips in less than 5 minutes.",
         },
         {
           q: "What if I lose my license?",
@@ -158,7 +158,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "Can I use it on multiple computers?",
-          a: "Yes. A single license lets you install Trading Journal on your personal computers (your trading desktop and your laptop, for example). Your .sqlite file is portable: copy it to a shared folder or carry it on a USB stick and you'll work from any of your machines as if it were the same one. Extra activations can be arranged by emailing support.",
+          a: "Yes. A single license lets you install CountPips on your personal computers (your trading desktop and your laptop, for example). Your .sqlite file is portable: copy it to a shared folder or carry it on a USB stick and you'll work from any of your machines as if it were the same one. Extra activations can be arranged by emailing support.",
         },
         {
           q: "What if I change computers?",

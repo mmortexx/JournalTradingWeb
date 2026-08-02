@@ -6,7 +6,7 @@ import { Database, FileLock2, KeyRound, Check, X } from "lucide-react";
 /**
  * SecuritySection — sección `#security` del HTML. Local-first:
  * 3 tarjetas (100 % en local, archivo .sqlite, export/import)
- * + tabla comparativa "Diario en la nube vs Trading Journal".
+ * + tabla comparativa "Diario en la nube vs CountPips".
  *
  * `num` — ordinal del eyebrow. Por defecto el de la home ("06"); las
  * páginas internas pasan el suyo para mantener su propia secuencia.
@@ -152,7 +152,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
               className="tnum border-l-2 border-[rgb(var(--accent-base)/0.30)] pl-2"
               style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgb(var(--accent-base))", fontWeight: 600 }}
             >
-              Trading Journal
+              CountPips
             </span>
             <span
               className="tnum"

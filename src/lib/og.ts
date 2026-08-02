@@ -17,6 +17,15 @@
  * Al cambiar `public/og.png` (con `python scripts/generate-og.py`), hay
  * que subir este número.
  */
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
+import { SITE_URL } from "@/lib/site";
 
+/* La dirección se toma de `@/lib/site`, NO se escribe aquí.
+   Este archivo llevaba su propia copia y sobrevivió al cambio de dominio
+   sin que nada avisara: la web entera declaraba ya `countpips.com` como
+   canónica mientras la miniatura de las redes seguía pidiéndose al
+   GitHub Pages antiguo. Habría funcionado —esa copia sigue encendida—
+   hasta el día que se apague, y entonces cada enlace compartido del sitio
+   se quedaría sin imagen, meses después y sin relación aparente con la
+   causa. Lo cazó una comprobación del HTML publicado, no el compilador:
+   una cadena duplicada nunca da error, solo se queda atrás. */
 export const OG_IMAGE = `${SITE_URL}/og.png?v=2`;

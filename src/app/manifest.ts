@@ -14,8 +14,8 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Trading Journal",
-    short_name: "Trading Journal",
+    name: "CountPips",
+    short_name: "CountPips",
     description:
       "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
     start_url: `${BASE}/`,
@@ -32,7 +32,7 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         // El logotipo REAL de la aplicación de escritorio: el mismo archivo
         // que usan su barra de título y su icono de bandeja
-        // (TradingJournal.App/Assets/app-logo.png). Antes había aquí un SVG
+        // (CountPips.App/Assets/app-logo.png). Antes había aquí un SVG
         // en línea inventado —cuadrado verde con una línea de gráfico— que
         // no aparecía en ninguna otra parte del producto.
         src: `${BASE}/logo.png`,

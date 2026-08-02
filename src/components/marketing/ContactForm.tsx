@@ -98,8 +98,8 @@ export function ContactForm() {
 
     const result = await submitForm({
       subject: es
-        ? `Nuevo mensaje de ${name.trim()} — Trading Journal`
-        : `New message from ${name.trim()} — Trading Journal`,
+        ? `Nuevo mensaje de ${name.trim()} — CountPips`
+        : `New message from ${name.trim()} — CountPips`,
       name: name.trim(),
       email: email.trim(),
       message: message.trim(),

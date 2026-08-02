@@ -90,7 +90,7 @@ export function IntroSequence() {
       '<span style="width:46px;height:46px;border-radius:12px;background:color-mix(in srgb,var(--surface) 66%,transparent);border:1px solid rgb(var(--divider) / 0.13);display:grid;place-items:center">' +
       BRAND_GLYPH_SVG(22) +
       "</span>" +
-      '<div class="font-serif" style="font-size:25px;color:var(--ink);letter-spacing:-.01em">Trading Journal</div>' +
+      '<div class="font-serif" style="font-size:25px;color:var(--ink);letter-spacing:-.01em">CountPips</div>' +
       '<div class="tnum" style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3)">Hecho para el trader manual serio</div>' +
       "</div>" +
       '<div data-ln class="tnum" style="position:absolute;right:26px;bottom:10px;font-size:clamp(3rem,9vw,7rem);font-weight:500;line-height:.8;color:color-mix(in srgb,var(--ink) 13%,transparent)">000</div>';

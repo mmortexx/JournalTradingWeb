@@ -387,7 +387,7 @@ def content(img: Image.Image) -> None:
     small = logo.resize((size, size), Image.LANCZOS)
     img.paste(small, (int(X * S), int(164 * S)), small)
 
-    text(d, (X + 46 + 14, 176), "Trading Journal", font("semibold", 22), INK, tracking=-0.1)
+    text(d, (X + 46 + 14, 176), "CountPips", font("semibold", 22), INK, tracking=-0.1)
     hairline(img, X, 240, R, 0.11)
 
     text(d, (X, 266), "LOCAL · PRIVADO · TUYO", font("semibold", 12.5), ACCENT, tracking=3.6)

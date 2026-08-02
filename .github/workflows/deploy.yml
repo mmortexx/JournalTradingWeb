@@ -64,6 +64,16 @@ jobs:
         # copiados a ./out/_next/ por el export).
         run: bun run build
         env:
+          # PREFIJO DE RUTAS — solo para GitHub Pages.
+          # Este sitio se publica en dos destinos: countpips.com, en la
+          # RAÍZ (Cloudflare Pages), y esta copia, que cuelga de
+          # /JournalTradingWeb. El prefijo se declara AQUÍ y en ningún
+          # sitio más: `next.config.ts` no lo lleva escrito, así que sin
+          # esta línea el sitio se compila para la raíz — que es lo que
+          # necesita el dominio propio y también el desarrollo local.
+          # Si algún día se apaga esta publicación, se borra esta línea y
+          # no hay que tocar la configuración.
+          NEXT_PUBLIC_BASE_PATH: /JournalTradingWeb
           # Destino de los formularios de contacto y boletín. Al ser un
           # sitio estático, Next incrusta el valor en el JS durante el
           # build: si el secret no está definido, el sitio se publica

@@ -135,7 +135,7 @@ export async function submitForm(fields: FormFields): Promise<SubmitResult> {
     botcheck,
     // Remitente visible en el email; cae al nombre del sitio si el
     // formulario no pide nombre.
-    from_name: rest.name?.trim() || "Trading Journal Web",
+    from_name: rest.name?.trim() || "CountPips Web",
     ...rest,
   });
 

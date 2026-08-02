@@ -1,0 +1,48 @@
+# Cabeceras HTTP — las lee Cloudflare Pages desde la raíz del sitio
+# publicado. GitHub Pages ignora este fichero por completo (no permite
+# configurar cabeceras), así que aquí no hay nada que pueda romper la
+# publicación antigua: o se aplica, o se ignora.
+#
+# Este fichero vive en `public/` para que el export lo copie tal cual a
+# `out/`, que es lo que Cloudflare publica.
+
+# ── Seguridad, en todo el sitio ───────────────────────────────────────
+/*
+  # Impide que el sitio se cargue dentro de un iframe ajeno. Sin esto,
+  # cualquiera puede incrustar la página en la suya y superponer sus
+  # propios controles encima de los botones reales — es como se roban
+  # clics de compra.
+  X-Frame-Options: DENY
+  # El navegador respeta el tipo de contenido declarado en vez de
+  # intentar adivinarlo. Evita que un fichero subido como imagen acabe
+  # ejecutándose como script.
+  X-Content-Type-Options: nosniff
+  # Al salir hacia otro dominio solo se envía el origen, nunca la ruta
+  # completa: la página concreta que estaba viendo el visitante no viaja
+  # a terceros.
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Se renuncia explícitamente a permisos que este sitio no usa. Si
+  # alguna dependencia intentara pedir cámara o micrófono, el navegador
+  # lo deniega sin preguntar al visitante.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+# ── Recursos con huella en el nombre ──────────────────────────────────
+# Next incrusta un hash en el nombre de cada fichero de `_next/static`,
+# así que un cambio de contenido SIEMPRE cambia el nombre. Eso permite
+# cachearlos un año sin riesgo de servir algo viejo: si cambia, la página
+# pedirá otro nombre. `immutable` le dice al navegador que ni se moleste
+# en revalidar.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Las imágenes y fuentes no llevan huella en el nombre, así que se
+# cachean un día y se revalidan. Un mes sería arriesgado: cambiar una
+# captura dejaría a los visitantes recurrentes viendo la anterior.
+/img/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# ── El HTML no se cachea ──────────────────────────────────────────────
+# Cada página vuelve a pedirse. Es lo que hace que un despliegue se vea
+# al instante en vez de esperar a que caduque la copia del navegador.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

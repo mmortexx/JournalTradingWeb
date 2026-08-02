@@ -417,12 +417,12 @@ export function OverviewApp() {
                 without competing with the float-cards' own `tj-float`
                 animation (different transform axis + slower 300ms ease). */}
             <div className="relative z-[2] transition-transform duration-300 ease-out hover:-translate-y-1" style={{ willChange: "transform" }}>
-              <WindowFrame caption="Trading Journal — Resumen">
+              <WindowFrame caption="CountPips — Resumen">
                 <FeatureImage
                   src={asset("/img/app-resumen.webp")}
                   alt={es
-                    ? "Pantalla de Resumen de Trading Journal: curva de rendimiento, KPIs y calendario P&L"
-                    : "Trading Journal Overview screen: performance curve, KPIs and P&L calendar"}
+                    ? "Pantalla de Resumen de CountPips: curva de rendimiento, KPIs y calendario P&L"
+                    : "CountPips Overview screen: performance curve, KPIs and P&L calendar"}
                   fit="contain"
                   className="absolute inset-0 h-full w-full"
                   overlay={0}

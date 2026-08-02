@@ -5,8 +5,8 @@ import { Hero } from "@/components/marketing/Hero";
 import { SideRail } from "@/components/tj/SideRail";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { OG_IMAGE } from "@/lib/og";
+import { SITE_URL } from "@/lib/site";
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — see layout.tsx for the rationale (social platforms
 // silently fail to render SVG OG images). Absolute URL bypasses the
 // metadataBase + basePath double-resolution issue (also see layout.tsx).
@@ -15,17 +15,17 @@ const PAGE_DESCRIPTION =
   "Diario de trading nativo de Windows. Métricas institucionales, disciplina que frena el error y datos 100% locales. Pago único desde 29 $. Sin suscripciones.";
 
 export const metadata: Metadata = {
-  title: { absolute: "Trading Journal — Opera como una mesa institucional." },
+  title: { absolute: "CountPips — Opera como una mesa institucional." },
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}/`,
   },
   openGraph: {
-    title: "Trading Journal — Opera como una mesa institucional.",
+    title: "CountPips — Opera como una mesa institucional.",
     description: PAGE_DESCRIPTION,
     url: `${SITE_URL}/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
     images: [
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Trading Journal — Opera como una mesa institucional.",
+        alt: "CountPips — Opera como una mesa institucional.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Trading Journal — Opera como una mesa institucional.",
+    title: "CountPips — Opera como una mesa institucional.",
     description:
       "Diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único desde 29 $.",
     images: [OG_IMAGE],

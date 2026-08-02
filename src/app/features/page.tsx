@@ -5,12 +5,12 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { SITE_URL } from "@/lib/site";
 
 // Estimated reading time (features bento + gallery + how it works + more
 // features). ~620 words across four sections at 220 wpm = ~3 min.
 const READING_TIME_MIN = 3;
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 
 /**
  * Breadcrumb structured data — page-specific. [Home, Features] so Google
@@ -39,8 +39,8 @@ const articleSchema = {
     "Bento de características, galería de la app, cómo funciona y más. Métricas, disciplina y seguridad tienen sus propias páginas enfocadas.",
   url: `${SITE_URL}/features/`,
   mainEntityOfPage: `${SITE_URL}/features/`,
-  author: { "@type": "Organization", name: "Trading Journal" },
-  publisher: { "@type": "Organization", name: "Trading Journal" },
+  author: { "@type": "Organization", name: "CountPips" },
+  publisher: { "@type": "Organization", name: "CountPips" },
   inLanguage: "es",
   timeRequired: `PT${READING_TIME_MIN}M`,
   // datePublished/dateModified use the frozen build date — same value
@@ -67,18 +67,18 @@ export const metadata: Metadata = {
     "Todo para operar con disciplina: bento de características, galería, cómo funciona y más. Métricas, disciplina y seguridad tienen su propia página enfocada.",
   alternates: { canonical: `${SITE_URL}/features/` },
   openGraph: {
-    title: "Características — Trading Journal",
-    description: "Explora cada característica de Trading Journal en profundidad.",
+    title: "Características — CountPips",
+    description: "Explora cada característica de CountPips en profundidad.",
     url: `${SITE_URL}/features/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Características — Trading Journal" }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Características — CountPips" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Características — Trading Journal",
+    title: "Características — CountPips",
     description: "40+ métricas institucionales, disciplina que cuesta dinero, playbook en vivo y 100% local.",
     images: [OG_IMAGE],
   },

@@ -1,6 +1,6 @@
 /*
  * Deterministic demo-data generator + metrics calculator.
- * Mirrors TradingJournal.Data/DemoData/DemoDataGenerator.cs:
+ * Mirrors CountPips.Data/DemoData/DemoDataGenerator.cs:
  *   9 instruments across 4 asset classes, 5 setups, 3 sessions,
  *   ~200 trades over 180 days, ~50% win rate, payoff ~1.5, PF ~1.5,
  *   expectancy ~0.25R, max DD ~8%, annualized Sharpe ~3.3.

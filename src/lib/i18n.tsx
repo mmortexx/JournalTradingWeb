@@ -13,7 +13,7 @@ export type Lang = "es" | "en";
 
 export const STR = {
   // ---- Brand / global ----
-  appName: { es: "Trading Journal", en: "Trading Journal" },
+  appName: { es: "CountPips", en: "CountPips" },
   tagline: { es: "Tu operativa, medida.", en: "Your trading, measured." },
   heroLead: {
     es: "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina que te frena antes de la tontería y tus datos 100 % en tu máquina.",

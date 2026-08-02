@@ -60,7 +60,7 @@ export function Changelog() {
           version: "v1.0",
           title: "Lanzamiento inicial",
           description:
-            "El primer release público de Trading Journal, nativo de Windows.",
+            "El primer release público de CountPips, nativo de Windows.",
           date: "Ene 2026",
           kind: "past",
         },
@@ -114,7 +114,7 @@ export function Changelog() {
           version: "v1.0",
           title: "Initial launch",
           description:
-            "The first public release of Trading Journal, native to Windows.",
+            "The first public release of CountPips, native to Windows.",
           date: "Jan 2026",
           kind: "past",
         },

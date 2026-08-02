@@ -41,9 +41,9 @@ export function Gallery() {
     {
       src: "/img/app-analitica.webp",
       alt: es
-        ? "Pantalla de Analítica de Trading Journal con la tabla de métricas por periodo, win rate, profit factor, Sharpe y Sortino"
-        : "Trading Journal Analytics screen with the metrics-by-period table, win rate, profit factor, Sharpe and Sortino",
-      caption: "Trading Journal — Analytics",
+        ? "Pantalla de Analítica de CountPips con la tabla de métricas por periodo, win rate, profit factor, Sharpe y Sortino"
+        : "CountPips Analytics screen with the metrics-by-period table, win rate, profit factor, Sharpe and Sortino",
+      caption: "CountPips — Analytics",
       title: es ? "Métricas institucionales" : "Institutional metrics",
       desc: es
         ? "40+ ratios calculados de tus operaciones. Sharpe, Sortino, Calmar, profit factor, expectancy en R."
@@ -52,21 +52,21 @@ export function Gallery() {
     {
       src: "/img/app-curva.webp",
       alt: es ? "Curva de rendimiento filtrada con drawdown sombreado y calidad de la curva" : "Filtered performance curve with shaded drawdown and curve quality",
-      caption: "Trading Journal — Performance",
+      caption: "CountPips — Performance",
       title: es ? "Curva de rendimiento" : "Performance curve",
       desc: es ? "Rendimiento vs balance, con drawdown sombreado y calidad de la curva (R², K-Ratio)." : "Performance vs balance, with shaded drawdown and curve quality (R², K-Ratio).",
     },
     {
       src: "/img/app-diario.webp",
       alt: es ? "Diario de trading con el check-in del día: horas de sueño, estado mental y físico" : "Trading journal with the daily check-in: hours of sleep, mental and physical state",
-      caption: "Trading Journal — Journal",
+      caption: "CountPips — Journal",
       title: es ? "Diario y disciplina" : "Journal and discipline",
       desc: es ? "Check-in diario: sueño, estado mental y físico, y si tenías plan." : "Daily check-in: sleep, mental and physical state, and whether you had a plan.",
     },
     {
       src: "/img/app-playbook.webp",
       alt: es ? "Playbook con las fichas de cada setup: Ruptura, Reversión, Pullback, Rango y Tendencia" : "Playbook with each setup card: Breakout, Reversal, Pullback, Range and Trend",
-      caption: "Trading Journal — Playbook",
+      caption: "CountPips — Playbook",
       title: es ? "Playbook en vivo" : "Live playbook",
       desc: es
         ? "Cada setup con su expectancy, win rate, muestra y reparto de R calculados de tus operaciones."
@@ -75,14 +75,14 @@ export function Gallery() {
     {
       src: "/img/app-operaciones.webp",
       alt: es ? "Registro de operaciones con 200 trades filtrables por instrumento, setup y resultado" : "Trade log with 200 trades filterable by instrument, setup and outcome",
-      caption: "Trading Journal — Trades",
+      caption: "CountPips — Trades",
       title: es ? "Registro de operaciones" : "Trade log",
       desc: es ? "200 operaciones filtrables por instrumento, setup, dirección y resultado." : "200 trades filterable by instrument, setup, direction and outcome.",
     },
     {
       src: "/img/app-resumen.webp",
       alt: es ? "Pantalla de resumen con curva de rendimiento y calendario P&L" : "Overview screen with performance curve and P&L calendar",
-      caption: "Trading Journal — Overview",
+      caption: "CountPips — Overview",
       title: es ? "Resumen" : "Overview",
       desc: es ? "Cómo va tu operativa, con curva de rendimiento y calendario P&L." : "How your trading is going, with performance curve and P&L calendar.",
     },

@@ -183,7 +183,7 @@ export function BeforeAfter() {
                 </svg>
               </span>
               <span className="t-label text-[rgb(var(--accent-base))]">
-                {es ? "Con Trading Journal" : "With Trading Journal"}
+                {es ? "Con CountPips" : "With CountPips"}
               </span>
             </div>
             {/* Vibrant liquid-glass card with static accent border glow + slightly

@@ -56,13 +56,13 @@ const ROWS: Row[] = [
   },
 ];
 
-/** Comparison table — Trading Journal vs cloud journals vs Excel. */
+/** Comparison table — CountPips vs cloud journals vs Excel. */
 export function Comparison() {
   const { lang } = useLang();
   const es = lang === "es";
 
   const cols = [
-    { key: "tj", label: es ? "Trading Journal" : "Trading Journal", sub: es ? "Esta app" : "This app", highlight: true },
+    { key: "tj", label: es ? "CountPips" : "CountPips", sub: es ? "Esta app" : "This app", highlight: true },
     { key: "cloud", label: es ? "Journals en la nube" : "Cloud journals", sub: es ? "Suscripción" : "Subscription", highlight: false },
     { key: "excel", label: es ? "Excel / Sheets" : "Excel / Sheets", sub: es ? "Gratis" : "Free", highlight: false },
   ];

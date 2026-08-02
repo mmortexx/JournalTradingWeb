@@ -7,12 +7,12 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { SITE_URL } from "@/lib/site";
 
 // Estimated reading time (story + values + social proof + testimonials +
 // changelog + milestones + lista de espera). ~700 words at 220 wpm = ~4 min.
 const READING_TIME_MIN = 4;
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
 // silently fail to render SVG OG images. See layout.tsx for the full note.
 
@@ -43,16 +43,16 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: "Acerca de",
   description:
-    "La historia de Trading Journal: por qué existe, para quién es, y cómo evoluciona. Hecho para el trader manual serio.",
+    "La historia de CountPips: por qué existe, para quién es, y cómo evoluciona. Hecho para el trader manual serio.",
   alternates: {
     canonical: `${SITE_URL}/about/`,
   },
   openGraph: {
-    title: "Acerca de — Trading Journal",
-    description: "La historia de Trading Journal: por qué existe, para quién es, y cómo evoluciona.",
+    title: "Acerca de — CountPips",
+    description: "La historia de CountPips: por qué existe, para quién es, y cómo evoluciona.",
     url: `${SITE_URL}/about/`,
     type: "website",
-    siteName: "Trading Journal",
+    siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
     images: [
@@ -60,15 +60,15 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Acerca de — Trading Journal",
+        alt: "Acerca de — CountPips",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Acerca de — Trading Journal",
+    title: "Acerca de — CountPips",
     description:
-      "La historia de Trading Journal: por qué existe, para quién es, y cómo evoluciona. Hecho para el trader manual serio.",
+      "La historia de CountPips: por qué existe, para quién es, y cómo evoluciona. Hecho para el trader manual serio.",
     images: [OG_IMAGE],
   },
 };

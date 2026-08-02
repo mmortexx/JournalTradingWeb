@@ -64,7 +64,7 @@ export function PricingFAQ() {
         },
         {
           q: "¿Puedo usarlo en varios ordenadores?",
-          a: "Sí. Una misma licencia te permite instalar Trading Journal en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Activaciones adicionales se gestionan escribiendo a soporte.",
+          a: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Activaciones adicionales se gestionan escribiendo a soporte.",
         },
         {
           q: "¿Qué pasa si pierdo mi licencia?",
@@ -82,7 +82,7 @@ export function PricingFAQ() {
         },
         {
           q: "Can I use it on multiple computers?",
-          a: "Yes. A single license lets you install Trading Journal on your personal computers (your trading desktop and your laptop, for example). Extra activations can be arranged by emailing support.",
+          a: "Yes. A single license lets you install CountPips on your personal computers (your trading desktop and your laptop, for example). Extra activations can be arranged by emailing support.",
         },
         {
           q: "What if I lose my license?",

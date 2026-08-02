@@ -1,27 +1,41 @@
 import type { NextConfig } from "next";
 
-// GitHub Pages serves the site at /JournalTradingWeb/, so production builds
-// need basePath + assetPrefix + output:export. In local dev we serve at the
-// root (http://localhost:3000/) with a normal dynamic server so Turbopack
-// can compile on demand — `output: "export"` + Turbopack dev can deadlock.
+/* ── DÓNDE CUELGA EL SITIO ─────────────────────────────────────────────
+   El mismo código se publica en dos destinos que no sirven las páginas
+   desde el mismo sitio:
+
+     · Cloudflare Pages (countpips.com) — RAÍZ del dominio, sin prefijo.
+     · GitHub Pages (mmortexx.github.io/JournalTradingWeb) — subdirectorio.
+
+   El prefijo NO puede decidirse por "producción sí / desarrollo no", que
+   es como estaba: con esa regla, cualquier compilación de producción
+   metía `/JournalTradingWeb` delante de cada ruta, y en un dominio propio
+   eso convierte todos los enlaces y todos los recursos en un 404.
+
+   Ahora lo decide el ENTORNO. Sin variable, no hay prefijo — que es lo
+   correcto para Cloudflare y también para el desarrollo local, así que el
+   caso por defecto es el bueno y el raro tiene que pedirse a propósito:
+   el flujo de GitHub Actions declara `NEXT_PUBLIC_BASE_PATH` y es el
+   único que lo hace. Si mañana se apaga GitHub Pages, se borra esa línea
+   del flujo y aquí no hay que tocar nada.
+
+   Ojo con el detalle que ya mordió una vez: `basePath` afecta a las rutas
+   que Next genera, pero NO a las cadenas que compone uno a mano; de eso
+   se encarga `asset()` leyendo esta misma variable. Por eso se expone en
+   `env` y no se queda como constante privada del build. */
 const IS_DEV = process.env.NODE_ENV === "development";
-const BASE_PATH = "/JournalTradingWeb";
+const BASE_PATH = IS_DEV ? "" : (process.env.NEXT_PUBLIC_BASE_PATH ?? "");
 
 const nextConfig: NextConfig = {
-  // Only static-export for production (GitHub Pages) builds.
+  // Exportación estática: vale igual para Cloudflare Pages y GitHub Pages.
+  // En desarrollo NO se activa — `output: "export"` con Turbopack en modo
+  // dev puede quedarse bloqueado.
   ...(IS_DEV ? {} : { output: "export" }),
-  // Only apply basePath + assetPrefix for production (GitHub Pages) builds.
-  ...(IS_DEV
-    ? {}
-    : {
-        basePath: BASE_PATH,
-        assetPrefix: `${BASE_PATH}/`,
-      }),
-  // Expose basePath to the client so image srcs in components can be
-  // prefixed (next/image does NOT auto-prefix absolute srcs starting
-  // with "/" under output:export + basePath).
+  ...(BASE_PATH
+    ? { basePath: BASE_PATH, assetPrefix: `${BASE_PATH}/` }
+    : {}),
   env: {
-    NEXT_PUBLIC_BASE_PATH: IS_DEV ? "" : BASE_PATH,
+    NEXT_PUBLIC_BASE_PATH: BASE_PATH,
     // Destino de los formularios (ver src/lib/forms.ts). Se declara aquí, y
     // no solo en el entorno, para que Next SIEMPRE lo sustituya por un
     // literal en el bundle del cliente. Si se deja sin declarar y la

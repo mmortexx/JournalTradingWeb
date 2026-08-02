@@ -1,5 +1,5 @@
 /**
- * BrandGlyph — el logotipo de Trading Journal: el libro mayor.
+ * BrandGlyph — el logotipo de CountPips: el libro mayor.
  *
  * Un libro abierto. En la página izquierda, los renglones del registro;
  * en la derecha, la curva que sale de haberlo llevado. Eso es el

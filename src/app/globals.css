@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   TRADING JOURNAL — DESIGN SYSTEM
+   COUNTPIPS — DESIGN SYSTEM
    Faithful to the native WinUI app: Resources/Colors.xaml,
    Typography.xaml, Palettes/*.xaml, TintedAcrylicBackdrop.cs.
    3-level translucent material (canvas < chrome < glass cards)
@@ -79,7 +79,7 @@
   --radius-lg: 8px;
   --radius-xl: 8px;
 
-  /* ---- Trading Journal brand tokens mapped to Tailwind ----
+  /* ---- CountPips brand tokens mapped to Tailwind ----
      NOTE: `--color-tj-accent*` mappings removed (R1-a) — they auto-
      generated ~108 unused `*-tj-accent` Tailwind utilities. Components
      now use `rgb(var(--accent-base))` directly in arbitrary Tailwind
@@ -108,7 +108,7 @@
 
        1. La paleta DEFAULT de la app es "Oro" (champagne/bronce), no
           verde. Fuente:
-          Agenda Trading/03-mvp/app/src/TradingJournal.App/Resources/
+          Agenda Trading/03-mvp/app/src/CountPips.App/Resources/
           Palettes/Oro.xaml:2 → "la original del proyecto, DEFAULT".
           Valores: #8A6C35 (light) / #C7A76B (dark, Light2).
        2. Igualar el acento al verde de P&L es EXACTAMENTE lo que el

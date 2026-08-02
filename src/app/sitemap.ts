@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 
 // Per-page SEO metadata. Priority is a hint to crawlers about relative
 // importance within the site (0.0–1.0); changeFrequency is a hint about

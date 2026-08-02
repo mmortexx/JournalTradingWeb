@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-const SITE_URL = "https://mmortexx.github.io/JournalTradingWeb";
 
 export default function robots(): MetadataRoute.Robots {
   return {
