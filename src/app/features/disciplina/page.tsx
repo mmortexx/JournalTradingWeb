@@ -109,6 +109,10 @@ const RMultipleSimulator = dynamic(
   () => import("@/components/marketing/RMultipleSimulator").then((m) => m.RMultipleSimulator),
   { loading: () => sectionFallback }
 );
+const DisciplineScore = dynamic(
+  () => import("@/components/marketing/DisciplineScore").then((m) => m.DisciplineScore),
+  { loading: () => sectionFallback }
+);
 
 export default function DisciplinaPage() {
   return (
@@ -144,6 +148,8 @@ export default function DisciplinaPage() {
       <ComparisonSlider />
 
       <RMultipleSimulator num="03" />
+
+      <DisciplineScore num="04" />
 
       <PlateInterlude index={2} />
       <FeaturePageNav current="disciplina" />
