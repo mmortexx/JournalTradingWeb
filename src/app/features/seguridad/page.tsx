@@ -93,6 +93,10 @@ const SecuritySection = dynamic(
   () => import("@/components/marketing/SecuritySection").then((m) => m.SecuritySection),
   { loading: () => sectionFallback }
 );
+const DataFlowComparison = dynamic(
+  () => import("@/components/marketing/DataFlowComparison").then((m) => m.DataFlowComparison),
+  { loading: () => sectionFallback }
+);
 const TechSpecs = dynamic(
   () => import("@/components/marketing/TechSpecs").then((m) => m.TechSpecs),
   { loading: () => sectionFallback }
@@ -127,6 +131,7 @@ export default function SeguridadPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <SecuritySection num="01" />
+      <DataFlowComparison num="02" />
       <TechSpecs />
 
       <PlateInterlude index={0} />
