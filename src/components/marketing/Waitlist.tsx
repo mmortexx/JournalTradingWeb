@@ -260,14 +260,19 @@ export function Waitlist() {
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         <motion.div
           initial={{ opacity: 0, scale: 0.94, y: 24 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-          className="liquid-glass depth-3 rounded-card p-6 sm:p-8 max-w-2xl mx-auto relative transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          // T3c — swap `liquid-glass` por `.tj-paper-glow` (papel cálido
+          // translúcido + halo champagne muy tenue): la tarjeta de waitlist
+          // es el único objeto destacado de la sección, le sienta bien un
+          // papel con halo. `depth-3`, rounded-card, padding y max-w-2xl
+          // intactos.
+          className="tj-paper tj-paper-glow depth-3 rounded-card p-6 sm:p-8 max-w-2xl mx-auto relative transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         >
           <div className="flex flex-col items-center text-center">
             <div className="flex justify-center">

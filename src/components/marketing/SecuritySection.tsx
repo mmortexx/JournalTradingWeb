@@ -38,7 +38,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
       // the eye; the `border-t` top hairline is preserved.
       className="section border-t border-[rgb(var(--divider)/0.06)] bg-veil scroll-mt-24"
     >
-      <div className="max-w-[1240px] mx-auto px-5 md:px-8">
+      <div className="tj-container" style={{ maxWidth: 1240 }}>
         <div className="max-w-[760px] mx-auto text-center mb-12">
           <div className="inline-flex items-center gap-3 mb-5">
             <span
@@ -98,14 +98,10 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
             return (
               <div
                 key={c.t}
-                style={{
-                  padding: 24,
-                  borderRadius: 8,
-                  border: "1px solid rgb(var(--divider) / 0.13)",
-                  background: "color-mix(in oklab, var(--surface) 55%, transparent)",
-                  backdropFilter: "blur(20px) saturate(1.4)",
-                  WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-                }}
+                // T3c — swap a `.tj-paper`: papel translúcido cálido. El icon
+                // chip + título + descripción conservan su jerarquía; el
+                // atlas se filtra por los bordes.
+                className="tj-paper rounded-[8px] border border-[rgb(var(--divider)/0.13)] p-5 sm:p-6"
               >
                 <span
                   className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-base)/0.06)] border border-[rgb(var(--accent-base)/0.15)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] inline-grid place-items-center text-[rgb(var(--accent-base))]"
@@ -122,17 +118,23 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
             );
           })}
         </div>
-        {/* Tabla comparativa */}
+        {/* Tabla comparativa — mobile: horizontal scroll inside the card.
+            The 3-column grid (label · CountPips · cloud) is readable
+            without scroll on md+ but on narrow phones (≤390px) the cells
+            compress to the point of wrapping awkwardly. We keep the card's
+            rounded clip via an outer wrapper and let an inner `overflow-x-auto`
+            pane scroll horizontally with a min-width of 480px so labels +
+            values keep their natural rhythm. A subtle right-edge gradient
+            fade (md:hidden) signals "more content this way" on touch. */}
         <div
-          className="overflow-hidden"
-          style={{
-            border: "1px solid rgb(var(--divider) / 0.13)",
-            borderRadius: 8,
-            background: "color-mix(in oklab, var(--surface) 60%, transparent)",
-            backdropFilter: "blur(16px) saturate(1.4)",
-            WebkitBackdropFilter: "blur(16px) saturate(1.4)",
-          }}
+          // T3c — swap a `.tj-paper-dense`: la tabla comparativa tiene
+          // 5 filas de texto pequeño + cabecera; el 86 % de opacidad
+          // mantiene AA en los textos `--ink-2`/`--ink-3` y deja que el
+          // atlas se filtre por los bordes sin competir con la tabla.
+          className="tj-paper-dense relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)]"
         >
+          <div className="relative overflow-x-auto">
+            <div className="min-w-[480px]">
           <div
             className="grid"
             style={{
@@ -210,6 +212,20 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
               </span>
             </div>
           ))}
+            </div>
+            {/* Mobile-only right-edge gradient fade — signals "swipe for more". */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 md:hidden"
+              style={{
+                background: "linear-gradient(to left, rgb(var(--bg) / 0.92), transparent)",
+              }}
+            />
+          </div>
+          {/* Mobile-only scroll hint. */}
+          <div className="md:hidden py-2 px-4 text-[11px] uppercase tracking-[0.14em] text-tertiary font-semibold text-center">
+            <span aria-hidden>←</span>{" "}{es ? "Desliza para comparar" : "Swipe to compare"}{" "}<span aria-hidden>→</span>
+          </div>
         </div>
       </div>
     </section>

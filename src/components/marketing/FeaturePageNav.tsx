@@ -115,12 +115,14 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
 
   return (
     <section className="section-tight bg-veil relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)]">
-      <div className="relative max-w-page mx-auto px-5 md:px-8">
+      <div className="relative tj-container">
         {/* Share button — top-right */}
         <Reveal className="flex justify-center mb-10">
           <button
             onClick={handleShare}
-            className="liquid-glass inline-flex items-center gap-2 h-10 px-5 rounded-[4px] text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-[background-color,transform] duration-200"
+            // T2h: bumped h-10 → min-h-[44px] (h-11 = 44px) so the
+            // share control meets the ≥44px touch-target spec on mobile.
+            className="liquid-glass inline-flex items-center gap-2 min-h-[44px] px-5 rounded-[4px] text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-[background-color,transform] duration-200"
             aria-label={es ? "Compartir esta página" : "Share this page"}
           >
             {copied ? (
@@ -144,13 +146,17 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             <Reveal>
               <Link
                 href={asset(AXES[prev].href)}
-                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                // T2h: min-h-[44px] guarantees the prev/next cards meet
+                // the ≥44px touch target on mobile regardless of label
+                // height. Icon container bumped w-10 h-10 → w-11 h-11 (44px)
+                // so the circular tap zone is comfortably tappable too.
+                className="group liquid-glass depth-1 rounded-card p-5 min-h-[44px] flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {/* R24-1c: arrow icon container shifts on hover from neutral
                     divider bg + tertiary text to accent-tinted bg + accent
                     text, so the icon reads as the tap target rather than a
                     decorative bullet. */}
-                <span className="grid place-items-center w-10 h-10 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-[rgb(var(--accent-base))] group-hover:bg-[rgb(var(--accent-base)/0.12)] transition-[background-color,color] duration-300 flex-none">
+                <span className="grid place-items-center w-11 h-11 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-[rgb(var(--accent-base))] group-hover:bg-[rgb(var(--accent-base)/0.12)] transition-[background-color,color] duration-300 flex-none">
                   <ArrowLeft size={18} />
                 </span>
                 <span className="min-w-0">
@@ -175,10 +181,10 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             <Reveal delay={0.06}>
               <Link
                 href={asset(AXES[next].href)}
-                className="group liquid-glass depth-1 rounded-card p-5 flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group liquid-glass depth-1 rounded-card p-5 min-h-[44px] flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {/* R24-1c: mirror of the prev card’s icon-container polish. */}
-                <span className="grid place-items-center w-10 h-10 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-[rgb(var(--accent-base))] group-hover:bg-[rgb(var(--accent-base)/0.12)] transition-[background-color,color] duration-300 flex-none">
+                <span className="grid place-items-center w-11 h-11 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-[rgb(var(--accent-base))] group-hover:bg-[rgb(var(--accent-base)/0.12)] transition-[background-color,color] duration-300 flex-none">
                   <ArrowRight size={18} />
                 </span>
                 <span className="min-w-0">
@@ -198,7 +204,14 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
           )}
         </div>
 
-        {/* "Sigue explorando" — all three axes */}
+        {/* "Sigue explorando" — all three axes.
+            T2h: mobile horizontal scroll rail (overflow-x-auto + snap-x)
+            per the brief — the 3 axis cards become a swipeable carousel
+            on touch (min-w-[260px] each, ~1.4 visible at 390px so the
+            "peek" signals scrollability), and snap to grid-cols-3 on
+            md+. The rail also gets a mobile-only right-edge gradient
+            fade + a "Desliza →" hint, same vocabulary as the
+            Comparison table. */}
         <Reveal delay={0.1}>
           <div className="text-center mb-6">
             <span className="eyebrow inline-flex items-center gap-2 justify-center text-tertiary">
@@ -208,12 +221,27 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             </span>
           </div>
         </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="relative md:block -mx-5 md:mx-0">
+          {/* Mobile-only right-edge gradient fade — signals "swipe for more".
+              pointer-events-none keeps taps flowing to the underlying cards. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 md:hidden z-10"
+            style={{
+              background: "linear-gradient(to left, rgb(var(--bg) / 0.92), transparent)",
+            }}
+          />
+          <div
+            className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 overflow-x-auto md:overflow-visible
+                       snap-x snap-mandatory md:snap-none px-5 md:px-0 pb-2 md:pb-0
+                       [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent-base)/0.4)_transparent]"
+            style={{ scrollbarWidth: "thin" }}
+          >
           {ORDER.map((axis, i) => {
             const isActive = axis === current;
             const a = AXES[axis];
             return (
-              <Reveal key={axis} delay={i * 0.06}>
+              <Reveal key={axis} delay={i * 0.06} className="shrink-0 md:shrink min-w-[260px] md:min-w-0 snap-start md:snap-none">
                 <Link
                   href={asset(a.href)}
                   aria-current={isActive ? "page" : undefined}
@@ -222,7 +250,10 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                   //   inner ring (ring-accent/30) on hover so the “tappable
                   //   cross-nav card” affordance is unmistakable. Active card
                   //   stays put (no hover lift — it IS the current page).
-                  className={`group relative liquid-glass rounded-card p-5 block transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
+                  // T2h: min-h-[44px] on the link itself so the whole card
+                  //   meets the ≥44px touch-target floor even if content is
+                  //   short.
+                  className={`group relative liquid-glass rounded-card p-5 block min-h-[44px] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
                     isActive
                       ? "border-[rgb(var(--accent-base)/0.4)] depth-2"
                       : "border-[rgb(var(--divider)/0.1)] depth-1 hover:depth-2 hover:-translate-y-1 hover:border-[rgb(var(--accent-base)/0.28)]"
@@ -281,6 +312,14 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
               </Reveal>
             );
           })}
+          </div>
+          {/* Mobile-only scroll hint — bidirectional arrows + label.
+              Same vocabulary as the Comparison table's mobile hint. */}
+          <div className="md:hidden mt-3 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.14em] text-tertiary font-semibold">
+            <span aria-hidden="true">←</span>
+            <span>{es ? "Desliza para explorar" : "Swipe to explore"}</span>
+            <span aria-hidden="true">→</span>
+          </div>
         </div>
       </div>
     </section>

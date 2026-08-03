@@ -93,7 +93,7 @@ export function ContactSupport() {
     >
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         <div className="max-w-3xl mx-auto text-center">
           <Reveal>
             <div className="flex justify-center">

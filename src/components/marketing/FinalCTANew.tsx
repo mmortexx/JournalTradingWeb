@@ -96,11 +96,21 @@ export function FinalCTANew() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.18 }}
-          className="mt-9 flex flex-wrap items-center justify-center gap-3"
+          // T2d — `gap-3.5` (14px) entre CTAs (era `gap-3` 12px) para
+          // que el par primary/secondary respire cuando envuelven en
+          // móvil estrecho. Sutil pero consistente con el gap-3.5 del
+          // strip de garantías abajo.
+          className="mt-9 flex flex-wrap items-center justify-center gap-3.5"
         >
           <Link
             href="/pricing"
-            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] px-8 text-base font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            // T2d — `px-6 sm:px-8` en ambos CTAs (era `px-8` fijo):
+            // en 320px el botón primario “Empieza hoy — 29 $” + icono
+            // medía ~281px y desbordaba los 280px de contenido útil
+            // (320 − 2×20 de px-5 del contenedor). Bajar a 24px de
+            // padding en móvil lo deja en ~265px y cabe con holgura;
+            // en sm+ se restaura 32px para mantener el respiro premium.
+            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] px-6 sm:px-8 text-base font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
             style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
           >
             {es ? "Empieza hoy — 29 $" : "Start today — $29"}
@@ -108,7 +118,7 @@ export function FinalCTANew() {
           </Link>
           <Link
             href="/demo"
-            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] border px-8 text-base font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] border px-6 sm:px-8 text-base font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
             style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
           >
             {/* R25-1e — Play icon prefix matches the Hero's "Ver la demo"
@@ -124,7 +134,11 @@ export function FinalCTANew() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
+          // T2d — `gap-y-2.5` (10px) entre garantías cuando envuelven
+          // (era `gap-y-2` 8px). En 320px las 4 garantías caen a 2
+          // líneas; 10px de gap vertical las separa sin abrir un hueco
+          // tipográfico.
+          className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5"
         >
           {[
             es ? "Actualizaciones 1.x gratuitas" : "Free 1.x updates",

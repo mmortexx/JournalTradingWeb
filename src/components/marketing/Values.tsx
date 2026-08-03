@@ -106,14 +106,24 @@ export function Values() {
           </Reveal>
         </div>
 
-        {/* 2×2 grid */}
-        <div className="mt-10 grid md:grid-cols-2 gap-5">
+        {/* 2×2 grid
+            T2d — `gap-5 md:gap-6` (20px / 24px) entre tarjetas (era
+            `gap-5` 20px fijo): en móvil el Δ es nulo, en desktop sube
+            4px para que las 4 tarjetas respiren sin abrirse un hueco
+            tipográfico. El grid sigue 1-col en móvil, 2-col en md+ (que
+            es el 2×2 efectivo en lg). */}
+        <div className="mt-10 grid md:grid-cols-2 gap-5 md:gap-6">
           {VALUES.map((v, i) => (
             <Reveal key={v.num} delay={0.1 + i * 0.08} className="h-full">
               <motion.article
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
                 transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="group relative liquid-glass depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                // T3c — swap `liquid-glass` por `.tj-paper`: las 4 tarjetas
+                // de principios ahora son papel cálido translúcido, igual
+                // que los bento cards (cohesión entre secciones de cards).
+                // depth-2, rounded-card, p-6, hover lift y accent edge
+                // intactos.
+                className="group relative tj-paper depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               >
                 {/* Accent edge — grows on hover. Scaled up from 1.25 → 1.4
                     for a more pronounced lift; the base color is now a low
@@ -155,7 +165,14 @@ export function Values() {
                 <h3 className="relative mt-5 t-h3 text-primary">
                   {es ? v.titleEs : v.titleEn}
                 </h3>
-                <p className="relative mt-2 text-sm text-secondary leading-relaxed">
+                {/* T2d — `leading-[1.65]` + `max-w-[42em]` en la
+                    descripción (era `leading-relaxed` = 1.625 sin
+                    tope de ancho). El spec pide line-height 1.6 y
+                    max-width ~42em para legibilidad móvil; en móvil el
+                    max-width no activa (la tarjeta es <42em) pero en
+                    desktop evita que las líneas se estiren demasiado en
+                    la columna ancha. */}
+                <p className="relative mt-2.5 text-sm text-secondary leading-[1.65] max-w-[42em]">
                   {es ? v.descEs : v.descEn}
                 </p>
               </motion.article>
@@ -183,10 +200,14 @@ export function Values() {
   );
 }
 
-/* ---- Inline icons (stroke = currentColor, 18px) ---- */
+/* ---- Inline icons (stroke = currentColor, 20px) ----
+   T2d — bump 18 → 20px para acercarse al rango 24-28px del spec
+   sin saturar el container `w-9 h-9` (36px) que les deja 8px de
+   padding alrededor. Las 4 mantienen el mismo viewBox 16x16 y
+   strokeWidth 1.3 para que el peso visual sea idéntico entre sí. */
 function LockIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <rect x="3" y="7" width="10" height="7" rx="1.4" stroke="currentColor" strokeWidth="1.3" />
       <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
       <circle cx="8" cy="10.5" r="1" fill="currentColor" />
@@ -195,7 +216,7 @@ function LockIcon() {
 }
 function CoinIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <circle cx="8" cy="8" r="5.4" stroke="currentColor" strokeWidth="1.3" />
       <path d="M8 5v6M6.4 6.4h2.4a1.2 1.2 0 0 1 0 2.4H7.2m0 0h1.6a1.2 1.2 0 0 1 0 2.4H6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -203,7 +224,7 @@ function CoinIcon() {
 }
 function ShieldIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M8 1.5 3 3.5v3.2c0 3 2.2 5.6 5 6.8 2.8-1.2 5-3.8 5-6.8V3.5L8 1.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
       <path d="M5.8 8.2l1.6 1.6L10.4 6.8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -211,7 +232,7 @@ function ShieldIcon() {
 }
 function CompassIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <circle cx="8" cy="8" r="5.4" stroke="currentColor" strokeWidth="1.3" />
       <path d="M10.2 5.8 8.8 8.8 5.8 10.2 7.2 7.2l3-1.4Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
     </svg>

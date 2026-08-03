@@ -22,7 +22,12 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
       id="metrics"
       className="section bg-veil relative border-t border-b border-[rgb(var(--divider)/0.06)] scroll-mt-24"
     >
-      <div className="max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* T2c — `tj-container` sustituye a `max-w-[1240px] mx-auto px-5 md:px-8`
+          para heredar los gutters fluidos (clamp(1.25rem, 4vw, 2.25rem))
+          y el page-w de T2a. El `gap-12` desktop se mantiene; en móvil el
+          gap baja a `gap-10` para evitar 48 px de aire entre titular y
+          tarjeta cuando se apilan. */}
+      <div className="tj-container grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
         <div>
           <div className="inline-flex items-center gap-3 mb-5">
             <span
@@ -75,7 +80,10 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               ? "No gráficos bonitos. Ratios que correlacionan con la consistencia a largo plazo: lo que separa un edge real de una racha."
               : "Not pretty charts. Ratios that correlate with long-term consistency: what separates a real edge from a streak."}
           </p>
-          <ul className="m-0 p-0 list-none grid grid-cols-2 gap-3">
+          {/* T2c — `gap-4` (16 px) en vez de `gap-3` (12 px): las tarjetas
+              2×2 ya no se pegan en móvil y el número grande (19 px / 700)
+              no roza la etiqueta. */}
+          <ul className="m-0 p-0 list-none grid grid-cols-2 gap-4">
             {[
               { l: "Sharpe", v: "3,34", c: "rgb(var(--pnl-pos))" },
               { l: "Profit factor", v: "1,56", c: "var(--ink)" },
@@ -92,12 +100,14 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 // R24-1c: added a tiny color-coded 3×3 dot before each label
                 // so the metric direction reads at a glance (pos / neg /
                 // accent / ink) without needing to parse the value first.
-                className="group/metric relative flex min-w-0 items-center justify-between gap-2 sm:gap-3 rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-[transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)]"
+                className="tj-paper group/metric relative flex min-w-0 items-center justify-between gap-2 sm:gap-3 rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-[transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)]"
                 style={{
-                  padding: "14px 16px",
-                  background: "color-mix(in oklab, var(--surface) 50%, transparent)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
+                  // T2c — padding 14×16 → 16×20: más respiro interno en
+                  // móvil para que número y etiqueta no se toquen.
+                  // T3c — fondo swap a `.tj-paper`: papel translúcido cálido
+                  // para que las KPIs floten sobre el atlas animado. Padding
+                  // y border de T2c se conservan intactos.
+                  padding: "16px 20px",
                 }}
               >
                 <span className="relative inline-flex items-center gap-2 min-w-0 break-words">
@@ -127,14 +137,14 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative rounded-[8px]"
+          // T3c — distribución R-múltiplo swap a `.tj-paper`: misma tarjeta
+          // de histograma, ahora sobre papel translúcido cálido. El border
+          // + padding originales se conservan; el `box-shadow` inset se
+          // retira porque `.tj-paper` ya aporta su propio catch-light.
+          className="tj-paper relative rounded-[8px]"
           style={{
             padding: 24,
             border: "1px solid rgb(var(--divider) / 0.13)",
-            background: "color-mix(in oklab, var(--surface) 60%, transparent)",
-            backdropFilter: "blur(20px) saturate(1.4)",
-            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.08)",
           }}
         >
           <div className="flex items-center justify-between mb-3">
@@ -169,7 +179,10 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               having an axis; the MODA label now lives in a small accent-
               tinted pill so it reads as a stamped marker rather than
               floating text that visually merges with the chart card’s top. */}
-          <div className="relative">
+          {/* T2c — envoltorio `min-w-0` para que el histograma no fuerce
+              overflow horizontal en móvil (los 9 bares + 8 gaps ya cabían,
+              pero el `min-w-0` protege contra sub-pixel rounding en 320 px). */}
+          <div className="relative min-w-0">
           <div className="flex items-end gap-1.5" style={{ height: 160 }}>
             {[
               { h: 14, r: "−3R" },
@@ -232,7 +245,10 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               </span>
             ))}
           </div>
-          <div className="mt-5 grid grid-cols-3 gap-3 pt-4 border-t" style={{ borderColor: "rgb(var(--divider) / 0.06)" }}>
+          {/* T2c — `gap-3` → `gap-4` para igualar el ritmo de las tarjetas
+              de ratios; los valores largos (“+0,32R”, “1,59”) ya no se
+              pegan a la etiqueta del vecino. */}
+          <div className="mt-5 grid grid-cols-3 gap-4 pt-4 border-t" style={{ borderColor: "rgb(var(--divider) / 0.06)" }}>
             {[
               { l: es ? "Ganadoras" : "Winners", v: "50 %" },
               { l: es ? "R medio" : "Avg R", v: "+0,32R" },

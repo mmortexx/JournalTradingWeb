@@ -64,16 +64,17 @@ const AppDemo = dynamic(
 function DemoSkeleton() {
   return (
     <div
-      className="rounded-xl overflow-hidden border border-[rgb(var(--divider)/0.1)] shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)] h-[588px] sm:h-[668px] md:h-[748px]"
+      className="rounded-xl overflow-hidden border border-[rgb(var(--divider)/0.1)] shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)] h-[588px] sm:h-[672px] md:h-[752px]"
       aria-hidden="true"
     >
       <div className="liquid-glass rounded-xl overflow-hidden h-full flex flex-col">
-        {/* ---- Window chrome (h-9) — Windows 11 layout: app icon + name on
-            the left, account chip + market-clock skeleton in the center,
-            Local-first LED skeleton on the right, Min/Max/Close caption
-            buttons at the far right. Matches the live WindowChrome (post
-            R25-1a) so hydration is visually seamless. */}
-        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] flex items-center justify-between h-9 shrink-0">
+        {/* ---- Window chrome (h-9 mobile / h-10 sm+) — Windows 11 layout:
+            app icon + name on the left, account chip + market-clock
+            skeleton in the center, Local-first LED skeleton on the right,
+            Min/Max/Close caption buttons at the far right. Matches the
+            live WindowChrome (post R25-1a + T2f mobile pass) so hydration
+            is visually seamless. */}
+        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] flex items-center justify-between h-9 sm:h-10 shrink-0">
           <div className="flex items-center px-3 min-w-0">
             {/* App icon placeholder — same 16×16 rounded square as the real
                 AppIcon, kept grey so it doesn't read as a brand mark yet. */}
@@ -91,32 +92,41 @@ function DemoSkeleton() {
               <Skeleton className="h-1.5 w-1.5 rounded-full" />
               <Skeleton className="h-3 w-16" />
             </div>
-            <div className="w-[46px] h-full flex items-center justify-center">
+            <div className="w-9 sm:w-[46px] h-full flex items-center justify-center">
               <Skeleton className="h-2.5 w-2.5" />
             </div>
-            <div className="w-[46px] h-full flex items-center justify-center">
+            <div className="w-9 sm:w-[46px] h-full flex items-center justify-center">
               <Skeleton className="h-2.5 w-2.5" />
             </div>
-            <div className="w-[46px] h-full flex items-center justify-center">
+            <div className="w-9 sm:w-[46px] h-full flex items-center justify-center">
               <Skeleton className="h-2.5 w-2.5" />
             </div>
           </div>
         </div>
 
-        {/* ---- Top nav (h-11) — 9 skeleton tabs (8 main + Settings, matches
-            the post-R25-1a TopNav). ---- */}
-        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] flex items-center gap-1 px-2 h-11 shrink-0">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-9 px-3 rounded-md flex items-center gap-2 ${
-                i === 0 ? "bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)]" : ""
-              }`}
-            >
-              <Skeleton className="h-3.5 w-3.5 rounded-sm" />
-              <Skeleton className="h-3 w-14 hidden sm:block" />
-            </div>
-          ))}
+        {/* ---- Top nav (h-11) — 4 skeleton tabs (Dashboard / Trades /
+            Analytics / Journal, matches the live TopNav which shows only
+            the 4 demo-able pages — not the full 8 of the real app). ---- */}
+        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch h-[46px] shrink-0">
+          <div aria-hidden="true" />
+          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-9 px-3 sm:px-4 rounded-md flex items-center gap-2 ${
+                  i === 0 ? "bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--divider)/0.1)]" : ""
+                }`}
+              >
+                <Skeleton className="h-3.5 w-3.5 rounded-sm" />
+                <Skeleton className="h-3 w-14 hidden sm:block" />
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-end gap-0.5 pr-1.5 sm:pr-2">
+            <Skeleton className="h-8 w-8 rounded-[4px] hidden sm:block" />
+            <Skeleton className="h-8 w-8 rounded-[4px]" />
+            <Skeleton className="h-8 w-9 rounded-[4px]" />
+          </div>
         </div>
 
         {/* ---- Dashboard-style panel — mirrors the DashboardPage's general

@@ -132,9 +132,21 @@ export function TopNav() {
        ventana pase lo que pase con el ancho de los botones de la derecha —
        el mismo resultado que la app consigue con su clon invisible. La
        columna izquierda está vacía a propósito y es la que hace de
-       contrapeso. `chrome-fill` es el velo de marco (ChromeFillBrush),
-       el mismo que llevan la barra de título y la de estado. */
-    <div className="demo-chrome demo-hairline border-b grid grid-cols-[1fr_auto_1fr] items-stretch h-[46px] shrink-0">
+       contrapeso. `min-w-0` en ambas columnas 1fr evita que los botones
+       fantasma (≥44px en móvil) empujen el ancho del panel y rompan la
+       página en viewports estrechos. `chrome-fill` es el velo de marco
+       (ChromeFillBrush), el mismo que llevan la barra de título y la de
+       estado. */
+    /* Rejilla de tres columnas para el centreado óptico de las pestañas
+        (ver comentario grande más abajo). En móvil se cambia a
+        `auto / 1fr / auto`: la columna izquierda vacía colapsa a 0 y la
+        derecha se dimensiona por su contenido (botones fantasma + ES),
+        de modo que los botones de la derecha NO se comprimen por debajo
+        de sus 44 px de toque y las pestañas se reparten el ancho restante
+        con scroll horizontal limpio si hace falta. En sm+ se vuelve al
+        `1fr / auto / 1fr` simétrico, que centra ópticamente las pestañas
+        como en la app real. */
+    <div className="demo-chrome demo-hairline border-b grid grid-cols-[auto_minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch h-[46px] shrink-0">
       <div aria-hidden="true" />
 
       <div
@@ -142,7 +154,7 @@ export function TopNav() {
         role="tablist"
         aria-label={t("demoTitle")}
         onKeyDown={onKeyDown}
-        className="flex items-center gap-1 min-w-0 overflow-x-auto no-scrollbar overscroll-x-contain"
+        className="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-x-auto no-scrollbar overscroll-x-contain"
       >
         {NAV_ITEMS.map((item) => {
           const active =
@@ -157,7 +169,11 @@ export function TopNav() {
               aria-controls="demo-tabpanel"
               tabIndex={active ? 0 : -1}
               onClick={() => setPage(item.key)}
-              className={`relative h-full px-4 flex items-center gap-2 text-[13px] transition-colors whitespace-nowrap outline-none focus-visible:ring-1 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:-ring-offset-1 ${
+              // `min-w-[44px]` en móvil garantiza el tamaño de toque mínimo
+              // incluso cuando la etiqueta está oculta (solo icono). En sm+,
+              // el texto le da al botón ancho de sobra y la restricción es
+              // inofensiva. `justify-center` centra el icono en móvil.
+              className={`relative h-full min-w-[44px] sm:min-w-0 px-3 sm:px-4 flex items-center justify-center sm:justify-start gap-2 text-[13px] transition-colors whitespace-nowrap outline-none focus-visible:ring-1 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:-ring-offset-1 ${
                 active
                   ? "text-primary"
                   : "text-secondary hover:text-primary"
@@ -180,12 +196,13 @@ export function TopNav() {
               <span className="hidden sm:inline">{label}</span>
               {/* Indicador nativo del NavigationView: barrita de acento
                   corta y centrada bajo el item, no un subrayado de borde a
-                  borde. `left-1/2 -translate-x-1/2 w-4` reproduce el ancho
-                  fijo del indicador de WinUI. */}
+                  borde. `left-1/2 -translate-x-1/2 w-5` reproduce el ancho
+                  fijo del indicador de WinUI (20 px, ligeramente más visible
+                  que el anterior de 16 px en pantallas táctiles pequeñas). */}
               {active && (
                 <span
                   aria-hidden="true"
-                  className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-4 h-[3px] rounded-full"
+                  className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full"
                   style={{ background: "rgb(var(--accent-base))" }}
                 />
               )}
@@ -197,15 +214,21 @@ export function TopNav() {
       {/* Pie del panel: modo streamer · tema · idioma. Son los tres botones
           fantasma que la app lleva en NavigationView.PaneFooter (XAML
           L289-313). El de streamer es decorativo aquí (oculta cifras en la
-          app real, algo que la demo no necesita); tema e idioma sí actúan. */}
-      <div className="flex items-center justify-end gap-0.5 pr-2">
-        <GhostButton
-          label={es ? "Modo streamer" : "Streamer mode"}
-          onClick={() => {}}
-        >
-          <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" />
-          <circle cx="12" cy="12" r="2.6" />
-        </GhostButton>
+          app real, algo que la demo no necesita); tema e idioma sí actúan.
+          El de streamer se oculta por debajo de `lg` para garantizar que los
+          botones de tema/idioma mantengan sus 32 px de ancho nativo (y 44 px
+          de toque en móvil) sin que la columna 1fr de la rejilla los comprima
+          en viewports intermedios (768–1023 px). */}
+      <div className="flex items-center justify-end gap-0.5 pr-2 sm:pr-2 min-w-0">
+        <div className="hidden lg:block">
+          <GhostButton
+            label={es ? "Modo streamer" : "Streamer mode"}
+            onClick={() => {}}
+          >
+            <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" />
+            <circle cx="12" cy="12" r="2.6" />
+          </GhostButton>
+        </div>
         <GhostButton
           label={es ? "Cambiar tema" : "Toggle theme"}
           onClick={toggleTheme}
@@ -224,7 +247,7 @@ export function TopNav() {
           onClick={() => setLang(es ? "en" : "es")}
           aria-label={es ? "Idioma" : "Language"}
           title={es ? "Idioma" : "Language"}
-          className="h-8 px-2.5 rounded-[4px] flex items-center gap-1 text-[12px] font-semibold text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
+          className="h-11 min-w-[44px] sm:h-8 sm:min-w-0 px-2 rounded-[4px] flex items-center justify-center gap-1 text-[12px] font-semibold text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
         >
           {es ? "ES" : "EN"}
           <svg
@@ -246,7 +269,9 @@ export function TopNav() {
 }
 
 /** Botón fantasma del pie del menú — mismo tamaño y peso que el
- *  GhostButtonStyle de la app (icono de 16 px en una caja de 32). */
+ *  GhostButtonStyle de la app (icono de 16 px en una caja de 32).
+ *  En móvil la caja crece a 44×44 px (h-11 w-11) para cumplir el mínimo
+ *  de tamaño de toque; en sm+ vuelve a 32×32 como en la app real. */
 function GhostButton({
   label,
   onClick,
@@ -262,7 +287,7 @@ function GhostButton({
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="w-8 h-8 rounded-[4px] flex items-center justify-center text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
+      className="h-11 w-11 sm:h-8 sm:w-8 rounded-[4px] flex items-center justify-center text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
     >
       <svg
         width="16"

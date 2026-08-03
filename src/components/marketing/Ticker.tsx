@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -59,11 +59,13 @@ const TICKER_ITEMS: TickerItem[] = [
 
 function Row() {
   return (
-    <div className="flex items-center shrink-0 gap-7 sm:gap-11" aria-hidden="true">
+    <div className="flex items-center shrink-0 gap-8 sm:gap-12" aria-hidden="true">
+      {/* T2c — `fontSize` 12.5 → 13.5 px (≥13 legible a escala móvil);
+          `gap` entre símbolos 7/11 → 8/12 para que cada ticker respire. */}
       {TICKER_ITEMS.map((it) => {
         const pos = it.chg >= 0;
         return (
-          <span key={it.sym} className="tnum flex items-center" style={{ fontSize: 12.5, color: "var(--ink-2)" }}>
+          <span key={it.sym} className="tnum flex items-center" style={{ fontSize: 13.5, color: "var(--ink-2)" }}>
             {it.sym}{" "}
             <span
               className="tnum"
@@ -81,6 +83,12 @@ function Row() {
 
 export function Ticker() {
   const reduce = useReducedMotion();
+  // T2c — pausa al hover. El usuario puede detener la cinta para leer un
+  // símbolo concreto sin que el scroll se lo lleve. Estado local simple:
+  // cuando `hovered` es true el callback de `useAnimationFrame` no avanza
+  // `x`, pero la pista sigue montada (no se desmonta/repinta) así que al
+  // salir el cursor la animación retoma en el mismo punto sin salto.
+  const [hovered, setHovered] = useState(false);
 
   // Scroll-velocity responsive speed: |velocity| 0..4000 → multiplier 1..2.4.
   // Wrapped in useSpring so the speed multiplier eases in/out smoothly
@@ -103,7 +111,7 @@ export function Ticker() {
   const x = useMotionValue(0);
 
   useAnimationFrame((_, delta) => {
-    if (reduce) return;
+    if (reduce || hovered) return;
     const el = trackRef.current;
     if (!el) return;
     const half = el.scrollWidth / 2;
@@ -127,11 +135,15 @@ export function Ticker() {
     <div
       role="marquee"
       aria-label="Market ticker"
-      /* `glass-band`: la cinta va a sangre, así que el rim de liquid-glass
-         no debe recorrer los cantos laterales — ahí se leerían como dos
-         rayas verticales pegadas al borde del navegador. Solo la luz de
-         arriba; las dos hairlines ya las pone `border-y`. */
-      className="relative border-y border-[rgb(var(--divider)/0.14)] py-3 liquid-glass glass-band overflow-hidden select-none"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      /* T2c — `py-3` (12 px) → `py-4` (16 px): la cinta tenía solo 12 px
+         de respiro vertical y el VLM la leía como banda pegada al borde.
+         16 px la separa visualmente de las secciones vecinas sin
+         engordarla. Resto sin cambios: `border-y`, `liquid-glass`,
+         `glass-band` (solo la luz superior), `overflow-hidden`,
+         `select-none`. */
+      className="relative border-y border-[rgb(var(--divider)/0.14)] py-4 liquid-glass glass-band overflow-hidden select-none"
     >
       {/* Left edge gradient fade — R27-1b: switched from hardcoded
           `rgba(0, 0, 0, ...)` to `color-mix(in srgb, var(--bg) ...,
@@ -170,7 +182,10 @@ export function Ticker() {
           (notably Safari on macOS) re-rasterize the track each frame as
           the x value changes, which shows up as a faint sub-pixel jitter
           on the tabular figures. No behavior change, pure perf hint. */}
-      <motion.div ref={trackRef} className="flex w-max gap-7 sm:gap-11" style={{ x, willChange: "transform" }}>
+      {/* T2c — `gap-8 sm:gap-12` (igual al `gap` interno de `<Row />`) para
+          que la costura entre Row 1 y Row 2 sea idéntica a la separación
+          entre símbolos: el loop se lee continuo, sin escalón visual. */}
+      <motion.div ref={trackRef} className="flex w-max gap-8 sm:gap-12" style={{ x, willChange: "transform" }}>
         <Row />
         <Row />
       </motion.div>

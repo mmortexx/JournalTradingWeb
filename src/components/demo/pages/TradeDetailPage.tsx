@@ -691,10 +691,14 @@ export function TradeDetailPage() {
 
       {/* ===== 2-COLUMN GRID: left (5fr) | right (4fr) =====
           Left: execution + anatomy + day-context + plan + context + dates.
-          Right: screenshots + tags + review. */}
-      <div className="grid lg:grid-cols-[5fr_4fr] gap-5">
+          Right: screenshots + tags + review.
+          `min-w-0` on both columns prevents the inner Anatomy grid's
+          fixed-width columns (3.5rem + 1fr + ...) from blowing the
+          column past its track on mobile (was forcing the panel's
+          scrollWidth to ~448px inside a 317px panel). */}
+      <div className="grid grid-cols-1 lg:grid-cols-[5fr_4fr] gap-5">
         {/* ===== LEFT COLUMN ===== */}
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 min-w-0">
           {/* Execution card */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -755,26 +759,31 @@ export function TradeDetailPage() {
                 {fills.length} {lang === "es" ? "fills" : "fills"}
               </span>
             </div>
-            {/* Table header */}
-            <div className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 pb-2 text-[10px] uppercase tracking-[0.14em] text-tertiary border-b border-[rgb(var(--divider)/0.1)]">
-              <div>{lang === "es" ? "Lado" : "Side"}</div>
-              <div>{lang === "es" ? "Hora" : "Time"}</div>
-              <div className="text-right">Qty</div>
-              <div className="text-right">{lang === "es" ? "Precio" : "Price"}</div>
-              <div className="text-right">{lang === "es" ? "Com." : "Fee"}</div>
-              <div className="text-right">{lang === "es" ? "Acum." : "Cum."}</div>
-            </div>
-            <ul className="divide-y divide-white/5">
-              {fills.map((f, i) => {
-                const isEntry = f.dir === "ENTRY";
-                return (
-                  <motion.li
-                    key={i}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.35, delay: 0.5 + i * 0.08, ease: EASE }}
-                    className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 py-2 items-center text-xs"
-                  >
+            {/* Table header — wrapped in overflow-x-auto so the fixed
+                column widths (3.5rem + 1fr + 3.5rem + 4rem + 3rem + 3.5rem
+                = ~296px + 5×12px gaps = ~356px) scroll horizontally inside
+                the card on narrow viewports instead of forcing the column
+                past its track. */}
+            <div className="overflow-x-auto custom-scroll -mx-1 px-1">
+              <div className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 pb-2 min-w-[24rem] text-[10px] uppercase tracking-[0.14em] text-tertiary border-b border-[rgb(var(--divider)/0.1)]">
+                <div>{lang === "es" ? "Lado" : "Side"}</div>
+                <div>{lang === "es" ? "Hora" : "Time"}</div>
+                <div className="text-right">Qty</div>
+                <div className="text-right">{lang === "es" ? "Precio" : "Price"}</div>
+                <div className="text-right">{lang === "es" ? "Com." : "Fee"}</div>
+                <div className="text-right">{lang === "es" ? "Acum." : "Cum."}</div>
+              </div>
+              <ul className="divide-y divide-white/5">
+                {fills.map((f, i) => {
+                  const isEntry = f.dir === "ENTRY";
+                  return (
+                    <motion.li
+                      key={i}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.35, delay: 0.5 + i * 0.08, ease: EASE }}
+                      className="grid grid-cols-[3.5rem_1fr_3.5rem_4rem_3rem_3.5rem] gap-x-3 py-2 items-center text-xs min-w-[24rem]"
+                    >
                     <div className="flex flex-col">
                       <span
                         className={`text-[11px] font-semibold ${
@@ -804,6 +813,7 @@ export function TradeDetailPage() {
                 );
               })}
             </ul>
+            </div>
           </motion.div>
 
           {/* Day-context card — mirrors the real app's "Dónde cayó
@@ -961,7 +971,7 @@ export function TradeDetailPage() {
         </div>
 
         {/* ===== RIGHT COLUMN ===== */}
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 min-w-0">
           {/* Screenshots card */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}

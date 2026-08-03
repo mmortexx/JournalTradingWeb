@@ -9,7 +9,16 @@ import { useTheme } from "@/lib/theme";
 import { BrandGlyph } from "@/components/tj/BrandGlyph";
 
 /**
- * Navbar — barra edge-to-edge con material acrylic premium.
+ * Navbar — barra edge-to-edge con material de papel translúcido (e-reader).
+ *
+ * T3b — la barra y el drawer adoptan `.tj-paper` / `.tj-paper-dense`
+ * (papel cálido translúcido: 72%/86% surface, blur 10px + saturate
+ * 140%, grano de papel SVG, catch-light inset). Reemplaza al cristal
+ * acrílico frío anterior. El megamenú añade `.tj-paper-glow` para un
+ * halo champagne tenue en el borde superior. La condensación al hacer
+ * scroll se conserva (68→56 px, sombra de profundidad), pero la barra
+ * ya no pasa a opaca al desplazar: el papel sigue dejando intuir el
+ * atlas animado del hero, que es justo lo que pide el producto.
  *
  * R28 — reescritura de la barra. Los tres problemas estructurales que
  * arrastraba la versión anterior y que esta corrige:
@@ -54,7 +63,10 @@ import { BrandGlyph } from "@/components/tj/BrandGlyph";
  * El material se diseñó para leerse sobre el ojo WebGL del fondo en
  * AMBOS temas: en oscuro `--surface` (#141618) aporta el scrim; en
  * claro `--surface` (#fbfaf7) aporta la base translúcida que aísla el
- * cromatismo del iris sin competir con él.
+ * cromatismo del iris sin competir con él. T3b cambia el cristal
+ * acrílico por papel cálido translúcido — mismo `--surface`, mismo
+ * aislamiento, pero con fibra de papel (grano SVG) y catch-light de
+ * lámina en vez de reflejo frío de cristal.
  *
  * El drawer móvil (focus-trap, scroll-lock, Escape, cierre por ruta) se
  * conserva íntegro — es maquinaria a11y probada y no se toca.
@@ -244,12 +256,75 @@ export function Navbar() {
 
   // Enlaces del drawer móvil — mantiene Acerca de y FAQ (en desktop
   // viven en el footer; la barra sigue al HTML: Producto/Demo/Precios).
-  const drawerLinks: { href: string; labelEs: string; labelEn: string }[] = [
-    { href: "/features", labelEs: "Características", labelEn: "Features" },
-    { href: "/demo", labelEs: "Demo", labelEn: "Demo" },
-    { href: "/pricing", labelEs: "Precios", labelEn: "Pricing" },
-    { href: "/about", labelEs: "Acerca de", labelEn: "About" },
-    { href: "/faq", labelEs: "FAQ", labelEn: "FAQ" },
+  // Cada entrada lleva un icono de línea de 14 px: el drawer se abre
+  // para escanear, y el icono acelera el reconocimiento frente a una
+  // lista en plano de solo texto. El estilo es el mismo que usa el
+  // megamenú de escritorio — coherencia entre las dos vías de entrada.
+  const drawerLinks: {
+    href: string;
+    labelEs: string;
+    labelEn: string;
+    icon: React.ReactNode;
+  }[] = [
+    {
+      href: "/features",
+      labelEs: "Características",
+      labelEn: "Features",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" />
+          <rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" />
+          <rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" />
+          <rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3" />
+        </svg>
+      ),
+    },
+    {
+      href: "/demo",
+      labelEs: "Demo",
+      labelEn: "Demo",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <rect x="1.5" y="3" width="13" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+          <path d="M6.5 6.5v3l2.8-1.5-2.8-1.5Z" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      href: "/pricing",
+      labelEs: "Precios",
+      labelEn: "Pricing",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M8 1.5 2 4v4.5c0 3.2 2.5 5.7 6 6.5 3.5-.8 6-3.3 6-6.5V4L8 1.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+          <path d="M5.8 8.2l1.5 1.5 3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
+    {
+      href: "/about",
+      labelEs: "Acerca de",
+      labelEn: "About",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" />
+          <path d="M8 7v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          <circle cx="8" cy="5" r="0.85" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      href: "/faq",
+      labelEs: "FAQ",
+      labelEn: "FAQ",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" />
+          <path d="M6.3 6.4c.1-1 .9-1.6 1.9-1.6 1.1 0 1.8.6 1.8 1.4 0 .7-.4 1-1 1.3-.6.3-.8.5-.8 1.1v.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          <circle cx="8" cy="11.3" r="0.85" fill="currentColor" />
+        </svg>
+      ),
+    },
   ];
 
   /** ¿Esta ruta (o una subruta suya) es la página actual? */
@@ -257,19 +332,30 @@ export function Navbar() {
     pathname === href || pathname.startsWith(href + "/");
 
   /**
-   * Realce compartido. Un único nodo con `layoutId` que Framer mueve
-   * entre elementos: en vez de que cada píldora se encienda y se apague
-   * por su cuenta, el fondo VIAJA de una a otra. Es la diferencia entre
-   * una barra que responde y una que se siente construida.
+   * Realce compartido. Una línea inferior fina que crece desde el centro
+   * al pasar el puntero o al recibir foco de teclado. Sustituye a la
+   * píldora de fondo de versiones previas: un trazo es más sobrio que un
+   * relleno y, sobre todo, NO compite con la regla de acento persistente
+   * que marca la ruta activa — dos señales, dos soportes distintos.
+   *
+   * La animación vive en CSS (`group-hover` / `group-focus-within`), no en
+   * el estado `hovered`: así el trazo se interpola al entrar Y al salir,
+   * algo que la versión condicional (`hovered === key && …`) no podía
+   * hacer porque el nodo desaparecía de golpe al desmontar.
+   *
+   * Se suprime cuando el enlace está activo: ahí manda la barra de
+   * acento y sumarle un segundo trazo a 6 px de distancia habría sido
+   * ruido visual, no refinamiento.
    */
-  const hoverPill = (key: string) =>
-    hovered === key ? (
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-[4px]"
-        style={{ background: "color-mix(in srgb, var(--ink) 6%, transparent)" }}
-      />
-    ) : null;
+  const hoverUnderline = (active: boolean) => (
+    <span
+      aria-hidden
+      className={`pointer-events-none absolute bottom-[6px] left-[15px] right-[15px] h-px origin-center scale-x-0 transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        active ? "" : "group-hover:scale-x-100 group-focus-within:scale-x-100"
+      }`}
+      style={{ background: "color-mix(in srgb, var(--ink) 22%, transparent)" }}
+    />
+  );
 
   /** Regla de acento persistente que marca la ruta actual. */
   const activeBar = (
@@ -285,10 +371,10 @@ export function Navbar() {
     return (
       <div
         key={href}
-        className="relative"
+        className="group relative"
         onMouseEnter={() => setHovered(href)}
       >
-        {hoverPill(href)}
+        {hoverUnderline(active)}
         <Link
           href={href}
           aria-current={active ? "page" : undefined}
@@ -306,35 +392,58 @@ export function Navbar() {
   const productActive = pathname.startsWith("/features");
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <>
+      {/* Estilo con alcance de componente — dos ajustes que no tienen
+          equivalente directo en utilidades de Tailwind y que por tanto
+          viven aquí en vez de en className:
+
+          1. `prefers-reduced-motion` — framer-motion respetará la
+             preferencia del usuario para sus propias transiciones
+             (AnimtePresence / motion.aside / motion.div), pero las
+             transiciones declaradas en className (hover underline,
+             color shifts, scale del chevron del drawer) no la
+             esuchan automáticamente. Este bloque las neutraliza.
+
+          2. Hover underline de los enlaces top-level — se declara con
+             `scale-x` en className, pero la altura y la posición
+             exactas (1 px, alineada al baseline visual del enlace)
+             merecen estar en CSS por legibilidad. */}
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          [data-navbar-root] *,
+          [data-navbar-root] *::before,
+          [data-navbar-root] *::after {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+          }
+        }
+      `}</style>
+      <header data-navbar-root className="fixed inset-x-0 top-0 z-50">
       <nav
-        className="relative flex w-full items-center border-b px-5 md:px-8"
+        // T3b — papel cálido translúcido. `tj-paper` aporta el material
+        // (backdrop-blur 10px + saturate 140%, grano de papel SVG,
+        // catch-light inset); `tj-paper-dense` sube la opacidad de 72%
+        // a 86% (82% en claro) para que el texto del navbar siga siendo
+        // legible AA sobre el hero animado sin renunciar a la fibra de
+        // papel. Se retira el `background`/`backdropFilter` inline
+        // previo: ahora manda el material. La condensación al hacer
+        // scroll se conserva en altura (68→56 px) y sombra de
+        // profundidad, pero la barra ya no pasa a opaca al desplazar —
+        // el atlas sigue intuyéndose a través del papel, incluso
+        // scrolled. `will-change: backdrop-filter` y `translateZ(0)`
+        // vienen heredados de `.tj-paper` (globals.css), así que el
+        // cambio de altura no jita.
+        className="tj-paper tj-paper-dense relative flex w-full items-center border-b px-5 md:px-8"
         style={{
-          // Condensación al hacer scroll: la barra se estrecha mientras
-          // el material gana cuerpo. Un solo gesto, dos señales.
           height: scrolled ? 56 : 68,
           borderColor: "rgb(var(--divider) / 0.1)",
-          // Al 92 % el material seguía dejando leer lo que pasaba por
-          // debajo: en tema claro se distinguían los filetes de la tabla
-          // comparativa y hasta palabras sueltas cruzando la barra. Un
-          // 8 % de transparencia es poco para una foto, pero muchísimo
-          // para un borde de 1 px de alto contraste. Con la página ya
-          // desplazada la barra pasa a ser prácticamente opaca (98 %) y
-          // conserva el desenfoque sólo como material, no como ventana.
-          // Arriba del todo, sobre el héroe, sí interesa que se vea el
-          // fondo: ahí se mantiene translúcida.
-          background: scrolled
-            ? "color-mix(in srgb, var(--surface) 98%, transparent)"
-            : "color-mix(in srgb, var(--surface) 82%, transparent)",
-          // `saturate(1.8)` teñía de más lo que quedaba detrás y delataba
-          // el cristal. 1.35 basta para que el material tenga vida.
-          backdropFilter: "blur(20px) saturate(1.35)",
-          WebkitBackdropFilter: "blur(20px) saturate(1.35)",
           boxShadow: scrolled
             ? "inset 0 1px 0 rgb(var(--divider) / 0.16), 0 14px 40px -16px rgb(0 0 0 / 0.55)"
             : "inset 0 1px 0 rgb(var(--divider) / 0.14), 0 6px 20px -12px rgb(0 0 0 / 0.4)",
           transition:
-            "height 0.34s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+            "height 0.34s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       >
         {/* Rejilla de tres zonas: la navegación queda ópticamente
@@ -363,14 +472,14 @@ export function Navbar() {
             onMouseLeave={() => setHovered(null)}
           >
             <div
-              className="relative"
+              className="group relative"
               onMouseEnter={() => {
                 setHovered("product");
                 megaEnter();
               }}
               onMouseLeave={megaLeave}
             >
-              {hoverPill("product")}
+              {hoverUnderline(productActive)}
               <button
                 type="button"
                 id="navbar-producto-trigger"
@@ -420,14 +529,19 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
                     transition={{ duration: 0.13, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute left-1/2 w-[520px] max-w-[calc(100vw-3rem)] origin-top rounded-[8px] border p-2"
+                    // T3b — el panel flota como una hoja de papel cálido
+                    // translúcida (72% surface, blur 10px, grano SVG) con
+                    // un halo champagne muy tenue en el borde superior
+                    // (.tj-paper-glow ::before). Más translúcido que el
+                    // navbar a propósito: aquí el texto es grande y el
+                    // contraste AA se preserva incluso a 72%. Se retira
+                    // el background/backdropFilter inline (mandaba el
+                    // 96% opaco previo) para que el material luzca.
+                    className="tj-paper tj-paper-glow absolute left-1/2 w-[520px] max-w-[calc(100vw-3rem)] origin-top rounded-[8px] border p-2"
                     style={{
                       top: "calc(100% + 14px)",
                       x: "-50%",
                       borderColor: "rgb(var(--divider) / 0.13)",
-                      background: "color-mix(in srgb, var(--surface) 96%, transparent)",
-                      backdropFilter: "blur(24px) saturate(1.4)",
-                      WebkitBackdropFilter: "blur(24px) saturate(1.4)",
                       boxShadow:
                         "0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78)",
                     }}
@@ -439,7 +553,9 @@ export function Navbar() {
                       className="absolute left-1/2 -top-[6px] h-[11px] w-[11px] -translate-x-1/2 rotate-45 rounded-[2px] border-l border-t"
                       style={{
                         borderColor: "rgb(var(--divider) / 0.13)",
-                        background: "color-mix(in srgb, var(--surface) 96%, transparent)",
+                        // Coincido con el 72 % del panel (.tj-paper) para
+                        // que la punta sea continuación visual de la hoja.
+                        background: "color-mix(in srgb, var(--surface) 72%, transparent)",
                       }}
                     />
                     <div className="relative grid grid-cols-2 gap-1">
@@ -544,6 +660,42 @@ export function Navbar() {
 
             <LanguagePicker />
 
+            {/* Disparador de la paleta ⌘K. Oculto en móvil: ahí la
+                navegación vive en el drawer y un campo de búsqueda
+                compite con el gesto natural de scroll. En escritorio sí
+                merece la pena: descubre una funcionalidad (la paleta)
+                que de otro modo solo conocería quien pulsa ⌘K.
+
+                El clic sintetiza un keydown ⌘K en window: OverlayHost
+                ya escucha ese evento y monta la paleta bajo demanda
+                (con import() diferido). Reutilizar el atajo evita
+                acoplar este botón al layout y preserva la carga
+                diferida. */}
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window === "undefined") return;
+                window.dispatchEvent(
+                  new KeyboardEvent("keydown", {
+                    key: "k",
+                    metaKey: true,
+                    bubbles: true,
+                  }),
+                );
+              }}
+              aria-label={es ? "Buscar o navegar (⌘K)" : "Search or navigate (⌘K)"}
+              title={es ? "Buscar o navegar (⌘K)" : "Search or navigate (⌘K)"}
+              className="hidden h-9 cursor-pointer items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.14)] bg-transparent px-2.5 text-[var(--ink-3)] outline-none transition-colors duration-150 hover:border-[rgb(var(--divider)/0.24)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:text-[var(--ink-2)] focus-visible:border-[rgb(var(--divider)/0.24)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] md:inline-flex"
+            >
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              <span className="hidden text-[11px] font-medium tracking-wide lg:inline">
+                ⌘K
+              </span>
+            </button>
+
             {/* CTA — rectángulo de 4 px, sin sheen ni sombra de color.
                 El único realce es un cambio de tono, declarado igual
                 para ratón y teclado. */}
@@ -566,7 +718,7 @@ export function Navbar() {
             <button
               ref={menuButtonRef}
               onClick={() => setMobileOpen((o) => !o)}
-              className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-2)] outline-none transition-colors duration-200 hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] md:hidden"
+              className="grid h-11 w-11 place-items-center rounded-full text-[var(--ink-2)] outline-none transition-colors duration-200 hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] md:hidden"
               aria-label={mobileOpen ? (es ? "Cerrar menú" : "Close menu") : (es ? "Abrir menú" : "Open menu")}
               aria-expanded={mobileOpen}
               aria-haspopup="dialog"
@@ -613,13 +765,23 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              className="liquid-glass safe-top fixed top-0 right-0 bottom-0 z-[60] flex w-[300px] max-w-[84vw] flex-col border-l border-[rgb(var(--divider)/0.1)] outline-none backdrop-blur-xl backdrop-saturate-150 md:hidden"
+              // T3b — el drawer es ahora una hoja de papel cálido
+              // translúcida que se desliza sobre el contenido: la página
+              // se intuye a través de él (72% surface, blur 10px +
+              // saturate 140%, grano SVG). Reemplaza el `liquid-glass`
+              // previo (cristal frío). `safe-top` y el `border-l` se
+              // conservan; el `backdrop-blur-xl backdrop-saturate-150`
+              // de Tailwind se retira porque `.tj-paper` ya aporta su
+              // propio backdrop-filter (no queremos duplicarlo ni
+              // pelear especificidad). El footer del drawer hereda
+              // `safe-bottom` en su contenedor interno.
+              className="tj-paper safe-top fixed top-0 right-0 bottom-0 z-[60] flex w-[300px] max-w-[84vw] flex-col border-l border-[rgb(var(--divider)/0.1)] outline-none md:hidden"
             >
-              <div className="flex h-16 shrink-0 items-center justify-between border-b border-[rgb(var(--divider)/0.05)] px-5">
+              <div className="flex h-16 shrink-0 items-center justify-between border-b border-[rgb(var(--divider)/0.06)] px-5">
                 <Link
                   href="/"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2.5 rounded-md"
+                  className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
                   aria-label={t("appName")}
                 >
                   <BrandMark />
@@ -627,10 +789,13 @@ export function Navbar() {
                     {t("appName")}
                   </span>
                 </Link>
+                {/* Close — área de toque de 44 px (especificación móvil).
+                    El icono se queda a 16 px para no gritar; lo que crece
+                    es la zona pulsable, no el glifo. */}
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="icon-btn grid h-8 w-8 place-items-center rounded-md text-[var(--ink-2)] transition-colors hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)]"
+                  className="grid h-11 w-11 place-items-center rounded-[4px] text-[var(--ink-2)] outline-none transition-colors hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
                   aria-label={es ? "Cerrar menú" : "Close menu"}
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -639,7 +804,16 @@ export function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-3" aria-label={es ? "Secciones" : "Sections"}>
+              <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-4" aria-label={es ? "Secciones" : "Sections"}>
+                {/* Etiqueta de sección — la navegación es la pieza
+                    principal del drawer; un pequeño sobretexto la
+                    enmarca y da aire al primer enlace. */}
+                <span
+                  className="px-3 pb-2 text-[10.5px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: "var(--ink-3)" }}
+                >
+                  {es ? "Secciones" : "Sections"}
+                </span>
                 {drawerLinks.map((l) => {
                   const active = isActive(l.href);
                   return (
@@ -648,10 +822,10 @@ export function Navbar() {
                       href={l.href}
                       onClick={() => setMobileOpen(false)}
                       aria-current={active ? "page" : undefined}
-                      className={`relative flex min-h-[44px] items-center rounded-lg py-2.5 pr-3 pl-4 text-sm transition-colors ${
+                      className={`group relative flex min-h-[48px] items-center gap-3 rounded-[6px] py-2.5 pr-3 pl-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] ${
                         active
                           ? "bg-[rgb(var(--divider)/0.06)] font-medium text-[var(--ink)]"
-                          : "text-[var(--ink-2)] hover:bg-[rgb(var(--divider)/0.05)] hover:text-[var(--ink)]"
+                          : "text-[var(--ink-2)] hover:bg-[rgb(var(--divider)/0.04)] hover:text-[var(--ink)]"
                       }`}
                     >
                       {/* Barra de acento a la izquierda: patrón estándar
@@ -664,36 +838,157 @@ export function Navbar() {
                           style={{ background: "rgb(var(--accent-base))" }}
                         />
                       )}
+                      {/* Icono: tono apagado en reposo, acento/ink en
+                          activo. Lo guía el `currentColor` del span. */}
+                      <span
+                        className="grid h-7 w-7 flex-none place-items-center rounded-[5px]"
+                        style={{
+                          background: active
+                            ? "rgb(var(--accent-base) / 0.12)"
+                            : "rgb(var(--divider) / 0.06)",
+                          color: active
+                            ? "rgb(var(--accent-base))"
+                            : "var(--ink-3)",
+                        }}
+                      >
+                        {l.icon}
+                      </span>
                       <span className="flex-1">{es ? l.labelEs : l.labelEn}</span>
+                      {/* Chevron discreto: reafirma que es navegable sin
+                          reclamar atención. */}
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        aria-hidden
+                        className="opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+                        style={{ color: "var(--ink-3)" }}
+                      >
+                        <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </Link>
                   );
                 })}
+
+                {/* Utilidades dentro del drawer: idioma y tema. En móvil
+                    la barra superior queda cubierta por el backdrop en
+                    cuanto el drawer se abre, así que estas dos acciones
+                    quedarían inaccesibles sin esta fila.
+
+                    Ambos controles suben a h-11 (44 px): el suelo táctil
+                    ≥44 px rige dentro del drawer, donde sí se toca. En la
+                    barra superior se mantiene h-9 porque ahí comparte
+                    fila con el resto del clúster y la entrada es por
+                    puntero. La diferencia la marca `size="md"` del
+                    LanguagePicker y la clase directa en el botón de tema.
+
+                    La hairline superior separa dos grupos funcionales
+                    (navegación vs. preferencias) sin añadir peso: las
+                    filas de navegación ya se separan por hover bg y
+                    redondeado; una raya entre CADA fila sería ruido, una
+                    raya entre GRUPOS es estructura. */}
+                <div
+                  aria-hidden
+                  className="mx-3 mt-4 h-px"
+                  style={{ background: "rgb(var(--divider) / 0.08)" }}
+                />
+                <span
+                  className="px-3 pb-2 pt-4 text-[10.5px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ color: "var(--ink-3)" }}
+                >
+                  {es ? "Preferencias" : "Preferences"}
+                </span>
+                <div className="flex items-center gap-2 px-3 pb-1">
+                  <LanguagePicker size="md" />
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    aria-label={es ? "Cambiar tema" : "Toggle theme"}
+                    title={es ? "Cambiar tema" : "Toggle theme"}
+                    data-theme-toggle
+                    className="inline-flex h-11 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[4px] border bg-transparent px-2.5 text-[11px] font-semibold tracking-wide text-[var(--ink-2)] outline-none transition-colors duration-150 border-[rgb(var(--divider)/0.14)] hover:border-[rgb(var(--divider)/0.24)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:text-[var(--ink)] focus-visible:border-[rgb(var(--divider)/0.24)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+                  >
+                    <AnimatePresence mode="wait" initial={false}>
+                      <motion.span
+                        key={theme}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.12 }}
+                        className="grid place-items-center"
+                        style={{ width: 15, height: 15 }}
+                      >
+                        {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                      </motion.span>
+                    </AnimatePresence>
+                    <span>{theme === "dark" ? (es ? "Claro" : "Light") : (es ? "Oscuro" : "Dark")}</span>
+                  </button>
+                </div>
               </nav>
 
-              <div className="safe-bottom shrink-0 border-t border-[rgb(var(--divider)/0.05)] p-4">
-                {/* Mismo tratamiento que el CTA de escritorio: rectángulo
-                    de 4 px, sin sheen ni sombra de acento. Se me pasó en
-                    la primera pasada porque vive dentro del drawer. */}
-                <Link
-                  href="/pricing"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[4px] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
-                  style={{
-                    background: "rgb(var(--accent-base))",
-                    color: "rgb(var(--accent-ink))",
-                  }}
-                >
-                  {t("buyNow")}
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
+              {/* Footer del drawer — CTAs + marca + copyright.
+                 El `safe-bottom` añade el inset de la home indicator en
+                 iOS; en escritorio resuelve a 0. El bloque flota sobre
+                 un borde superior hairline que separa la navegación
+                 (scrollable) de la conversión (fija al fondo). */}
+              <div className="safe-bottom shrink-0 border-t border-[rgb(var(--divider)/0.06)] px-4 pt-4">
+                <div className="flex flex-col gap-2">
+                  {/* CTA secundario — la demo es la conversión suave:
+                      "míralo antes de pagar". Ghost, sin relleno de
+                      acento, para no competir con el primario. */}
+                  <Link
+                    href="/demo"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.18)] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_5%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                    style={{ color: "var(--ink)" }}
+                  >
+                    {es ? "Ver demo" : "View demo"}
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M5 3l5 5-5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </Link>
+                  {/* CTA primario — mismo tratamiento que el de escritorio:
+                      rectángulo de 4 px, sin sheen ni sombra de acento. */}
+                  <Link
+                    href="/pricing"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex h-12 w-full items-center justify-center gap-1.5 rounded-[4px] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+                    style={{
+                      background: "rgb(var(--accent-base))",
+                      color: "rgb(var(--accent-ink))",
+                    }}
+                  >
+                    {t("buyNow")}
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </Link>
+                </div>
+
+                {/* Marca + copyright. Mismo glifo y nombre que la barra
+                    superior — el pie del drawer reafirma dónde se está. */}
+                <div className="mt-4 flex items-center gap-2 border-t border-[rgb(var(--divider)/0.06)] pt-3">
+                  <BrandMark />
+                  <div className="flex min-w-0 flex-col leading-tight">
+                    <span className="font-serif text-[12.5px] font-medium text-[var(--ink)]">
+                      {t("appName")}
+                    </span>
+                    <span
+                      className="tnum text-[10.5px]"
+                      style={{ color: "var(--ink-3)" }}
+                    >
+                      © {new Date().getFullYear()} {t("appName")}. {t("rights")}
+                    </span>
+                  </div>
+                </div>
               </div>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
     </header>
+    </>
   );
 }
 
@@ -757,12 +1052,18 @@ const LANGUAGES: { code: Lang; code2: string; native: string }[] = [
   { code: "en", code2: "EN", native: "English" },
 ];
 
-function LanguagePicker() {
+function LanguagePicker({ size = "sm" }: { size?: "sm" | "md" }) {
   const { lang, setLang } = useLang();
   const es = lang === "es";
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
+  // `size` sólo controla la altura del disparador: "sm" (h-9, 36 px) para
+  // el clúster de escritorio donde comparte fila con otros cuadrados de
+  // 36 px; "md" (h-11, 44 px) para el drawer móvil, donde rige el suelo
+  // táctil ≥44 px. El resto del estilo (borde, hover, focus-visible, tipo)
+  // se comparte íntegro — una sola declaración para dos tamaños.
+  const sizeCls = size === "md" ? "h-11" : "h-9";
 
   useEffect(() => {
     if (!open) return;
@@ -796,7 +1097,7 @@ function LanguagePicker() {
         aria-expanded={open}
         aria-label={es ? "Cambiar idioma" : "Change language"}
         title={es ? "Cambiar idioma" : "Change language"}
-        className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-[4px] border bg-transparent px-2.5 text-[11px] font-semibold tracking-wide text-[var(--ink-2)] outline-none transition-colors duration-150 border-[rgb(var(--divider)/0.14)] hover:border-[rgb(var(--divider)/0.24)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:text-[var(--ink)] focus-visible:border-[rgb(var(--divider)/0.24)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+        className={`inline-flex ${sizeCls} cursor-pointer items-center gap-1.5 rounded-[4px] border bg-transparent px-2.5 text-[11px] font-semibold tracking-wide text-[var(--ink-2)] outline-none transition-colors duration-150 border-[rgb(var(--divider)/0.14)] hover:border-[rgb(var(--divider)/0.24)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:text-[var(--ink)] focus-visible:border-[rgb(var(--divider)/0.24)] focus-visible:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]`}
       >
         <GlobeIcon />
         <span className="tnum">{actual.code2}</span>

@@ -58,7 +58,7 @@ export function BeforeAfter() {
 
   return (
     <section className="section bg-veil relative overflow-hidden">
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         <Reveal className="text-center max-w-2xl mx-auto">
           <Eyebrow className="justify-center">
             {es ? "La transformación" : "The transformation"}
@@ -78,7 +78,7 @@ export function BeforeAfter() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-secondary leading-relaxed">
+          <p className="mt-4 text-secondary leading-[1.6]">
             {es
               ? "No te prometemos magia. Te prometemos un espejo: lo que haces hoy, sin maquillaje, y lo que podrías hacer si cada operación tuviera un plan."
               : "We don't promise magic. We promise a mirror: what you do today, without makeup, and what you could do if every trade had a plan."}

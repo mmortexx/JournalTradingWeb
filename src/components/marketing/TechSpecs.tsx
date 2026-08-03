@@ -88,7 +88,7 @@ export function TechSpecs() {
 
   return (
     <section className="section bg-veil relative overflow-hidden">
-      <div className="relative max-w-page mx-auto px-5 md:px-8">
+      <div className="relative tj-container">
         {/* Header */}
         <Reveal className="max-w-2xl">
           <Eyebrow>{es ? "Técnico" : "Technical"}</Eyebrow>
@@ -103,7 +103,7 @@ export function TechSpecs() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed">
+          <p className="mt-4 text-lg text-secondary leading-[1.6]">
             {es
               ? "Sin dependencias externas, sin procesos en segundo plano, sin telemetría. Una vez instalado, es tuyo."
               : "No external dependencies, no background processes, no telemetry. Once installed, it's yours."}
@@ -159,7 +159,7 @@ export function TechSpecs() {
           {/* R25-1e — Lock icon prefix promotes the footnote from fine
               print to a deliberate "offline / privacy" callout. The
               accent-tinted icon ties to the section's accent palette. */}
-          <p className="text-xs text-tertiary leading-relaxed flex items-start gap-1.5">
+          <p className="text-xs text-tertiary leading-[1.6] flex items-start gap-1.5">
             <Lock size={13} aria-hidden className="mt-0.5 shrink-0 text-[rgb(var(--accent-base)/0.70)]" />
             <span>
               {es

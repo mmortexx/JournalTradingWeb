@@ -87,7 +87,12 @@ export function TrustStrip() {
           // every item ending up alone on its own line at 375px. The
           // flex-wrap + whitespace-nowrap per item is preserved so the
           // labels themselves never break mid-word.
-          className="flex flex-wrap items-center justify-center gap-x-5 sm:gap-x-8 gap-y-3.5 text-secondary text-sm"
+          // T2d — gap-y bumped 3.5 → 4 (14px → 16px) so when the strip
+          // wraps to 2 lines on 390px the vertical breathing matches the
+          // visual weight of the icons (16px gap ≈ icon height). Slight
+          // but reads as a deliberate rhythm rather than two cramped
+          // lines.
+          className="flex flex-wrap items-center justify-center gap-x-5 sm:gap-x-8 gap-y-4 text-secondary text-sm"
         >
           {items.map((item, i) => (
             <Fragment key={item.label}>

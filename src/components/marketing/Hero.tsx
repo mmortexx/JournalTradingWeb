@@ -173,9 +173,9 @@ export function Hero() {
               style={{
                 fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
                 fontWeight: 300,
-                lineHeight: 1.65,
+                lineHeight: 1.6,
                 color: "var(--ink-2)",
-                maxWidth: "34em",
+                maxWidth: "44em",
               }}
             >
               {es
@@ -186,11 +186,19 @@ export function Hero() {
 
           {/* CTA — rectángulos de 4 px, sin brillo ni sombra de color.
               El realce al pasar por encima y el foco son el MISMO gesto,
-              declarados en CSS, para que teclado y ratón vayan igual. */}
-          <div data-seq className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch lg:self-end">
+              declarados en CSS, para que teclado y ratón vayan igual.
+
+              T2c — anchura: los botones ya no se estiran a todo el ancho
+              del contenedor (leían como barra 280 px en 390 px). Ahora son
+              `inline-flex` natural (w-fit) y el contenedor padre controla la
+              alineación con `items-center` (móvil, apilados y centrados) →
+              `sm:items-center` (sm-md, lado a lado) → `lg:items-end`
+              (escritorio, apilados a la derecha en la columna estrecha).
+              El gap es 12 px en todos los puntos de quiebre. */}
+          <div data-seq className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-start lg:flex-col lg:items-end lg:self-end">
             <Link
               href="/pricing"
-              className="inline-flex h-[50px] items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              className="inline-flex h-[50px] w-fit items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
               style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
             >
               {es ? "Comprar — desde 29 $" : "Buy — from $29"}
@@ -198,7 +206,7 @@ export function Hero() {
             </Link>
             <Link
               href="/demo"
-              className="inline-flex h-[50px] items-center justify-center gap-2.5 rounded-[4px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              className="inline-flex h-[50px] w-fit items-center justify-center gap-2.5 rounded-[4px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
               style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
             >
               <Play size={14} fill="currentColor" aria-hidden />
@@ -224,9 +232,14 @@ export function Hero() {
               los campos se alinean solos en cualquier ancho y la jerarquía
               la da la etiqueta encima del valor — que además es como se
               lee una placa de características de verdad. */}
-          <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
+          {/* T2c — `gap-y-7` (era 6) y `min-w-0` en cada celda para que el
+              valor largo no empuje al vecino en anchos límite. Las
+              etiquetas siguen `uppercase tracking-[0.16em]` (ya estaban);
+              los valores ahora `fontWeight: 600` (semibold) para leer la
+              jerarquía sin depender solo del tamaño. */}
+          <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
             {specs.map((s) => (
-              <div key={s.k} className="flex flex-col gap-1">
+              <div key={s.k} className="flex min-w-0 flex-col gap-1.5">
                 <dt
                   className="tnum uppercase"
                   style={{ fontSize: 9.5, letterSpacing: "0.16em", color: "var(--ink-3)" }}
@@ -235,7 +248,7 @@ export function Hero() {
                 </dt>
                 <dd
                   className="tnum m-0"
-                  style={{ fontSize: 13, color: "var(--ink)" }}
+                  style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}
                 >
                   {s.v}
                 </dd>

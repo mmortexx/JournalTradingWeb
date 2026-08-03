@@ -110,7 +110,7 @@ export function PricingFAQ() {
           printed surface. */}
       <div className="grain absolute inset-0 pointer-events-none" aria-hidden="true" />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Centered header — eyebrow + headline + lead + reassurance
             pills. Mirrors the Pricing section's header rhythm so the
             two sections read as one continuous conversion story. */}

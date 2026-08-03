@@ -22,9 +22,9 @@ export function StillHaveQuestions() {
   return (
     <section
       aria-label={es ? "¿Aún tienes dudas?" : "Still have questions?"}
-      className="relative px-5 md:px-8 py-8 md:py-10"
+      className="relative py-8 md:py-10"
     >
-      <div className="max-w-page mx-auto">
+      <div className="tj-container">
         <Reveal y={18}>
           <motion.div
             whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}

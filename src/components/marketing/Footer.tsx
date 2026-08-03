@@ -144,7 +144,12 @@ export function Footer() {
 
   return (
     <footer className="relative mt-auto liquid-glass glass-band border-t border-[rgb(var(--divider)/0.1)] safe-bottom">
-      <div className="relative max-w-page mx-auto px-5 md:px-8 py-12 md:py-16">
+      {/* `tj-container` (T2a's fluid gutter system: clamp(1.25rem, 4vw, 2.25rem))
+          — same fluid gutter rhythm as Hero, StatsBand, MetricsShowcase, etc.
+          so the footer's left/right inset reads as one with the page above it
+          rather than a separate px-5/md:px-8 silo. `py-12 md:py-16` preserved
+          for vertical breath. */}
+      <div className="tj-container relative py-12 md:py-16">
         <div className="grid grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-8 md:gap-10">
           {/* Brand column — candlestick mark + wordmark lockup (mirrors
               Navbar.BrandMark exactly), tagline, "100 % local" inline
@@ -184,10 +189,13 @@ export function Footer() {
               <span>{es ? "100 % local" : "100 % local"}</span>
             </div>
 
-            {/* Social links — 5 icons, 28px hit-targets, liquid-glass
-                surface with a magnetic cursor-follow (strength 0.3). SVGs
-                trimmed to 14×14 (RSS 13×13, X 12×12) so the glyph sits
-                comfortably inside the smaller 28px target. */}
+            {/* Social links — icon-only buttons with comfortable tap
+                targets. `h-9 w-9` (36 px) reads as a small refined chip on
+                desktop while still clearing the WCAG 2.5.5 spirit on mobile
+                (the MagneticButton wrapper also exposes a slight magnetic
+                pull area beyond the visual box). SVGs trimmed to 14×14
+                (RSS 13×13, X 12×12) so the glyph sits comfortably inside
+                the 36 px target with ~11 px of optical padding. */}
             <div className="mt-6 flex items-center gap-2">
               {SOCIAL_LINKS.map(({ label, href, Icon }) => (
                 <MagneticButton
@@ -197,7 +205,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   ariaLabel={label}
                   strength={0.3}
-                  className="icon-btn grid h-7 w-7 place-items-center rounded-[4px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
+                  className="icon-btn grid h-9 w-9 place-items-center rounded-[5px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
                 >
                   <Icon />
                 </MagneticButton>
@@ -222,7 +230,18 @@ export function Footer() {
                   la etiqueta —lo pone `.eyebrow`—, así que el aspecto no
                   cambia. */}
               <h3 className="eyebrow mb-3.5">{col.title}</h3>
-              <ul className="space-y-3">
+              {/* Each link is an inline-flex row with `min-h-[44px]` so the
+                  tap target clears the WCAG 2.5.5 (AAA) 44 px threshold on
+                  mobile without bloating the desktop rhythm — the row's
+                  intrinsic height is the target, not the text bbox. The
+                  visible accent underline lives on the inner `<span>`
+                  (carrying `.link-underline`) so the sweep stays anchored
+                  to the text rather than the bottom of the 44 px row,
+                  which would otherwise read as a divider. `w-full` on the
+                  outer `<a>`/`<button>` extends the tap zone across the
+                  column, so a slightly-off tap on the right padding still
+                  lands on the link. */}
+              <ul>
                 {col.links.map((l) => (
                   <li key={l.label}>
                     {l.glossary ? (
@@ -232,17 +251,17 @@ export function Footer() {
                       <GlossaryLauncher>
                         <button
                           type="button"
-                          className="link-underline text-sm text-secondary hover:text-primary transition-colors duration-200 text-left"
+                          className="link-underline-host inline-flex items-center min-h-[44px] w-full text-left text-sm text-secondary hover:text-primary transition-colors duration-200"
                         >
-                          {l.label}
+                          <span className="link-underline">{l.label}</span>
                         </button>
                       </GlossaryLauncher>
                     ) : (
                       <Link
                         href={l.href}
-                        className="link-underline text-sm text-secondary hover:text-primary transition-colors duration-200"
+                        className="inline-flex items-center min-h-[44px] w-full text-sm text-secondary hover:text-primary transition-colors duration-200"
                       >
-                        {l.label}
+                        <span className="link-underline">{l.label}</span>
                       </Link>
                     )}
                   </li>
@@ -252,13 +271,26 @@ export function Footer() {
           ))}
         </div>
 
+        {/* Structural separator — 1px neutral border-white/10 gradient at
+            12% opacity. Floats rather than terminating in a hard edge.
+            Sits BETWEEN the link grid above and the trust-pills + bottom-bar
+            cluster below — the link grid is the footer's primary content
+            (navigation), and the trust pills + bottom bar are meta
+            (credentials, copyright, status). The hairline gives the meta
+            region its own visual zone rather than letting the pills float
+            ambiguously between the two. `mt-12` gives the grid room to
+            breathe above; `mb-8` gives the pills room below. */}
+        <div className="divider-grad mt-12 mb-8" />
+
         {/* Trust signals — compact inline pill strip. Hairline border +
             faint tint so the pills read as quiet credentials, not as
             feature cards (PositioningStrip on the home page already
             carries the visual version). `flex-wrap` lets the row reflow
             on narrow viewports; `gap-2` keeps a tight institutional
-            rhythm. */}
-        <div className="mt-10 flex flex-wrap items-center gap-2">
+            rhythm. Sits directly above the bottom bar so the two read
+            as a single "meta region" separated from the link grid by
+            the divider-grad above. */}
+        <div className="flex flex-wrap items-center gap-2">
           {trust.map((item) => (
             <span
               key={item}
@@ -269,16 +301,13 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Structural separator — 1px neutral border-white/10 gradient at
-            12% opacity. Floats rather than terminating in a hard edge. */}
-        <div className="divider-grad my-8" />
-
         {/* Bottom bar — left: © year appName. rights; right: status
             indicator (pulsing emerald dot + label) + Privacy/Terms legal
             links + version + locale. Hairline top via the divider-grad
             above. Status dot is decorative (aria-hidden); the label text
-            carries the accessible meaning. */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            carries the accessible meaning. `mt-8` separates it from the
+            trust pills above. */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-secondary">
             © <span className="tnum">{year}</span> {t("appName")}. {t("rights")}
           </p>

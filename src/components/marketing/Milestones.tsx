@@ -65,7 +65,7 @@ export function Milestones() {
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Header */}
         <div className="max-w-2xl">
           <Reveal>
@@ -87,7 +87,7 @@ export function Milestones() {
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
-            <p className="mt-4 text-secondary leading-relaxed">
+            <p className="mt-4 text-secondary leading-[1.6]">
               {es
                 ? "Doce meses, cinco hitos. Cada uno sale de la misma conversación: traders reales pidiendo una cosa concreta."
                 : "Twelve months, five milestones. Each one comes from the same conversation: real traders asking for one concrete thing."}

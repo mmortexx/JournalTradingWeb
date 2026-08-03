@@ -59,8 +59,14 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
       : new Intl.NumberFormat("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
 
   const chipStyle = (active: boolean): React.CSSProperties => ({
+    /* T2g — minHeight 44 + padding 12/18 guarantees the ≥44 px touch
+       target on the risk/balance chips (was 30 px with padding 8/14,
+       below the spec floor). lineHeight 1.2 keeps the label on one
+       line; fontSize 12 is unchanged. */
     fontSize: 12,
-    padding: "8px 14px",
+    lineHeight: 1.2,
+    minHeight: 44,
+    padding: "12px 18px",
     borderRadius: 4,
     cursor: "pointer",
     transition: "background 0.2s, color 0.2s, border-color 0.2s",

@@ -207,13 +207,18 @@ export function WindowChrome() {
   const { fullscreen, setFullscreen } = useDemo();
 
   return (
-    <div className="demo-chrome demo-hairline border-b flex items-center h-10 text-xs shrink-0 relative cursor-default select-none">
-      {/* Identidad + cuenta */}
-      <div className="flex items-center gap-3 px-3 min-w-0 shrink-0">
-        <div className="flex items-center gap-2">
+    <div className="tj-paper-dense demo-chrome demo-hairline border-b flex items-center h-11 sm:h-10 text-xs shrink-0 relative cursor-default select-none">
+      {/* Identidad + cuenta. `min-w-0` + `truncate` en el nombre evita que
+          el chip de cuenta empuje el reloj fuera del panel en viewports
+          estrechos. En móvil la barra sube a h-11 (44 px) para que los
+          botones de ventana cumplan el mínimo de tamaño de toque sin tener
+          que ensancharlos visualmente — el lavado del hover ya llega a los
+          cantos. */}
+      <div className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 min-w-0 shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
           <AppIcon />
           <span
-            className="text-[13px] font-semibold text-primary hidden sm:inline truncate"
+            className="text-[13px] font-semibold text-primary hidden sm:inline truncate min-w-0"
             style={{
               fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
             }}
@@ -225,18 +230,23 @@ export function WindowChrome() {
       </div>
 
       {/* Reloj — empujado contra el estado local-first, como en la app. */}
-      <div className="flex-1 min-w-0 flex justify-end pr-3">
+      <div className="flex-1 min-w-0 flex justify-end pr-2 sm:pr-3">
         <MarketClock />
       </div>
 
-      {/* Estado local-first + botones de ventana */}
+      {/* Estado local-first + botones de ventana. En móvil cada botón de
+          .caption ocupa 44 px de ancho (de 46 px en escritorio) para cumplir
+          el mínimo de toque sin que el alto de la barra tenga que crecer
+          más allá de los 44 px que ya tiene — la regla h-full hereda esa
+          altura y el área clicable queda en 44×44. En sm+ recuperan sus
+          46 px nativos. */}
       <div className="flex items-stretch h-full shrink-0">
         <LocalFirstLED />
         <button
           type="button"
           aria-label={t("winMinimize")}
           tabIndex={-1}
-          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-150"
+          className="w-11 sm:w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-150"
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
             <line x1="0.5" y1="5" x2="9.5" y2="5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
@@ -246,7 +256,7 @@ export function WindowChrome() {
           type="button"
           aria-label={fullscreen ? t("winRestore") : t("winMaximize")}
           onClick={() => setFullscreen(!fullscreen)}
-          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-150"
+          className="w-11 sm:w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary transition-colors duration-150"
         >
           {fullscreen ? (
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
@@ -265,7 +275,7 @@ export function WindowChrome() {
           onClick={() => {
             if (fullscreen) setFullscreen(false);
           }}
-          className="w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[#C42B1C] hover:text-white transition-colors duration-150"
+          className="w-11 sm:w-[46px] h-full flex items-center justify-center text-tertiary hover:bg-[#C42B1C] hover:text-white transition-colors duration-150"
         >
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
             <line x1="0.5" y1="0.5" x2="9.5" y2="9.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />

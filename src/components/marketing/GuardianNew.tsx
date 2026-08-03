@@ -20,15 +20,24 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
       className="section bg-veil relative overflow-hidden border-t border-[rgb(var(--divider)/0.06)] scroll-mt-24"
     >
       <div className="relative max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Mockup tarjeta "Comprobación previa" */}
+        {/* Mockup tarjeta "Comprobación previa"
+            R20-3b / T2d — padding lateral y vertical escalado por
+            breakpoint (p-5 20px · sm:p-6 24px · md:p-8 32px) para que la
+            tarjeta respire en móvil y se sienta generosa en desktop.
+            Antes era un `padding: 20` fijo en inline-style: en 390px eso
+            dejaba ~247px de contenido útil dentro de la tarjeta y el
+            texto se leía claustrofóbico. Moverlo a utility classes
+            permite subir a 32px en desktop sin tocar móvil. */}
         <div
-          className="relative rounded-[8px]"
+          // T3c — swap a `.tj-paper-dense`: contenido denso (fila de trade,
+          // checklist de 3, aviso de bloqueo, 2 CTAs) necesita más opacidad
+          // que el papel 72 % estándar para mantener WCAG AA. Sigue siendo
+          // papel translúcido cálido (86 %) — el atlas sigue filtrándose por
+          // los bordes. Estados rojo/verde (checklist + aviso bloqueo) se
+          // conservan intactos: tienen sus propios fondos teñidos.
+          className="tj-paper-dense relative rounded-[8px] p-5 sm:p-6 md:p-8"
           style={{
-            padding: 20,
             border: "1px solid rgb(var(--divider) / 0.13)",
-            background: "color-mix(in oklab, var(--surface) 70%, transparent)",
-            backdropFilter: "blur(20px) saturate(1.4)",
-            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             // Elevación neutra: se retiró el resplandor teñido de acento
             // (era un glow de color puro sin función informativa).
             boxShadow:
@@ -132,11 +141,16 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               R24-1c: added an outer pnl-neg glow ring + AlertTriangle is
               now wrapped in a stamped circular container so the icon +
               the OPERACIÓN BLOQUEADA label read as a single stamped seal
-              rather than a floating icon + text. */}
+              rather than a floating icon + text.
+              T2d — padding lateral subido a 14px 16px 14px 18px (era
+              12px 14px 12px 16px) para garantizar ≥16px de respiro
+              horizontal entre el texto del aviso y el borde del box,
+              cumpliendo el spec “el texto rojo no toca los bordes” en
+              móviles estrechos (320px) donde antes se apretaba. */}
           <div
             className="rounded-[8px] mb-3 relative overflow-hidden"
             style={{
-              padding: "12px 14px 12px 16px",
+              padding: "14px 16px 14px 18px",
               background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",
               border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 28%, transparent)",
               boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.06)",
@@ -177,13 +191,20 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
           {/* R21-3b: action buttons stack vertically on mobile (flex-col sm:flex-row)
               so the longest label "Ajustar a 2 contratos" / "Adjust to 2 contracts"
               (≈147px at 12px/600) fits without overflowing the ≈115px inner half-width
-              on a 375px viewport. At sm+ the buttons resume their side-by-side layout. */}
-          <div className="flex flex-col sm:flex-row gap-2">
+              on a 375px viewport. At sm+ the buttons resume their side-by-side layout.
+              T2d — `height: 36` en inline-style era silenciado por `flex-1` (que
+              expande `flex-basis: 0%`, cuyo valor NO-auto ignora la propiedad
+              `height` en el eje principal del flex container). Resultado: los
+              botones se renderizaban a 20px de alto (la altura del texto), muy
+              por debajo del umbral táctil de 44px. Reemplazado por `min-h-[44px]`
+              (que SÍ se respeta independientemente de flex-basis) + `px-4` para
+              más respiro horizontal. Es un fix de accesibilidad real, no
+              cosmético: los dos botones del mockup son los únicos CTAs visibles
+              de la sección y deben ser tocables con el pulgar en móvil. */}
+          <div className="flex flex-col sm:flex-row gap-2.5">
             <button
-              className="tnum flex-1 min-w-0"
+              className="tnum flex-1 min-w-0 min-h-[44px] px-4 inline-flex items-center justify-center"
               style={{
-                height: 36,
-                padding: "0 12px",
                 borderRadius: 4,
                 background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
                 color: "rgb(var(--accent-base))",
@@ -196,10 +217,8 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               {es ? "Ajustar a 2 contratos" : "Adjust to 2 contracts"}
             </button>
             <button
-              className="tnum flex-1 min-w-0"
+              className="tnum flex-1 min-w-0 min-h-[44px] px-4 inline-flex items-center justify-center"
               style={{
-                height: 36,
-                padding: "0 12px",
                 borderRadius: 4,
                 background: "transparent",
                 color: "var(--ink-2)",
@@ -269,7 +288,12 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               ? "El Guardián no te dice qué hacer. Te bloquea cuando rompes tus propias reglas."
               : "The Guardian doesn't tell you what to do. It blocks you when you break your own rules."}
           </p>
-          <ul className="m-0 p-0 list-none space-y-4">
+          {/* T2d — `space-y-5` (20px) entre features (era `space-y-4` 16px):
+              el incremento refuerza la legibilidad móvil sin abrir un
+              hueco tipográfico; a desktop el Δ es apenas perceptible.
+              + `leading-[1.6]` en la descripción para parity con Values
+              y con el spec de legibilidad de la home. */}
+          <ul className="m-0 p-0 list-none space-y-5">
             {[
               { i: ShieldCheck, t: es ? "Frena antes del error" : "Brakes before the error", d: es ? "Bloquea tamaños que excedan tu riesgo máximo por operación." : "Blocks sizes that exceed your max per-trade risk." },
               { i: HandMetal, t: es ? "Te obliga a respetar el plan" : "Forces you to respect the plan", d: es ? "Límites de drawdown diario y total configurables." : "Daily and total drawdown limits configurable." },
@@ -285,7 +309,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
                   </span>
                   <div>
                     <h3 className="m-0" style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)" }}>{f.t}</h3>
-                    <p className="m-0 mt-1" style={{ fontSize: 13.5, lineHeight: 1.55, color: "var(--ink-2)" }}>{f.d}</p>
+                    <p className="m-0 mt-1" style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--ink-2)" }}>{f.d}</p>
                   </div>
                 </li>
               );

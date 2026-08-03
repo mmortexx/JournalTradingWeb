@@ -40,7 +40,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             "radial-gradient(70% 60% at 30% 0%, color-mix(in oklab, var(--ink) 5%, transparent), transparent 60%)",
         }}
       />
-      <div className="relative max-w-[1280px] mx-auto px-5 md:px-8">
+      <div className="relative tj-container" style={{ maxWidth: 1280 }}>
         <div className="max-w-[760px] mb-12">
           <div className="inline-flex items-center gap-3 mb-5">
             <span
@@ -97,14 +97,16 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             // bento cards match the canonical “lift + accent border
             // glow” hover vocabulary used by Integrations / TestimonialsWall
             // / ValueTestimonials / Story / Milestones / ContactSupport.
+            // T2h — card padding now responsive: 20px on mobile (p-5),
+            // 24px from sm. Original was flat `padding: 24` which felt
+            // tight against the edge on 320–390px viewports.
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5 }}
-            className="group lg:col-span-7 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
+            // T3c — swap a `.tj-paper`: papel translúcido cálido en vez de
+            // glass frío. Border, rounded, hover lift, padding y minHeight
+            // intactos. El sweep de acento del top-edge se conserva.
+            className="tj-paper group lg:col-span-7 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
             style={{
-              padding: 24,
-              background: "color-mix(in oklab, var(--surface) 55%, transparent)",
-              backdropFilter: "blur(20px) saturate(1.4)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.4)",
               minHeight: 360,
             }}
           >
@@ -225,12 +227,8 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="group lg:col-span-5 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
+            className="tj-paper group lg:col-span-5 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
             style={{
-              padding: 24,
-              background: "color-mix(in oklab, var(--surface) 55%, transparent)",
-              backdropFilter: "blur(20px) saturate(1.4)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.4)",
               minHeight: 360,
             }}
           >
@@ -356,13 +354,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
-            style={{
-              padding: 24,
-              background: "color-mix(in oklab, var(--surface) 55%, transparent)",
-              backdropFilter: "blur(20px) saturate(1.4)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            }}
+            className="tj-paper group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-2">
               <span
@@ -414,13 +406,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
-            style={{
-              padding: 24,
-              background: "color-mix(in oklab, var(--surface) 55%, transparent)",
-              backdropFilter: "blur(20px) saturate(1.4)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            }}
+            className="tj-paper group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-2">
               <span
@@ -472,13 +458,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)]"
-            style={{
-              padding: 24,
-              background: "color-mix(in oklab, var(--surface) 55%, transparent)",
-              backdropFilter: "blur(20px) saturate(1.4)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            }}
+            className="tj-paper group lg:col-span-4 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-2">
               <span

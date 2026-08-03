@@ -1247,6 +1247,20 @@
   }
 
   .max-w-page { max-width: 1200px; }
+
+  /* .tj-container — contenedor horizontal único y consistente para toda
+     sección de página. Combina el ancho de mancha (--page-w), el
+     centrado y el padding lateral responsivo en una sola clase, para que
+     ninguna sección vuelva a ir "pegada al borde" en móvil por usar
+     `px-5` sueltos o sin max-width. En móvil deja 20 px de canal a cada
+     lado (→ texto cómodo en 390 px), en tablet 32 px y en desktop hasta
+     36 px. Úsalo en el wrapper interior de cada <section>. */
+  .tj-container {
+    width: 100%;
+    max-width: var(--page-w, 1080px);
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 4vw, 2.25rem);
+  }
   .rounded-card { border-radius: 8px; }
   .rounded-pill { border-radius: 12px; }
 
@@ -2943,7 +2957,23 @@ button.icon-btn:hover > svg,
 }
 @media (max-width: 900px) {
   .tj-interlude {
-    min-height: 62vh;
+    /* En móvil una lámina a 62 vh dejaba ~2.000 px de "página en blanco"
+       entre los capítulos (4 pausas × ~520 px), que se leía como que la
+       página se había cortado. Se baja a 38 vh — todavía respira y deja
+       ver el atlas, pero sin la sensación de hueco muerto — y se centra
+       verticalmente el pie para que ocupe su espacio en vez de flotar al
+       fondo de una caja casi vacía. */
+    min-height: 38vh;
+    align-items: center;
+  }
+  .tj-interlude-caption {
+    padding-top: clamp(1.5rem, 5vh, 3rem);
+  }
+}
+@media (max-width: 480px) {
+  .tj-interlude {
+    /* Pantallas muy estrechas: aún más compacta. */
+    min-height: 32vh;
   }
 }
 
@@ -3244,3 +3274,113 @@ button.icon-btn:hover > svg,
     animation: none;
   }
 }
+
+/* ============================================================
+   TJPAPER — material "papel translúcido de e-reader"
+   ============================================================
+   Un usuario lo pidió explícito: un efecto translúcido como el
+   papel de una tablet de lectura (Kindle Paperwhite / Kobo), no
+   el cristal oscuro de liquid-glass. Este material es CÁLIDO,
+   ligeramente translúcido, con grano de papel y un halo de luz
+   superior — la superficie sobre la que el atlas grabado del
+   fondo se intuye sin competir con el texto.
+
+   Se diferencia de .liquid-glass en tres cosas:
+     1. Tinte CÁLIDO (papel) en vez de neutral gris.
+     2. Translucidez real (~72%) — deja ver el fondo animado.
+     3. Grano de papel sutil + luz de borde superior.
+
+   Usar en: navbar, drawer móvil, tarjetas destacadas, banners
+   fijos. NO en superficies que necesitan contraste máximo sobre
+   texto pequeño (ahí sigue mandando .bg-veil / .liquid-glass).
+   ============================================================ */
+.tj-paper {
+  position: relative;
+  background-color: color-mix(in srgb, var(--surface) 72%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(140%) brightness(1.02);
+  backdrop-filter: blur(10px) saturate(140%) brightness(1.02);
+  /* Grano de papel — la misma textura fractal del BackgroundFX, pero
+     local y más sutil, para que el material lea como fibra de papel
+     incluso donde el fondo global está velado. */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--surface) 80%, transparent) 0%,
+      color-mix(in srgb, var(--surface) 68%, transparent) 100%);
+  background-size: 180px 180px, 100% 100%;
+  background-blend-mode: overlay, normal;
+  /* Luz de borde superior — el reflejo de una lámina de papel
+     catch-light bajo una lámpara. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 -1px 0 rgb(0 0 0 / 0.06);
+}
+:root[data-theme="light"] .tj-paper {
+  background-color: color-mix(in srgb, var(--surface) 68%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    inset 0 -1px 0 rgb(0 0 0 / 0.05);
+}
+/* Variante más densa para superficies que necesitan más opacidad
+   (navbar sobre hero animado, drawers). */
+.tj-paper-dense {
+  background-color: color-mix(in srgb, var(--surface) 86%, transparent);
+}
+:root[data-theme="light"] .tj-paper-dense {
+  background-color: color-mix(in srgb, var(--surface) 82%, transparent);
+}
+/* Halo cálido opcional — un resplandor champagne muy tenue en el
+   borde superior, para tarjetas destacadas. */
+.tj-paper-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(120% 60% at 50% 0%,
+    color-mix(in srgb, var(--accent-base, rgb(199 167 107)) 8%, transparent),
+    transparent 55%);
+}
+
+/* ============================================================
+   VEIL REBALANCE — el atlas se ve más, en todas las secciones
+   ============================================================
+   El usuario pidió que los fondos animados se vean "mucho mejor
+   en todos los menús secciones" y "super fluido sin cortes". El
+   velo de sección (.bg-veil) estaba al 88% en claro / 90% oscuro,
+   lo que tapaba casi todo el atlas grabado excepto en las pausas.
+   Se baja a 78% / 82% para que el fondo se intuya a través de
+   cada capítulo, no solo en las láminas. El contraste del texto
+   se preserva: el atlas es lápiz fino a ~0,6 de opacidad, así
+   que bajar el velo un 10% aporta como mucho un 4% de tinta bajo
+   el texto terciario — sigue por encima de 4,5:1 de AA. */
+:root[data-palette="clasico"] .bg-veil,
+:root[data-theme="light"][data-palette="clasico"] .bg-veil {
+  background-color: color-mix(in srgb, var(--bg) 82%, transparent);
+}
+:root[data-theme="light"][data-palette="clasico"] .bg-veil {
+  background-color: color-mix(in srgb, var(--bg) 78%, transparent);
+}
+:root:not([data-theme="light"])[data-palette="clasico"] .bg-veil {
+  background-color: color-mix(in srgb, var(--bg) 84%, transparent);
+}
+
+/* ============================================================
+   FLUIDEZ — aceleración GPU para todos los materiales de cristal
+   ============================================================
+   Asegura que backdrop-filter y las transformaciones de scroll
+   no jitan: `will-change` solo en los elementos que de verdad se
+   mueven (navbar sticky, materiales con backdrop-filter), y
+   `translate-z(0)` para forzar capa de composición sin promotion
+   excesiva (que consumiría memoria). */
+.tj-paper,
+.liquid-glass {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: backdrop-filter;
+}
+/* Quitar will-change tras 2s sin interacción para liberar memoria
+   en dispositivos modestos — patrón recomendado por web.dev. La
+   regla es estática; el cleanup lo gestiona el navegador cuando el
+   elemento sale del viewport vía content-visibility. */
+

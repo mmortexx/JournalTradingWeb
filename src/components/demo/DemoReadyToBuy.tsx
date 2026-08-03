@@ -105,7 +105,12 @@ export function DemoReadyToBuy() {
                 <MagneticButton
                   href={asset("/features")}
                   strength={0.15}
-                  className="liquid-glass group inline-flex items-center gap-2 px-8 py-3 rounded-lg font-medium text-primary border border-[rgb(var(--divider)/0.18)] hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--accent-base)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-[background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                  // T3c — swap `liquid-glass` por `.tj-paper`: el CTA
+                  // secundario ahora usa el mismo papel cálido que las
+                  // tarjetas de DemoCapabilities de arriba, para que la
+                  // sección lea como una familia de superficies cohesiva
+                  // en vez de mezclar cristal frío + papel.
+                  className="tj-paper group inline-flex items-center gap-2 px-8 py-3 rounded-lg font-medium text-primary border border-[rgb(var(--divider)/0.18)] hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--accent-base)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-[background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                 >
                   {es ? "Explora características" : "Explore features"}
                   <svg

@@ -44,7 +44,7 @@ export function HowItWorks() {
     <section className="section bg-veil relative overflow-hidden">
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Header */}
         <Reveal className="max-w-2xl relative">
           <Eyebrow>{es ? "Cómo funciona" : "How it works"}</Eyebrow>
@@ -59,7 +59,7 @@ export function HowItWorks() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed">
+          <p className="mt-4 text-lg text-secondary leading-[1.6]">
             {es
               ? "Diseñado para el trader que opera todos los días: rápido de entrada, brutal de análisis, honesto de diagnóstico."
               : "Designed for the trader who trades every day: fast to enter, brutal on analysis, honest on diagnosis."}
@@ -96,7 +96,12 @@ export function HowItWorks() {
                 <div className="relative mb-6">
                 <motion.div
                   whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                  className="relative w-[144px] h-[144px] rounded-card liquid-glass depth-1 flex items-center justify-center transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  // T2h: step illustration circle responsive — 120px on
+                  // mobile (saves ~24px vertical per step on small
+                  // viewports), 144px from sm+ where the 3-col grid has
+                  // room. The connector line top-[72px] is hidden md:block
+                  // so it only renders at md+ where the circle is 144px.
+                  className="relative w-[120px] h-[120px] sm:w-[144px] sm:h-[144px] rounded-card liquid-glass depth-1 flex items-center justify-center transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 >
                     {/* Step illustration */}
                     <div className="relative">
@@ -129,7 +134,7 @@ export function HowItWorks() {
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-secondary leading-relaxed max-w-xs md:max-w-none">
+                <p className="text-sm text-secondary leading-[1.6] max-w-xs md:max-w-none">
                   {s.desc}
                 </p>
               </motion.li>

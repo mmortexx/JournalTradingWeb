@@ -69,7 +69,7 @@ export function Comparison() {
 
   return (
     <section className="section cv-auto relative overflow-hidden bg-veil">
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         <Reveal className="max-w-2xl">
           <Eyebrow>{es ? "Comparativa" : "Comparison"}</Eyebrow>
           <h2 className="mt-5 t-h2 text-primary">
@@ -83,7 +83,7 @@ export function Comparison() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed">
+          <p className="mt-4 text-lg text-secondary leading-[1.6]">
             {es
               ? "Excel es libre pero mudo. La nube es cómoda pero cara y ajena. Esta app es local, honesta y tuya."
               : "Excel is free but silent. The cloud is convenient but costly and foreign. This app is local, honest and yours."}
@@ -135,7 +135,17 @@ export function Comparison() {
                     cabecera de una tabla impresa. */}
                 <thead className="sticky top-0 z-20">
                   <tr className="border-b border-[rgb(var(--divider)/0.15)]">
-                    <th scope="col" className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom bg-[rgb(var(--bg))]">
+                    <th
+                      scope="col"
+                      className="text-left p-5 md:p-6 text-xs uppercase tracking-[0.12em] font-semibold text-tertiary h-14 md:h-16 align-bottom sticky left-0 z-20"
+                      // T2h: opaque background via color-mix (works for both
+                      // hex and RGB-component --bg values across all themes).
+                      // The original bg-[rgb(var(--bg))] was invalid CSS when
+                      // --bg is a hex value (most themes), leaving the sticky
+                      // column transparent and letting scroll content show
+                      // through. color-mix at 100% == var(--bg) opaque.
+                      style={{ backgroundColor: "color-mix(in srgb, var(--bg) 100%, transparent)" }}
+                    >
                       {es ? "Característica" : "Feature"}
                     </th>
                     {cols.map((c) => (
@@ -201,7 +211,13 @@ export function Comparison() {
                         i % 2 === 1 ? "bg-[rgb(var(--divider)/0.015)]" : ""
                       }`}
                     >
-                      <th scope="row" className="text-left p-5 md:p-6 font-medium text-secondary text-[14px] h-16 md:h-[72px] align-middle transition-shadow duration-200 group-hover:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)/0.40)]">
+                      <th
+                        scope="row"
+                        className="text-left p-5 md:p-6 font-medium text-secondary text-[14px] h-16 md:h-[72px] align-middle transition-shadow duration-200 group-hover:shadow-[inset_3px_0_0_0_rgb(var(--accent-base)/0.40)] sticky left-0 z-10"
+                        // T2h: opaque background for the sticky row-header
+                        // column — same color-mix approach as the col header.
+                        style={{ backgroundColor: "color-mix(in srgb, var(--bg) 100%, transparent)" }}
+                      >
                         {es ? row.labelEs : row.labelEn}
                       </th>
                       {row.cells.map((cell, j) => (

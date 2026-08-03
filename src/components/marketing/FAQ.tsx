@@ -190,7 +190,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
          vacio absoluto entre la regla del hero y el buscador. */
       className={`${standalone ? "pt-10 pb-[clamp(4rem,8vw,7rem)]" : "section"} cv-auto bg-veil relative overflow-hidden scroll-mt-24`}
     >
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Encabezado interno — el h2 siempre se renderiza (necesario para
             el TOC + SEO); en modo standalone (/faq) se omite el eyebrow
             porque el PageHeader ya aporta su propio kicker arriba. */}

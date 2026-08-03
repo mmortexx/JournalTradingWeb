@@ -289,8 +289,10 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
             exit={{ opacity: 0, scale: 0.98, y: -4 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* Search input row */}
-            <div className="flex items-center gap-2.5 px-3 h-11 border-b border-[rgb(var(--divider)/0.1)]">
+            {/* Search input row — h-12 (48 px) para que el input tenga un
+                área de toque cómoda en móvil (≥44 px) y el kbd de Esc no
+                quede pegado al borde superior en pantallas pequeñas. */}
+            <div className="flex items-center gap-2.5 px-3 h-12 border-b border-[rgb(var(--divider)/0.1)]">
               <SearchIcon />
               <input
                 ref={inputRef}
@@ -302,7 +304,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
                 }}
                 placeholder={es ? "Escribe un comando…" : "Type a command…"}
                 aria-label={es ? "Buscar comando" : "Search command"}
-                className="flex-1 bg-transparent text-sm text-primary placeholder:text-tertiary focus:outline-none tnum"
+                className="flex-1 h-full bg-transparent text-sm text-primary placeholder:text-tertiary focus:outline-none tnum"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -331,7 +333,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
                           onClose();
                         }}
                         aria-current={isActive ? "true" : undefined}
-                        className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${
+                        className={`w-full flex items-center gap-3 px-3 min-h-[44px] py-2.5 text-left transition-colors ${
                           isActive
                             ? "bg-[rgb(var(--divider)/0.1)] text-primary"
                             : "text-secondary hover:bg-[rgb(var(--divider)/0.04)]"

@@ -147,7 +147,7 @@ function KpiStripCell({
   reKey: string;
 }) {
   return (
-    <div className="flex items-stretch flex-1 min-w-0">
+    <div className="flex items-stretch flex-1 min-w-[6rem] md:min-w-0 shrink-0 md:shrink">
       <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2 sm:px-3 items-center text-center rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
         <div className="text-[10px] uppercase tracking-[0.14em] text-tertiary truncate">
           {label}
@@ -158,7 +158,7 @@ function KpiStripCell({
       </div>
       {showHairline && (
         <div
-          className="self-stretch w-px my-1 bg-gradient-to-b from-transparent via-white/15 to-transparent"
+          className="self-stretch w-px shrink-0 my-1 bg-gradient-to-b from-transparent via-white/15 to-transparent"
           aria-hidden="true"
         />
       )}
@@ -618,7 +618,7 @@ function HeatmapLegend({ trades }: { trades: Trade[] }) {
 
   return (
     <div className="mt-4 flex items-center justify-between gap-4 flex-wrap">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap min-w-0 gap-y-1.5">
         <span className="text-[10px] uppercase tracking-wider text-tertiary">
           {lang === "es" ? "Escala" : "Scale"}
         </span>
@@ -626,7 +626,7 @@ function HeatmapLegend({ trades }: { trades: Trade[] }) {
           {swatches.map((bg, i) => (
             <div
               key={i}
-              className="w-4 h-full"
+              className="w-3 sm:w-4 h-full"
               style={{ backgroundColor: bg }}
               aria-hidden="true"
             />
@@ -1364,7 +1364,7 @@ export function AnalyticsPage() {
             <Eyebrow>
               {lang === "es" ? "Resumen del periodo filtrado" : "Filtered period summary"}
             </Eyebrow>
-            <div className="flex items-stretch py-2">
+            <div className="flex items-stretch py-2 overflow-x-auto custom-scroll -mx-1 px-1">
               <KpiStripCell
                 label={lang === "es" ? "Operaciones" : "Trades"}
                 showHairline
@@ -1404,13 +1404,16 @@ export function AnalyticsPage() {
           </div>
 
           {/* ============ WIN/LOSS + RISK/QUALITY 2-CARD ROW (3:4 ratio) ============ */}
-          <div className="grid grid-cols-1 lg:grid-cols-7 gap-5">
-            {/* Win/loss card — 3×2 grid. */}
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-5 min-w-0">
+            {/* Win/loss card — 3×2 grid. Mobile: 3 cols is tight at 320px;
+                the RatioCells are centered so they read fine even when
+                each cell is ~90px wide. Added min-w-0 so the grid can
+                shrink within the card without forcing overflow. */}
             <SectionCard
               eyebrow={lang === "es" ? "Ganadoras vs perdedoras" : "Winners vs losers"}
-              className="lg:col-span-3"
+              className="lg:col-span-3 min-w-0"
             >
-              <div className="grid grid-cols-3 gap-x-4 gap-y-5">
+              <div className="grid grid-cols-3 gap-x-2 sm:gap-x-4 gap-y-5 min-w-0">
                 <RatioCell label={t("avgWin")}>
                   <Money value={m.avgWin} sign colorizeSign tone="pos" decimals={0} />
                 </RatioCell>
@@ -1444,7 +1447,7 @@ export function AnalyticsPage() {
             {/* Risk/quality card — 4×3 grid. */}
             <SectionCard
               eyebrow={lang === "es" ? "Riesgo, calidad y rachas" : "Risk, quality & streaks"}
-              className="lg:col-span-4"
+              className="lg:col-span-4 min-w-0"
               hint={
                 shortSample ? (
                   <Chip variant="warn" className="text-[10px]">
@@ -1453,7 +1456,7 @@ export function AnalyticsPage() {
                 ) : null
               }
             >
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-2 sm:gap-x-4 gap-y-5 min-w-0">
                 <RatioCell label={t("maxDrawdown")}>
                   <Money value={m.maxDrawdown} sign colorizeSign tone="neg" decimals={0} />
                 </RatioCell>
@@ -1755,7 +1758,20 @@ export function AnalyticsPage() {
             </SectionCard>
           </div>
 
-          {/* ============ DISTRIBUTIONS (3 cards) ============ */}
+          {/* ============ DISTRIBUTIONS (3 cards) ============
+              The Histogram component (`src/components/charts/Histogram.tsx`)
+              lays its bars out as `flex-1` children of a `flex items-end`
+              row. By default flex items don't shrink below their content's
+              min-content width, so on narrow viewports the P&L histogram
+              labels ("431 US$", "1.2K US$"…) push the bars past the card's
+              right edge and overflow the demo panel. We can't edit the
+              Histogram component (not in this task's owned files), so we
+              pass a className with a Tailwind arbitrary descendant variant
+              that sets `min-w-0` on every `.flex-1` bar wrapper inside the
+              chart — that lets the bars shrink below their labels' min
+              width, which in turn lets the labels' `truncate w-full`
+              actually truncate. `overflow-hidden` is the safety net so no
+              bar can ever escape the card, even mid-animation. */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <SectionCard eyebrow={t("rDistribution")}>
               <Histogram
@@ -1763,6 +1779,7 @@ export function AnalyticsPage() {
                 height={140}
                 colorize="pos-neg"
                 formatX={(x) => `${x}R`}
+                className="overflow-hidden [&_.flex-1]:min-w-0"
               />
               <HistogramLegend
                 kind="pos-neg"
@@ -1776,6 +1793,7 @@ export function AnalyticsPage() {
                 height={140}
                 colorize="pos-neg"
                 formatX={(x) => compactMoney(Number(x))}
+                className="overflow-hidden [&_.flex-1]:min-w-0"
               />
               <HistogramLegend
                 kind="pos-neg"
@@ -1789,6 +1807,7 @@ export function AnalyticsPage() {
                 height={140}
                 colorize="accent"
                 formatX={(x) => String(x)}
+                className="overflow-hidden [&_.flex-1]:min-w-0"
               />
               <HistogramLegend
                 kind="accent"

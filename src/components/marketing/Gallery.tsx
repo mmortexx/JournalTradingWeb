@@ -93,7 +93,7 @@ export function Gallery() {
       {/* Section grain */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
-      <div className="relative max-w-page mx-auto px-5 md:px-8">
+      <div className="relative tj-container">
         {/* Header */}
         {/* Alineada a la izquierda como Caracteristicas, Como funciona y Y
             mucho mas: centrada, el eje de lectura saltaba al medio y
@@ -113,7 +113,7 @@ export function Gallery() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed">
+          <p className="mt-4 text-lg text-secondary leading-[1.6]">
             {es
               ? "Cada pantalla entera, sin recortes. Tal cual la verías en tu Windows."
               : "Every screen in full, uncropped. Exactly as you'd see it on your Windows."}

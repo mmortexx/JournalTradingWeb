@@ -99,7 +99,7 @@ export function PageHeader({
           void. Sits under the accent halo so both layers read together. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Breadcrumb — Home / <current page>. Plain text on the trailing
             crumb (no link) so users can't tap into the page they're already
             on; the home crumb is the only navigable one. Kept as a plain
@@ -150,9 +150,12 @@ export function PageHeader({
         {/* Subtitle — fades in at 400ms per the task spec. Uses the
             design-system secondary text token (gray-300 on dark) so the
             lead reads coherently against both the dark backdrop and the
-            grain overlay. */}
+            grain overlay. T2h: max-w-2xl (672px) → max-w-[44em] (~704px)
+            and leading-relaxed (1.625) → leading-[1.6] per the page-header
+            brief: comfortable measure + 1.6 line-height for the lead
+            paragraph on every subpage. */}
         <FadeIn delay={400} duration={800}>
-          <p className="mt-5 text-lg md:text-xl text-secondary leading-relaxed max-w-2xl">
+          <p className="mt-5 text-lg md:text-xl text-secondary leading-[1.6] max-w-[44em]">
             {es ? subtitleEs : subtitleEn}
           </p>
         </FadeIn>

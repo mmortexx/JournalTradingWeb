@@ -128,7 +128,7 @@ export function ContactForm() {
     >
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-      <div className="relative max-w-page mx-auto px-5 md:px-8">
+      <div className="relative tj-container">
         <div className="max-w-xl mx-auto">
           <Reveal>
             <div className="flex justify-center">
@@ -159,7 +159,10 @@ export function ContactForm() {
           </Reveal>
 
           <Reveal delay={0.14} y={20}>
-            <div className="mt-8 liquid-glass depth-2 rounded-card p-6 relative overflow-hidden">
+            {/* T3c — swap `liquid-glass` por `.tj-paper`: el formulario
+                se lee como una tarjeta de papel cálido translúcida.
+                `depth-2`, padding, rounded-card y min-h-[360px] intactos. */}
+            <div className="tj-paper depth-2 rounded-card p-6 relative overflow-hidden mt-8">
               {/* min-height keeps layout stable when the form swaps to the
                   success state, so the card doesn't collapse on submit. */}
               <div className="min-h-[360px] flex flex-col justify-center">
@@ -322,7 +325,19 @@ export function ContactForm() {
                         disabled={sending || !ready}
                         aria-busy={sending}
                         whileTap={sending || !ready ? undefined : { scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                        className="w-full sm:w-auto bg-[rgb(var(--accent-base))] text-[#1A1917] px-6 py-2.5 rounded-[4px] text-sm font-semibold transition-[background-color,transform,opacity] duration-200 hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                        /* T2g — `min-h-[44px]` guarantees the ≥44 px touch target
+                           regardless of label line-height; the previous `py-2.5`
+                           alone produced a 40 px button on mobile (real touch-target
+                           fix, same class of bug as T2d's Guardian buttons).
+                           `w-full sm:w-fit sm:min-w-[180px]` makes the button
+                           auto-width on tablet/desktop (≤260 px content) instead
+                           of stretching as a full-width bar; on mobile it stays
+                           full-width inside the max-w-xl card so it reads as the
+                           primary action. Text color kept as #1A1917 (always-dark
+                           ink on the medium-lightness gold accent fill — clears
+                           AA in both themes; matches the Waitlist + Download CTA
+                           treatment). */
+                        className="w-full sm:w-fit sm:min-w-[180px] inline-flex items-center justify-center gap-2 min-h-[44px] bg-[rgb(var(--accent-base))] text-[#1A1917] px-6 py-2.5 rounded-[4px] text-sm font-semibold transition-[background-color,transform,opacity] duration-200 hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                       >
                         {sending
                           ? es ? "Enviando…" : "Sending…"

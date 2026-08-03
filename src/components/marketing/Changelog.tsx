@@ -146,7 +146,7 @@ export function Changelog() {
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Header */}
         <div className="relative max-w-3xl mx-auto text-center">
           <Reveal>
@@ -170,7 +170,7 @@ export function Changelog() {
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
-            <p className="relative mt-4 text-lg text-secondary max-w-xl mx-auto leading-relaxed">
+            <p className="relative mt-4 text-lg text-secondary max-w-xl mx-auto leading-[1.6]">
               {es
                 ? "Cada versión se construye sobre el feedback de traders reales. Esto es lo que ya está en tu mano y lo que viene."
                 : "Every version is built on feedback from real traders. Here's what's already in your hands and what's coming."}
@@ -258,7 +258,7 @@ export function Changelog() {
                             {entry.title}
                           </h3>
                           <p
-                            className={`mt-1.5 text-sm leading-relaxed ${
+                            className={`mt-1.5 text-sm leading-[1.6] ${
                               isPast ? "text-secondary" : "text-tertiary"
                             }`}
                           >

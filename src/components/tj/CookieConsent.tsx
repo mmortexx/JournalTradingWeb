@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 
 /**
@@ -16,13 +15,45 @@ import { useLang } from "@/lib/i18n";
  *   mid-sentence). The new policy waits for either an explicit scroll signal
  *   (user is actively navigating) or a 5 s fallback so screen-reader users
  *   who don't scroll still eventually get the consent prompt.
- * - Dismissal is persisted in `localStorage` under `tj-cookie-consent = "1"`.
- * - No tracking, no ads — purely technical cookies — so the copy says so.
+ * - Dismissal is persisted in `localStorage` under `tj-cookie-consent`,
+ *   with the value `"accepted"` or `"declined"` so future logic (analytics,
+ *   preference cookies) can branch on the user's choice. For now both
+ *   outcomes are functionally identical — the site uses only strictly-
+ *   necessary technical cookies — but presenting both buttons respects the
+ *   user's agency and matches the GDPR-style consent affordance the rest
+ *   of the chrome (footer, navbar) implies.
  * - Reveal/dismiss: pure opacity fade in/out, no slide. Minimal, clean.
+ * - `MotionConfig reducedMotion="user"` makes framer-motion respect
+ *   `prefers-reduced-motion: reduce` automatically — transforms and layout
+ *   animations are disabled, the opacity fade is preserved (it's not a
+ *   motion-sickness trigger).
  *
- * Width: clamped to `max-w-sm` (384 px) but capped to `100vw - 6rem` on small
- * screens so the banner leaves a 64 px right gutter for the global BackToTop
- * button (44 px wide + 24 px right margin = 68 px) — they never overlap.
+ * Width: clamped to `min(22rem, 100vw - 7rem)` via inline style. The 7 rem
+ * right gutter (112 px) clears the global BackToTop button (44 px wide +
+ * 24 px right margin = 68 px) with a comfortable 28 px buffer on 390 px
+ * viewports, so the two never overlap when both are visible. BackToTop
+ * additionally lifts itself above the banner via `data-cookie-consent`
+ * detection (see BackToTop.tsx) so the two never share a vertical band
+ * either — belt and suspenders.
+ *
+ * Action row: a 2-column grid (Decline | Accept). Both buttons fill their
+ * grid cell (`w-full`) so they share the banner width equally regardless
+ * of label length, and both meet the WCAG 2.5.5 44 px tap target. The
+ * previous "Más info" link was dropped because the FAQ it pointed at is
+ * already linked from the footer's Resources column; duplicating it here
+ * forced `flex-wrap` on narrow viewports and bloated the banner to 250+
+ * px (3 stacked button rows). The 2-col grid keeps the action region to a
+ * single 44 px row.
+ *
+ * POSITION OVERRIDE — `style={{ position: "fixed" }}`. The `.liquid-glass`
+ * material class sets `position: relative` (so its `::before` rim and
+ * `::after` inset highlights can absolute-position against the host). That
+ * rule has the same specificity as Tailwind's `.fixed` utility but is
+ * defined later in `globals.css`, so it wins — the banner was rendering
+ * in normal document flow at the bottom of the page, not pinned to the
+ * viewport. Inline `position: fixed` has higher specificity than any class
+ * selector and reliably overrides the `.liquid-glass` rule. (We can't edit
+ * globals.css from this subagent — see T2a ownership.)
  *
  * State strategy follows the project rule: no setState inside effect bodies.
  * The "dismissed" flag uses a lazy initializer (SSR-safe — returns true so the
@@ -44,7 +75,8 @@ export function CookieConsent() {
   const [dismissed, setDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     try {
-      return window.localStorage.getItem(STORAGE_KEY) === "1";
+      const v = window.localStorage.getItem(STORAGE_KEY);
+      return v === "accepted" || v === "declined";
     } catch {
       return false;
     }
@@ -80,57 +112,90 @@ export function CookieConsent() {
     };
   }, [dismissed]);
 
-  function dismiss() {
+  /** Persist the user's choice and hide the banner. Both branches functionally
+   *  do the same thing today (no non-essential cookies are loaded), but the
+   *  stored value lets future analytics/preference scripts branch on consent
+   *  without re-prompting. */
+  function choose(choice: "accepted" | "declined") {
     setVisible(false);
     setDismissed(true);
     try {
-      window.localStorage.setItem(STORAGE_KEY, "1");
+      window.localStorage.setItem(STORAGE_KEY, choice);
     } catch {
       /* localStorage unavailable — keep in-memory dismissal only. */
     }
   }
 
   return (
-    <AnimatePresence>
-      {visible && !dismissed && (
-        <motion.div
-          role="dialog"
-          aria-live="polite"
-          aria-label={es ? "Consentimiento de cookies" : "Cookie consent"}
-          className="fixed bottom-4 left-4 z-50 w-[calc(100vw-2rem)] max-w-[min(24rem,calc(100vw-6rem))] liquid-glass rounded-card p-4 shadow-2xl safe-bottom"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="flex items-start gap-3">
-            <CookieIcon />
-            <p className="text-[13px] leading-relaxed text-secondary flex-1">
-              {es
-                ? "Usamos cookies técnicas para recordar tus preferencias. Sin tracking, sin publicidad."
-                : "We use technical cookies to remember your preferences. No tracking, no ads."}
-            </p>
-          </div>
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence>
+        {visible && !dismissed && (
+          <motion.div
+            role="dialog"
+            aria-live="polite"
+            aria-label={es ? "Consentimiento de cookies" : "Cookie consent"}
+            // `data-cookie-consent="visible"` is the hook BackToTop uses to
+            // detect the banner and lift itself above it (see BackToTop.tsx
+            // `cookieLift` computation). Without this attribute the floating
+            // button would sit at the same vertical band as the banner and
+            // visually crowd it on narrow viewports.
+            data-cookie-consent="visible"
+            // Inline style overrides `.liquid-glass { position: relative }`
+            // (see component header). Width clamped to leave a 7 rem right
+            // gutter for the BackToTop button on small viewports — the
+            // banner sits bottom-left, the BackToTop sits bottom-right, and
+            // they never share a column.
+            style={{
+              position: "fixed",
+              width: "min(22rem, calc(100vw - 7rem))",
+            }}
+            // p-5 = 20 px padding per spec (≥20 px). safe-bottom clears the
+            // iOS home indicator. z-50 sits above BackToTop's z-40 in case
+            // their stacking contexts ever interact.
+            className="bottom-4 left-4 z-50 liquid-glass rounded-card p-5 shadow-2xl safe-bottom"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="flex items-start gap-3">
+              <CookieIcon />
+              <p className="text-[13px] leading-relaxed text-secondary flex-1">
+                {es
+                  ? "Usamos cookies técnicas para recordar tus preferencias. Sin tracking ni publicidad. Puedes aceptar o rechazar libremente."
+                  : "We use technical cookies to remember your preferences. No tracking, no ads. You can accept or decline freely."}
+              </p>
+            </div>
 
-          <div className="mt-3 flex items-center justify-end gap-3">
-            <Link
-              href="/faq"
-              onClick={dismiss}
-              className="text-[12px] font-medium text-tertiary hover:text-primary transition-colors underline-offset-4 hover:underline"
-            >
-              {es ? "Más info" : "Learn more"}
-            </Link>
-            <button
-              type="button"
-              onClick={dismiss}
-              className="bg-[rgb(var(--accent-base))] text-[#06130d] px-6 py-2 rounded-lg text-sm font-medium hover:brightness-110 active:scale-[0.97] transition-[filter,transform]"
-            >
-              {es ? "Entendido" : "Got it"}
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            {/* Action row — 2-column grid (Decline | Accept). Both buttons
+                fill their grid cell (w-full) so they share the banner width
+                equally regardless of label length. Each meets the WCAG
+                2.5.5 44 px tap target via min-h-[44px]. The "Más info" link
+                was removed because the FAQ it pointed at is already linked
+                from the footer's Resources column — duplicating it here
+                forced flex-wrap on narrow viewports and bloated the banner
+                to 250+ px (3 stacked button rows). The 2-col grid keeps the
+                banner to a single 44 px action row. */}
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => choose("declined")}
+                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-sm font-medium text-secondary border border-[rgb(var(--divider)/0.22)] hover:bg-[rgb(var(--divider)/0.06)] hover:text-primary active:scale-[0.98] transition-[background,color,transform] duration-150"
+              >
+                {es ? "Rechazar" : "Decline"}
+              </button>
+              <button
+                type="button"
+                onClick={() => choose("accepted")}
+                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-sm font-medium bg-[rgb(var(--accent-base))] text-[#06130d] hover:brightness-110 active:scale-[0.98] transition-[filter,transform] duration-150"
+              >
+                {es ? "Aceptar" : "Accept"}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </MotionConfig>
   );
 }
 

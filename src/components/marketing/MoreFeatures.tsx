@@ -74,7 +74,7 @@ export function MoreFeatures() {
     <section className="section bg-veil relative overflow-hidden">
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-      <div className="relative max-w-page mx-auto px-5 md:px-8">
+      <div className="relative tj-container">
         <Reveal className="max-w-2xl">
           <Eyebrow>{es ? "Y mucho más" : "And much more"}</Eyebrow>
           <h2 className="mt-5 t-h2 text-primary">
@@ -88,14 +88,18 @@ export function MoreFeatures() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed">
+          <p className="mt-4 text-lg text-secondary leading-[1.6]">
             {es
               ? "Cada una existe porque un trader la pidió para tomar mejores decisiones — no para llenar la landing."
               : "Each one exists because a trader asked for it to make better decisions — not to fill up the landing."}
           </p>
         </Reveal>
 
-        <div className="mt-10 grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        {/* T2h: gap-5 → gap-5 sm:gap-5 (consistent 20px gaps per the
+            brief's ≥20px floor on all breakpoints — the previous
+            sm:gap-4 was 16px on sm+ which fell below the spec). The
+            3-col desktop rhythm stays tight at 20px. */}
+        <div className="mt-10 grid md:grid-cols-3 sm:grid-cols-2 gap-5">
           {features.map((f, i) => (
             <motion.div
               key={f.title}
@@ -120,7 +124,8 @@ export function MoreFeatures() {
                     {f.icon}
                   </div>
                   <h3 className="t-h4 text-primary">{f.title}</h3>
-                  <p className="mt-1.5 text-[13px] text-secondary leading-relaxed">{f.desc}</p>
+                  {/* T2h: leading-relaxed (1.625) → leading-[1.6] per spec. */}
+                  <p className="mt-1.5 text-[13px] text-secondary leading-[1.6]">{f.desc}</p>
               </motion.article>
             </motion.div>
           ))}

@@ -28,8 +28,16 @@ import { useLang } from "@/lib/i18n";
  * ESTA página, no destinos del sitio. Mezclar ambas cosas era lo que
  * generaba la sensación de "índice con secciones que no existen".
  *
- * Oculto por debajo de 1100 px para no pisar el contenido en pantallas
- * estrechas.
+ * Oculto por debajo de 1420 px (ancho del breakpoint `min-[1420px]:flex`
+ * del JSX de abajo) para no pisar el contenido en pantallas estrechas.
+ * El umbral real es 1420 px, no 1100 px como decía aquí antes: a 1100 px
+ * la mancha centrada (max 1080 px) deja solo ~10 px de margen a cada
+ * lado y el raíl, anclado a `left-[22px]`, se solapa con el contenido.
+ * 1420 px deja ~170 px de margen a cada lado, suficiente para que el
+ * raíl respire sin invadir la mancha. El comentario anterior quedó
+ * desactualizado cuando el umbral se subió para limpiar el solape en
+ * 1280 px; lo alineo aquí para que el próximo que lo lea entienda por
+ * qué es 1420 y no 1100.
  */
 const ANCHORS = [
   { id: "top", num: "01", es: "Inicio", en: "Home" },

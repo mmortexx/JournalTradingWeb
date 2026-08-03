@@ -828,7 +828,10 @@ export function DashboardPage() {
             Mirrors the WinUI Grid with VerticalHairlineStyle borders
             between columns. Each cell: small caption + 18px tabular value. */}
         <Reveal delay={0.08}>
-          <div className="grid grid-cols-[repeat(7,minmax(0,1fr))] gap-x-4 px-1 py-2 overflow-x-auto">
+          {/* Mobile: horizontal-scroll strip with min-w cells (so the 7 KPIs
+              stay readable instead of collapsing to ~25px each inside the
+              316px panel). Desktop: same 7-col grid as before, no scroll. */}
+          <div className="flex md:grid md:grid-cols-[repeat(7,minmax(0,1fr))] gap-x-4 px-1 py-2 overflow-x-auto custom-scroll">
             <KpiCell
               label={t("pnlTotal")}
               value={
@@ -1135,7 +1138,7 @@ function KpiCell({
   value: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-center min-w-0 px-1 py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
+    <div className="flex flex-col items-center gap-1 text-center min-w-[5.5rem] md:min-w-0 shrink-0 md:shrink px-1 py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
       <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary truncate max-w-full">
         {label}
       </div>
@@ -1323,7 +1326,7 @@ function RealityCheck() {
 function KpiDivider() {
   return (
     <div
-      className="self-stretch w-px justify-self-center bg-gradient-to-b from-transparent via-white/15 to-transparent"
+      className="self-stretch w-px shrink-0 justify-self-center bg-gradient-to-b from-transparent via-white/15 to-transparent"
       aria-hidden="true"
     />
   );

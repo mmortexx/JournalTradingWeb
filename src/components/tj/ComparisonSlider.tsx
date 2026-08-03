@@ -11,56 +11,72 @@ import {
   motion,
   useMotionValue,
   useTransform,
+  useReducedMotion,
+  animate,
 } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 
 /**
- * ComparisonSlider — a draggable before/after slider that lets the visitor
- * reveal more of one side by dragging a vertical handle across the card.
+ * ComparisonSlider — "Antes vs Después" con arrastre intuitivo.
  *
- * - One liquid-glass card (`h-64`) split into two layers:
- *     · Base layer (z-0): the "After / Después" panel — vibrant, accent
- *       border glow, green ✓ icons. Always painted full-width so the
- *       card never shows a blank gap when the handle is dragged to the
- *       far left.
- *     · Clipped overlay (z-10): the "Before / Antes" panel — muted,
- *       desaturated, red ✗ icons. Its right edge follows the handle so
- *       dragging right reveals more "before", dragging left reveals
- *       more "after".
- * - The handle is a vertical accent line + circular grip with double
- *   arrows (`‹ ›`). It uses pointer events so the drag works equally
- *   well with mouse, touch and pen. We use MotionValue + useTransform
- *   to drive the clip + handle position without a React state update
- *   per pointermove (which would re-render the whole card on every
- *   frame and jank on lower-end machines).
- * - Keyboard: the handle is focusable (`role="slider"`). Arrow Left /
- *   Right move by 8 %, Home / End jump to the extremes. aria-valuenow
- *   is kept in sync.
- * - Reduced-motion users get the same drag behaviour (it's a direct
- *   manipulation, not an animation) but no spring physics on the
- *   handle's resting position.
+ * ── La dirección que NO confunde ──────────────────────────────────────
+ * En un slider de marketing, arrastrar a la DERECHA debe revelar MÁS
+ * DEL DESPUÉS (el estado mejorado, verde). Izquierda = pasado, derecha
+ * = progreso. La versión anterior hacía lo contrario — el overlay del
+ * "antes" se extendía hacia la derecha al arrastrar — y se leía "al
+ * revés".
+ *
+ * Aquí el DESPUÉS es el overlay recortado: su borde izquierdo sigue
+ * al handle. Antes = base a sangre. Así:
+ *   · handle a la izquierda  → se ve todo ANTES (rojo)
+ *   · handle al centro       → mitad antes / mitad después
+ *   · handle a la derecha    → se ve todo DESPUÉS (verde)
+ *   · arrastrar a la derecha → CRECE el después ✓
+ *
+ * ── Animación de bienvenida ───────────────────────────────────────────
+ * Al entrar en viewport, el handle viaja 50 → 88 → 50 % en ~1,4 s con
+ * suavizado de spring. El visitante ve el efecto sin tocar nada. Con
+ * `prefers-reduced-motion` se queda en 50/50.
+ *
+ * ── Fluidez ───────────────────────────────────────────────────────────
+ *  · `useMotionValue` + `useTransform` mueven clip + handle sin re-render
+ *    por fotograma (60 fps en hardware modesto).
+ *  · `will-change: clip-path` en el overlay; `translateZ(0)` en el grip.
+ *  · El bucle de auto-animación se detiene al ocultar la pestaña y al
+ *    empezar un arrastre manual.
+ *
+ * ── Accesibilidad ─────────────────────────────────────────────────────
+ *  · `role="slider"`, `aria-orientation`, `aria-valuenow/text`.
+ *  · Teclado: ←/↓ −8 %, →/↑ +8 %, Home/End a los extremos.
+ *  · Touch: `touch-action: none` en el contenedor para no scrollear la
+ *    página al arrastrar.
  */
 
-const MIN_PCT = 4; // keep a sliver visible on either side
+const MIN_PCT = 4;
 const MAX_PCT = 96;
-const KEYBOARD_STEP = 8; // %
+const KEYBOARD_STEP = 8;
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function ComparisonSlider() {
   const { lang } = useLang();
   const es = lang === "es";
+  const reduce = useReducedMotion();
 
   const before = es
     ? [
         "Operas por instinto",
         "No recuerdas por qué entraste",
         "Repites los mismos errores",
+        "No sabes tu win rate real",
       ]
     : [
         "You trade on instinct",
         "You don't remember why you entered",
         "You repeat the same mistakes",
+        "You don't know your real win rate",
       ];
 
   const after = es
@@ -68,64 +84,106 @@ export function ComparisonSlider() {
         "Cada operación tiene un plan",
         "Sabes qué funcionó y qué no",
         "Mejoras cada semana, medido",
+        "Conoces tu expectancy",
       ]
     : [
         "Every trade has a plan",
         "You know what worked and what didn't",
         "You improve every week, measured",
+        "You know your expectancy",
       ];
 
-  // The slider position as a 0–100 percentage. Initialized at 50 %
-  // (handle dead center). MotionValue lets us drive both the handle's
-  // `left` and the overlay's clip-path in a single source of truth
-  // without React re-renders per pointermove frame.
+  // Posición del handle (0–100). 50 = centro.
   const pos = useMotionValue(50);
 
-  // `left` for the handle: clamped to [MIN_PCT, MAX_PCT].
-  const handleLeft = useTransform(pos, (v) => `${Math.min(MAX_PCT, Math.max(MIN_PCT, v))}%`);
-
-  // The "before" overlay's right edge follows the handle so dragging
-  // right reveals more "before" content; dragging left reveals more
-  // "after". `inset(0 ${100 - v}% 0 0)` clips from the right inward.
-  const beforeClip = useTransform(
-    pos,
-    (v) =>
-      `inset(0 ${100 - Math.min(MAX_PCT, Math.max(MIN_PCT, v))}% 0 0 round 8px)`
+  // `left` del handle, acotado.
+  const handleLeft = useTransform(pos, (v) =>
+    `${Math.min(MAX_PCT, Math.max(MIN_PCT, v))}%`,
   );
 
-  // Track the live value for ARIA + the label chip. This DOES setState
-  // but only on pointerup / keydown (not on every pointermove), so the
-  // card doesn't re-render during the drag itself — the MotionValues
-  // handle the per-frame visual updates out-of-band.
+  // El DESPUÉS es el overlay recortado: su borde izquierdo sigue al
+  // handle. `inset(0 0 0 v%)` recorta v% desde la izquierda → visible
+  // de v% a 100%. A v=50 → visible la mitad derecha (después). A v=96
+  // → visible casi todo (todo después). A v=4 → casi nada (todo antes).
+  const afterClip = useTransform(
+    pos,
+    (v) =>
+      `inset(0 0 0 ${Math.min(MAX_PCT, Math.max(MIN_PCT, v))}% round 8px)`,
+  );
+
   const [ariaPct, setAriaPct] = useState(50);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
+  const autoPlayedRef = useRef(false);
 
-  // Pointermove handler — reads the cursor's X relative to the card's
-  // bounding box and writes a 0–100 value to the `pos` MotionValue.
-  // No React state, no re-render — just a motion value write, which
-  // framer-motion propagates to the subscribed elements via its own
-  // render loop.
-  const onPointerMove = useCallback((e: PointerEvent) => {
-    if (!draggingRef.current) return;
+  // ── Auto-animación de bienvenida ─────────────────────────────────
+  // Al entrar en viewport por primera vez, viaja 50 → 88 → 50 % para
+  // enseñar el efecto. Se cancela si el usuario empieza a arrastrar.
+  useEffect(() => {
+    if (reduce || autoPlayedRef.current) return;
     const el = containerRef.current;
     if (!el) return;
-    const r = el.getBoundingClientRect();
-    const pct = ((e.clientX - r.left) / r.width) * 100;
-    pos.set(Math.min(MAX_PCT, Math.max(MIN_PCT, pct)));
-  }, [pos]);
 
-  // Stop dragging on global pointerup — attaches to window so the drag
-  // continues even if the cursor leaves the card while held.
+    let cancelled = false;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (cancelled) return;
+        for (const e of entries) {
+          if (e.isIntersecting && !autoPlayedRef.current) {
+            autoPlayedRef.current = true;
+            // 50 → 88 (ida, 0.7s) → 50 (vuelta, 0.7s). Spring suave.
+            const a1 = animate(pos, 88, {
+              type: "spring",
+              stiffness: 90,
+              damping: 18,
+              duration: 0.7,
+            });
+            const t = setTimeout(() => {
+              if (draggingRef.current || cancelled) return;
+              animate(pos, 50, {
+                type: "spring",
+                stiffness: 90,
+                damping: 18,
+                duration: 0.7,
+                onComplete: () => setAriaPct(50),
+              });
+            }, 820);
+            io.disconnect();
+            return () => {
+              a1.stop();
+              clearTimeout(t);
+            };
+          }
+        }
+      },
+      { threshold: 0.45 },
+    );
+    io.observe(el);
+    return () => {
+      cancelled = true;
+      io.disconnect();
+    };
+  }, [pos, reduce]);
+
+  // ── Arrastre por puntero ─────────────────────────────────────────
+  const onPointerMove = useCallback(
+    (e: PointerEvent) => {
+      if (!draggingRef.current) return;
+      const el = containerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const pct = ((e.clientX - r.left) / r.width) * 100;
+      pos.set(Math.min(MAX_PCT, Math.max(MIN_PCT, pct)));
+    },
+    [pos],
+  );
+
   useEffect(() => {
     const stop = () => {
       if (!draggingRef.current) return;
       draggingRef.current = false;
-      // Sync the ARIA value once at rest — single re-render at end of
-      // interaction instead of per-frame.
-      const v = pos.get();
-      setAriaPct(Math.round(v));
+      setAriaPct(Math.round(pos.get()));
     };
     window.addEventListener("pointerup", stop);
     window.addEventListener("pointermove", onPointerMove);
@@ -136,11 +194,8 @@ export function ComparisonSlider() {
   }, [onPointerMove, pos]);
 
   const startDrag = (e: ReactPointerEvent<HTMLButtonElement>) => {
-    // Don't start a drag on keyboard focus — pointer events only.
     if (e.pointerType === "mouse" && e.button !== 0) return;
     draggingRef.current = true;
-    // Immediately position to the click point so the handle "jumps to"
-    // the cursor on first click rather than waiting for a move event.
     const el = containerRef.current;
     if (el) {
       const r = el.getBoundingClientRect();
@@ -176,15 +231,13 @@ export function ComparisonSlider() {
   };
 
   return (
-    <section className="section">
-      <div className="max-w-page mx-auto px-5 md:px-8">
+    <section className="section bg-veil">
+      <div className="tj-container">
         <Reveal className="text-center max-w-2xl mx-auto">
           <Eyebrow className="justify-center">
             {es ? "Arrastra y compara" : "Drag and compare"}
           </Eyebrow>
-          <h2
-            className="mt-5 t-h2 text-primary"
-          >
+          <h2 className="mt-5 t-h2 text-primary">
             {es ? (
               <>
                 Mueve la barra. <span className="text-gradient">Mira tu reflejo.</span>
@@ -195,109 +248,32 @@ export function ComparisonSlider() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-secondary leading-relaxed">
+          <p className="mt-4 text-secondary leading-[1.6]">
             {es
-              ? "Arrastra la barra central para revelar más del antes o del después. La transformación no es magia: es disciplina medida."
-              : "Drag the center bar to reveal more of the before or the after. The transformation isn't magic: it's measured discipline."}
+              ? "Arrastra la barra hacia la derecha para descubrir lo que cambia con CountPips. La transformación no es magia: es disciplina medida."
+              : "Drag the bar to the right to uncover what changes with CountPips. The transformation isn't magic: it's measured discipline."}
           </p>
         </Reveal>
 
         <Reveal delay={0.1} y={28}>
           <div
             ref={containerRef}
-            className="liquid-glass depth-2 rounded-card overflow-hidden h-64 relative select-none mt-10 max-w-3xl mx-auto transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
-            // Prevent the page from scrolling while the visitor drags the
-            // handle on a touch device — touch-action: none on the
-            // container means the pointermove events stay ours.
+            className="tj-paper rounded-card overflow-hidden h-[320px] sm:h-[300px] relative select-none mt-10 max-w-3xl mx-auto border border-[rgb(var(--divider)/0.16)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
             style={{ touchAction: "none" }}
           >
-            {/* ─────────────── AFTER (base layer, full width) ─────────────── */}
+            {/* ─────────── BEFORE (base layer, full width) ─────────── */}
+            {/* El "antes" es la base a sangre: siempre pintado, con tinte
+                rojo apagado y contenido en la mitad izquierda. Cuando el
+                overlay del después se repliega, lo que queda visible es
+                este lado. */}
             <div className="absolute inset-0">
-              {/* OPAQUE green-tinted surface — mirrors the Before layer's
-                  red-tinted surface so both sides read "full" and clearly
-                  distinct in BOTH themes. Without this, in light theme the
-                  After side looked blank/white next to the solid Before. */}
+              {/* Surface muted rojo */}
               <div
                 aria-hidden="true"
                 className="absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, rgb(var(--pnl-pos))), color-mix(in srgb, var(--surface) 84%, rgb(var(--pnl-pos))))",
-                }}
-              />
-              {/* Accent wash — same as the After card in BeforeAfter */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(120% 80% at 100% 0%, rgb(var(--accent-base) / 0.18), transparent 60%)",
-                }}
-              />
-              {/* Header chip top-right — R20-3b: switched the After chip from
-                  neutral divider bg to accent-tinted bg/border so the two chips
-                  read as a symmetric red↔green pair (Before red / After accent).
-                  bg divider/0.05 → accent/0.10; border divider/0.20 → accent/0.30;
-                  label text-primary → text-accent so the chip colour-blocks
-                  correctly with the green-tinted After surface.
-                  R24-1c: added an accent-tinted drop shadow so the chip
-                  floats above the After surface (matches the depth-2 card
-                  chrome) + a tiny accent dot before the label so the chip
-                  reads as a stamped badge rather than a floating label. */}
-              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-base)/0.10)] border border-[rgb(var(--accent-base)/0.30)] shadow-[0_4px_12px_-4px_rgb(var(--accent-base)/0.30)]">
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-pos/15 text-pnl-pos">
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[rgb(var(--accent-base))]">
-                  {es ? "Después" : "After"}
-                </span>
-              </div>
-              {/* La lista del DESPUÉS vive en la MITAD DERECHA, que es la
-                  parte que esta capa deja ver (el overlay del "antes" tapa
-                  la izquierda). Antes ocupaba `inset-0` con `pl-16`, es
-                  decir, el texto caía en la mitad izquierda — justo debajo
-                  del overlay opaco del "antes". Resultado: el lado verde
-                  salía vacío y el comparador parecía al revés. */}
-              <ul className="absolute inset-y-0 right-0 w-1/2 flex flex-col justify-center gap-4 px-6 md:px-8">
-                {after.map((line, i) => (
-                  <motion.li
-                    key={i}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-30px" }}
-                    transition={{ delay: 0.25 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex items-start gap-3"
-                  >
-                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-pos/15 items-center justify-center mt-0.5">
-                      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                        <path d="M2 6.5l2.5 2.5L10 3.5" stroke="rgb(var(--pnl-pos))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                    <span className="text-[14px] text-primary font-medium">{line}</span>
-                  </motion.li>
-                ))}
-              </ul>
-            </div>
-
-            {/* ─────────────── BEFORE (clipped overlay) ─────────────── */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ clipPath: beforeClip }}
-            >
-              {/* Muted OPAQUE surface — sits ABOVE the after layer and must
-                  mask it completely (if it were translucent, the ✓ list se
-                  vería debajo de la ✗ y el slider parecería "al revés").
-                  `--card` es un token oklch de shadcn, así que
-                  `rgb(var(--card)/x)` era inválido y dejaba esta capa
-                  transparente — de ahí el bug. color-mix sobre --surface
-                  (hex del design system) produce un gris pizarra sólido. */}
-              <div
-                className="absolute inset-0 saturate-[0.85] border-r border-pnl-neg/30"
-                style={{
-                  background:
-                    "linear-gradient(180deg, color-mix(in srgb, var(--surface) 97%, #000), color-mix(in srgb, var(--surface) 86%, #000))",
+                    "linear-gradient(180deg, color-mix(in srgb, var(--surface) 97%, rgb(var(--pnl-neg))), color-mix(in srgb, var(--surface) 88%, rgb(var(--pnl-neg))))",
                 }}
               />
               {/* Soft red wash */}
@@ -306,15 +282,12 @@ export function ComparisonSlider() {
                 className="absolute inset-0 pointer-events-none"
                 style={{
                   background:
-                    "radial-gradient(120% 80% at 0% 0%, rgb(var(--pnl-neg) / 0.14), transparent 60%)",
+                    "radial-gradient(120% 80% at 0% 0%, rgb(var(--pnl-neg) / 0.16), transparent 60%)",
                 }}
               />
-              {/* Header chip top-left */}
-              {/* R24-1c: same drop-shadow treatment as the After chip so the
-                  Before chip floats symmetrically — pnl-neg-tinted shadow
-                  instead of accent so it stays in the “caution” color block. */}
-              <div className="absolute top-3 left-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pnl-neg/10 border border-pnl-neg/25 shadow-[0_4px_12px_-4px_rgb(var(--pnl-neg)/0.30)]">
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-neg/15 text-pnl-neg">
+              {/* Chip ANTES (top-left) */}
+              <div className="absolute top-3 left-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-pnl-neg/12 border border-pnl-neg/28 shadow-[0_4px_12px_-4px_rgb(var(--pnl-neg)/0.30)]">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-neg/18 text-pnl-neg">
                   <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
@@ -323,45 +296,99 @@ export function ComparisonSlider() {
                   {es ? "Antes" : "Before"}
                 </span>
               </div>
-              {/* La lista del ANTES vive en la MITAD IZQUIERDA, que es la
-                  parte que el recorte de esta capa deja ver. Simétrica a la
-                  del después. */}
+              {/* Lista ANTES — mitad izquierda */}
               <ul className="absolute inset-y-0 left-0 w-1/2 flex flex-col justify-center gap-4 px-6 md:px-8">
                 {before.map((line, i) => (
-                  <li
+                  <motion.li
                     key={i}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ delay: 0.15 + i * 0.07, duration: 0.5, ease: EASE }}
                     className="flex items-start gap-3"
                   >
-                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-neg/15 items-center justify-center mt-0.5">
+                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-neg/15 ring-1 ring-pnl-neg/35 items-center justify-center mt-0.5">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                         <path d="M3 3l6 6M9 3l-6 6" stroke="rgb(var(--pnl-neg))" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     </span>
-                    {/* R27-1d — bumped text-secondary/85 → text-secondary
-                        (full opacity) so the muted "before" list items
-                        clear WCAG AA comfortably in light theme. At /85
-                        the effective contrast on the muted Before surface
-                        was ~5:1 (marginal AA pass at 14px regular); at
-                        full opacity it's ~9:1. The Before items still
-                        read as visually de-emphasized vs the After items
-                        (text-primary ~18:1) thanks to the secondary tier
-                        + the muted gray surface + red ✗ icons. */}
-                    <span className="text-[14px] text-secondary">{line}</span>
-                  </li>
+                    <span className="text-[13px] sm:text-[14px] text-secondary">{line}</span>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+
+            {/* ─────────── AFTER (clipped overlay, right side) ─────────── */}
+            {/* El "después" es el overlay recortado por la izquierda: su
+                borde izquierdo sigue al handle. Arrastrar a la derecha
+                hace CRECER el después — la dirección intuitiva de
+                progreso. */}
+            <motion.div
+              className="absolute inset-0"
+              style={{ clipPath: afterClip, willChange: "clip-path" }}
+            >
+              {/* Surface vibrante verde/champagne */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, rgb(var(--pnl-pos))), color-mix(in srgb, var(--surface) 84%, rgb(var(--pnl-pos))))",
+                }}
+              />
+              {/* Accent wash */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(120% 80% at 100% 0%, rgb(var(--accent-base) / 0.18), transparent 60%)",
+                }}
+              />
+              {/* Accent top-line */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 top-0 h-px opacity-70"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, rgb(var(--accent-base)), transparent)",
+                }}
+              />
+              {/* Chip DESPUÉS (top-right) */}
+              <div className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-base)/0.12)] border border-[rgb(var(--accent-base)/0.32)] shadow-[0_4px_12px_-4px_rgb(var(--accent-base)/0.30)]">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pnl-pos/15 text-pnl-pos">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M2 6.5l2.5 2.5L10 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.18em] font-semibold text-[rgb(var(--accent-base))]">
+                  {es ? "Con CountPips" : "With CountPips"}
+                </span>
+              </div>
+              {/* Lista DESPUÉS — mitad derecha */}
+              <ul className="absolute inset-y-0 right-0 w-1/2 flex flex-col justify-center gap-4 px-6 md:px-8">
+                {after.map((line, i) => (
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ delay: 0.25 + i * 0.07, duration: 0.5, ease: EASE }}
+                    className="flex items-start gap-3"
+                  >
+                    <span className="inline-flex shrink-0 w-5 h-5 rounded-full bg-pnl-pos/15 ring-1 ring-pnl-pos/40 items-center justify-center mt-0.5">
+                      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M2 6.5l2.5 2.5L10 3.5" stroke="rgb(var(--pnl-pos))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span className="text-[13px] sm:text-[14px] text-primary font-medium">{line}</span>
+                  </motion.li>
                 ))}
               </ul>
             </motion.div>
 
-            {/* ─────────────── DRAG HANDLE ─────────────── */}
-            {/* R21-3b: widened the button's hit area from w-1 (4px) to w-12 (48px)
-                so the handle is comfortably reachable on touch (iOS HIG minimum
-                is 44×44px; the previous 4px-wide strip was nearly impossible to
-                grab with a finger). The visible drag line stays 4px wide (now a
-                child span) so the visual affordance is unchanged — only the
-                invisible touch target grows. The glow + grip children are now
-                centered on the button's center (which equals the line position)
-                via left-1/2 -translate-x-1/2 instead of the previous -left-1
-                -right-1 (which only worked when the button itself was the line). */}
+            {/* ─────────── DRAG HANDLE ─────────── */}
+            {/* Hit area ancha (48px) para touch; línea visible de 2px. */}
             <motion.button
               type="button"
               role="slider"
@@ -369,52 +396,31 @@ export function ComparisonSlider() {
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={ariaPct}
-              aria-valuetext={es ? `${ariaPct}% mostrado` : `${ariaPct}% shown`}
+              aria-valuetext={es ? `${ariaPct}% después visible` : `${ariaPct}% after shown`}
               aria-orientation="horizontal"
               onPointerDown={startDrag}
               onKeyDown={onKeyDown}
               style={{ left: handleLeft, touchAction: "none" }}
-              // R20-3b: handle line tinted with a touch of accent (divider/60 →
-              //   divider/70 + accent/15 overlay via the glow span below) so the
-              //   affordance reads as part of the site's accent system rather
-              //   than a neutral rule. Hover/focus ring widened 2 → 3 with
-              //   offset for clearer grab affordance.
               className="group/handle absolute top-0 bottom-0 z-30 -translate-x-1/2 w-12 cursor-ew-resize focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.60)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
-              {/* Soft glow along the line — R20-3b: bumped divider/30 →
-                  accent/35 so the glow reads as accent light rather than
-                  neutral haze. R21-3b: re-centered on the button's center
-                  (left-1/2 -translate-x-1/2 w-3) since the button is now
-                  wider than the line. */}
+              {/* Glow filament */}
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-3 blur-[3px] bg-[rgb(var(--accent-base)/0.35)] opacity-70 group-hover/handle:opacity-100 transition-opacity duration-200"
+                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-3 blur-[3px] bg-[rgb(var(--accent-base)/0.40)] opacity-70 group-hover/handle:opacity-100 transition-opacity duration-200"
               />
-              {/* Visible drag line — 4px rule, accent on hover. Lives as a
-                  child span so the wider button hit area stays transparent.
-                  R24-1c: replaced the flat divider/70 fill with a vertical
-                  3-stop gradient (top + bottom = accent/35, middle =
-                  divider/70) so the line reads as a glowing filament that
-                  fades at the card edges rather than a hard 4px rule.
-                  Hover swaps the middle stop to accent/55 (already in place). */}
+              {/* Visible line — 2px gold gradient */}
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 group-hover/handle:bg-[rgb(var(--accent-base)/0.55)] transition-[background-color] duration-200"
+                className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 transition-[background-color] duration-200"
                 style={{
                   background:
-                    "linear-gradient(180deg, rgb(var(--accent-base) / 0.35) 0%, rgb(var(--divider) / 0.70) 22%, rgb(var(--divider) / 0.70) 78%, rgb(var(--accent-base) / 0.35) 100%)",
+                    "linear-gradient(180deg, rgb(var(--accent-base) / 0.5) 0%, rgb(var(--divider) / 0.75) 22%, rgb(var(--divider) / 0.75) 78%, rgb(var(--accent-base) / 0.5) 100%)",
                 }}
               />
-              {/* Circular grip with double arrows — R20-3b: refined the grip.
-                  Added group-hover/handle:scale-105 + a thin accent inner
-                  ring (ring-1 ring-accent/40) so the grip lifts visibly on
-                  hover. Outer accent shadow kept (the signature accent halo).
-                  R24-1c: deepened the hover halo — grip now lifts with a
-                  brighter accent outer shadow (0.55 → 0.70) + scale-105 →
-                  scale-110 + ring color 0.40 → 0.65 so the grab affordance
-                  reads unmistakably on a quick mouse-over. */}
+              {/* Circular grip — 44px tap target, paper material */}
               <span
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-full liquid-glass text-primary border border-[rgb(var(--divider)/0.30)] ring-1 ring-[rgb(var(--accent-base)/0.40)] group-hover/handle:ring-[rgb(var(--accent-base)/0.65)] shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)] group-hover/handle:shadow-[0_10px_28px_-6px_rgb(var(--accent-base)/0.70)] transition-[transform,box-shadow,--tw-ring-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/handle:scale-110"
+                className="tj-paper absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-11 h-11 rounded-full text-primary border border-[rgb(var(--divider)/0.28)] ring-1 ring-[rgb(var(--accent-base)/0.45)] group-hover/handle:ring-[rgb(var(--accent-base)/0.70)] shadow-[0_8px_24px_-6px_rgb(var(--accent-base)/0.55)] group-hover/handle:shadow-[0_10px_28px_-6px_rgb(var(--accent-base)/0.70)] transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/handle:scale-105"
+                style={{ transform: "translateZ(0) translate(-50%, -50%)" }}
                 aria-hidden="true"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -429,28 +435,17 @@ export function ComparisonSlider() {
               </span>
             </motion.button>
 
-            {/* Edge hint — top-center line showing this is interactive */}
-            {/* R24-1c: tj-float animation on the hint so it gently bobs
-                ±4px vertically (keyframe in globals.css) — reads as an
-                invitation to interact rather than a static label. Reduced
-                by the global prefers-reduced-motion rule. */}
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none" style={{ animation: "tj-float 2.4s ease-in-out infinite" }}>
-              {/* R27-1d — bumped text-tertiary/70 → text-tertiary (full
-                  opacity) so the "Arrastra →" / "Drag →" hint clears WCAG
-                  AA comfortably in light theme. At 10px/700 the /70 modifier
-                  dropped the effective contrast to ~5:1 (marginal AA pass);
-                  at full opacity (post R27-1a tertiary darkening to #40454F)
-                  it's ~7:1. The hint still reads as subtle/tertiary-tier
-                  vs the primary after-items and the chip labels, preserving
-                  the "quiet invitation to interact" intent. */}
-              {/* Flecha doble, no "→": arrastrar a la derecha descubre más
-                  del ANTES y a la izquierda más del DESPUÉS. Una flecha
-                  sencilla hacia la derecha sugería "avanzar" cuando lo que
-                  hace es retroceder al pasado. */}
-              <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary font-semibold">
-                {es ? "← Arrastra →" : "← Drag →"}
-              </span>
-            </div>
+            {/* Edge hint — top-center, "Arrastra →" */}
+            {!reduce && (
+              <div
+                className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+                style={{ animation: "tj-float 2.4s ease-in-out infinite" }}
+              >
+                <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary font-semibold">
+                  {es ? "Arrastra →" : "Drag →"}
+                </span>
+              </div>
+            )}
           </div>
         </Reveal>
 

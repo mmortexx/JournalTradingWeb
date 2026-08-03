@@ -104,7 +104,7 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
           conversion section reads as a premium printed surface. */}
       <div className="grain absolute inset-0 pointer-events-none" aria-hidden="true" />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Header — centered, matches Stripe / Linear / Vercel pricing
             pages. El h2 siempre se renderiza (necesario para el TOC + SEO);
             en modo standalone (/pricing) se omiten el eyebrow y el lead
@@ -220,7 +220,17 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           : { y: -4, scale: 1.005, transition: { type: "spring", stiffness: 300, damping: 24 } }
       }
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      className={`relative liquid-glass rounded-card p-6 sm:p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      // T3c — swap `liquid-glass` por papel translúcido cálido:
+      //  · Pro: `.tj-paper .tj-paper-glow` (papel + halo champagne, sigue
+      //    destacado sin necesidad de borde-degradado).
+      //  · Core: `.tj-paper-dense` (86 % de opacidad — su lista de 8
+      //    features con texto pequeño necesita más opacidad para AA).
+      // `depth-2` y los borders de Tailwind se conservan; el `isolation:
+      // isolate` del Pro sigue haciendo de stacking context para el
+      // watermark PREMIUM a z-index: -1.
+      className={`relative ${
+        isPro ? "tj-paper tj-paper-glow" : "tj-paper-dense"
+      } rounded-card p-6 sm:p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isPro
           ? "depth-2 border-[rgb(var(--accent-base)/0.35)]"
           : "depth-2 border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--divider)/0.18)]"
@@ -384,26 +394,26 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         ))}
       </ul>
 
-      {/* CTA — full-width primary high-contrast button using the theme's
-          primary text/bg tokens (white-on-dark in dark theme, near-black on
-          paper in light theme) so the CTA reads as the strongest action on
-          both cards without violating the no-hardcoded-color rule. Both Core
-          and Pro use the same primary treatment so neither reads as the
-          "lesser" path; the Pro card differentiates via the gradient-border +
-          glow + accent rail + "Más popular" pill rather than via its CTA.
-          The accent-tinted shadow adds warmth without going garish, and
-          `hover:-translate-y-0.5` gives the pressable affordance
-          institutional sites use (R20-3c). */}
+      {/* CTA — auto-width primary high-contrast button (≤260px) centered
+          under the feature list. Both Core and Pro use the same primary
+          treatment (white-on-dark in dark theme, near-black on paper in
+          light theme); the Pro card differentiates via the gradient-border +
+          glow + accent rail + "Más popular" pill rather than via its CTA
+          (restrained Anthropic-grade differentiation). `h-12` keeps the
+          tap target at 48px (≥44px floor). `w-fit max-w-[260px]` makes the
+          button auto-width on every breakpoint instead of stretching as a
+          full-width bar (the user complaint) — `mx-auto` via the flex
+          justify-center parent centers it under the price column. */}
       <motion.div
         whileTap={{ scale: 0.98, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-        className="mt-8"
+        className="mt-8 flex justify-center"
       >
         {/* Buy CTA — `href="#"` is intentional (R20-2b): no payment system
             is wired yet. Replace with the checkout URL when billing lands. */}
         <MagneticButton
           href="#"
           strength={0.18}
-          className="group w-full flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[var(--bg)] shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[var(--bg)] shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         >
           {plan.cta}
           <svg

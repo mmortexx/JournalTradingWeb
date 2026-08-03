@@ -33,7 +33,7 @@ export function Integrations() {
     <section className="section bg-veil relative overflow-hidden">
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-      <div className="relative max-w-page mx-auto px-5 md:px-8">
+      <div className="relative tj-container">
         <Reveal className="max-w-2xl">
           <Eyebrow>{es ? "Integraciones" : "Integrations"}</Eyebrow>
           <h2 className="mt-5 t-h2 text-primary">
@@ -47,14 +47,17 @@ export function Integrations() {
               </>
             )}
           </h2>
-          <p className="mt-4 text-lg text-secondary leading-relaxed">
+          <p className="mt-4 text-lg text-secondary leading-[1.6]">
             {es
               ? "CSV universal. Mapea columnas una sola vez y olídate."
               : "Universal CSV. Map columns once and forget."}
           </p>
         </Reveal>
 
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* T2h: 2-col mobile gap-3 → gap-3.5 (14px) for slight breathing
+            between broker cards on 320–390px viewports without losing the
+            dense logo-wall feel. */}
+        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-3">
           {BROKERS.map((b, i) => (
             <motion.div
               key={b.name}
@@ -96,7 +99,7 @@ export function Integrations() {
 
         {/* Universal-CSV reminder line. */}
         <Reveal delay={0.15} className="mt-8">
-          <p className="text-sm text-tertiary leading-relaxed">
+          <p className="text-sm text-tertiary leading-[1.6]">
             {es ? (
               <>
                 ¿Tu broker no está en la lista?{" "}

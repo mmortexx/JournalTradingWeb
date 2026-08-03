@@ -96,7 +96,7 @@ export function Story() {
     <section id="story" className="section bg-veil relative scroll-mt-24 overflow-hidden">
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8 grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-20 items-start">
+      <div className="relative z-10 tj-container grid lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-20 items-start">
         {/* LEFT — editorial pull quote (sticky + subtle parallax) */}
         <motion.div className="lg:sticky lg:top-24" >
           <Reveal>
@@ -160,7 +160,12 @@ export function Story() {
           </Reveal>
 
           <Reveal delay={0.18}>
-            <p className="mt-8 text-secondary leading-relaxed">
+            {/* T2h: long-form narrative paragraph — leading-relaxed (1.625)
+                → leading-[1.7] per the about-page brief for comfortable
+                editorial measure. Added max-w-[44em] so the paragraph keeps
+                its rhythm on wide desktop where the left grid column would
+                otherwise stretch it too wide. */}
+            <p className="mt-8 text-secondary leading-[1.7] max-w-[44em]">
               {es
                 ? "Cada app de trading que probamos era o bien una hoja de cálculo glorificada, o bien una suscripción mensual que perdía tus datos si dejabas de pagar. Ninguna te enseñaba lo que TU comportamiento te costaba en dinero. Así que construimos una que sí lo hace — y que vive en tu ordenador."
                 : "Every trading app we tried was either a glorified spreadsheet, or a monthly subscription that lost your data if you stopped paying. None of them showed what YOUR behavior cost you in money. So we built one that does — and that lives on your computer."}
@@ -238,7 +243,7 @@ export function Story() {
                     <h3 className="mt-2 t-h3 text-primary">
                       {p.title}
                     </h3>
-                    <p className="mt-2 text-sm text-secondary leading-relaxed">{p.desc}</p>
+                    <p className="mt-2 text-sm text-secondary leading-[1.6]">{p.desc}</p>
                   </motion.div>
                 </div>
               </Reveal>

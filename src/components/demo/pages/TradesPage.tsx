@@ -215,8 +215,13 @@ const TradeRow = memo(function TradeRow({
         isConfirming ? "bg-pnl-neg/10" : ""
       }`}
     >
-      {/* Col 0 — checkbox + direction chip (mirrors TradesPage.xaml col 0). */}
-      <td className="pl-5 pr-3 py-2.5 whitespace-nowrap">
+      {/* Col 0 — checkbox + direction chip (mirrors TradesPage.xaml col 0).
+          Sticky left-0 on mobile so the direction chip + selection
+          checkbox stay anchored while scrolling the wide table. The
+          explicit bg-[rgb(var(--bg))] is opaque so scrolled cells don't
+          bleed through; the row's alternating/hover bg is layered on top
+          via the inner div so the striping still reads. */}
+      <td className="pl-5 pr-3 py-2.5 whitespace-nowrap sticky left-0 z-10 bg-[rgb(var(--bg))]">
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -490,18 +495,18 @@ function KpiStripCell({
   showHairline: boolean;
 }) {
   return (
-    <div className="flex items-stretch flex-1 min-w-0">
+    <div className="flex items-stretch flex-1 min-w-[5.5rem] sm:min-w-[6rem] md:min-w-0 shrink-0 md:shrink">
       <div className="flex-1 min-w-0 flex flex-col gap-1.5 px-2 sm:px-3">
         <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary truncate">
           {label}
         </div>
-        <div className="font-bold text-xl md:text-2xl tnum text-primary leading-none">
+        <div className="font-bold text-lg sm:text-xl md:text-2xl tnum text-primary leading-none">
           <span key={filterSig}>{children}</span>
         </div>
       </div>
       {showHairline && (
         <div
-          className="w-px self-stretch my-1 bg-[rgb(var(--divider)/0.18)]"
+          className="w-px shrink-0 self-stretch my-1 bg-[rgb(var(--divider)/0.18)]"
           aria-hidden="true"
         />
       )}
@@ -849,9 +854,10 @@ export function TradesPage() {
            (mirrors TradesPage.xaml lines 42-226). Loose on canvas,
            no enclosing card. ===== */}
       <div className="space-y-2.5">
-        {/* Row 1 — Instrument. */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary min-w-[92px]">
+        {/* Row 1 — Instrument. Mobile: the caption column shrinks to 64px
+             so the chips get more breathing room at 320–390px. */}
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary min-w-[64px] sm:min-w-[92px]">
             {t("colInstrument")}
           </span>
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -878,12 +884,12 @@ export function TradesPage() {
         </div>
 
         {/* Row 2 — Direction + Compliance + Clear. */}
-        <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary min-w-[92px]">
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary min-w-[64px] sm:min-w-[92px]">
               {t("direction")}
             </span>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <FilterChip
                 active={filters.direction === "all"}
                 onClick={() => handleSetFilters({ direction: "all" })}
@@ -917,7 +923,7 @@ export function TradesPage() {
             <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
               {t("compliance")}
             </span>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <FilterChip
                 active={filters.compliance === "all"}
                 onClick={() => handleSetFilters({ compliance: "all" })}
@@ -960,9 +966,9 @@ export function TradesPage() {
         {/* Fila 3 — Resultado + Setup (TradesPage.xaml L107-213). Sin
             ella no se podía revisar "mis perdedoras de este setup", que
             es justo para lo que se abre esta pantalla. */}
-        <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary min-w-[92px]">
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary min-w-[64px] sm:min-w-[92px]">
               {es ? "Resultado" : "Result"}
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -1050,7 +1056,7 @@ export function TradesPage() {
             (TradesPage.xaml L15-16, "full-bleed: menos superficies
             encajonadas"). Meterlos en una tarjeta, como hacía la demo,
             rompía esa jerarquía y llenaba la pantalla de recuadros. */}
-        <div className="flex items-stretch py-2">
+        <div className="flex items-stretch py-2 overflow-x-auto custom-scroll -mx-1 px-1">
           {/* El símbolo va DETRÁS de la cifra ("+5.732,24 US$"), como en
               toda la app y como en la propia columna P&L de la tabla de
               abajo. Con el prefijo "$" delante, este KPI era el único
@@ -1083,15 +1089,26 @@ export function TradesPage() {
         </div>
       </div>
 
-      {/* ===== Trades table card (the only boxed surface) ===== */}
-      <div className="demo-card overflow-hidden">
-        <div className="relative">
-          <div className="overflow-x-auto custom-scroll">
+      {/* ===== Trades table card (the only boxed surface) =====
+           Mobile: the table is wider than the card (min-w-[1080px]) so it
+           scrolls horizontally INSIDE the card via overflow-x-auto. A
+           left-edge fade gradient mirrors the right one to hint at scroll
+           affordance on both sides. min-w-0 on the wrappers prevents the
+           table from inflating the card width on narrow viewports. */}
+      <div className="demo-card overflow-hidden min-w-0">
+        <div className="relative min-w-0">
+          <div className="overflow-x-auto custom-scroll min-w-0">
             <table className="w-full text-sm border-collapse min-w-[1080px]">
               <thead className="demo-chrome border-b border-[rgb(var(--divider)/0.10)]">
                 <tr className="text-left">
-                  {/* Col 0 — select-all checkbox + direction caption. */}
-                  <th scope="col" className="pl-5 pr-3 py-3 whitespace-nowrap w-[88px]">
+                  {/* Col 0 — select-all checkbox + direction caption.
+                      Sticky on mobile so the checkbox + direction chip
+                      stay visible while scrolling horizontally through
+                      the wide table. Uses --bg (opaque page surface) so
+                      scrolled cells underneath don't bleed through; on
+                      desktop (md:) the sticky positioning is removed
+                      because the table fits the card. */}
+                  <th scope="col" className="pl-5 pr-3 py-3 whitespace-nowrap w-[88px] sticky left-0 z-20 bg-[rgb(var(--bg))] demo-chrome">
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -1286,7 +1303,16 @@ export function TradesPage() {
               </tbody>
             </table>
           </div>
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-transparent to-black/20" />
+          {/* Right-edge fade — hints that the table scrolls horizontally
+              beyond the card's right edge. No left fade: the sticky first
+              column (checkbox + direction chip) already signals "this is
+              pinned, scroll right for more". */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-transparent to-black/20" aria-hidden />
+          {/* Subtle shadow on the right edge of the sticky first column —
+              only visible while the table is scrolled horizontally, gives
+              the pinned column a visual separation from the scrolling
+              cells underneath. */}
+          <div className="pointer-events-none absolute left-[88px] top-0 bottom-0 w-4 bg-gradient-to-r from-black/15 to-transparent md:hidden" aria-hidden />
         </div>
 
         {/* Bulk action bar — only when rows are selected. Spring in

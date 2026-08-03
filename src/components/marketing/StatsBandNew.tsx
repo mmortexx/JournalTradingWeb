@@ -41,14 +41,19 @@ export function StatsBandNew() {
       // preserved for the section's lower edge.
       className="section-tight border-b relative overflow-hidden bg-veil"
     >
-      <div className="max-w-page mx-auto px-5 md:px-8">
+      {/* T2c — `tj-container` hereda los gutters fluidos (clamp(1.25rem,
+          4vw, 2.25rem)) definidos por T2a en globals.css, sustituyendo al
+          `px-5 md:px-8` hardcodeado que dejaba 20 px fijos en móvil. La
+          rejilla pasa a `gap-y-10` en móvil (era 8) para que las tres
+          cifras apiladas respiren; el divider vertical sigue solo en sm+. */}
+      <div className="tj-container">
         {/* Filete superior + divisores verticales. La banda eran tres
             cifras sueltas flotando en el aire, sin tarjeta ni estructura:
             se leía como el hueco entre dos secciones y no como el bloque
             de credenciales que es. Los divisores son bordes reales, así
             que desaparecen solos al apilarse en móvil. */}
         <div className="h-px w-full bg-[rgb(var(--divider)/0.12)]" aria-hidden="true" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-8 pt-8 sm:divide-x sm:divide-[rgb(var(--divider)/0.10)]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-10 pt-10 sm:gap-y-0 sm:pt-9 sm:divide-x sm:divide-[rgb(var(--divider)/0.10)]">
           {stats.map((s, i) => (
             <Reveal key={s.v} delay={i * 0.08} y={14} className="flex flex-col sm:px-7 md:px-9 sm:first:pl-0 sm:last:pr-0">
               {/* Accent dot — small credential marker above the number,
@@ -69,7 +74,7 @@ export function StatsBandNew() {
               >
                 {s.v}
               </div>
-              <div className="mt-2 text-[13.5px] text-secondary leading-snug">
+              <div className="mt-2.5 text-[13.5px] text-secondary leading-snug" style={{ maxWidth: "22em" }}>
                 {s.l}
               </div>
             </Reveal>

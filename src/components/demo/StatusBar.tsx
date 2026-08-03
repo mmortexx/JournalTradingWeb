@@ -66,7 +66,7 @@ export function StatusBar() {
   const complianceLabel = fmtPct(compliance, lang, 0);
 
   return (
-    <div className="demo-chrome demo-hairline border-t relative flex items-center justify-between px-4 h-7 text-[11px] text-tertiary select-none">
+    <div className="demo-chrome demo-hairline border-t relative flex items-center justify-between px-3 sm:px-4 h-7 text-[11px] text-tertiary select-none gap-2">
       {/* LEFT — discipline LED + "Disciplina: NN %" text. Static
           (non-clickable) — matches the real app's DisciplineStatus
           StackPanel (XAML L313-318), which is a status indicator, not
@@ -99,7 +99,7 @@ export function StatusBar() {
 
       {/* DERECHA — versión, en texto terciario y cifras tabulares, igual
           que el VersionText de la app. */}
-      <span className="tnum tabular-nums ml-auto">v2.4.1</span>
+      <span className="tnum tabular-nums ml-auto shrink-0">v2.4.1</span>
     </div>
   );
 }
