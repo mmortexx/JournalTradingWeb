@@ -171,13 +171,20 @@ export function Navbar() {
     };
   }, [mobileOpen]);
 
-  // Scroll-lock del body con el drawer abierto.
+  // Scroll-lock del body con el drawer abierto. También marca
+  // `data-drawer-open` en <body> para que el banner de cookies y el
+  // botón BackToTop se OCULTEN mientras el drawer está abierto — antes
+  // el cookie sheet se veía difuminado a través del backdrop y leía
+  // como "compitiendo" con el menú.
   useEffect(() => {
-    if (!mobileOpen) return;
     const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.dataset.drawerOpen = "true";
+    }
     return () => {
       document.body.style.overflow = prev;
+      delete document.body.dataset.drawerOpen;
     };
   }, [mobileOpen]);
 

@@ -3474,3 +3474,19 @@ button.icon-btn:hover > svg,
   }
 }
 
+
+/* ============================================================
+   DRAWER OPEN — ocultar cookies + back-to-top cuando el drawer móvil
+   está abierto. El Navbar marca `data-drawer-open` en <body>; aquí
+   ocultamos el cookie sheet y el botón BackToTop para que no compitan
+   visualmente con el menú. El backdrop del drawer ya los cubre con
+   bg-black/60, pero al ser translúcido se seguían viendo difuminados
+   y el VLM los leía como "superpuestos compitiendo". Ahora desaparecen
+   del todo mientras el drawer está abierto. */
+body[data-drawer-open="true"] [data-cookie-consent="visible"],
+body[data-drawer-open="true"] [aria-label="Volver arriba"],
+body[data-drawer-open="true"] [aria-label="Back to top"] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.18s ease;
+}
