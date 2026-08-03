@@ -178,6 +178,10 @@ const Comparison = dynamic(
   () => import("@/components/marketing/Comparison").then((m) => m.Comparison),
   { loading: () => sectionFallback }
 );
+const SavingsCalculator = dynamic(
+  () => import("@/components/marketing/SavingsCalculator").then((m) => m.SavingsCalculator),
+  { loading: () => sectionFallback }
+);
 const PricingFAQ = dynamic(
   () => import("@/components/marketing/PricingFAQ").then((m) => m.PricingFAQ),
   { loading: () => sectionFallback }
@@ -234,6 +238,7 @@ export default function PricingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <Pricing standalone />
+      <SavingsCalculator />
       <Comparison />
       {/* Pricing-specific FAQ — 4 bilingual Q&A focused on trial, payment,
           multi-computer and lost license. */}
