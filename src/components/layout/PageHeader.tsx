@@ -114,7 +114,14 @@ export function PageHeader({
           className="flex items-center gap-2 text-xs text-tertiary mb-6"
           aria-label={es ? "Migas de pan" : "Breadcrumb"}
         >
-          <Link href="/" className="hover:text-primary transition-colors">
+          <Link
+            href="/"
+            // min-h-[44px] + py + -my-1: el texto es pequeño (xs) pero el
+            // área táctil cumple el mínimo de 44 px en móvil sin alterar
+            // la altura visual de la fila de migas (el margin negativo
+            // compensa el padding para que el layout no se desplace).
+            className="inline-flex min-h-[44px] items-center -my-2 py-2 pr-2 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] rounded-[4px]"
+          >
             {es ? "Inicio" : "Home"}
           </Link>
           <span className="opacity-40" aria-hidden="true">/</span>

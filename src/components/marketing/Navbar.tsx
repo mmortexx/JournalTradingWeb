@@ -450,10 +450,11 @@ export function Navbar() {
             centrada en la página con independencia de lo que midan la
             marca (izquierda) y el clúster de utilidades (derecha). */}
         <div className="mx-auto grid w-full max-w-page grid-cols-[1fr_auto_1fr] items-center gap-4">
-          {/* ZONA 1 — Marca */}
+          {/* ZONA 1 — Marca. min-h-[44px] garantiza el suelo táctil en
+              móvil (el glifo + texto solos medían 32 px). */}
           <Link
             href="/"
-            className="flex min-w-0 items-center gap-[11px] justify-self-start rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+            className="flex min-h-[44px] min-w-0 items-center gap-[11px] justify-self-start rounded-lg px-1 outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
             style={{ color: "var(--ink)" }}
             aria-label={t("appName")}
           >
@@ -626,8 +627,15 @@ export function Navbar() {
             {navLink("/pricing", es ? "Precios" : "Pricing")}
           </div>
 
-          {/* ZONA 3 — Utilidades: reloj UTC · tema · idioma · CTA · hamburguesa */}
+          {/* ZONA 3 — Utilidades: reloj UTC · tema · idioma · CTA · hamburguesa.
+              En móvil (<768px) el reloj/tema/idioma/⌘K/CTA se OCULTAN aquí
+              porque están duplicados dentro del drawer a ≥44 px (ver
+              "Preferencias" más abajo). Antes mostraban a 36 px en la barra
+              superior móvil, por debajo del mínimo táctil de 44 px — el
+              usuario los veía "mal posicionados". Ahora la barra móvil sólo
+              lleva logo + hamburguesa, ambos limpios. */}
           <div className="flex flex-none items-center gap-2 justify-self-end">
+            <div className="hidden md:flex md:items-center md:gap-2">
             <UtcClock />
             <IconButton
               onClick={toggleTheme}
@@ -714,6 +722,7 @@ export function Navbar() {
                 <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
+            </div>{/* /hidden md:flex — utilidades de escritorio */}
 
             <button
               ref={menuButtonRef}
