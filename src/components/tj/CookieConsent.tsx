@@ -134,60 +134,52 @@ export function CookieConsent() {
             role="dialog"
             aria-live="polite"
             aria-label={es ? "Consentimiento de cookies" : "Cookie consent"}
-            // `data-cookie-consent="visible"` is the hook BackToTop uses to
-            // detect the banner and lift itself above it (see BackToTop.tsx
-            // `cookieLift` computation). Without this attribute the floating
-            // button would sit at the same vertical band as the banner and
-            // visually crowd it on narrow viewports.
             data-cookie-consent="visible"
-            // Inline style overrides `.liquid-glass { position: relative }`
-            // (see component header). Width clamped to leave a 7 rem right
-            // gutter for the BackToTop button on small viewports — the
-            // banner sits bottom-left, the BackToTop sits bottom-right, and
-            // they never share a column.
-            style={{
-              position: "fixed",
-              width: "min(22rem, calc(100vw - 7rem))",
-            }}
-            // p-5 = 20 px padding per spec (≥20 px). safe-bottom clears the
-            // iOS home indicator. z-50 sits above BackToTop's z-40 in case
-            // their stacking contexts ever interact.
-            className="bottom-4 left-4 z-50 liquid-glass rounded-card p-5 shadow-2xl safe-bottom"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            style={{ position: "fixed" }}
+            // ── Estructura mobile-first ──────────────────────────────────
+            // En móvil (<768px): bottom sheet a SANGRE — w-full, left-0,
+            // bottom-0, esquinas redondeadas solo arriba. Es el patrón
+            // móvil nativo (menos "caja flotante", más "panel que sube
+            // desde abajo"), ocupa todo el ancho y no deja contenido
+            // asomando por los lados. Padding compacto (p-4) + texto más
+            // corto para que el sheet no tape más de ~16% de la pantalla.
+            //
+            // En desktop (≥768px): tarjeta compacta bottom-left
+            // (w-[22rem], bottom-4 left-4, rounded-card) — la versión
+            // original, menos intrusiva en pantalla grande.
+            //
+            // z-50 sobre BackToTop (z-40). safe-bottom para el home
+            // indicator de iOS en el sheet móvil.
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="tj-paper tj-paper-dense z-50 safe-bottom left-0 bottom-0 w-full rounded-t-[12px] border-t border-[rgb(var(--divider)/0.14)] p-4 shadow-2xl md:left-4 md:bottom-4 md:w-[22rem] md:rounded-card md:border md:border-[rgb(var(--divider)/0.13)] md:p-5"
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2.5 md:gap-3">
               <CookieIcon />
-              <p className="text-[13px] leading-relaxed text-secondary flex-1">
+              <p className="text-[12.5px] leading-[1.5] text-secondary flex-1 md:text-[13px] md:leading-relaxed">
                 {es
-                  ? "Usamos cookies técnicas para recordar tus preferencias. Sin tracking ni publicidad. Puedes aceptar o rechazar libremente."
-                  : "We use technical cookies to remember your preferences. No tracking, no ads. You can accept or decline freely."}
+                  ? "Cookies técnicas, sin tracking ni publicidad. ¿Aceptas o rechazas?"
+                  : "Technical cookies, no tracking or ads. Accept or decline?"}
               </p>
             </div>
 
-            {/* Action row — 2-column grid (Decline | Accept). Both buttons
-                fill their grid cell (w-full) so they share the banner width
-                equally regardless of label length. Each meets the WCAG
-                2.5.5 44 px tap target via min-h-[44px]. The "Más info" link
-                was removed because the FAQ it pointed at is already linked
-                from the footer's Resources column — duplicating it here
-                forced flex-wrap on narrow viewports and bloated the banner
-                to 250+ px (3 stacked button rows). The 2-col grid keeps the
-                banner to a single 44 px action row. */}
-            <div className="mt-4 grid grid-cols-2 gap-2">
+            {/* Action row — 2-column grid (Decline | Accept). Botones
+                full-width en sus celdas, ≥44px tap target. En móvil el
+                sheet es full-width así que los botones son cómodos. */}
+            <div className="mt-3 grid grid-cols-2 gap-2 md:mt-4">
               <button
                 type="button"
                 onClick={() => choose("declined")}
-                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-sm font-medium text-secondary border border-[rgb(var(--divider)/0.22)] hover:bg-[rgb(var(--divider)/0.06)] hover:text-primary active:scale-[0.98] transition-[background,color,transform] duration-150"
+                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-[13px] font-medium text-secondary border border-[rgb(var(--divider)/0.22)] hover:bg-[rgb(var(--divider)/0.06)] hover:text-primary active:scale-[0.98] transition-[background,color,transform] duration-150"
               >
                 {es ? "Rechazar" : "Decline"}
               </button>
               <button
                 type="button"
                 onClick={() => choose("accepted")}
-                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-sm font-medium bg-[rgb(var(--accent-base))] text-[#06130d] hover:brightness-110 active:scale-[0.98] transition-[filter,transform] duration-150"
+                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-[13px] font-medium bg-[rgb(var(--accent-base))] text-[#06130d] hover:brightness-110 active:scale-[0.98] transition-[filter,transform] duration-150"
               >
                 {es ? "Aceptar" : "Accept"}
               </button>
