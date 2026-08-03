@@ -3403,3 +3403,19 @@ button.icon-btn:hover > svg,
    regla es estática; el cleanup lo gestiona el navegador cuando el
    elemento sale del viewport vía content-visibility. */
 
+/* ============================================================
+   TJ-PING — pulso "live" para indicadores de estado en tiempo real
+   ============================================================
+   Usado por SessionClock (punto "Abierta"). Un ping sutil que se
+   expande y desvanece — señal universal de "en vivo". Respeta
+   prefers-reduced-motion (se desactiva abajo). */
+@keyframes tj-ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  75%, 100% { transform: scale(2.6); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes tj-ping {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+  }
+}
+

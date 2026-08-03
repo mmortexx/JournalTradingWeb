@@ -89,6 +89,10 @@ const Waitlist = dynamic(
   () => import("@/components/marketing/Waitlist").then((m) => m.Waitlist),
   { loading: () => sectionFallback }
 );
+const SessionClock = dynamic(
+  () => import("@/components/marketing/SessionClock").then((m) => m.SessionClock),
+  { loading: () => sectionFallback }
+);
 
 export default function AboutPage() {
   return (
@@ -112,6 +116,7 @@ export default function AboutPage() {
       />
       <Story />
       <Values />
+      <SessionClock num="02" />
 
       <PlateInterlude index={0} />
       <Changelog />
