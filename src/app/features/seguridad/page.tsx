@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
-import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL } from "@/lib/site";
 
@@ -45,7 +44,7 @@ const articleSchema = {
   dateModified: "2025-01-01",
   // Reuse the OG image (1200×630 PNG, meets Google's 1.91:1 spec).
   // See worklog Task R20-1d (E3) + R20-2d.
-  image: OG_IMAGE,
+  image: `${SITE_URL}/opengraph-image`,
   // about[] as canonical Thing objects (not plain strings) — slightly
   // improves classification signals. See worklog Task R20-1d (E7).
   about: [
@@ -76,13 +75,11 @@ export const metadata: Metadata = {
     // Next.js shallow-merges child openGraph over layout's — layout's
     // default OG image is NOT inherited when the child omits `images`.
     // See worklog Task R22-1d (G2) + R23-2a.
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Seguridad — CountPips" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Seguridad — CountPips",
     description: "Local-first, sin nube ni cuentas. Tus datos 100% en tu máquina.",
-    images: [OG_IMAGE],
   },
 };
 

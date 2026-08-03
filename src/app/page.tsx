@@ -4,7 +4,6 @@ import { Ticker } from "@/components/marketing/Ticker";
 import { Hero } from "@/components/marketing/Hero";
 import { SideRail } from "@/components/tj/SideRail";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { OG_IMAGE } from "@/lib/og";
 import { SITE_URL } from "@/lib/site";
 
 // PNG (not SVG) — see layout.tsx for the rationale (social platforms
@@ -28,21 +27,12 @@ export const metadata: Metadata = {
     siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: "CountPips — Opera como una mesa institucional.",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "CountPips — Opera como una mesa institucional.",
     description:
       "Diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único desde 29 $.",
-    images: [OG_IMAGE],
   },
 };
 

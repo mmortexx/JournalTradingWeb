@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
-import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL } from "@/lib/site";
 
@@ -150,21 +149,12 @@ export const metadata: Metadata = {
     siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: "Precios — CountPips",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Precios — CountPips",
     description:
       "Pago único, sin suscripciones. Core $29 · Pro $49. Tus datos 100% locales para siempre.",
-    images: [OG_IMAGE],
   },
 };
 

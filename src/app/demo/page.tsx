@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
-import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL } from "@/lib/site";
 
@@ -53,21 +52,12 @@ export const metadata: Metadata = {
     siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: "Demo en vivo — CountPips",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Demo en vivo — CountPips",
     description:
       "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra realistas. No es un vídeo: es la app.",
-    images: [OG_IMAGE],
   },
 };
 

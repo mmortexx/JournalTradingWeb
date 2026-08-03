@@ -5,7 +5,6 @@ import { Story } from "@/components/marketing/Story";
 import { Values } from "@/components/marketing/Values";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
-import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL } from "@/lib/site";
 
@@ -55,21 +54,12 @@ export const metadata: Metadata = {
     siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: "Acerca de — CountPips",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Acerca de — CountPips",
     description:
       "La historia de CountPips: por qué existe, para quién es, y cómo evoluciona. Hecho para el trader manual serio.",
-    images: [OG_IMAGE],
   },
 };
 

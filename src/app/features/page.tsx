@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
-import { OG_IMAGE } from "@/lib/og";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL } from "@/lib/site";
 
@@ -49,7 +48,7 @@ const articleSchema = {
   datePublished: "2025-01-01",
   dateModified: "2025-01-01",
   // Reuse the OG image (1200×630 PNG, meets Google's 1.91:1 spec).
-  image: OG_IMAGE,
+  image: `${SITE_URL}/opengraph-image`,
   // about[] as canonical Thing objects (not plain strings) — slightly
   // improves classification signals.
   about: [
@@ -74,13 +73,11 @@ export const metadata: Metadata = {
     siteName: "CountPips",
     locale: "es_ES",
     alternateLocale: ["en_US"],
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Características — CountPips" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Características — CountPips",
     description: "40+ métricas institucionales, disciplina que cuesta dinero, playbook en vivo y 100% local.",
-    images: [OG_IMAGE],
   },
 };
 

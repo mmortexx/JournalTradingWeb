@@ -15,7 +15,6 @@ import { BackgroundFX } from "@/components/tj/BackgroundFX";
 import { IntroSequence } from "@/components/tj/IntroSequence";
 import { SectionReveal } from "@/components/tj/SectionReveal";
 import { DecorFX } from "@/components/tj/DecorFX";
-import { OG_IMAGE } from "@/lib/og";
 import { SITE_URL } from "@/lib/site";
 
 /**
@@ -220,21 +219,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_ES",
     alternateLocale: ["en_US"],
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: "CountPips — Tu operativa, medida.",
-      },
-    ],
+    // `images` se omite AQUÍ a propósito: Next.js auto-inyecta la
+    // tarjeta desde src/app/opengraph-image.tsx (imagen dinámica
+    // generada en runtime, servida desde /opengraph-image en la raíz
+    // del dominio). Antes apuntábamos a `${SITE_URL}/og.png?v=2`, una
+    // URL absoluta que dependía de SITE_URL — si el dominio no
+    // coincidía o el archivo faltaba, la vista previa social quedaba
+    // en blanco. La imagen dinámica siempre coincide con la web real,
+    // sin importar dónde se publique.
   },
   twitter: {
     card: "summary_large_image",
     title: "CountPips — Tu operativa, medida.",
     description:
       "Diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales.",
-    images: [OG_IMAGE],
+    // `images` se omite también: src/app/twitter-image.tsx la inyecta.
   },
   robots: {
     index: true,
