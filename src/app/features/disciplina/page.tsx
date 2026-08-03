@@ -105,6 +105,10 @@ const ComparisonSlider = dynamic(
   () => import("@/components/tj/ComparisonSlider").then((m) => m.ComparisonSlider),
   { loading: () => sectionFallback }
 );
+const RMultipleSimulator = dynamic(
+  () => import("@/components/marketing/RMultipleSimulator").then((m) => m.RMultipleSimulator),
+  { loading: () => sectionFallback }
+);
 
 export default function DisciplinaPage() {
   return (
@@ -138,6 +142,8 @@ export default function DisciplinaPage() {
 
       <PlateInterlude index={1} />
       <ComparisonSlider />
+
+      <RMultipleSimulator num="03" />
 
       <PlateInterlude index={2} />
       <FeaturePageNav current="disciplina" />
