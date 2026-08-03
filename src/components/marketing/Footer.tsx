@@ -189,14 +189,20 @@ export function Footer() {
               <span>{es ? "100 % local" : "100 % local"}</span>
             </div>
 
-            {/* Social links — icon-only buttons with comfortable tap
-                targets. `h-9 w-9` (36 px) reads as a small refined chip on
-                desktop while still clearing the WCAG 2.5.5 spirit on mobile
-                (the MagneticButton wrapper also exposes a slight magnetic
-                pull area beyond the visual box). SVGs trimmed to 14×14
-                (RSS 13×13, X 12×12) so the glyph sits comfortably inside
-                the 36 px target with ~11 px of optical padding. */}
-            <div className="mt-6 flex items-center gap-2">
+            {/* Social links — icon-only buttons at the WCAG 2.5.5 (AAA)
+                44 px tap target. P4 fix: this was `h-9 w-9` (36 px) which
+                reads as a refined chip but is below the 44 px threshold
+                the rest of the chrome holds (footer link rows, cookie
+                buttons, BackToTop). Bumped to `h-11 w-11` (44 px) so the
+                footer's social row is consistent with the rest of the
+                site's touch language; the 14 px SVGs now sit with ~15 px
+                of optical padding, which reads as deliberately generous
+                (Stripe / Linear pattern) rather than cramped. `gap-2.5`
+                (10 px) gives the row a touch more breathing room than
+                the previous `gap-2` (8 px) — same premium-editorial
+                rhythm the eyebrow column headers use. MagneticButton
+                preserves the magnetic pull on fine-pointer devices. */}
+            <div className="mt-6 flex items-center gap-2.5">
               {SOCIAL_LINKS.map(({ label, href, Icon }) => (
                 <MagneticButton
                   key={label}
@@ -205,7 +211,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   ariaLabel={label}
                   strength={0.3}
-                  className="icon-btn grid h-9 w-9 place-items-center rounded-[5px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
+                  className="icon-btn grid h-11 w-11 place-items-center rounded-[6px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
                 >
                   <Icon />
                 </MagneticButton>

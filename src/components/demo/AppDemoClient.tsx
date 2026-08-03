@@ -64,17 +64,17 @@ const AppDemo = dynamic(
 function DemoSkeleton() {
   return (
     <div
-      className="rounded-xl overflow-hidden border border-[rgb(var(--divider)/0.1)] shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)] h-[588px] sm:h-[672px] md:h-[752px]"
+      className="rounded-xl overflow-hidden border border-[rgb(var(--divider)/0.1)] shadow-[0_4px_10px_rgb(0_0_0/0.26),0_18px_40px_rgb(0_0_0/0.3),0_0_28px_rgb(var(--accent-base)/0.1),0_24px_80px_-12px_rgb(0_0_0/0.6)] h-[598px] sm:h-[674px] md:h-[754px]"
       aria-hidden="true"
     >
       <div className="liquid-glass rounded-xl overflow-hidden h-full flex flex-col">
-        {/* ---- Window chrome (h-9 mobile / h-10 sm+) — Windows 11 layout:
+        {/* ---- Window chrome (h-11 mobile / h-10 sm+) — Windows 11 layout:
             app icon + name on the left, account chip + market-clock
             skeleton in the center, Local-first LED skeleton on the right,
             Min/Max/Close caption buttons at the far right. Matches the
             live WindowChrome (post R25-1a + T2f mobile pass) so hydration
             is visually seamless. */}
-        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] flex items-center justify-between h-9 sm:h-10 shrink-0">
+        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] flex items-center justify-between h-11 sm:h-10 shrink-0">
           <div className="flex items-center px-3 min-w-0">
             {/* App icon placeholder — same 16×16 rounded square as the real
                 AppIcon, kept grey so it doesn't read as a brand mark yet. */}
@@ -92,13 +92,13 @@ function DemoSkeleton() {
               <Skeleton className="h-1.5 w-1.5 rounded-full" />
               <Skeleton className="h-3 w-16" />
             </div>
-            <div className="w-9 sm:w-[46px] h-full flex items-center justify-center">
+            <div className="w-11 sm:w-[46px] h-full flex items-center justify-center">
               <Skeleton className="h-2.5 w-2.5" />
             </div>
-            <div className="w-9 sm:w-[46px] h-full flex items-center justify-center">
+            <div className="w-11 sm:w-[46px] h-full flex items-center justify-center">
               <Skeleton className="h-2.5 w-2.5" />
             </div>
-            <div className="w-9 sm:w-[46px] h-full flex items-center justify-center">
+            <div className="w-11 sm:w-[46px] h-full flex items-center justify-center">
               <Skeleton className="h-2.5 w-2.5" />
             </div>
           </div>
@@ -107,7 +107,7 @@ function DemoSkeleton() {
         {/* ---- Top nav (h-11) — 4 skeleton tabs (Dashboard / Trades /
             Analytics / Journal, matches the live TopNav which shows only
             the 4 demo-able pages — not the full 8 of the real app). ---- */}
-        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch h-[46px] shrink-0">
+        <div className="liquid-glass border-b border-[rgb(var(--divider)/0.1)] grid grid-cols-[auto_minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch h-[46px] shrink-0">
           <div aria-hidden="true" />
           <div className="flex items-center gap-0.5 sm:gap-1 px-1.5">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -178,7 +178,7 @@ function DemoSkeleton() {
         </div>
 
         {/* ---- Status bar (h-7) ---- */}
-        <div className="liquid-glass border-t border-[rgb(var(--divider)/0.1)] flex items-center justify-between px-3 h-7 shrink-0 mt-auto">
+        <div className="liquid-glass border-t border-[rgb(var(--divider)/0.1)] flex items-center justify-between px-3 sm:px-4 h-7 shrink-0 mt-auto">
           <Skeleton className="h-2.5 w-32" />
           <Skeleton className="h-2.5 w-40 hidden sm:block" />
           <Skeleton className="h-2.5 w-16" />

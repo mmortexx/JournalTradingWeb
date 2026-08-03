@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 interface FeatureImageProps {
   src: string;
@@ -58,6 +58,21 @@ export function FeatureImage({
   surfaceBg,
 }: FeatureImageProps) {
   const isContain = fit === "contain";
+  const reduce = useReducedMotion();
+  // Under reduced-motion, render at the final state with no transition —
+  // the global MotionConfig already suppresses transforms, but the scale
+  // zoom-out on cover mode and the y-lift on contain mode would still
+  // animate opacity / position. Short-circuit the variants entirely.
+  const initial = reduce
+    ? { opacity: 1, y: 0, scale: 1 }
+    : isContain
+    ? { opacity: 0, y: 6 }
+    : { opacity: 0, scale: 1.05 };
+  const whileInView = reduce
+    ? { opacity: 1, y: 0, scale: 1 }
+    : isContain
+    ? { opacity: 1, y: 0 }
+    : { opacity: 1, scale: 1 };
   return (
     <motion.div
       // Reveal animation — tuned per fit mode. Cover mode keeps the
@@ -66,10 +81,10 @@ export function FeatureImage({
       // visibly clips the screenshot's edge during the reveal) and uses a
       // pure opacity + 6px lift, so the WHOLE screenshot is visible at
       // every frame and the reveal reads as a gentle settle, not a crop.
-      initial={isContain ? { opacity: 0, y: 6 } : { opacity: 0, scale: 1.05 }}
-      whileInView={isContain ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1 }}
+      initial={initial}
+      whileInView={whileInView}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={reduce ? { duration: 0 } : { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
       className={`overflow-hidden rounded-card ${className}`}
       style={
         isContain

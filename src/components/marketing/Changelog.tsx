@@ -219,7 +219,7 @@ export function Changelog() {
                     >
                       <motion.div
                         whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                        className={`liquid-glass depth-1 rounded-card p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                        className={`liquid-glass depth-1 rounded-card p-5 h-full min-w-0 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                           isPast
                             ? "hover:border-[rgb(var(--accent-base)/0.30)]"
                             : "hover:border-[rgb(var(--divider)/0.25)]"

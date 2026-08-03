@@ -76,7 +76,7 @@ export function Values() {
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         {/* Header */}
         <div className="max-w-2xl">
           <Reveal>
@@ -148,7 +148,7 @@ export function Values() {
                         color is present before hover. The base ring deepens
                         to 0.30 on hover to match the existing hover shadow. */}
                     <span
-                      className="shrink-0 w-9 h-9 rounded-lg liquid-glass border border-[rgb(var(--accent-base)/0.18)] flex items-center justify-center text-tertiary transition-colors duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:border-[rgb(var(--accent-base)/0.30)]"
+                      className="shrink-0 w-10 h-10 rounded-lg liquid-glass border border-[rgb(var(--accent-base)/0.18)] flex items-center justify-center text-tertiary transition-colors duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:border-[rgb(var(--accent-base)/0.30)]"
                       aria-hidden="true"
                     >
                       {v.icon}

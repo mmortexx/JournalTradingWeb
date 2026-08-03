@@ -59,6 +59,7 @@ export function MarketBackground({
     let price = 0.5;
     let raf = 0;
     let lastT = performance.now();
+    let visible = true;
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
@@ -165,7 +166,17 @@ export function MarketBackground({
     }
 
     function tick(now: number) {
-      const dt = (now - lastT) / 1000;
+      raf = requestAnimationFrame(tick);
+      // Skip the simulation step (and its redraw) when the tab is hidden:
+      // rAF is throttled to ~1fps anyway, but `dt` would balloon on resume
+      // and the candles would jump-scroll several seconds forward in one
+      // frame. Resetting `lastT` on visibilitychange keeps the resume
+      // seamless.
+      if (!visible) {
+        lastT = now;
+        return;
+      }
+      const dt = Math.min((now - lastT) / 1000, 0.1);
       lastT = now;
       if (!reduce) {
         offset += speed * candleW * dt;
@@ -177,8 +188,10 @@ export function MarketBackground({
         }
       }
       draw();
-      raf = requestAnimationFrame(tick);
     }
+
+    const onVis = () => { visible = !document.hidden; };
+    document.addEventListener("visibilitychange", onVis);
 
     resize();
     window.addEventListener("resize", resize);
@@ -186,6 +199,7 @@ export function MarketBackground({
 
     return () => {
       cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("resize", resize);
     };
   }, [density, speed, volatility, showEquityLine, inView]);

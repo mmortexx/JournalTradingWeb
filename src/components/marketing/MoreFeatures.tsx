@@ -111,11 +111,11 @@ export function MoreFeatures() {
                 delay: Math.min(i * 0.06, 0.3),
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="h-full"
+              className="h-full min-w-0"
             >
               <motion.article
                 whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                className="group liquid-glass depth-1 rounded-card border border-transparent p-5 h-full transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
+                className="group liquid-glass depth-1 rounded-card border border-transparent p-5 h-full min-w-0 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
               >
                   {/* Icon */}
                   <div

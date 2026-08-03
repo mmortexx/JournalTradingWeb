@@ -90,7 +90,7 @@ export function HowItWorks() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-                className="relative flex flex-col items-center text-center md:items-start md:text-left md:pl-6"
+                className="relative flex flex-col items-center text-center md:items-start md:text-left md:pl-6 min-w-0"
               >
                 {/* Numbered circle + illustration */}
                 <div className="relative mb-6">

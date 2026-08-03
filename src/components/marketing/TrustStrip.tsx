@@ -76,7 +76,7 @@ export function TrustStrip() {
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
       />
 
-      <div className="relative z-10 max-w-page mx-auto px-5 md:px-8">
+      <div className="relative z-10 tj-container">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}

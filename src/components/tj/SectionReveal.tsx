@@ -6,8 +6,13 @@ import { usePathname } from "next/navigation";
 /**
  * SectionReveal — puerto del `_reveal()` del HTML de referencia: cada
  * <section> de nivel superior (excepto el hero #top) entra con un rise
- * de 26 px + fade (0.8 s, cubic-bezier(.22,1,.36,1)) cuando asoma en
+ * de 22 px + fade (0.65 s, cubic-bezier(.22,1,.36,1)) cuando asoma en
  * viewport (threshold 10 %, rootMargin -8 % inferior).
+ *
+ * La duración y el desplazamiento están afinados al mismo presupuesto
+ * que Reveal (0.55 s, 16 px): aquí las secciones son más grandes y
+ * toleran un poco más de recorrido (22 px) sin verse tropicales, pero
+ * la familia de movimiento es la misma en toda la página.
  *
  * Implementación con Web Animations API (`el.animate()`) en lugar de
  * estilos inline: WAAPI no toca los atributos del DOM, así que no
@@ -40,10 +45,10 @@ export function SectionReveal() {
           io.unobserve(el);
           el.animate(
             [
-              { opacity: 0, transform: "translateY(26px)" },
+              { opacity: 0, transform: "translateY(22px)" },
               { opacity: 1, transform: "none" },
             ],
-            { duration: 800, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
+            { duration: 650, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
           );
         });
       },

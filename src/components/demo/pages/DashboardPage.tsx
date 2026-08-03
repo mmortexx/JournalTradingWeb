@@ -324,8 +324,10 @@ export function DashboardPage() {
                   <button
                     type="button"
                     aria-label={t("dropScreens")}
-                    className="w-full border border-dashed border-[rgb(var(--divider)/0.15)] rounded-md flex flex-col items-center justify-center gap-2 text-tertiary hover:text-secondary hover:border-[rgb(var(--divider)/0.3)] hover:bg-[rgb(var(--divider)/0.05)] transition-colors group"
-                    style={{ height: 380 }}
+                    // Responsive height: 380px fixed was the WinUI RowDefinition,
+                    // but on a 316px mobile card it filled the entire viewport.
+                    // 260px mobile → 320px sm → 380px md+ (desktop parity).
+                    className="w-full border border-dashed border-[rgb(var(--divider)/0.15)] rounded-md flex flex-col items-center justify-center gap-2 text-tertiary hover:text-secondary hover:border-[rgb(var(--divider)/0.3)] hover:bg-[rgb(var(--divider)/0.05)] transition-colors group h-[260px] sm:h-[320px] md:h-[380px]"
                   >
                     <svg
                       width="32"
@@ -831,7 +833,7 @@ export function DashboardPage() {
           {/* Mobile: horizontal-scroll strip with min-w cells (so the 7 KPIs
               stay readable instead of collapsing to ~25px each inside the
               316px panel). Desktop: same 7-col grid as before, no scroll. */}
-          <div className="flex md:grid md:grid-cols-[repeat(7,minmax(0,1fr))] gap-x-4 px-1 py-2 overflow-x-auto custom-scroll">
+          <div className="flex md:grid md:grid-cols-[repeat(7,minmax(5.5rem,1fr))] gap-x-4 px-1 py-2 overflow-x-auto custom-scroll">
             <KpiCell
               label={t("pnlTotal")}
               value={
@@ -1138,7 +1140,7 @@ function KpiCell({
   value: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-center min-w-[5.5rem] md:min-w-0 shrink-0 md:shrink px-1 py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
+    <div className="flex flex-col items-center gap-1 text-center min-w-[5.5rem] shrink-0 px-1 py-1 rounded-md transition-colors hover:bg-[rgb(var(--divider)/0.03)]">
       <div className="text-[10px] uppercase tracking-[0.12em] text-tertiary truncate max-w-full">
         {label}
       </div>
@@ -1326,7 +1328,14 @@ function RealityCheck() {
 function KpiDivider() {
   return (
     <div
-      className="self-stretch w-px shrink-0 justify-self-center bg-gradient-to-b from-transparent via-white/15 to-transparent"
+      // `md:hidden` — at md+ the parent switches from `flex` to a 7-col
+      // CSS Grid (`md:grid md:grid-cols-[repeat(7,minmax(0,1fr))]`). The
+      // 7 KpiDividers would otherwise become extra grid items (13 children
+      // in a 7-col grid → wraps to 2 rows of KPIs). Hiding them on md+
+      // leaves exactly 7 grid children (one per KpiCell) so the strip
+      // stays a single row; the `gap-x-4` provides the optical separation
+      // the dividers were painting on mobile.
+      className="self-stretch w-px shrink-0 justify-self-center bg-gradient-to-b from-transparent via-white/15 to-transparent md:hidden"
       aria-hidden="true"
     />
   );

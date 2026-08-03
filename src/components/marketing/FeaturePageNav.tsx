@@ -221,7 +221,15 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             </span>
           </div>
         </Reveal>
-        <div className="relative md:block -mx-5 md:mx-0">
+        {/* P6 — `-mx-5` → `-mx-[clamp(1.25rem,4vw,2.25rem)]`: the rail's
+            negative margin now matches tj-container's fluid padding exactly
+            (clamp tracks 4vw between 20–36px). Previously the fixed -20px
+            left a 4–8px gutter on each side at 480–768px viewports where
+            the container's 4vw padding exceeds 20px — the rail's left edge
+            was visibly inset from the section above/below it. Inner px
+            matches the same clamp so the cards inside re-establish the
+            container's content edge. */}
+        <div className="relative md:block -mx-[clamp(1.25rem,4vw,2.25rem)] md:mx-0">
           {/* Mobile-only right-edge gradient fade — signals "swipe for more".
               pointer-events-none keeps taps flowing to the underlying cards. */}
           <div
@@ -233,7 +241,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
           />
           <div
             className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 overflow-x-auto md:overflow-visible
-                       snap-x snap-mandatory md:snap-none px-5 md:px-0 pb-2 md:pb-0
+                       snap-x snap-mandatory md:snap-none px-[clamp(1.25rem,4vw,2.25rem)] md:px-0 pb-2 md:pb-0
                        [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent-base)/0.4)_transparent]"
             style={{ scrollbarWidth: "thin" }}
           >

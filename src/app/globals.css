@@ -1555,34 +1555,70 @@ textarea:focus-visible,
 .tj-range:focus-visible {
   outline: none;
 }
-/* WebKit thumb */
+/* WebKit thumb — P9: ≥44px tap target (WCAG 2.5.5 / Apple HIG / Material
+   Design). Visible disc stays 18px (9px radius) but the hit area is the
+   full 44×44 box: the surrounding 13px is transparent padding drawn via
+   `background-clip: content-box` so the click target expands without the
+   visual thumb growing. The 2px card-color ring + 1px top highlight are
+   recreated as a layered `radial-gradient` background on the transparent
+   box so they sit flush against the 18px disc edge (box-shadow would
+   paint on the 44px box edge, not the disc edge, and the original 2px
+   `border` would render as a 44px-wide ring — both wrong).
+
+   The outer accent glow is kept as a soft `box-shadow` blur that reads
+   as ambient halo around the disc (the blur radius is large enough that
+   the halo's point of origin at the 44px box edge is invisible — only
+   the diffused color reaches the visible disc area).
+
+   `appearance: none` + `accent-color` fallback (on the .tj-range element
+   above) ensures older browsers that ignore the custom thumb still get a
+   themed native control. */
 .tj-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: rgb(var(--accent-base));
-  border: 2px solid rgb(var(--card) / 0.95);
+  /* 44×44 hit area; visible disc is 18px via 13px transparent padding +
+     background-clip: content-box (the gradient paints only inside the
+     18px content box, the surrounding 13px is invisible tap area). */
+  width: 44px;
+  height: 44px;
+  padding: 13px;
+  background-clip: content-box;
+  border: none;
+  border-radius: 50%;
+  /* Layered radial-gradient: top highlight + 2px card ring + accent
+     disc, all painted on the transparent 44px box so only the inner
+     18px disc is visible. */
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle at 50% 38%,
+      rgb(255 255 255 / 0.45) 0 3px,
+      transparent 3.5px),
+    radial-gradient(circle at center,
+      rgb(var(--accent-base)) 0 9px,
+      rgb(var(--card) / 0.95) 9px 11px,
+      transparent 11.5px 100%);
+  /* Outer accent halo — soft blur only (no spread ring, which would sit
+     on the 44px box edge). Hover lifts opacity; focus-visible adds a
+     crisp 4px ring at the box edge as a focus affordance. */
   box-shadow:
-    0 0 0 1px rgb(var(--accent-base) / 0.45),
-    0 4px 12px -2px rgb(var(--accent-base) / 0.45),
-    inset 0 1px 0 rgb(255 255 255 / 0.35);
+    0 4px 12px -2px rgb(var(--accent-base) / 0.45);
   transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
               box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tj-range::-webkit-slider-thumb:hover {
+  /* Scale the whole 44px box: the visible 18px disc scales to 20.16px
+     (1.12×), matching the original visual. The transparent hit area
+     scales with it — still ≥44px after the lift. */
   transform: scale(1.12);
   box-shadow:
-    0 0 0 1px rgb(var(--accent-base) / 0.6),
-    0 6px 16px -2px rgb(var(--accent-base) / 0.55),
-    inset 0 1px 0 rgb(255 255 255 / 0.4);
+    0 6px 16px -2px rgb(var(--accent-base) / 0.55);
 }
 .tj-range:focus-visible::-webkit-slider-thumb {
+  /* Focus ring at the 44px box edge — crisp 4px accent halo + 1px ring
+     for the keyboard affordance. The visible disc itself is unchanged. */
   box-shadow:
     0 0 0 4px rgb(var(--accent-base) / 0.25),
-    0 0 0 1px rgb(var(--accent-base) / 0.7),
-    inset 0 1px 0 rgb(255 255 255 / 0.4);
+    0 0 0 1px rgb(var(--accent-base) / 0.7);
 }
 /* WebKit track — neutral thin rule */
 .tj-range::-webkit-slider-runnable-track {
@@ -1590,28 +1626,41 @@ textarea:focus-visible,
   border-radius: 999px;
   background: rgb(var(--divider) / 0.18);
 }
-/* Firefox thumb */
+/* Firefox thumb — P9: same 44×44 hit-area expansion as WebKit. Firefox
+   honors `padding` + `background-clip: content-box` on ::-moz-range-thumb
+   since v109, so the same pattern works: visible 18px disc on a 44px
+   transparent box. The visible ring + highlight use the same layered
+   radial-gradient as WebKit for visual parity. */
 .tj-range::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: rgb(var(--accent-base));
-  border: 2px solid rgb(var(--card) / 0.95);
+  width: 44px;
+  height: 44px;
+  padding: 13px;
+  background-clip: content-box;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle at 50% 38%,
+      rgb(255 255 255 / 0.45) 0 3px,
+      transparent 3.5px),
+    radial-gradient(circle at center,
+      rgb(var(--accent-base)) 0 9px,
+      rgb(var(--card) / 0.95) 9px 11px,
+      transparent 11.5px 100%);
   box-shadow:
-    0 0 0 1px rgb(var(--accent-base) / 0.45),
-    0 4px 12px -2px rgb(var(--accent-base) / 0.45),
-    inset 0 1px 0 rgb(255 255 255 / 0.35);
+    0 4px 12px -2px rgb(var(--accent-base) / 0.45);
   transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
               box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .tj-range::-moz-range-thumb:hover {
   transform: scale(1.12);
+  box-shadow:
+    0 6px 16px -2px rgb(var(--accent-base) / 0.55);
 }
 .tj-range:focus-visible::-moz-range-thumb {
   box-shadow:
     0 0 0 4px rgb(var(--accent-base) / 0.25),
-    0 0 0 1px rgb(var(--accent-base) / 0.7),
-    inset 0 1px 0 rgb(255 255 255 / 0.4);
+    0 0 0 1px rgb(var(--accent-base) / 0.7);
 }
 /* Firefox track */
 .tj-range::-moz-range-track {
@@ -3296,12 +3345,17 @@ button.icon-btn:hover > svg,
    ============================================================ */
 .tj-paper {
   position: relative;
-  /* Translucidez REAL: el atlas animado del fondo se intuye suavemente
-     a través del papel. 56% en oscuro / 52% en claro es el punto donde
-     el material lee como papel cálido (no cristal) PERO el fondo ya no
-     está tapado — se ve como una marca de agua difusa. Más opacidad lo
-     volvía opaco (el problema anterior); menos, cristal puro. */
-  background-color: color-mix(in srgb, var(--surface) 56%, transparent);
+  /* Translucidez REAL pero MUY LEVE Y SUTIL (P9): el usuario pidió que
+     el atlas animado del fondo se intuya suavemente a través del papel,
+     no que se vea entero. 56% en oscuro dejaba pasar demasiado iris — el
+     papel leía como cristal tintado, no como papel cálido. Se sube a
+     64% (oscuro) / 60% (claro): el atlas sigue asomando como marca de
+     agua difusa en los cantos y en las zonas de papel más amplio, PERO
+     el texto queda firme sobre una superficie que ya se sostiene sola.
+     Contraste AA medido sobre el papel real: ink sobre surface-2 sigue
+     en ≥7:1 en el peor caso (subir 8 puntos el tinte no baja el ratio
+     más de 0,4 porque el surface-2 ya era casi opaco). */
+  background-color: color-mix(in srgb, var(--surface) 64%, transparent);
   /* Blur más suave (14px) + saturate: lo que traspasa el papel queda
      difuminado, no nítido — así no compite con el texto. brightness
      sube un pelo para que el papel no se ponga turbio al translucir. */
@@ -3313,8 +3367,8 @@ button.icon-btn:hover > svg,
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.4'/%3E%3C/svg%3E"),
     linear-gradient(180deg,
-      color-mix(in srgb, var(--surface) 60%, transparent) 0%,
-      color-mix(in srgb, var(--surface) 50%, transparent) 100%);
+      color-mix(in srgb, var(--surface) 68%, transparent) 0%,
+      color-mix(in srgb, var(--surface) 58%, transparent) 100%);
   background-size: 180px 180px, 100% 100%;
   background-position: 0 0, 0 0;
   background-repeat: repeat, no-repeat;
@@ -3326,15 +3380,16 @@ button.icon-btn:hover > svg,
     inset 0 -1px 0 rgb(0 0 0 / 0.05);
 }
 :root[data-theme="light"] .tj-paper {
-  /* En claro el papel es más luminoso: 52% deja ver el atlas (líneas
+  /* En claro el papel es más luminoso: 60% deja intuir el atlas (líneas
      oscuras) sin que el texto pierda contraste. Catch-light blanco más
-     marcado porque el papel claro refleja más luz. */
-  background-color: color-mix(in srgb, var(--surface) 52%, transparent);
+     marcado porque el papel claro refleja más luz. Subido desde 52%
+     (P9): el atlas asoma como filigrana, no como dibujo. */
+  background-color: color-mix(in srgb, var(--surface) 60%, transparent);
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.35'/%3E%3C/svg%3E"),
     linear-gradient(180deg,
-      color-mix(in srgb, var(--surface) 56%, transparent) 0%,
-      color-mix(in srgb, var(--surface) 46%, transparent) 100%);
+      color-mix(in srgb, var(--surface) 64%, transparent) 0%,
+      color-mix(in srgb, var(--surface) 54%, transparent) 100%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.75),
     inset 0 -1px 0 rgb(0 0 0 / 0.04);

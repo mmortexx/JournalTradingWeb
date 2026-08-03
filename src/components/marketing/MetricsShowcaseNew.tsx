@@ -2,6 +2,7 @@
 
 import { useLang } from "@/lib/i18n";
 import { motion } from "framer-motion";
+import { Reveal } from "@/components/tj/Reveal";
 
 /**
  * MetricsShowcaseNew — sección `#metrics` del HTML. Dos columnas:
@@ -29,60 +30,73 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
           tarjeta cuando se apilan. */}
       <div className="tj-container grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
         <div>
-          <div className="inline-flex items-center gap-3 mb-5">
-            <span
-              className="tnum"
-              style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
+          <Reveal>
+            <div className="inline-flex items-center gap-3 mb-5">
+              <span
+                className="tnum"
+                style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}
+              >
+                § {num}
+              </span>
+              <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
+              <span
+                className="tnum"
+                style={{ fontSize: 11, letterSpacing: "0.2em", color: "var(--ink-3)" }}
+              >
+                {es ? "MÉTRICAS" : "METRICS"}
+              </span>
+            </div>
+          </Reveal>
+          <Reveal delay={0.06}>
+            <h2
+              className="font-serif m-0"
+              style={{
+                fontSize: "clamp(2rem, 3.6vw, 3rem)",
+                fontWeight: 400,
+                letterSpacing: "-0.022em",
+                lineHeight: 1.08,
+                color: "var(--ink)",
+                textWrap: "balance",
+              }}
             >
-              § {num}
-            </span>
-            <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
-            <span
-              className="tnum"
-              style={{ fontSize: 11, letterSpacing: "0.2em", color: "var(--ink-3)" }}
+              {es ? (
+                <>
+                  Las cifras que usan{" "}
+                  <span style={{ color: "rgb(var(--accent-base))" }}>los que viven de esto</span>.
+                </>
+              ) : (
+                <>
+                  The numbers the{" "}
+                  <span style={{ color: "rgb(var(--accent-base))" }}>pros who live off this</span> use.
+                </>
+              )}
+            </h2>
+          </Reveal>
+          <Reveal delay={0.12}>
+            <p
+              className="mt-5 mb-8"
+              style={{
+                fontSize: "clamp(1rem, 1.3vw, 1.12rem)",
+                lineHeight: 1.62,
+                color: "var(--ink-2)",
+                maxWidth: "36em",
+              }}
             >
-              {es ? "MÉTRICAS" : "METRICS"}
-            </span>
-          </div>
-          <h2
-            className="font-serif m-0"
-            style={{
-              fontSize: "clamp(2rem, 3.6vw, 3rem)",
-              fontWeight: 400,
-              letterSpacing: "-0.022em",
-              lineHeight: 1.08,
-              color: "var(--ink)",
-              textWrap: "balance",
-            }}
-          >
-            {es ? (
-              <>
-                Las cifras que usan{" "}
-                <span style={{ color: "rgb(var(--accent-base))" }}>los que viven de esto</span>.
-              </>
-            ) : (
-              <>
-                The numbers the{" "}
-                <span style={{ color: "rgb(var(--accent-base))" }}>pros who live off this</span> use.
-              </>
-            )}
-          </h2>
-          <p
-            className="mt-5 mb-8"
-            style={{
-              fontSize: "clamp(1rem, 1.3vw, 1.12rem)",
-              lineHeight: 1.62,
-              color: "var(--ink-2)",
-              maxWidth: "36em",
-            }}
-          >
-            {es
-              ? "No gráficos bonitos. Ratios que correlacionan con la consistencia a largo plazo: lo que separa un edge real de una racha."
-              : "Not pretty charts. Ratios that correlate with long-term consistency: what separates a real edge from a streak."}
-          </p>
+              {es
+                ? "No gráficos bonitos. Ratios que correlacionan con la consistencia a largo plazo: lo que separa un edge real de una racha."
+                : "Not pretty charts. Ratios that correlate with long-term consistency: what separates a real edge from a streak."}
+            </p>
+          </Reveal>
           {/* T2c — `gap-4` (16 px) en vez de `gap-3` (12 px): las tarjetas
               2×2 ya no se pegan en móvil y el número grande (19 px / 700)
-              no roza la etiqueta. */}
+              no roza la etiqueta.
+              P1 — envoltorio Reveal stagger 0.18 para que las 4 KPIs
+              entren en escena como bloque coordinado, no como lista
+              asíncrona. El stagger interno entre las 4 tiles se logra con
+              el `delay` único del wrapper (no por tile): en móvil las 4 se
+              asientan a la vez, leyendo como placa de ratios, no como
+              cascada decorativa. */}
+          <Reveal delay={0.18}>
           <ul className="m-0 p-0 list-none grid grid-cols-2 gap-4">
             {[
               { l: "Sharpe", v: "3,34", c: "rgb(var(--pnl-pos))" },
@@ -129,6 +143,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               </li>
             ))}
           </ul>
+          </Reveal>
         </div>
 
         {/* Distribución de R */}

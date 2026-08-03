@@ -118,10 +118,11 @@ export function Hero() {
           style={{
             fontSize: "clamp(2rem, 7.4vw, 5.4rem)",
             fontWeight: 600,
-            lineHeight: 1.02,
+            lineHeight: 1.04,
             letterSpacing: "-0.035em",
             color: "var(--ink)",
             maxWidth: "16em",
+            textWrap: "balance",
             textRendering: "optimizeLegibility",
             WebkitFontSmoothing: "antialiased",
           }}
@@ -149,19 +150,26 @@ export function Hero() {
             en el estilo del producto —idéntica a la de antes— y filete
             doble en el clásico, que es el remate con el que un libro
             impreso cierra un bloque. Misma función, dos vocabularios. */}
-        <div data-seq aria-hidden className="tj-rule mt-8 w-full" />
+        <div data-seq aria-hidden className="tj-rule mt-7 w-full" />
 
-        {/* ---- Entradilla + CTA, en dos columnas sobre la rejilla ---- */}
-        <div className="mt-8 grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26em)]">
+        {/* ---- Entradilla + CTA, en dos columnas sobre la rejilla ----
+            P1 — ritmo vertical reequilibrado: `mt-7` (28 px) entre
+            titular → regla y regla → entradilla (era `mt-8` 32 px en
+            ambos, lo que dejaba 64 px de aire después del H1 y se leía
+            como hueco muerto). `gap-y-7` en móvil (era 8) reduce el
+            salto entre la entradilla y la columna de CTAs cuando se
+            apilan, sin tocar el `gap-x-10` del escritorio. */}
+        <div className="mt-7 grid gap-x-10 gap-y-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,26em)]">
           <div data-seq>
             <p
               className="m-0 break-words"
               style={{
                 fontSize: "clamp(1.05rem, 2vw, 1.5rem)",
                 fontWeight: 300,
-                lineHeight: 1.3,
+                lineHeight: 1.4,
                 color: "color-mix(in oklab, var(--ink) 86%, transparent)",
                 maxWidth: "20em",
+                textWrap: "balance",
               }}
             >
               {es
@@ -194,11 +202,20 @@ export function Hero() {
               alineación con `items-center` (móvil, apilados y centrados) →
               `sm:items-center` (sm-md, lado a lado) → `lg:items-end`
               (escritorio, apilados a la derecha en la columna estrecha).
-              El gap es 12 px en todos los puntos de quiebre. */}
-          <div data-seq className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-start lg:flex-col lg:items-end lg:self-end">
+
+              P1 — gap entre CTAs subido de `gap-3` (12 px) a `gap-3.5`
+              (14 px): paridad con FinalCTANew. Las transiciones pasan de
+              `transition-colors duration-150` a `transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]` + `hover:-translate-y-0.5` para que el lift del hover sea el mismo gesto que el de las tarjetas KPI y los bento cards, manteniendo la consistencia del lenguaje de interacción en toda la home. El `min-w-[180px]` asegura que el botón secundario no quede visualmente enano frente al primario en móvil — los dos leen como un par coordinado.
+              P1-r2 — altura `h-[50px]` → `h-[52px]`: paridad exacta con
+              FinalCTANew (que ya estaba en 52 px). Unificar la altura del
+              CTA primario/secundario entre las dos secciones de compra
+              (Hero arriba, FinalCTA abajo) refuerza la lectura de par
+              coordinado a lo largo de la página y elimina el salto visual
+              de 2 px entre las dos llamadas a la acción principales. */}
+          <div data-seq className="flex flex-col items-center gap-3.5 sm:flex-row sm:items-center sm:justify-start lg:flex-col lg:items-end lg:self-end">
             <Link
               href="/pricing"
-              className="inline-flex h-[50px] w-fit items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              className="inline-flex h-[52px] min-w-[180px] w-fit items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
               style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
             >
               {es ? "Comprar — desde 29 $" : "Buy — from $29"}
@@ -206,7 +223,7 @@ export function Hero() {
             </Link>
             <Link
               href="/demo"
-              className="inline-flex h-[50px] w-fit items-center justify-center gap-2.5 rounded-[4px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
+              className="inline-flex h-[52px] min-w-[180px] w-fit items-center justify-center gap-2.5 rounded-[4px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
               style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
             >
               <Play size={14} fill="currentColor" aria-hidden />
@@ -219,10 +236,17 @@ export function Hero() {
             Sustituye a la fila de distintivos con puntos de acento. Cada
             dato es una pareja etiqueta/valor separada por reglas
             hairline: se lee como la placa de un instrumento, no como una
-            fila de sellos de confianza. */}
+            fila de sellos de confianza.
+
+            P1 — `mt-14` (56 px) → `mt-12` (48 px): la placa se
+            separaba demasiado de la entradilla en móvil (la columna de
+            CTAs apilada dejaba un hueco de aire antes de la regla superior
+            de la placa). 48 px conserva la jerarquía sin abrir un hueco
+            tipográfico. El `pt-5` (20 px) entre la regla y los campos se
+            mantiene: es el respiro correcto para una placa de datos. */}
         <div
           data-seq
-          className="mt-14 border-t pt-5"
+          className="mt-12 border-t pt-5"
           style={{ borderColor: "rgb(var(--divider) / 0.14)" }}
         >
           {/* Rejilla, no flex con reglas verticales. La versión anterior

@@ -181,7 +181,25 @@ export function SavingsCalculator() {
                 </button>
               ))}
             </div>
-            {/* Slider fino para el precio mensual */}
+            {/* Slider fino para el precio mensual — unified pill style */}
+            <div className="flex items-center justify-between mb-2">
+              <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+                {es ? "Precio mensual" : "Monthly price"}
+              </span>
+              <span
+                className="tnum inline-flex items-baseline px-2.5 py-0.5 rounded-full"
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "rgb(var(--accent-base))",
+                  background: "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)",
+                  border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 32%, transparent)",
+                  transition: "color 0.18s cubic-bezier(0.22,1,0.36,1)",
+                }}
+              >
+                {fmtUsd(altMonthly)}{es ? "/mes" : "/mo"}
+              </span>
+            </div>
             <input
               type="range"
               min={5}
@@ -190,23 +208,37 @@ export function SavingsCalculator() {
               value={altMonthly}
               onChange={(e) => setAltMonthly(parseInt(e.target.value))}
               className="tj-range w-full"
-              style={{ accentColor: "rgb(var(--accent-base))" }}
+              style={{ accentColor: "rgb(var(--accent-base))", height: 44 }}
               aria-label={es ? "Precio mensual de la alternativa por suscripción" : "Monthly price of subscription alternative"}
+              aria-valuemin={5}
+              aria-valuemax={50}
+              aria-valuenow={altMonthly}
             />
             <div className="flex items-center justify-between mt-1">
               <span className="tnum" style={{ fontSize: 9.5, color: "var(--ink-3)" }}>5 $</span>
-              <span className="tnum" style={{ fontSize: 14, fontWeight: 700, color: "rgb(var(--accent-base))" }}>{fmtUsd(altMonthly)}{es ? "/mes" : "/mo"}</span>
               <span className="tnum" style={{ fontSize: 9.5, color: "var(--ink-3)" }}>50 $</span>
             </div>
           </div>
 
-          {/* Años de uso */}
+          {/* Años de uso — unified pill style */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-2">
               <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
                 {es ? "Años de uso" : "Years of use"}
               </span>
-              <span className="tnum" style={{ fontSize: 14, fontWeight: 700, color: "rgb(var(--accent-base))" }}>{years} {es ? "años" : "yrs"}</span>
+              <span
+                className="tnum inline-flex items-baseline px-2.5 py-0.5 rounded-full"
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "rgb(var(--accent-base))",
+                  background: "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)",
+                  border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 32%, transparent)",
+                  transition: "color 0.18s cubic-bezier(0.22,1,0.36,1)",
+                }}
+              >
+                {years} {es ? "años" : "yrs"}
+              </span>
             </div>
             <input
               type="range"
@@ -216,8 +248,11 @@ export function SavingsCalculator() {
               value={years}
               onChange={(e) => setYears(parseInt(e.target.value))}
               className="tj-range w-full"
-              style={{ accentColor: "rgb(var(--accent-base))" }}
+              style={{ accentColor: "rgb(var(--accent-base))", height: 44 }}
               aria-label={es ? "Años de uso" : "Years of use"}
+              aria-valuemin={1}
+              aria-valuemax={10}
+              aria-valuenow={years}
             />
           </div>
         </div>
@@ -312,13 +347,16 @@ export function SavingsCalculator() {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-3 sm:px-4 py-3.5 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}
     >
       <div className="tnum relative" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>
         {label}
       </div>
-      <div className="tnum min-w-0 break-words relative" style={{ fontSize: 18, fontWeight: 700, marginTop: 4, color }}>
+      <div
+        className="tnum min-w-0 break-words relative"
+        style={{ fontSize: 18, fontWeight: 700, marginTop: 4, color, transition: "color 0.18s cubic-bezier(0.22,1,0.36,1)" }}
+      >
         {value}
       </div>
     </div>

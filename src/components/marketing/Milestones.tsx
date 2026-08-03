@@ -127,7 +127,7 @@ export function Milestones() {
                       delay: 0.1 + i * 0.1,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="relative snap-start shrink-0 w-[230px] md:w-auto md:flex-1"
+                    className="relative snap-start shrink-0 w-[230px] md:w-auto md:flex-1 min-w-0"
                   >
                     {/* Dot */}
                     <div className="relative flex items-center justify-start h-9">

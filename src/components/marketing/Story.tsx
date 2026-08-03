@@ -219,7 +219,7 @@ export function Story() {
                   />
                   <motion.div
                     whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                    className="group relative liquid-glass depth-2 rounded-card border border-transparent p-5 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
+                    className="group relative liquid-glass depth-2 rounded-card border border-transparent p-5 min-w-0 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span

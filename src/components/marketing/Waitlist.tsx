@@ -417,7 +417,7 @@ export function Waitlist() {
                           aria-invalid={status === "error"}
                           aria-describedby={status === "error" ? "waitlist-error" : undefined}
                           required
-                          className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)] disabled:opacity-60"
+                          className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)] aria-invalid:border-[rgb(var(--pnl-neg)/0.50)] aria-invalid:hover:border-[rgb(var(--pnl-neg)/0.65)] aria-invalid:focus-visible:border-[rgb(var(--pnl-neg)/0.70)] aria-invalid:focus-visible:ring-[rgb(var(--pnl-neg)/0.18)] disabled:opacity-60"
                         />
                         {/* Campo trampa — fuera de pantalla, ignorado por
                             personas. Si un bot lo rellena, el script de

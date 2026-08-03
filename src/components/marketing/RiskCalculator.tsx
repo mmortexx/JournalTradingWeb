@@ -329,7 +329,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               value={riskPct}
               onChange={(e) => setRiskPct(parseFloat(e.target.value))}
               className="tj-range w-full"
-              style={{ accentColor: "rgb(var(--accent-base))" }}
+              style={{ accentColor: "rgb(var(--accent-base))", height: 44 }}
               aria-label={es ? "Riesgo por operación en porcentaje" : "Risk per trade percentage"}
               aria-valuemin={0.25}
               aria-valuemax={3}
@@ -533,7 +533,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-3 sm:px-4 py-3.5 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{
         background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
       }}
@@ -546,7 +546,7 @@ function Result({ label, value, color }: { label: string; value: string; color: 
       </div>
       <div
         className="tnum min-w-0 break-words relative"
-        style={{ fontSize: 19, fontWeight: 700, marginTop: 4, color }}
+        style={{ fontSize: 19, fontWeight: 700, marginTop: 4, color, transition: "color 0.18s cubic-bezier(0.22,1,0.36,1)" }}
       >
         {value}
       </div>

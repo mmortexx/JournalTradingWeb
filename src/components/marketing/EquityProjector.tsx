@@ -139,7 +139,8 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
     return `M ${padX},${svgH - padY} L ` + pts.join(" L ") + ` L ${lastX.toFixed(1)},${svgH - padY} Z`;
   }, [c.curve]);
 
-  // Reusable slider with label + value
+  // Reusable slider — label + accent value pill + ≥44px touch row.
+  // Unified across all interactive tools (Risk/Equity/RMultiple/Savings/Edge).
   const slider = (
     label: string,
     value: number,
@@ -151,13 +152,20 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
     ariaLabel: string,
   ) => (
     <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
           {label}
         </span>
         <span
-          className="tnum"
-          style={{ fontSize: 14, fontWeight: 700, color: "rgb(var(--accent-base))" }}
+          className="tnum inline-flex items-baseline px-2.5 py-0.5 rounded-full"
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: "rgb(var(--accent-base))",
+            background: "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)",
+            border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 32%, transparent)",
+            transition: "color 0.18s cubic-bezier(0.22,1,0.36,1)",
+          }}
         >
           {fmtNum(value, Number.isInteger(step) ? 0 : 2)}{suffix}
         </span>
@@ -170,8 +178,11 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="tj-range w-full"
-        style={{ accentColor: "rgb(var(--accent-base))" }}
+        style={{ accentColor: "rgb(var(--accent-base))", height: 44 }}
         aria-label={ariaLabel}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={value}
       />
     </div>
   );
@@ -297,7 +308,7 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
             </svg>
           </div>
 
-          {/* Result tiles */}
+          {/* Result tiles — unified 2×2 grid, ≥16px padding, hover lift + accent border */}
           <div className="grid grid-cols-2 gap-3.5 mb-5">
             <Result label={es ? "Balance final" : "Final balance"} value={fmtUsd(c.finalBalance)} color="rgb(var(--accent-base))" />
             <Result label={es ? "Retorno total" : "Total return"} value={fmtPct(c.totalReturnPct, 0)} color={c.totalReturnPct >= 0 ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))"} />
@@ -328,13 +339,16 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-3 sm:px-4 py-3.5 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}
     >
       <div className="tnum relative" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>
         {label}
       </div>
-      <div className="tnum min-w-0 break-words relative" style={{ fontSize: 19, fontWeight: 700, marginTop: 4, color }}>
+      <div
+        className="tnum min-w-0 break-words relative"
+        style={{ fontSize: 19, fontWeight: 700, marginTop: 4, color, transition: "color 0.18s cubic-bezier(0.22,1,0.36,1)" }}
+      >
         {value}
       </div>
     </div>

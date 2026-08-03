@@ -144,10 +144,24 @@ export function DownloadCTA() {
                     : { y: -2, transition: { type: "spring", stiffness: 300, damping: 20 } }
                 }
                 whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-5 sm:px-8 py-3 rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-medium transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[rgb(var(--accent-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                // P6 — `text-sm sm:text-base` + `px-4 sm:px-5 md:px-8`: on
+                // 320px viewports the previous `text-base` + `px-5` forced
+                // "Descargar para Windows" to wrap to 2 lines (button grew
+                // from 48 → 69px tall, looked cramped). Shorter padding +
+                // text-sm keeps the label on one line at 320–390px; sm+
+                // restores the canonical text-base + px-5 padding when the
+                // viewport has room. Touch target stays ≥44px (py-3 = 24px
+                // + line ~22px = 46px).
+                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-4 sm:px-5 md:px-8 py-3 text-sm sm:text-base rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-medium transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[rgb(var(--accent-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <WindowsIcon className="shrink-0 transition-transform duration-200 group-hover:scale-105" />
-                <span className="break-words">{es ? "Descargar para Windows" : "Download for Windows"}</span>
+                {/* P6 — responsive label: short on mobile (one line), full
+                    on sm+. Both render inside the same span so the icon↔text
+                    gap stays consistent. */}
+                <span className="whitespace-nowrap">
+                  <span className="sm:hidden">{es ? "Descargar" : "Download"}</span>
+                  <span className="hidden sm:inline">{es ? "Descargar para Windows" : "Download for Windows"}</span>
+                </span>
               </motion.a>
               {/* R24-1d — promotes the offline-installer subtext from bare
                   fine print to a trust badge with a small lock icon prefix

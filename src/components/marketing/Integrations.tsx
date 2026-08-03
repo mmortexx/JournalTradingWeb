@@ -70,7 +70,7 @@ export function Integrations() {
                 ease: [0.22, 1, 0.36, 1],
               }}
               whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="group relative liquid-glass depth-1 rounded-card border border-transparent p-4 h-full flex flex-col gap-3 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)]"
+              className="group relative liquid-glass depth-1 rounded-card border border-transparent p-4 h-full min-w-0 flex flex-col gap-3 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)]"
             >
               {/* Row: monogram mark (left) + CSV chip (right). */}
               <div className="relative flex items-center justify-between">

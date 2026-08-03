@@ -124,7 +124,7 @@ export function Gallery() {
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {shots.map((shot, i) => (
             <Reveal key={shot.src} delay={i * 0.06}>
-              <figure className="group relative">
+              <figure className="group relative min-w-0">
                 {/* Anchor wraps ONLY the WindowFrame (not the caption) so
                     the focus ring + click target are scoped to the frame,
                     and the accent glow below is also scoped to the frame

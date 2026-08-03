@@ -389,21 +389,22 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
             >
               <CheckIcon delay={0.3 + i * 0.06} />
             </span>
-            <span className="text-secondary leading-relaxed min-w-0 break-words">{f}</span>
+            <span className="text-secondary leading-[1.6] min-w-0 break-words">{f}</span>
           </li>
         ))}
       </ul>
 
-      {/* CTA — auto-width primary high-contrast button (≤260px) centered
-          under the feature list. Both Core and Pro use the same primary
-          treatment (white-on-dark in dark theme, near-black on paper in
-          light theme); the Pro card differentiates via the gradient-border +
-          glow + accent rail + "Más popular" pill rather than via its CTA
-          (restrained Anthropic-grade differentiation). `h-12` keeps the
-          tap target at 48px (≥44px floor). `w-fit max-w-[260px]` makes the
-          button auto-width on every breakpoint instead of stretching as a
-          full-width bar (the user complaint) — `mx-auto` via the flex
-          justify-center parent centers it under the price column. */}
+      {/* CTA — auto-width primary button (≤260px) centered under the feature
+          list. Per the P7 spec, the Pro plan's primary action uses the brand
+          gold accent fill (accent-base bg + accent-ink text) so the
+          recommended tier reads as the dominant CTA on the page; Core keeps
+          the restrained dark primary treatment so the two CTAs read as a
+          clear hierarchy (Pro = accent / Core = neutral) rather than a pair
+          of identical buttons. `h-12` keeps the tap target at 48px (≥44px
+          floor). `w-fit max-w-[260px]` makes the button auto-width on every
+          breakpoint instead of stretching as a full-width bar (the user
+          complaint) — `mx-auto` via the flex justify-center parent centers
+          it under the price column. */}
       <motion.div
         whileTap={{ scale: 0.98, transition: { type: "spring", stiffness: 400, damping: 25 } }}
         className="mt-8 flex justify-center"
@@ -413,7 +414,15 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         <MagneticButton
           href="#"
           strength={0.18}
-          className="group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[var(--bg)] shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className={
+            // Pro: gold accent fill + accent-ink text + accent-tinted hover
+            // (deepens to accent-hover, never drops contrast). Core: dark
+            // primary surface (txt-primary bg + bg text) with the same
+            // shadow + lift treatment for visual parity.
+            isPro
+              ? "group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-semibold transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] shadow-[0_1px_2px_rgb(var(--accent-base)/0.25)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgb(var(--accent-base)/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              : "group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[var(--bg)] shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          }
         >
           {plan.cta}
           <svg

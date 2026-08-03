@@ -217,8 +217,13 @@ export function WindowChrome() {
       <div className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 min-w-0 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <AppIcon />
+          {/* App name — visible on mobile too (was `hidden sm:inline`).
+              Without it the mobile title bar showed just an 18px icon + 3
+              caption buttons with 130px of dead space between them — the
+              window read as untitled. "CountPips" at 13px is ~70px wide,
+              fills the dead space without crowding the caption buttons. */}
           <span
-            className="text-[13px] font-semibold text-primary hidden sm:inline truncate min-w-0"
+            className="text-[13px] font-semibold text-primary truncate min-w-0"
             style={{
               fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
             }}

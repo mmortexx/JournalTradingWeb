@@ -94,6 +94,10 @@ const FeaturesBento = dynamic(
   () => import("@/components/marketing/FeaturesBento").then((m) => m.FeaturesBento),
   { loading: () => sectionFallback }
 );
+const FeatureExplorer = dynamic(
+  () => import("@/components/marketing/FeatureExplorer").then((m) => m.FeatureExplorer),
+  { loading: () => sectionFallback }
+);
 const Gallery = dynamic(
   () => import("@/components/marketing/Gallery").then((m) => m.Gallery),
   { loading: () => sectionFallback }
@@ -134,6 +138,7 @@ export default function FeaturesPage() {
       {/* Overview sections — broad strokes. Deep dives moved to
           /features/metricas, /features/disciplina, /features/seguridad. */}
       <FeaturesBento num="01" />
+      <FeatureExplorer num="02" />
 
       <PlateInterlude index={0} />
       <Gallery />

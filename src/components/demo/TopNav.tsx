@@ -173,10 +173,17 @@ export function TopNav() {
               // incluso cuando la etiqueta está oculta (solo icono). En sm+,
               // el texto le da al botón ancho de sobra y la restricción es
               // inofensiva. `justify-center` centra el icono en móvil.
-              className={`relative h-full min-w-[44px] sm:min-w-0 px-3 sm:px-4 flex items-center justify-center sm:justify-start gap-2 text-[13px] transition-colors whitespace-nowrap outline-none focus-visible:ring-1 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:-ring-offset-1 ${
+              //
+              // Active state on mobile: icon-only tabs need a clearer active
+              // signal than the 3px gold bar alone (which reads at ~20px on a
+              // 44px button). A subtle accent-tinted background pill (mobile
+              // only, `sm:bg-transparent` resets it) + the gold bar reads as
+              // "selected" the way iOS/Material tab bars do. The bar also
+              // bumps from w-5 → w-6 on mobile for visibility.
+              className={`relative h-full min-w-[44px] sm:min-w-0 px-3 sm:px-4 flex items-center justify-center sm:justify-start gap-2 text-[13px] transition-colors whitespace-nowrap outline-none focus-visible:ring-1 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:-ring-offset-1 rounded-md sm:rounded-none ${
                 active
-                  ? "text-primary"
-                  : "text-secondary hover:text-primary"
+                  ? "text-primary bg-[rgb(var(--accent-base)/0.10)] sm:bg-transparent"
+                  : "text-secondary hover:text-primary hover:bg-[rgb(var(--divider)/0.04)] sm:hover:bg-transparent"
               }`}
             >
               <svg
@@ -196,13 +203,13 @@ export function TopNav() {
               <span className="hidden sm:inline">{label}</span>
               {/* Indicador nativo del NavigationView: barrita de acento
                   corta y centrada bajo el item, no un subrayado de borde a
-                  borde. `left-1/2 -translate-x-1/2 w-5` reproduce el ancho
-                  fijo del indicador de WinUI (20 px, ligeramente más visible
-                  que el anterior de 16 px en pantallas táctiles pequeñas). */}
+                  borde. `left-1/2 -translate-x-1/2 w-6 sm:w-5` reproduce el
+                  ancho fijo del indicador de WinUI (24 px en móvil para
+                  mejor visibilidad sobre iconos sin etiqueta, 20 px en sm+). */}
               {active && (
                 <span
                   aria-hidden="true"
-                  className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full"
+                  className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-6 sm:w-5 h-[3px] rounded-full"
                   style={{ background: "rgb(var(--accent-base))" }}
                 />
               )}

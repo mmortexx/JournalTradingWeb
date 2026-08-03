@@ -109,7 +109,7 @@ export function BeforeAfter() {
               // edge reads as a hard “past / avoided” signal even at the
               // rest opacity (0.7); previously the border faded almost to
               // invisible against the dark backdrop.
-              className="relative flex-1 rounded-card liquid-glass depth-2 overflow-hidden border border-pnl-neg/30 saturate-[0.85] transition-shadow duration-300"
+              className="relative flex-1 min-w-0 rounded-card liquid-glass depth-2 overflow-hidden border border-pnl-neg/30 saturate-[0.85] transition-shadow duration-300"
             >
               {/* Soft red wash */}
               <div
@@ -199,7 +199,7 @@ export function BeforeAfter() {
               // acento redundante con el propio borde — se retiró; la
               // elevación pasa a ser la neutra `depth-2`, igual que la
               // tarjeta "antes").
-              className="relative flex-1 rounded-card liquid-glass depth-2 overflow-hidden border border-[rgb(var(--accent-base)/0.28)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="relative flex-1 min-w-0 rounded-card liquid-glass depth-2 overflow-hidden border border-[rgb(var(--accent-base)/0.28)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
             >
               {/* Accent wash */}
               <div

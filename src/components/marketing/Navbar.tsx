@@ -538,8 +538,26 @@ export function Navbar() {
                     // contraste AA se preserva incluso a 72%. Se retira
                     // el background/backdropFilter inline (mandaba el
                     // 96% opaco previo) para que el material luzca.
+                    //
+                    // P8 — `position: "absolute"` inline es NO NEGOCIABLE.
+                    // `.tj-paper` en globals.css declara `position: relative`
+                    // (linea 3298) para que su `::before` (.tj-paper-glow)
+                    // y sus inset box-shadows se anclen al propio elemento.
+                    // Esa regla tiene la misma especificidad que la utilidad
+                    // `absolute` de Tailwind, pero cae MÁS TARDE en el
+                    // cascade (globals.css se importa después de
+                    // @tailwindcss), así que la hereda y el panel acaba
+                    // renderizándose en flujo normal — ocupando el espacio
+                    // debajo del botón en vez de flotar. El panel medía
+                    // y=-18..123 (solapando el navbar 0..56) en lugar de
+                    // y=70..211 (flotando debajo). Inline style gana a
+                    // cualquier regla externa sin `!important`, así que
+                    // este es el fix mínimo y estable: ni tocar globals.css
+                    // ni añadir `!absolute` (que rompería el patrón si
+                    // Tailwind v4 cambiara el modificador).
                     className="tj-paper tj-paper-glow absolute left-1/2 w-[520px] max-w-[calc(100vw-3rem)] origin-top rounded-[8px] border p-2"
                     style={{
+                      position: "absolute",
                       top: "calc(100% + 14px)",
                       x: "-50%",
                       borderColor: "rgb(var(--divider) / 0.13)",
@@ -784,13 +802,29 @@ export function Navbar() {
               // propio backdrop-filter (no queremos duplicarlo ni
               // pelear especificidad). El footer del drawer hereda
               // `safe-bottom` en su contenedor interno.
+              //
+              // P8 — `style={{ position: "fixed" }}` inline. `.tj-paper`
+              // en globals.css (línea 3298) declara `position: relative`
+              // para anclar su `::before`/`::after`/inset shadows al
+              // propio elemento; misma especificidad que la utilidad
+              // `fixed` de Tailwind pero más tarde en el cascade → la
+              // hereda. Sin este override el drawer acababa en flujo
+              // normal (x=0, y=68, h=652, izquierda del viewport) en
+              // vez de fijado a la derecha (top:0 right:0 bottom:0,
+              // altura completa). Mismo patrón que CookieConsent.tsx
+              // (línea 138) usa para el mismo conflicto. Inline style
+              // gana a cualquier regla externa sin `!important`.
               className="tj-paper safe-top fixed top-0 right-0 bottom-0 z-[60] flex w-[300px] max-w-[84vw] flex-col border-l border-[rgb(var(--divider)/0.1)] outline-none md:hidden"
+              style={{ position: "fixed" }}
             >
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-[rgb(var(--divider)/0.06)] px-5">
                 <Link
                   href="/"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+                  // P8 — `min-h-[44px]` iguala el suelo táctil del botón
+                  // "Cerrar" contiguo (también h-11). Antes la marca medía
+                  // 32 px (solo el glifo), por debajo del mínimo móvil.
+                  className="flex min-h-[44px] items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
                   aria-label={t("appName")}
                 >
                   <BrandMark />

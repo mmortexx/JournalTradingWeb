@@ -244,7 +244,7 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
                         <button
                           key={oi}
                           onClick={() => setAnswers((a) => a.map((v, i) => (i === qi ? oi : v)))}
-                          className="text-left min-h-[44px] px-3.5 py-2.5 rounded-[6px] text-[13px] leading-[1.35] transition-[background,border-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+                          className="text-left min-h-[44px] px-3.5 py-2.5 rounded-[6px] text-[13px] leading-[1.35] transition-[background,border-color,color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
                           style={{
                             background: active
                               ? "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)"

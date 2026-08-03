@@ -49,6 +49,7 @@ export function ParticleField({
     let ps: P[] = [];
     let raf = 0;
     let mouse = { x: -9999, y: -9999 };
+    let visible = true;
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
@@ -75,6 +76,15 @@ export function ParticleField({
     }
 
     function draw() {
+      // Pause the loop when the tab is hidden — the rAF would be throttled
+      // to 1fps anyway, but skipping the work keeps the particle state from
+      // drifting (the mouse-repel math would compound against stale cursor
+      // positions) and frees the main thread for whatever the visitor is
+      // actually doing in the other tab.
+      if (!visible) {
+        raf = requestAnimationFrame(draw);
+        return;
+      }
       ctx.clearRect(0, 0, W, H);
       const c = color();
       for (const p of ps) {
@@ -129,6 +139,8 @@ export function ParticleField({
     const parent = canvas.parentElement;
 
     resize();
+    const onVis = () => { visible = !document.hidden; };
+    document.addEventListener("visibilitychange", onVis);
     window.addEventListener("resize", resize);
     if (!reduce) {
       window.addEventListener("mousemove", onMove);
@@ -140,6 +152,7 @@ export function ParticleField({
 
     return () => {
       cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMove);
       parent?.removeEventListener("mouseleave", onLeave);
