@@ -1,17 +1,46 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useLang } from "@/lib/i18n";
 
 /**
- * RiskCalculator — sección § 04·c del HTML. Calculadora interactiva:
- * slider de riesgo %, chips de plantilla, chips de balance, muestra
- * resultados: riesgo $, tamaño, R:R, beneficio y barra riesgo/beneficio.
+ * RiskCalculator — calculadora de tamaño de posición REAL e interactiva.
  *
- * Estado local con useState + useMemo para los cálculos.
+ * Antes era una demo de valores fijos (entry 100 / stop 95 / target 115).
+ * Ahora el trader introduce SU operación: balance, riesgo %, entrada,
+ * stop y objetivo. Se calcula en vivo: riesgo $, tamaño (unidades),
+ * beneficio, R:R, valor de la posición y % del balance comprometido.
  *
- * `num` — ordinal del eyebrow. Por defecto el de la home ("04·c"); las
- * páginas internas pasan el suyo para mantener su propia secuencia.
+ * ── Cómo se calcula ───────────────────────────────────────────────────
+ *   riskPerShare   = |entry − stop|     (vale para largo y corto)
+ *   rewardPerShare = |target − entry|
+ *   rr             = rewardPerShare / riskPerShare
+ *   riskUsd        = balance · riskPct / 100
+ *   size           = riskUsd / riskPerShare
+ *   profit         = size · rewardPerShare
+ *   positionValue  = size · entry
+ *   positionPct    = positionValue / balance · 100
+ *
+ * Usar valores absolutos para risk/reward per share permite que la
+ * misma calculadora sirva para largos (stop < entry) y cortos
+ * (stop > entry) sin un conmutador de dirección.
+ *
+ * ── Validación ────────────────────────────────────────────────────────
+ * Si riskPerShare ≤ 0 (entry == stop) o rewardPerShare ≤ 0 (target ==
+ * entry), no se puede calcular el tamaño: se muestra un aviso inline en
+ * vez de NaN/Infinity. Los campos siguen siendo editables.
+ *
+ * ── Material ──────────────────────────────────────────────────────────
+ * La tarjeta usa `.tj-paper` (papel translúcido cálido) + `.tj-paper-glow`
+ * (halo champagne) para cohesión con el resto del sitio. Los chips de
+ * plantilla/balance mantienen ≥44 px de touch target.
+ *
+ * ── Copiar plan ───────────────────────────────────────────────────────
+ * Un botón "Copiar plan" lleva al portapapeles un resumen de texto plano
+ * con todos los parámetros y resultados — listo para pegar en el diario
+ * de CountPips. Refuerza el mensaje "mide antes de operar".
+ *
+ * `num` — ordinal del eyebrow (las páginas internas pasan el suyo).
  */
 export function RiskCalculator({ num = "04·c" }: { num?: string }) {
   const { lang } = useLang();
@@ -28,41 +57,47 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
     { label: "25k $", v: 25000 },
   ];
 
+  // ── Estado editable: la operacion del usuario ─────────────────────
   const [riskPct, setRiskPct] = useState(1.0);
   const [balance, setBalance] = useState(10000);
+  const [entry, setEntry] = useState(100);
+  const [stop, setStop] = useState(95);
+  const [target, setTarget] = useState(115);
+  const [copied, setCopied] = useState(false);
 
-  // Entrada / Stop / Target fijos como en el HTML.
-  const entry = 100;
-  const stop = 95;
-  const target = 115;
-  const riskPerShare = entry - stop; // 5
-  const rewardPerShare = target - entry; // 15
-  const rr = rewardPerShare / riskPerShare; // 3
-  const riskUsd = (balance * riskPct) / 100;
-  const size = riskUsd / riskPerShare;
-  const profit = size * rewardPerShare;
-  const profitPct = (profit / balance) * 100;
+  // ── Cálculo en vivo (abs-value → largo y corto) ───────────────────
+  const c = useMemo(() => {
+    const riskPerShare = Math.abs(entry - stop);
+    const rewardPerShare = Math.abs(target - entry);
+    const valid = riskPerShare > 0 && rewardPerShare > 0 && entry > 0;
+    const rr = valid ? rewardPerShare / riskPerShare : 0;
+    const riskUsd = (balance * riskPct) / 100;
+    const size = valid ? riskUsd / riskPerShare : 0;
+    const profit = valid ? size * rewardPerShare : 0;
+    const profitPct = (profit / balance) * 100;
+    const positionValue = valid ? size * entry : 0;
+    const positionPct = (positionValue / balance) * 100;
+    // ¿Es corto? stop > entry → Long/Short hint.
+    const direction = entry > 0 && stop > entry ? "short" : "long";
+    return { riskPerShare, rewardPerShare, valid, rr, riskUsd, size, profit, profitPct, positionValue, positionPct, direction };
+  }, [entry, stop, target, balance, riskPct]);
 
   const fmtUsd = (n: number) =>
     es
       ? new Intl.NumberFormat("es-ES", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
       : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
-  // Anchos de las barras Riesgo / Beneficio normalizados.
-  const max = Math.max(riskUsd, profit, 1);
-  const riskW = (riskUsd / max) * 100;
-  const profitW = (profit / max) * 100;
-
   const fmtNum = (n: number, dec = 2) =>
     es
       ? new Intl.NumberFormat("es-ES", { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n)
       : new Intl.NumberFormat("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
 
+  // Anchos de las barras Riesgo / Beneficio normalizados.
+  const max = Math.max(c.riskUsd, c.profit, 1);
+  const riskW = (c.riskUsd / max) * 100;
+  const profitW = (c.profit / max) * 100;
+
   const chipStyle = (active: boolean): React.CSSProperties => ({
-    /* T2g — minHeight 44 + padding 12/18 guarantees the ≥44 px touch
-       target on the risk/balance chips (was 30 px with padding 8/14,
-       below the spec floor). lineHeight 1.2 keeps the label on one
-       line; fontSize 12 is unchanged. */
     fontSize: 12,
     lineHeight: 1.2,
     minHeight: 44,
@@ -79,11 +114,71 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
       : "1px solid rgb(var(--divider) / 0.13)",
   });
 
+  // ── Input numérico reutilizable (≥44 px, tnum, label) ─────────────
+  const numInput = (label: string, value: number, onChange: (n: number) => void, ariaLabel: string) => (
+    <label className="block min-w-0">
+      <span
+        className="tnum block"
+        style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)", marginBottom: 4 }}
+      >
+        {label}
+      </span>
+      <input
+        type="number"
+        inputMode="decimal"
+        step="any"
+        min={0}
+        value={Number.isFinite(value) ? value : ""}
+        onChange={(e) => {
+          const v = parseFloat(e.target.value);
+          onChange(Number.isFinite(v) ? v : 0);
+        }}
+        aria-label={ariaLabel}
+        className="tnum w-full min-h-[44px] rounded-[6px] outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] transition-colors"
+        style={{
+          fontSize: 16,
+          fontWeight: 600,
+          color: "var(--ink)",
+          background: "color-mix(in oklab, var(--surface-2) 60%, transparent)",
+          border: "1px solid rgb(var(--divider) / 0.13)",
+          padding: "8px 12px",
+        }}
+      />
+    </label>
+  );
+
+  // ── Copiar plan al portapapeles ───────────────────────────────────
+  const copyPlan = useCallback(async () => {
+    if (!c.valid) return;
+    const lines = [
+      es ? "Plan de operación — CountPips" : "Trade plan — CountPips",
+      "─".repeat(28),
+      `${es ? "Balance" : "Balance"}: ${fmtUsd(balance)}`,
+      `${es ? "Riesgo" : "Risk"}: ${fmtNum(riskPct)} % (${fmtUsd(c.riskUsd)})`,
+      `${es ? "Entrada" : "Entry"}: ${fmtNum(entry)}`,
+      `${es ? "Stop" : "Stop"}: ${fmtNum(stop)}`,
+      `${es ? "Objetivo" : "Target"}: ${fmtNum(target)}`,
+      `${es ? "Dirección" : "Direction"}: ${c.direction === "short" ? (es ? "Corto" : "Short") : (es ? "Largo" : "Long")}`,
+      "─".repeat(28),
+      `${es ? "Tamaño" : "Size"}: ${fmtNum(c.size, 2)} u`,
+      `${es ? "R:R" : "R:R"}: ${fmtNum(c.rr, 2)} : 1`,
+      `${es ? "Beneficio" : "Profit"}: ${fmtUsd(c.profit)} (${fmtNum(c.profitPct, 1)} %)`,
+      `${es ? "Valor posición" : "Position value"}: ${fmtUsd(c.positionValue)} (${fmtNum(c.positionPct, 1)} % ${es ? "del balance" : "of balance"})`,
+    ];
+    try {
+      await navigator.clipboard.writeText(lines.join("\n"));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      // clipboard no disponible — aviso silencioso
+    }
+  }, [c, balance, riskPct, entry, stop, target, es, fmtUsd, fmtNum]);
+
   return (
     <section
       className="section-tight bg-veil border-t border-[rgb(var(--divider)/0.06)]"
     >
-      <div className="max-w-[1240px] mx-auto px-5 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+      <div className="tj-container grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         <div>
           <div className="inline-flex items-center gap-3 mb-5">
             <span
@@ -131,8 +226,8 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             }}
           >
             {es
-              ? "Configura tu balance y tu plan. Te decimos cuánto arriesgar, cuántas unidades y dónde poner el stop."
-              : "Set your balance and your plan. We tell you how much to risk, how many units, and where to place your stop."}
+              ? "Introduce tu balance y tu operacion. Te decimos cuántas unidades, cuánto arriesgas y dónde poner el stop. Vale para largos y cortos."
+              : "Enter your balance and your trade. We tell you how many units, how much you risk, and where to place your stop. Works for longs and shorts."}
           </p>
           {/* Chips de plantilla */}
           <div className="mb-4">
@@ -180,17 +275,13 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
           </div>
         </div>
 
-        {/* Tarjeta calculadora */}
+        {/* Tarjeta calculadora — papel translúcido cálido */}
         <div
-          className="relative"
+          className="tj-paper tj-paper-glow relative"
           style={{
             padding: 24,
             borderRadius: 8,
             border: "1px solid rgb(var(--divider) / 0.13)",
-            background: "color-mix(in oklab, var(--surface) 60%, transparent)",
-            backdropFilter: "blur(20px) saturate(1.4)",
-            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-            boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.08)",
           }}
         >
           {/* Slider de riesgo */}
@@ -202,11 +293,6 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               >
                 {es ? "Riesgo por operación" : "Risk per trade"}
               </span>
-              {/* R24-1c: the slider value now sits inside an accent-tinted
-                  pill (bg accent/12 + border accent/35) with a soft accent
-                  glow halo, so the large accent number reads as a stamped
-                  live figure rather than floating text that visually
-                  competes with the slider track below. */}
               <span
                 className="tnum inline-flex items-baseline gap-1"
                 style={{
@@ -222,12 +308,6 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
                 {fmtNum(riskPct)} %
               </span>
             </div>
-            {/* R24-1c: filled progress track — a thin bar above the native
-                input that fills accent from 0% to the current riskPct
-                position so the slider reads as a meter (the native input’s
-                track styling in .tj-range is browser-thin and doesn’t
-                visually convey “how far along the range you are”). Width =
-                (riskPct − min) / (max − min) × 100. */}
             <div
               className="relative h-1 rounded-[3px] mb-1.5 overflow-hidden"
               style={{ background: "rgb(var(--divider) / 0.13)" }}
@@ -248,11 +328,6 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               step={0.05}
               value={riskPct}
               onChange={(e) => setRiskPct(parseFloat(e.target.value))}
-              // R20-3b: .tj-range in globals.css swaps the default thumb for a
-              // token-driven accent disc with inset highlight + glow ring on
-              // hover/focus. accent-color kept as a fallback for any browser
-              // that ignores ::-webkit-slider-thumb (Safari < 14, very old
-              // Firefox) so the slider never falls back to the OS default.
               className="tj-range w-full"
               style={{ accentColor: "rgb(var(--accent-base))" }}
               aria-label={es ? "Riesgo por operación en porcentaje" : "Risk per trade percentage"}
@@ -268,49 +343,101 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             </div>
           </div>
 
-          {/* Entrada / Stop / Target */}
+          {/* Entrada / Stop / Target — EDITABLES */}
           <div
-            className="grid grid-cols-3 gap-2 p-3 rounded-[8px] mb-5"
+            className="grid grid-cols-3 gap-2 p-3 rounded-[8px] mb-4"
             style={{
               background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
               border: "1px solid rgb(var(--divider) / 0.06)",
             }}
           >
-            {[
-              { l: es ? "Entrada" : "Entry", v: entry.toString() },
-              { l: es ? "Stop" : "Stop", v: stop.toString() },
-              { l: es ? "Objetivo" : "Target", v: target.toString() },
-            ].map((f) => (
-              <div key={f.l}>
-                <div
-                  className="tnum"
-                  style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}
-                >
-                  {f.l}
-                </div>
-                <div className="tnum" style={{ fontSize: 16, fontWeight: 600, marginTop: 2, color: "var(--ink)" }}>{f.v}</div>
-              </div>
-            ))}
+            {numInput(es ? "Entrada" : "Entry", entry, setEntry, es ? "Precio de entrada" : "Entry price")}
+            {numInput(es ? "Stop" : "Stop", stop, setStop, es ? "Precio de stop loss" : "Stop loss price")}
+            {numInput(es ? "Objetivo" : "Target", target, setTarget, es ? "Precio objetivo take profit" : "Take profit target price")}
           </div>
 
-          {/* Resultados — R20-3b: gap-3 → gap-3.5 + Result card padding
-              bumped from p-3 to px-4 py-3.5 so each cell breathes and the
-              2×2 grid reads as four tappable stat tiles instead of a packed
-              table. Bottom margin preserved (mb-5) so the per-trade bar
-              below keeps its anchor separation. */}
+          {/* Aviso de validación + dirección */}
+          {!c.valid ? (
+            <div
+              className="mb-4 rounded-[6px] px-3 py-2.5 text-[12px] leading-[1.5]"
+              style={{
+                background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",
+                border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 30%, transparent)",
+                color: "rgb(var(--pnl-neg))",
+              }}
+              role="alert"
+            >
+              {es
+                ? "Entrada, stop y objetivo deben ser distintos y positivos para calcular el tamaño."
+                : "Entry, stop and target must be distinct and positive to calculate size."}
+            </div>
+          ) : (
+            <div
+              className="mb-4 flex items-center gap-2 text-[11px] tnum"
+              style={{ color: "var(--ink-3)", letterSpacing: "0.06em" }}
+            >
+              <span
+                aria-hidden
+                className="inline-flex items-center justify-center rounded-full"
+                style={{
+                  width: 16, height: 16,
+                  background: c.direction === "short"
+                    ? "color-mix(in oklab, rgb(var(--pnl-neg)) 16%, transparent)"
+                    : "color-mix(in oklab, rgb(var(--pnl-pos)) 16%, transparent)",
+                  color: c.direction === "short" ? "rgb(var(--pnl-neg))" : "rgb(var(--pnl-pos))",
+                  fontSize: 10, fontWeight: 700,
+                }}
+              >
+                {c.direction === "short" ? "↓" : "↑"}
+              </span>
+              {c.direction === "short"
+                ? (es ? "Operación en corto detectada" : "Short trade detected")
+                : (es ? "Operación en largo detectada" : "Long trade detected")}
+            </div>
+          )}
+
+          {/* Resultados */}
           <div className="grid grid-cols-2 gap-3.5 mb-5">
-            <Result label={es ? "Riesgo $" : "Risk $"} value={fmtUsd(riskUsd)} color="rgb(var(--pnl-neg))" />
-            <Result label={es ? "Beneficio" : "Profit"} value={fmtUsd(profit)} color="rgb(var(--pnl-pos))" />
-            <Result label={es ? "Tamaño" : "Size"} value={`${fmtNum(size, 2)} ${es ? "u" : "u"}`} color="var(--ink)" />
-            <Result label="R:R" value={`${fmtNum(rr, 2)} : 1`} color="rgb(var(--accent-base))" />
+            <Result label={es ? "Riesgo $" : "Risk $"} value={fmtUsd(c.riskUsd)} color="rgb(var(--pnl-neg))" />
+            <Result label={es ? "Beneficio" : "Profit"} value={fmtUsd(c.profit)} color="rgb(var(--pnl-pos))" />
+            <Result label={es ? "Tamaño" : "Size"} value={`${fmtNum(c.size, 2)} u`} color="var(--ink)" />
+            <Result label="R:R" value={`${fmtNum(c.rr, 2)} : 1`} color="rgb(var(--accent-base))" />
+          </div>
+
+          {/* Stats adicionales: valor posición + % balance */}
+          <div
+            className="grid grid-cols-2 gap-2 mb-5 rounded-[6px] p-3"
+            style={{ background: "color-mix(in oklab, var(--surface-2) 40%, transparent)", border: "1px solid rgb(var(--divider) / 0.05)" }}
+          >
+            <div>
+              <div className="tnum" style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+                {es ? "Valor posición" : "Position value"}
+              </div>
+              <div className="tnum" style={{ fontSize: 14, fontWeight: 600, marginTop: 2, color: "var(--ink)" }}>
+                {fmtUsd(c.positionValue)}
+              </div>
+            </div>
+            <div>
+              <div className="tnum" style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+                {es ? "% del balance" : "% of balance"}
+              </div>
+              <div
+                className="tnum"
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  marginTop: 2,
+                  // >50% del balance en una sola posición es agresivo → aviso visual
+                  color: c.positionPct > 50 ? "rgb(var(--pnl-neg))" : "var(--ink)",
+                }}
+              >
+                {fmtNum(c.positionPct, 1)} %
+              </div>
+            </div>
           </div>
 
           {/* Barra Riesgo ↔ Beneficio */}
           <div>
-            {/* R24-1c: R:R label centered above the bar so the two-color
-                meter reads as a risk←→reward comparison rather than a single
-                stacked fill. The label sits in the same uppercase tnum style
-                as the rest of the card’s section headers. */}
             <div className="flex items-center justify-between mb-2">
               <span
                 className="tnum inline-flex items-center gap-1.5"
@@ -323,7 +450,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
                 className="tnum"
                 style={{ fontSize: 9, letterSpacing: "0.16em", color: "rgb(var(--accent-base))", fontWeight: 700 }}
               >
-                {fmtNum(rr, 2)} : 1 {es ? "R:R" : "R:R"}
+                {fmtNum(c.rr, 2)} : 1 {es ? "R:R" : "R:R"}
               </span>
               <span
                 className="tnum inline-flex items-center gap-1.5"
@@ -345,11 +472,6 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
                 className="absolute right-0 top-0 h-full"
                 style={{ width: `${profitW}%`, background: "rgb(var(--pnl-pos))" }}
               />
-              {/* R24-1c: center divider hairline so the two fills read as
-                  discrete halves (risk ← | → profit) rather than a single
-                  contiguous fill. Sits at the 50% mark via left-1/2 + a
-                  subtle vertical gradient that fades at top + bottom so
-                  the divider reads as an etched mark rather than a notch. */}
               <span
                 aria-hidden
                 className="absolute top-0 bottom-0"
@@ -362,11 +484,46 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               />
             </div>
             <div className="mt-2 flex items-center justify-between tnum" style={{ fontSize: 11, color: "var(--ink-2)" }}>
-              <span>{fmtUsd(riskUsd)}</span>
-              <span style={{ color: "var(--ink-3)" }}>{fmtNum(profitPct, 1)} % {es ? "del balance" : "of balance"}</span>
-              <span>{fmtUsd(profit)}</span>
+              <span>{fmtUsd(c.riskUsd)}</span>
+              <span style={{ color: "var(--ink-3)" }}>{fmtNum(c.profitPct, 1)} % {es ? "del balance" : "of balance"}</span>
+              <span>{fmtUsd(c.profit)}</span>
             </div>
           </div>
+
+          {/* Copiar plan — refuerzo "mide antes de operar" */}
+          <button
+            type="button"
+            onClick={copyPlan}
+            disabled={!c.valid}
+            aria-label={es ? "Copiar plan de operación al portapapeles" : "Copy trade plan to clipboard"}
+            className="mt-5 w-full sm:w-fit inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-[6px] text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{
+              background: copied
+                ? "color-mix(in oklab, rgb(var(--pnl-pos)) 16%, transparent)"
+                : "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)",
+              color: copied ? "rgb(var(--pnl-pos))" : "rgb(var(--accent-base))",
+              border: copied
+                ? "1px solid color-mix(in oklab, rgb(var(--pnl-pos)) 40%, transparent)"
+                : "1px solid color-mix(in oklab, rgb(var(--accent-base)) 35%, transparent)",
+            }}
+          >
+            {copied ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8.5l3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                {es ? "Plan copiado" : "Plan copied"}
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M3 11V3.5A1.5 1.5 0 014.5 2H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+                {es ? "Copiar plan" : "Copy plan"}
+              </>
+            )}
+          </button>
         </div>
       </div>
     </section>
@@ -376,9 +533,6 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      // R24-1c: hover lift + accent inner ring so each Result tile reads
-      // as tappable (matches the MetricsShowcaseNew KPI tile polish).
-      // Bumped label from 9px → 10px (above the 10px floor for legibility).
       className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-3 sm:px-4 py-3.5 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{
         background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
@@ -392,14 +546,6 @@ function Result({ label, value, color }: { label: string; value: string; color: 
       </div>
       <div
         className="tnum min-w-0 break-words relative"
-        // R27-1d — bumped 17→19px so the "Beneficio" result (text-pnl-pos,
-        // #0B8B4B ≈ 3.9:1 on the Result tile surface) clears WCAG AA in
-        // light theme. At 17px/700 it failed AA normal-text (4.5:1); at
-        // 19px/700 it qualifies as WCAG "large text" (≥14pt bold) which
-        // only requires 3:1. The "Riesgo $" (pnl-neg), "Tamaño" (ink) and
-        // "R:R" (accent-base) values already passed at 17px/700 — the bump
-        // is a uniform 2px lift so all four Result tiles stay optically
-        // balanced (a per-tile size would break the grid's rhythm).
         style={{ fontSize: 19, fontWeight: 700, marginTop: 4, color }}
       >
         {value}
