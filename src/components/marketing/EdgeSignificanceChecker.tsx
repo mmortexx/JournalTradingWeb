@@ -1,0 +1,331 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { useLang } from "@/lib/i18n";
+import { Reveal } from "@/components/tj/Reveal";
+
+/**
+ * EdgeSignificanceChecker — ¿tu edge es real o suerte?
+ *
+ * El trader introduce: número de operaciones (N), win rate observado,
+ * ganancia/pérdida media en R. El componente calcula:
+ *   · expectancy en R
+ *   · z-score y p-valor de un test binomial (H0: win rate real = 50%,
+ *     es decir, "tirar una moneda")
+ *   · veredicto: ¿el edge es estadísticamente significativo (p<0.05)?
+ *   · muestra mínima recomendada para detectar ese win rate al 95% de
+ *     confianza (n = (z·z · p·(1-p)) / e·e, con e = margen ±5%)
+ *
+ * ── Por qué aquí ──────────────────────────────────────────────────────
+ * Encaja en /faq porque responde a la pregunta más frecuente de un
+ * trader novato: "tengo un 60% de aciertos en 20 operaciones, ¿tengo
+ * un edge?". La respuesta honesta es NO — 20 operaciones no bastan para
+ * distinguir un 60% real de una moneda cargada al 50%. Este tool lo
+ * muestra con números, no con opiniones.
+ *
+ * ── Honestidad estadística ────────────────────────────────────────────
+ * El test binomial asume independencia e identica distribución (iid),
+ * lo cual NUNCA es del todo cierto en trading (regímenes cambian,
+ * correlación entre operaciones). El copy lo dice: es una COTA, no una
+ * garantía. El verdadero test es el tiempo + fuera de muestra.
+ *
+ * ── Material ──────────────────────────────────────────────────────────
+ * .tj-paper + .tj-paper-glow. Touch targets ≥44px. Sin overflow mobile.
+ */
+export function EdgeSignificanceChecker({ num = "01" }: { num?: string }) {
+  const { lang } = useLang();
+  const es = lang === "es";
+
+  const [trades, setTrades] = useState(50);
+  const [winRate, setWinRate] = useState(58); // %
+  const [avgWinR, setAvgWinR] = useState(2.0);
+  const [avgLossR, setAvgLossR] = useState(1.0);
+
+  const c = useMemo(() => {
+    const wr = winRate / 100;
+    const p0 = 0.5; // hipótesis nula: win rate real = 50% (azar)
+    const n = trades;
+
+    // Expectancy en R
+    const expectancyR = wr * avgWinR - (1 - wr) * avgLossR;
+
+    // Test binomial (aproximación normal, válida para n·p0·(1-p0) ≥ 5)
+    const np0 = n * p0 * (1 - p0);
+    const canTest = np0 >= 5;
+    // z = (observedWins - expectedUnderH0) / sqrt(n·p0·(1-p0))
+    const observedWins = wr * n;
+    const expectedWins = p0 * n;
+    const se = Math.sqrt(np0);
+    const z = canTest && se > 0 ? (observedWins - expectedWins) / se : 0;
+
+    // p-valor (two-tailed, approx normal CDF via erf)
+    // p = 2 * (1 - Φ(|z|))
+    const pValue = canTest ? 2 * (1 - normalCdf(Math.abs(z))) : 1;
+
+    const significant = pValue < 0.05;
+    const strongSignificant = pValue < 0.01;
+
+    // Muestra mínima para detectar `winRate` al 95% confianza, margen ±5%
+    // n = z² · p·(1-p) / e²  con z=1.96 (95%), p=winRate, e=0.05
+    const e = 0.05;
+    const z95 = 1.96;
+    const minSample = Math.ceil((z95 * z95 * (wr) * (1 - wr)) / (e * e));
+
+    return {
+      expectancyR,
+      z,
+      pValue,
+      significant,
+      strongSignificant,
+      canTest,
+      minSample,
+      sampleAdequate: n >= minSample,
+      wins: Math.round(observedWins),
+      losses: n - Math.round(observedWins),
+    };
+  }, [trades, winRate, avgWinR, avgLossR]);
+
+  const fmtNum = (n: number, dec = 2) =>
+    es
+      ? new Intl.NumberFormat("es-ES", { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n)
+      : new Intl.NumberFormat("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
+
+  const fmtPct = (n: number, dec = 1) => `${fmtNum(n, dec)} %`;
+
+  const slider = (
+    label: string,
+    value: number,
+    min: number,
+    max: number,
+    step: number,
+    onChange: (n: number) => void,
+    suffix: string,
+    ariaLabel: string,
+  ) => (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+          {label}
+        </span>
+        <span className="tnum" style={{ fontSize: 14, fontWeight: 700, color: "rgb(var(--accent-base))" }}>
+          {fmtNum(value, Number.isInteger(step) ? 0 : 2)}{suffix}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className="tj-range w-full"
+        style={{ accentColor: "rgb(var(--accent-base))" }}
+        aria-label={ariaLabel}
+      />
+    </div>
+  );
+
+  const verdict = !c.canTest
+    ? {
+        label: es ? "Muestra insuficiente" : "Insufficient sample",
+        color: "var(--ink-2)",
+        text: es
+          ? `Con ${trades} operaciones no se puede hacer un test estadístico fiable. Necesitas al menos ~20 para que la aproximación sea válida.`
+          : `With ${trades} trades a reliable statistical test isn't possible. You need at least ~20 for the approximation to hold.`,
+      }
+    : !c.significant
+      ? {
+          label: es ? "No significativo" : "Not significant",
+          color: "rgb(var(--pnl-neg))",
+          text: es
+            ? `Un ${fmtNum(winRate, 0)}% de aciertos en ${trades} operaciones NO es estadísticamente distinto de tirar una moneda (p = ${fmtNum(c.pValue, 3)}). Podría ser suerte. Sigue operando y midiendo.`
+            : `A ${fmtNum(winRate, 0)}% win rate over ${trades} trades is NOT statistically distinct from a coin flip (p = ${fmtNum(c.pValue, 3)}). It could be luck. Keep trading and measuring.`,
+        }
+      : c.strongSignificant
+        ? {
+            label: es ? "Edge fuerte" : "Strong edge",
+            color: "rgb(var(--pnl-pos))",
+            text: es
+              ? `Un ${fmtNum(winRate, 0)}% en ${trades} operaciones es muy poco probable por azar (p = ${fmtNum(c.pValue, 4)} < 0,01). Hay algo real aquí — pero valídalo fuera de muestra.`
+              : `A ${fmtNum(winRate, 0)}% over ${trades} trades is very unlikely by chance (p = ${fmtNum(c.pValue, 4)} < 0.01). There's something real here — but validate out-of-sample.`,
+          }
+        : {
+            label: es ? "Edge moderado" : "Moderate edge",
+            color: "rgb(var(--accent-base))",
+            text: es
+              ? `Un ${fmtNum(winRate, 0)}% en ${trades} operaciones es significativo (p = ${fmtNum(c.pValue, 3)} < 0,05). Probablemente hay un edge, pero el margen es fino: acumula más operaciones para confirmarlo.`
+              : `A ${fmtNum(winRate, 0)}% over ${trades} trades is significant (p = ${fmtNum(c.pValue, 3)} < 0.05). There's likely an edge, but the margin is thin: accumulate more trades to confirm.`,
+          };
+
+  return (
+    <section className="section-tight bg-veil border-t border-[rgb(var(--divider)/0.06)]">
+      <div className="tj-container grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+        {/* Left: intro + inputs */}
+        <div>
+          <div className="inline-flex items-center gap-3 mb-5">
+            <span className="tnum" style={{ fontSize: 12, fontWeight: 500, letterSpacing: "0.04em", color: "rgb(var(--accent-base))" }}>
+              § {num}
+            </span>
+            <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
+            <span className="tnum" style={{ fontSize: 11, letterSpacing: "0.2em", color: "var(--ink-3)" }}>
+              {es ? "TEST ESTADÍSTICO" : "STATISTICAL TEST"}
+            </span>
+          </div>
+          <h2
+            className="font-serif m-0"
+            style={{
+              fontSize: "clamp(1.85rem, 3.3vw, 2.8rem)",
+              fontWeight: 400,
+              letterSpacing: "-0.022em",
+              lineHeight: 1.1,
+              color: "var(--ink)",
+              textWrap: "balance",
+            }}
+          >
+            {es ? (
+              <>
+                ¿Tu win rate es <span style={{ color: "rgb(var(--accent-base))" }}>real</span> o es suerte?
+              </>
+            ) : (
+              <>
+                Is your win rate <span style={{ color: "rgb(var(--accent-base))" }}>real</span> or luck?
+              </>
+            )}
+          </h2>
+          <p
+            className="mt-5 mb-7"
+            style={{ fontSize: "clamp(1rem, 1.2vw, 1.08rem)", lineHeight: 1.6, color: "var(--ink-2)", maxWidth: "34em" }}
+          >
+            {es
+              ? "60% de aciertos en 20 operaciones suena bien — pero estadísticamente es indistinguible de una moneda. Este test te dice si tu muestra basta para afirmar que tienes un edge."
+              : "60% win rate over 20 trades sounds good — but statistically it's indistinguishable from a coin. This test tells you if your sample is enough to claim you have an edge."}
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {slider(es ? "Operaciones (N)" : "Trades (N)", trades, 5, 500, 5, setTrades, "", es ? "Número de operaciones" : "Number of trades")}
+            {slider(es ? "Win rate" : "Win rate", winRate, 35, 75, 1, setWinRate, " %", es ? "Porcentaje de aciertos" : "Win rate percentage")}
+            {slider(es ? "Ganancia media" : "Avg win (R)", avgWinR, 0.5, 5, 0.1, setAvgWinR, " R", es ? "Ganancia media en R" : "Average win in R")}
+            {slider(es ? "Pérdida media" : "Avg loss (R)", avgLossR, 0.25, 3, 0.05, setAvgLossR, " R", es ? "Pérdida media en R" : "Average loss in R")}
+          </div>
+        </div>
+
+        {/* Right: results card */}
+        <div
+          className="tj-paper tj-paper-glow relative lg:sticky lg:top-24"
+          style={{ padding: 24, borderRadius: 8, border: "1px solid rgb(var(--divider) / 0.13)" }}
+        >
+          {/* Verdict headline */}
+          <div className="mb-5">
+            <div className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+              {es ? "Veredicto" : "Verdict"}
+            </div>
+            <div className="flex items-baseline gap-3 mt-1 mb-2">
+              <span
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                style={{
+                  background: `color-mix(in oklab, ${verdict.color} 12%, transparent)`,
+                  border: `1px solid color-mix(in oklab, ${verdict.color} 35%, transparent)`,
+                }}
+              >
+                <span aria-hidden className="w-1.5 h-1.5 rounded-full" style={{ background: verdict.color }} />
+                <span className="tnum" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: verdict.color }}>
+                  {verdict.label}
+                </span>
+              </span>
+            </div>
+            <p className="m-0 text-[13px] leading-[1.6]" style={{ color: "var(--ink)" }}>
+              {verdict.text}
+            </p>
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-3.5 mb-4">
+            <Result label={es ? "Expectancy" : "Expectancy"} value={`${c.expectancyR >= 0 ? "+" : ""}${fmtNum(c.expectancyR, 3)} R`} color={c.expectancyR >= 0 ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))"} />
+            <Result label="z-score" value={fmtNum(c.z, 2)} color="var(--ink)" />
+            <Result label="p-valor" value={fmtNum(c.pValue, 4)} color={c.significant ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))"} />
+            <Result label={es ? "Aciertos / Pérdidas" : "Wins / Losses"} value={`${c.wins} / ${c.losses}`} color="var(--ink)" />
+          </div>
+
+          {/* Sample-size adequacy bar */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+                {es ? "Muestra vs. necesaria" : "Sample vs. needed"}
+              </span>
+              <span className="tnum" style={{ fontSize: 11, fontWeight: 600, color: c.sampleAdequate ? "rgb(var(--pnl-pos))" : "rgb(var(--pnl-neg))" }}>
+                {trades} / {c.minSample}
+              </span>
+            </div>
+            <div className="relative h-2 rounded-[3px] overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
+              <div
+                className="absolute left-0 top-0 h-full rounded-[3px]"
+                style={{
+                  width: `${Math.min(100, (trades / c.minSample) * 100)}%`,
+                  background: c.sampleAdequate
+                    ? "linear-gradient(90deg, color-mix(in oklab, rgb(var(--pnl-pos)) 45%, transparent), rgb(var(--pnl-pos)))"
+                    : "linear-gradient(90deg, color-mix(in oklab, rgb(var(--pnl-neg)) 45%, transparent), rgb(var(--pnl-neg)))",
+                  transition: "width 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
+              />
+              {/* minSample marker */}
+              <div
+                aria-hidden
+                className="absolute top-0 bottom-0"
+                style={{
+                  left: `${Math.min(100, (c.minSample / Math.max(trades, c.minSample)) * 100)}%`,
+                  width: 1,
+                  background: "rgb(var(--divider) / 0.5)",
+                }}
+              />
+            </div>
+            <p className="tnum m-0 mt-1.5 text-[10.5px]" style={{ color: "var(--ink-3)" }}>
+              {c.sampleAdequate
+                ? (es ? `Muestra suficiente para detectar un ${fmtNum(winRate, 0)}% real al 95% de confianza (±5%).` : `Sample sufficient to detect a real ${fmtNum(winRate, 0)}% at 95% confidence (±5%).`)
+                : (es ? `Te faltan ${c.minSample - trades} operaciones más para detectar un ${fmtNum(winRate, 0)}% real al 95% de confianza.` : `You need ${c.minSample - trades} more trades to detect a real ${fmtNum(winRate, 0)}% at 95% confidence.`)}
+            </p>
+          </div>
+
+          {/* Disclaimer */}
+          <div
+            className="rounded-[6px] px-3 py-2.5"
+            style={{ background: "color-mix(in oklab, var(--surface-2) 40%, transparent)", border: "1px solid rgb(var(--divider) / 0.06)" }}
+          >
+            <p className="tnum m-0 text-[11px] leading-[1.55]" style={{ color: "var(--ink-3)" }}>
+              {es
+                ? "Test binomial (aproximación normal) asumiendo operaciones iid. El trading real NO es iid (regímenes cambian, correlación entre operaciones). Es una cota orientativa, no una garantía. El verdadero test es el tiempo + validación fuera de muestra."
+                : "Binomial test (normal approximation) assuming iid trades. Real trading is NOT iid (regimes shift, trades correlate). This is an orientative bound, not a guarantee. The real test is time + out-of-sample validation."}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── normalCdf — CDF de la normal estándar vía erf (Abramowitz & Stegun 7.1.26) ── */
+function normalCdf(x: number): number {
+  // erf aproximada, error < 1e-7
+  const t = 1 / (1 + 0.3275911 * Math.abs(x));
+  const y =
+    1 -
+    ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) *
+      t *
+      Math.exp(-x * x);
+  return x >= 0 ? y : 1 - y;
+}
+
+function Result({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div
+      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-3 sm:px-4 py-3.5 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}
+    >
+      <div className="tnum relative" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>
+        {label}
+      </div>
+      <div className="tnum min-w-0 break-words relative" style={{ fontSize: 18, fontWeight: 700, marginTop: 4, color }}>
+        {value}
+      </div>
+    </div>
+  );
+}

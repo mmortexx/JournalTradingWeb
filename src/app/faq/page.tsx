@@ -202,6 +202,10 @@ const ContactSupport = dynamic(
   () => import("@/components/marketing/ContactSupport").then((m) => m.ContactSupport),
   { loading: () => sectionFallback }
 );
+const EdgeSignificanceChecker = dynamic(
+  () => import("@/components/marketing/EdgeSignificanceChecker").then((m) => m.EdgeSignificanceChecker),
+  { loading: () => sectionFallback }
+);
 const ContactForm = dynamic(
   () => import("@/components/marketing/ContactForm").then((m) => m.ContactForm),
   { loading: () => sectionFallback }
@@ -236,6 +240,7 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <FAQ standalone />
+      <EdgeSignificanceChecker num="01" />
       {/* `StillHaveQuestions` retirado: la página encadenaba CUATRO
           bloques seguidos diciendo lo mismo ("¿aún tienes dudas?",
           "¿no encuentras tu respuesta?", el formulario y el cierre).
