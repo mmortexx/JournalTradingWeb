@@ -100,6 +100,10 @@ const RiskCalculator = dynamic(
   () => import("@/components/marketing/RiskCalculator").then((m) => m.RiskCalculator),
   { loading: () => sectionFallback }
 );
+const EquityProjector = dynamic(
+  () => import("@/components/marketing/EquityProjector").then((m) => m.EquityProjector),
+  { loading: () => sectionFallback }
+);
 const Wrapped = dynamic(
   () => import("@/components/marketing/Wrapped").then((m) => m.Wrapped),
   { loading: () => sectionFallback }
@@ -131,6 +135,7 @@ export default function MetricasPage() {
       />
       <MetricsShowcaseNew num="01" />
       <RiskCalculator num="02" />
+      <EquityProjector num="03" />
 
       <PlateInterlude index={0} />
       <Wrapped />
