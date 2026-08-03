@@ -91,9 +91,15 @@ export function Hero() {
           hairlines HORIZONTALES que separan titular, entradilla y placa
           de especificaciones, que sí marcan bloques reales. */}
 
-      <div className="tj-legible-text relative z-10 mx-auto w-full max-w-[1240px] px-6 pt-32 pb-14 sm:px-10">
+      {/* P-mobile-center: en móvil el hero va CENTRADO (eyebrow, titular,
+         regla, entradilla, CTAs, placa). En escritorio (lg) mantiene el
+         layout original alineado a la izquierda en dos columnas. Antes
+         el titular iba a la izquierda y los CTAs centrados — esa mezcla
+         se leía como 'nada está centrado donde debe'. Ahora en móvil
+         todo el bloque va centrado como un conjunto coherente. */}
+      <div className="tj-legible-text relative z-10 mx-auto w-full max-w-[1240px] px-6 pt-32 pb-14 text-center sm:px-10 lg:text-left">
         {/* ---- Antetítulo ---- */}
-        <div data-seq className="mb-6 flex items-center gap-2.5">
+        <div data-seq className="mb-6 flex items-center justify-center gap-2.5 lg:justify-start">
           {/* Cuadrado de acento de 5 px, sin resplandor ni animación:
               una marca de registro, no una luz de aviso. */}
           <span
@@ -114,7 +120,7 @@ export function Hero() {
         {/* ---- Titular ---- */}
         <h1
           data-seq
-          className="m-0 font-sans break-words uppercase"
+          className="m-0 mx-auto font-sans break-words uppercase lg:mx-0"
           style={{
             fontSize: "clamp(2rem, 7.4vw, 5.4rem)",
             fontWeight: 600,
@@ -159,10 +165,10 @@ export function Hero() {
             como hueco muerto). `gap-y-7` en móvil (era 8) reduce el
             salto entre la entradilla y la columna de CTAs cuando se
             apilan, sin tocar el `gap-x-10` del escritorio. */}
-        <div className="mt-7 grid gap-x-10 gap-y-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,26em)]">
-          <div data-seq>
+        <div className="mt-7 grid gap-x-10 gap-y-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,26em)] lg:text-left">
+          <div data-seq className="mx-auto lg:mx-0" style={{ maxWidth: "44em" }}>
             <p
-              className="m-0 break-words"
+              className="m-0 mx-auto break-words lg:mx-0"
               style={{
                 fontSize: "clamp(1.05rem, 2vw, 1.5rem)",
                 fontWeight: 300,
@@ -177,7 +183,7 @@ export function Hero() {
                 : "Measure it with institutional-grade rigour."}
             </p>
             <p
-              className="m-0 mt-4 break-words"
+              className="m-0 mt-4 mx-auto break-words lg:mx-0"
               style={{
                 fontSize: "clamp(0.95rem, 1.3vw, 1.05rem)",
                 fontWeight: 300,
@@ -212,7 +218,7 @@ export function Hero() {
               (Hero arriba, FinalCTA abajo) refuerza la lectura de par
               coordinado a lo largo de la página y elimina el salto visual
               de 2 px entre las dos llamadas a la acción principales. */}
-          <div data-seq className="flex flex-col items-center gap-3.5 sm:flex-row sm:items-center sm:justify-start lg:flex-col lg:items-end lg:self-end">
+          <div data-seq className="flex flex-col items-center gap-3.5 sm:flex-row sm:items-center sm:justify-center lg:flex-col lg:items-end lg:self-end lg:justify-start">
             <Link
               href="/pricing"
               className="inline-flex h-[52px] min-w-[180px] w-fit items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
@@ -261,7 +267,7 @@ export function Hero() {
               etiquetas siguen `uppercase tracking-[0.16em]` (ya estaban);
               los valores ahora `fontWeight: 600` (semibold) para leer la
               jerarquía sin depender solo del tamaño. */}
-          <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
+          <dl className="m-0 grid grid-cols-2 gap-x-8 gap-y-7 sm:grid-cols-3 lg:mx-0 lg:grid-cols-5" style={{ justifyItems: "center" }}>
             {specs.map((s) => (
               <div key={s.k} className="flex min-w-0 flex-col gap-1.5">
                 <dt
