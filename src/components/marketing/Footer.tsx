@@ -112,11 +112,13 @@ export function Footer() {
       title: es ? "Recursos" : "Resources",
       links: [
         { label: "FAQ", href: "/faq" },
-        {
-          label: es ? "Glosario" : "Glossary",
-          href: "#",
-          glossary: true,
-        },
+        /* El glosario ya NO abre la ventana emergente desde aquí: tiene
+           sección propia con 51 páginas. La ventana sigue existiendo para
+           consultar un término sin salir de la página que estás leyendo,
+           que es otro caso de uso; desde el pie, lo que se espera al
+           pulsar «Glosario» es ir al glosario. */
+        { label: es ? "Glosario" : "Glossary", href: "/glosario" },
+        { label: es ? "Herramientas" : "Tools", href: "/herramientas" },
         // "Blog" entry removed in R20-2b — no blog exists yet (re-add when
         // /blog lands). "Documentación" aliases /faq (FAQ serves as docs).
         { label: es ? "Documentación" : "Docs", href: "/faq" },

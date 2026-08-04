@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
+import { TERMINOS } from "@/lib/glosario";
+import { HERRAMIENTAS } from "@/lib/herramientas";
 
 export const dynamic = "force-static";
 
@@ -41,6 +43,29 @@ const PAGES: PageMeta[] = [
   { path: "/terminos", priority: 0.3, changeFrequency: "yearly" },
   { path: "/cookies", priority: 0.3, changeFrequency: "yearly" },
   { path: "/aviso-legal", priority: 0.3, changeFrequency: "yearly" },
+
+  /* ── Secciones generadas ──────────────────────────────────────────
+     El glosario y las herramientas se derivan de sus propios datos en
+     lugar de escribirse aquí a mano. El motivo es simple: son 51 + 6
+     direcciones, y una lista copiada se desincroniza el primer día que
+     alguien añada un término. Si mañana el glosario crece, el mapa del
+     sitio crece con él sin que nadie se acuerde de tocarlo. */
+  { path: "/glosario", priority: 0.7, changeFrequency: "monthly" },
+  ...TERMINOS.map((t) => ({
+    path: `/glosario/${t.slug}`,
+    /* Baja por página, y es lo correcto: ninguna definición suelta
+       compite con la portada. El valor está en el conjunto. */
+    priority: 0.5,
+    changeFrequency: "yearly" as const,
+  })),
+  { path: "/herramientas", priority: 0.8, changeFrequency: "monthly" },
+  ...HERRAMIENTAS.map((h) => ({
+    path: `/herramientas/${h.slug}`,
+    /* Más alta que las del glosario: una calculadora resuelve algo, y es
+       la clase de página que la gente enlaza y comparte. */
+    priority: 0.7,
+    changeFrequency: "monthly" as const,
+  })),
 ];
 
 // Use a frozen build-time date so the static export is deterministic

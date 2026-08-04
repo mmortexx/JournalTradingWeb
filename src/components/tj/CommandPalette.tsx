@@ -77,6 +77,13 @@ const PAGES: Page[] = [
   { path: "/features/disciplina", es: "Disciplina", en: "Discipline" },
   { path: "/features/seguridad", es: "Seguridad", en: "Security" },
   { path: "/demo", es: "Demo", en: "Demo" },
+  /* Faltaban tres destinos que sí existen. El test lleva tiempo con
+     dirección propia y nunca llegó aquí; las herramientas y el glosario
+     son de hoy. Un buscador de navegación que no conoce media web
+     enseña a no usarlo. */
+  { path: "/test", es: "Test de disciplina", en: "Discipline test" },
+  { path: "/herramientas", es: "Herramientas", en: "Tools" },
+  { path: "/glosario", es: "Glosario", en: "Glossary" },
   { path: "/pricing", es: "Precios", en: "Pricing" },
   { path: "/about", es: "Acerca de", en: "About" },
   { path: "/faq", es: "FAQ", en: "FAQ" },

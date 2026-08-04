@@ -305,6 +305,44 @@ export function Navbar() {
         </svg>
       ),
     },
+    {
+      /* Las calculadoras tenían dirección propia desde hoy pero seguían
+         sin estar en ningún menú: existir y no poder encontrarse es
+         quedarse a mitad de camino. */
+      href: "/herramientas",
+      labelEs: "Herramientas",
+      labelEn: "Tools",
+      descEs: "Siete calculadoras, gratis y sin registro",
+      descEn: "Seven calculators, free and with no sign-up",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path
+            d="M10.4 2.3a3.4 3.4 0 0 0-4 4.4L2.6 10.5a1.3 1.3 0 0 0 1.8 1.8l3.8-3.8a3.4 3.4 0 0 0 4.4-4l-2 2-1.6-1.6 2-1.6Z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "/glosario",
+      labelEs: "Glosario",
+      labelEn: "Glossary",
+      descEs: "51 términos explicados sin rodeos",
+      descEn: "51 terms explained without waffle",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path
+            d="M3 2.6h6.2a2 2 0 0 1 2 2v8.8H5a2 2 0 0 1-2-2V2.6Z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+          <path d="M5.4 5.6h3.6M5.4 8h3.6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
+      ),
+    },
   ];
 
   // Enlaces del drawer móvil — mantiene Acerca de y FAQ (en desktop
@@ -378,6 +416,41 @@ export function Navbar() {
           <path d="M8 14.5A6.5 6.5 0 1 1 8 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
           <path d="M8 8l4-3.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
           <circle cx="8" cy="8" r="1.4" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      /* Las herramientas, también en móvil y no sólo en el megamenú de
+         escritorio: el desplegable de Producto no existe por debajo de
+         768 px, así que sin esta entrada las siete calculadoras serían
+         inalcanzables desde un teléfono. */
+      href: "/herramientas",
+      labelEs: "Herramientas",
+      labelEn: "Tools",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path
+            d="M10.4 2.3a3.4 3.4 0 0 0-4 4.4L2.6 10.5a1.3 1.3 0 0 0 1.8 1.8l3.8-3.8a3.4 3.4 0 0 0 4.4-4l-2 2-1.6-1.6 2-1.6Z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
+    },
+    {
+      href: "/glosario",
+      labelEs: "Glosario",
+      labelEn: "Glossary",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path
+            d="M3 2.6h6.2a2 2 0 0 1 2 2v8.8H5a2 2 0 0 1-2-2V2.6Z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+          <path d="M5.4 5.6h3.6M5.4 8h3.6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
         </svg>
       ),
     },
