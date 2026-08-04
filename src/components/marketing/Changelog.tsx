@@ -31,51 +31,47 @@ export function Changelog() {
   const { lang } = useLang();
   const es = lang === "es";
 
+  /* ── Por qué aquí ya no hay historial ────────────────────────────────
+     Esta lista presentaba v1.0, v1.2, v1.3 y v1.4 como versiones YA
+     publicadas, con fechas de enero a julio de 2026 —o sea, en el
+     pasado— de un producto que todavía no se puede comprar. El pie
+     remataba con «v1.4.2» y un punto verde de «sistemas operativos».
+
+     Era el último resto de una tanda de contenido inventado que ya se
+     había limpiado en el resto del sitio: se retiraron testimonios de
+     personas que no existen y una valoración de 4,8 sobre 47 reseñas que
+     tampoco. Esto se quedó, y desentonaba con todo lo demás.
+
+     Hay además una incoherencia de fondo que NO me corresponde resolver
+     y que dejo señalada: tres de estas entradas describen funciones que
+     la página de precios vende como incluidas desde el primer día —el
+     playbook con estadísticas y el Monte Carlo en los planes, el modo
+     prop firm y el importador en Pro—. O son del lanzamiento, o son
+     futuras, pero no las dos cosas. Al fundir lo publicado en una única
+     entrada de lanzamiento, la contradicción se reduce a las dos últimas
+     líneas del plan, que son decisión de producto. */
   const entries: Entry[] = es
     ? [
-        {
-          version: "v1.4",
-          title: "Discipline Guardian",
-          description:
-            "El guardián te frena antes de operar fuera de plan",
-          date: "Jul 2026",
-          kind: "past",
-        },
-        {
-          version: "v1.3",
-          title: "Monte Carlo + Risk of ruin",
-          description: "Simula 10.000 escenarios de tu curva de equity",
-          date: "May 2026",
-          kind: "past",
-        },
-        {
-          version: "v1.2",
-          title: "Playbook con stats en vivo",
-          description:
-            "Cada setup muestra expectancy calculada de tus operaciones",
-          date: "Mar 2026",
-          kind: "past",
-        },
         {
           version: "v1.0",
           title: "Lanzamiento inicial",
           description:
-            "El primer release público de CountPips, nativo de Windows.",
-          date: "Ene 2026",
-          kind: "past",
+            "El journal completo: métricas, calendario, curva de capital, playbook con estadísticas, el guardián de disciplina e importación por CSV.",
+          date: "En preparación",
+          kind: "next",
         },
         {
           version: "v1.5",
           title: "Importador de rivales",
           description: "Importa tu historial de otro journal en 5 minutos",
-          date: "Q3 2026",
+          date: "Después del lanzamiento",
           kind: "next",
         },
         {
           version: "v1.6",
           title: "Backtesting visual",
           description: "Replay del mercado con tus reglas de setup",
-          date: "Q4 2026",
+          date: "Más adelante",
           kind: "next",
         },
         {
@@ -83,60 +79,38 @@ export function Changelog() {
           title: "Modo prop firm avanzado",
           description:
             "Reglas de pérdida diaria, drawdown máximo y reset",
-          date: "2027",
+          date: "Más adelante",
           kind: "next",
         },
       ]
     : [
         {
-          version: "v1.4",
-          title: "Discipline Guardian",
-          description: "The guardian stops you before trading off-plan",
-          date: "Jul 2026",
-          kind: "past",
-        },
-        {
-          version: "v1.3",
-          title: "Monte Carlo + Risk of ruin",
-          description: "Simulate 10,000 scenarios of your equity curve",
-          date: "May 2026",
-          kind: "past",
-        },
-        {
-          version: "v1.2",
-          title: "Playbook with live stats",
-          description:
-            "Each setup shows expectancy computed from your trades",
-          date: "Mar 2026",
-          kind: "past",
-        },
-        {
           version: "v1.0",
           title: "Initial launch",
           description:
-            "The first public release of CountPips, native to Windows.",
-          date: "Jan 2026",
-          kind: "past",
+            "The full journal: metrics, calendar, equity curve, playbook with live stats, the discipline guardian and CSV import.",
+          date: "In preparation",
+          kind: "next",
         },
         {
           version: "v1.5",
           title: "Rival importer",
           description: "Import your history from another journal in 5 minutes",
-          date: "Q3 2026",
+          date: "After launch",
           kind: "next",
         },
         {
           version: "v1.6",
           title: "Visual backtesting",
           description: "Market replay with your setup rules",
-          date: "Q4 2026",
+          date: "Later",
           kind: "next",
         },
         {
           version: "v2.0",
           title: "Advanced prop firm mode",
           description: "Daily loss rules, max drawdown and reset",
-          date: "2027",
+          date: "Later",
           kind: "next",
         },
       ];
@@ -151,7 +125,9 @@ export function Changelog() {
         <div className="relative max-w-3xl mx-auto text-center">
           <Reveal>
             <div className="relative flex justify-center">
-              <Eyebrow>{es ? "Changelog & Roadmap" : "Changelog & Roadmap"}</Eyebrow>
+              {/* «Changelog» prometía un historial de versiones publicadas
+                  que no existe. Esto es un plan, y se llama plan. */}
+              <Eyebrow>{es ? "Hoja de ruta" : "Roadmap"}</Eyebrow>
             </div>
           </Reveal>
           <Reveal delay={0.06}>
@@ -160,20 +136,24 @@ export function Changelog() {
             >
               {es ? (
                 <>
-                  En constante <span className="text-gradient">evolución.</span>
+                  Lo que viene, <span className="text-gradient">y en qué orden.</span>
                 </>
               ) : (
                 <>
-                  Constantly <span className="text-gradient">evolving.</span>
+                  What's coming, <span className="text-gradient">and in what order.</span>
                 </>
               )}
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
             <p className="relative mt-4 text-lg text-secondary max-w-xl mx-auto leading-[1.6]">
+              {/* Decía «cada versión se construye sobre el feedback de
+                  traders reales» y «lo que ya está en tu mano». Ninguna
+                  de las dos cosas puede ser cierta todavía: no hay
+                  versiones publicadas ni, por tanto, usuarios. */}
               {es
-                ? "Cada versión se construye sobre el feedback de traders reales. Esto es lo que ya está en tu mano y lo que viene."
-                : "Every version is built on feedback from real traders. Here's what's already in your hands and what's coming."}
+                ? "Sin fechas cerradas: se publican cuando estén, no cuando toque. Apúntate a la lista y te avisamos en cada una."
+                : "No fixed dates: they ship when they are ready, not when a calendar says so. Join the list and we'll tell you at each one."}
             </p>
           </Reveal>
         </div>

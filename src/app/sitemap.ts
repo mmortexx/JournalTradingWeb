@@ -33,6 +33,14 @@ const PAGES: PageMeta[] = [
   // Lower-velocity editorial / trust pages.
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
+  /* Páginas legales. Prioridad baja porque nadie las busca, pero van en el
+     mapa igualmente: que existan y sean localizables es una señal de
+     confianza, y las pasarelas de pago las exigen accesibles antes de
+     aprobar una cuenta. Cambian una vez al año como mucho. */
+  { path: "/privacidad", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/terminos", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/cookies", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/aviso-legal", priority: 0.3, changeFrequency: "yearly" },
 ];
 
 // Use a frozen build-time date so the static export is deterministic

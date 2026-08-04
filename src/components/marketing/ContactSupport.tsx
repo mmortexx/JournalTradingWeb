@@ -48,34 +48,34 @@ const CARDS: Card[] = [
     // el día que cambia.
     descEs: SUPPORT_EMAIL,
     descEn: SUPPORT_EMAIL,
-    metaEs: "Respuesta en 24h",
-    metaEn: "Reply in 24h",
+    /* «Respuesta en 24h» era un compromiso de servicio sin nadie detrás
+       que pueda cumplirlo hoy. Se sustituye por algo que sí es cierto y
+       que además tranquiliza igual: quien escribe recibe respuesta de la
+       persona que hace el producto, no de un centro de soporte. */
+    metaEs: "Contesta quien lo desarrolla",
+    metaEn: "Answered by the developer",
     ctaEs: "Escribir",
     ctaEn: "Write us",
     href: `mailto:${SUPPORT_EMAIL}`,
   },
-  // `href="#"` for the two cards below is intentional (R20-2b): the docs
-  // portal and the Discord/Telegram community are not live yet. Replace
-  // with real URLs when those land.
+  /* Aquí había dos tarjetas más, ambas con `href="#"`: un portal de
+     documentación que no existe y una comunidad de Discord y Telegram que
+     tampoco. Prometer «Guías y tutoriales» y «Unirme» para no llevar a
+     ninguna parte es peor que no ofrecerlo.
+
+     La de documentación se conserva porque el destino SÍ existe —la FAQ
+     hace de documentación, y así lo declara ya el pie del sitio—, pero
+     dice lo que hay y lleva donde hay que llevar. La de comunidad se va
+     hasta que la comunidad exista. */
   {
     icon: BookOpen,
-    titleEs: "Documentación",
-    titleEn: "Documentation",
-    descEs: "Guías y tutoriales",
-    descEn: "Guides and tutorials",
+    titleEs: "Preguntas frecuentes",
+    titleEn: "Frequently asked",
+    descEs: "Pago, licencia, datos y compatibilidad",
+    descEn: "Payment, licence, data and compatibility",
     ctaEs: "Consultar",
     ctaEn: "Browse",
-    href: "#",
-  },
-  {
-    icon: MessagesSquare,
-    titleEs: "Comunidad",
-    titleEn: "Community",
-    descEs: "Discord + Telegram",
-    descEn: "Discord + Telegram",
-    ctaEs: "Unirme",
-    ctaEn: "Join",
-    href: "#",
+    href: "#faq",
   },
 ];
 
@@ -132,7 +132,10 @@ export function ContactSupport() {
           </Reveal>
         </div>
 
-        <div className="mt-10 grid md:grid-cols-3 gap-4">
+        {/* Dos columnas, no tres: se retiró la tarjeta de comunidad por
+            apuntar a un Discord que no existe. Con `md:grid-cols-3` las
+            dos que quedan se irían a la izquierda dejando un hueco. */}
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
           {CARDS.map((c, i) => {
             const Icon = c.icon;
             const title = es ? c.titleEs : c.titleEn;

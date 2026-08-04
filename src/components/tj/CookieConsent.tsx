@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 
@@ -158,10 +159,29 @@ export function CookieConsent() {
           >
             <div className="flex items-start gap-2.5 md:gap-3">
               <CookieIcon />
+              {/* El enlace a la política es obligatorio, no cortesía: pedir
+                  consentimiento sin ofrecer dónde informarse es justo lo
+                  que la norma no permite, y aquí se había quitado a
+                  propósito por un problema de ancho del banner.
+                  Ahora va DENTRO del párrafo, en línea, así que no añade
+                  una tercera fila de botones ni fuerza el ajuste que
+                  motivó su retirada.
+                  Y de paso corrige el texto: la web no usa cookies, usa
+                  almacenamiento local. Decir «cookies técnicas» era
+                  cómodo pero falso, y la página que enlazamos explica
+                  precisamente la diferencia. */}
               <p className="text-[12.5px] leading-[1.5] text-secondary flex-1 md:text-[13px] md:leading-relaxed">
                 {es
-                  ? "Cookies técnicas, sin tracking ni publicidad. ¿Aceptas o rechazas?"
-                  : "Technical cookies, no tracking or ads. Accept or decline?"}
+                  ? "Esta web no usa cookies: solo recuerda tus preferencias en tu navegador. Sin rastreo ni publicidad. "
+                  : "This site uses no cookies: it just remembers your preferences in your browser. No tracking, no ads. "}
+                <Link
+                  href="/cookies"
+                  className="link-underline-host whitespace-nowrap text-primary transition-colors hover:text-[rgb(var(--accent-base))]"
+                >
+                  <span className="link-underline">
+                    {es ? "Ver qué guarda" : "See what it stores"}
+                  </span>
+                </Link>
               </p>
             </div>
 

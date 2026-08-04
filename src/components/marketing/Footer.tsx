@@ -10,20 +10,23 @@ import { BrandGlyph } from "@/components/tj/BrandGlyph";
 /**
  * Social link definition — icon + accessible label.
  *
- * GitHub points at the real source repo. X / YouTube / Discord / RSS are
- * intentionally left as `href="#"` placeholders — the corresponding social
- * accounts are not live yet (wiring them in is tracked in R20-1b → R20-2b).
- * Do NOT replace these with real URLs until each account exists.
+ * SOLO PERFILES QUE EXISTEN. Aquí había cinco iconos y cuatro apuntaban a
+ * `href="#"` porque las cuentas no estaban creadas: X, YouTube, Discord y
+ * RSS. Eso son cuatro enlaces muertos repetidos en las diez páginas del
+ * sitio, y un enlace que no lleva a ninguna parte cuesta más credibilidad
+ * de la que aporta el icono.
+ *
+ * Se quedan fuera hasta que la cuenta exista de verdad. Para volver a
+ * ponerlos basta añadir la línea con su dirección real — los iconos siguen
+ * definidos más abajo, no hay que rehacer nada.
+ *
+ * El RSS además no puede existir todavía por otro motivo: no hay blog del
+ * que emitir un canal.
  */
 type SocialLink = { label: string; href: string; Icon: () => ReactElement };
 
 const SOCIAL_LINKS: SocialLink[] = [
   { label: "GitHub", href: "https://github.com/mmortexx/CountPipsWeb", Icon: GitHubIcon },
-  // Placeholders — social accounts not yet created (see comment above).
-  { label: "X / Twitter", href: "#", Icon: XIcon },
-  { label: "YouTube", href: "#", Icon: YouTubeIcon },
-  { label: "Discord", href: "#", Icon: DiscordIcon },
-  { label: "RSS", href: "#", Icon: RSSIcon },
 ];
 
 /**
@@ -123,9 +126,24 @@ export function Footer() {
       title: es ? "Empresa" : "Company",
       links: [
         { label: es ? "Acerca de" : "About", href: "/about" },
-        { label: es ? "Contacto" : "Contact", href: "/about" },
-        { label: es ? "Privacidad" : "Privacy", href: "#" },
-        { label: es ? "Términos" : "Terms", href: "#" },
+        /* «Contacto» llevaba a /about, donde NO hay ningún formulario: el
+           único del sitio vive en /faq. Quien pulsaba aquí aterrizaba en la
+           historia del producto y tenía que buscarse la vida. */
+        { label: es ? "Contacto" : "Contact", href: "/faq" },
+      ],
+    },
+    {
+      /* Columna legal. Antes «Privacidad» y «Términos» colgaban de
+         «Empresa» y apuntaban a `#` —dos enlaces muertos en las diez
+         páginas— mientras dos formularios recogían correos. Ahora las
+         cuatro existen y tienen su columna, que es donde las busca quien
+         las busca. */
+      title: es ? "Legal" : "Legal",
+      links: [
+        { label: es ? "Privacidad" : "Privacy", href: "/privacidad" },
+        { label: es ? "Términos" : "Terms", href: "/terminos" },
+        { label: "Cookies", href: "/cookies" },
+        { label: es ? "Aviso legal" : "Legal notice", href: "/aviso-legal" },
       ],
     },
   ];
@@ -150,7 +168,10 @@ export function Footer() {
           rather than a separate px-5/md:px-8 silo. `py-12 md:py-16` preserved
           for vertical breath. */}
       <div className="tj-container relative py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-8 md:gap-10">
+        {/* Cinco columnas desde `md`, no cuatro: la legal es nueva. En
+            móvil siguen siendo dos, y las cuatro de enlaces caen en dos
+            filas de dos, que es lo que cabe en 376 px sin apretar. */}
+        <div className="grid grid-cols-2 md:grid-cols-[1.5fr_1fr_1fr_1fr_1fr] gap-8 md:gap-10">
           {/* Brand column — candlestick mark + wordmark lockup (mirrors
               Navbar.BrandMark exactly), tagline, "100 % local" inline
               pill, and the 5 social icons. The lockup matches the
@@ -333,21 +354,20 @@ export function Footer() {
               below — it's pure metadata and the dimmer weight helps it
               read as secondary information next to the legal links. */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs text-secondary">
-            {/* Indicador de estado — punto sólido, SIN el anillo
-                `animate-ping`. El barrido tipo radar latía en bucle en
-                el pie de todas las páginas: mucho reclamo visual para un
-                dato que no cambia nunca. El punto en verde P&L ya dice
-                "operativo"; el color es la señal, no el movimiento. */}
-            <span className="inline-flex items-center gap-1.5">
-              {/* El envoltorio `relative flex` existía solo para apilar
-                  el anillo del radar sobre el punto. Sin anillo, sobra. */}
-              <span
-                aria-hidden
-                className="inline-flex h-1.5 w-1.5 rounded-full"
-                style={{ background: "rgb(var(--pnl-pos))" }}
-              />
-              <span>{es ? "Sistemas operativos" : "All systems operational"}</span>
-            </span>
+            {/* Aquí había un punto verde con «Sistemas operativos» que no
+                consultaba absolutamente nada: era verde siempre, por
+                estar escrito en verde. Un indicador de estado que no mide
+                el estado es peor que ninguno — el día que algo se caiga
+                seguirá diciendo que todo va bien.
+
+                Y va acompañado de otra retirada: el pie declaraba la
+                versión «v1.4.2» de un programa que aún no se puede
+                descargar. Las dos afirmaciones se sostenían en el mismo
+                historial de versiones inventado que se acaba de convertir
+                en hoja de ruta.
+
+                Cuando exista un servicio real que vigilar, esto vuelve —
+                leyendo de algún sitio. */}
             {/* Aquí vivían otra vez «Privacidad» y «Términos», los mismos
                 dos enlaces que la columna «Empresa» de arriba ya lista a
                 unos centímetros. Duplicados y, además, rotos de otra
@@ -358,9 +378,6 @@ export function Footer() {
                 Se quedan los de la columna y desaparecen éstos: un mismo
                 destino repetido dos veces en el mismo pie no da acceso,
                 da ruido — y el que se retira era justo el inservible. */}
-            <span aria-hidden className="opacity-30">·</span>
-            <span className="tnum text-tertiary">v1.4.2</span>
-            <span aria-hidden className="opacity-30">·</span>
             <span>ES + EN</span>
           </div>
         </div>

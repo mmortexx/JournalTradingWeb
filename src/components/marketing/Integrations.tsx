@@ -11,6 +11,16 @@ interface Broker {
   mark: string;
 }
 
+/**
+ * Estos NO son integraciones directas: son plataformas cuyo fichero CSV se
+ * ha comprobado que entra. El subtítulo de la sección ya lo dice, y es
+ * importante que lo siga diciendo — un muro de logotipos se lee como
+ * «conecta tu cuenta» aunque el texto de al lado diga otra cosa.
+ *
+ * Fuera TD Ameritrade: la marca dejó de existir al integrarse en Schwab, y
+ * un logotipo de una casa que ya no opera envejece la lista entera. Entra
+ * Charles Schwab, que es donde fueron a parar esas cuentas.
+ */
 const BROKERS: Broker[] = [
   { name: "Interactive Brokers", mark: "IB" },
   { name: "MetaTrader 4", mark: "M4" },
@@ -21,7 +31,7 @@ const BROKERS: Broker[] = [
   { name: "Coinbase", mark: "CB" },
   { name: "OANDA", mark: "OA" },
   { name: "IG", mark: "IG" },
-  { name: "TD Ameritrade", mark: "TD" },
+  { name: "Charles Schwab", mark: "CS" },
 ];
 
 /** Logo wall of broker / import integrations. Bilingual. */

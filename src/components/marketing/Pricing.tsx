@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
@@ -203,6 +204,31 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
               <span>{es ? "Tus datos nunca salen de tu equipo" : "Your data never leaves your machine"}</span>
             </span>
           </div>
+        </Reveal>
+
+        {/* La garantía de 30 días se retiró de aquí y no se sustituyó por
+            nada, así que la página quedó sin decir UNA palabra sobre
+            devoluciones. Para un pago único sin prueba gratuita, ese
+            silencio es fricción: quien duda, no compra.
+
+            No invento la política —es una decisión legal y comercial que
+            no me corresponde— pero sí cierro el hueco enlazando a donde
+            está explicado que las condiciones se publican al abrir la
+            venta, que hoy es la respuesta verdadera. */}
+        <Reveal delay={0.2}>
+          <p className="mt-4 text-center text-[13px] text-tertiary">
+            {es ? "El producto aún no está a la venta. " : "The product is not on sale yet. "}
+            <Link
+              href="/terminos#availability"
+              className="link-underline-host -my-2 inline-flex py-2 text-secondary transition-colors hover:text-primary"
+            >
+              <span className="link-underline">
+                {es
+                  ? "Condiciones de compra y devolución"
+                  : "Purchase and refund conditions"}
+              </span>
+            </Link>
+          </p>
         </Reveal>
       </div>
     </section>
