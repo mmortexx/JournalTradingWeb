@@ -24,14 +24,25 @@ import { Reveal } from "@/components/tj/Reveal";
  * .tj-paper + .tj-paper-glow (papel translúcido cálido, halo champagne).
  * Touch targets ≥44px. Sin overflow en mobile.
  */
+/* Los planes viven FUERA del componente por dos motivos, y ninguno es estético.
+   Uno: sus nombres son de marca, iguales en español y en inglés, así que no
+   tenían nada que hacer dentro de un render que depende del idioma. Dos: al
+   declararse dentro se creaban de nuevo en cada render, y como la lista figura
+   entre las dependencias del cálculo de abajo, el `useMemo` se rehacía siempre
+   y no memorizaba nada. Aquí arriba la identidad es estable.
+
+   El tipo de `id` se declara en vez de dejarlo inferir: inferido salía como
+   texto libre y no encajaba con el estado, que solo admite estos dos valores. */
+type PlanId = "core" | "pro";
+
+const COUNTPIPS_PLANS: { id: PlanId; label: string; price: number }[] = [
+  { id: "core", label: "CountPips Core", price: 29 },
+  { id: "pro", label: "CountPips Pro", price: 49 },
+];
+
 export function SavingsCalculator() {
   const { lang } = useLang();
   const es = lang === "es";
-
-  const countpipsPlans = [
-    { id: "core", label: es ? "CountPips Core" : "CountPips Core", price: 29 },
-    { id: "pro", label: es ? "CountPips Pro" : "CountPips Pro", price: 49 },
-  ];
 
   // Alternativas SaaS típicas (rango 15-30 $/mes)
   const altPresets = [
@@ -40,12 +51,12 @@ export function SavingsCalculator() {
     { label: es ? "Premium" : "Premium", v: 30 },
   ];
 
-  const [plan, setPlan] = useState<"core" | "pro">("pro");
+  const [plan, setPlan] = useState<PlanId>("pro");
   const [altMonthly, setAltMonthly] = useState(25);
   const [years, setYears] = useState(3);
 
   const c = useMemo(() => {
-    const cpPrice = countpipsPlans.find((p) => p.id === plan)!.price;
+    const cpPrice = COUNTPIPS_PLANS.find((p) => p.id === plan)!.price;
     const altTotal = altMonthly * 12 * years;
     const savings = altTotal - cpPrice;
     const savingsPct = altTotal > 0 ? (savings / altTotal) * 100 : 0;
@@ -58,7 +69,7 @@ export function SavingsCalculator() {
       curve.push({ year: y, sub: altMonthly * 12 * y, cp: cpPrice });
     }
     return { cpPrice, altTotal, savings, savingsPct, breakEvenMonths, curve };
-  }, [plan, altMonthly, years, countpipsPlans]);
+  }, [plan, altMonthly, years]);
 
   const fmtUsd = (n: number) =>
     es
@@ -149,7 +160,7 @@ export function SavingsCalculator() {
               {es ? "Tu plan CountPips" : "Your CountPips plan"}
             </div>
             <div className="flex flex-wrap gap-2">
-              {countpipsPlans.map((p) => (
+              {COUNTPIPS_PLANS.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => setPlan(p.id)}

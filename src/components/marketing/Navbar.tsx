@@ -455,8 +455,20 @@ export function Navbar() {
       >
         {/* Rejilla de tres zonas: la navegación queda ópticamente
             centrada en la página con independencia de lo que midan la
-            marca (izquierda) y el clúster de utilidades (derecha). */}
-        <div className="mx-auto grid w-full max-w-page grid-cols-[1fr_auto_1fr] items-center gap-4">
+            marca (izquierda) y el clúster de utilidades (derecha).
+
+            DOS columnas en móvil y tres a partir de `md`, y el motivo es
+            de fondo: la zona central se oculta en móvil con `hidden`, es
+            decir `display:none`, y un hijo así NO ocupa su celda — sale
+            de la rejilla por completo. Con tres columnas declaradas y
+            solo dos hijos visibles, el botón de menú heredaba la celda
+            del centro y aparecía en mitad de la barra, con 178 px de
+            hueco a su derecha, en vez de pegado al borde.
+
+            No se arregla dándole al botón una alineación propia: la
+            celda equivocada seguiría siendo la del centro. Se arregla
+            declarando la rejilla que de verdad hay en cada tamaño. */}
+        <div className="mx-auto grid w-full max-w-page grid-cols-[1fr_auto] items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
           {/* ZONA 1 — Marca. min-h-[44px] garantiza el suelo táctil en
               móvil (el glifo + texto solos medían 32 px). */}
           <Link

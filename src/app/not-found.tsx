@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useLang } from "@/lib/i18n";
-import { asset } from "@/lib/asset";
 import { MarketBackground } from "@/components/tj/MarketBackground";
 import { ParticleField } from "@/components/tj/ParticleField";
 
@@ -35,21 +34,21 @@ export default function NotFound() {
 
   const tiles = [
     {
-      href: asset("/features"),
+      href: "/features",
       label: es ? "Características" : "Features",
       desc: es
         ? "Métricas, disciplina y local-first."
         : "Metrics, discipline and local-first.",
     },
     {
-      href: asset("/demo"),
+      href: "/demo",
       label: es ? "Demo" : "Demo",
       desc: es
         ? "La app, en tu navegador."
         : "The app, in your browser.",
     },
     {
-      href: asset("/pricing"),
+      href: "/pricing",
       label: es ? "Precios" : "Pricing",
       desc: es
         ? "Pago único. Sin suscripción."
@@ -61,7 +60,7 @@ export default function NotFound() {
     e.preventDefault();
     const term = q.trim();
     // No query → just land on FAQ; otherwise pre-fill the search box.
-    router.push(asset(term ? `/faq?q=${encodeURIComponent(term)}` : "/faq"));
+    router.push(term ? `/faq?q=${encodeURIComponent(term)}` : "/faq");
   }
 
   return (

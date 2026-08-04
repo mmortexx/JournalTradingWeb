@@ -68,25 +68,27 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-// Use ABSOLUTE URLs for OG image and logo. Next.js resolves relative OG
-// image paths against `metadataBase`, but with a basePath the resolution
-// is fragile (a leading-slash path like "/JournalTradingWeb/og.png" gets
-// re-resolved against `metadataBase`, producing a doubled basePath:
-// `.../JournalTradingWeb/JournalTradingWeb/og.png`). Absolute URLs bypass
-// that resolution entirely and emit verbatim.
+// LA TARJETA PARA COMPARTIR YA NO ES UN FICHERO QUE SE MANTENGA A MANO.
+// La generan `src/app/opengraph-image.tsx` y `src/app/twitter-image.tsx`
+// durante la compilación, y Next las inyecta solo en los metadatos de cada
+// ruta. Por eso aquí abajo `openGraph.images` se omite a propósito: ponerlo
+// sobrescribiría la imagen generada.
 //
-// PNG (no SVG) — Twitter/X, Facebook, LinkedIn, Slack y Discord fallan en
-// silencio con imágenes OG en SVG y enseñan una tarjeta rota o genérica.
-// Un PNG de 1200×630 es el único formato que renderiza en todas.
+// Antes era un PNG fijo en `public/og.png`, compuesto por un script de
+// Python y referenciado con un `?v=` que había que subir a mano cada vez.
+// Ese trío —fichero, script y número de versión— se retiró al pasar a la
+// generación automática; editar el diseño ahora es editar el componente.
 //
-// La tarjeta se genera con `python scripts/generate-og.py`, que compone el
-// PNG con las fuentes reales de la marca (Instrument Sans) y con el
-// logotipo real de la app. NO se rasteriza desde un SVG: el SVG anterior
-// pedía 'Segoe UI Variable', el rasterizador no la tenía y la miniatura
-// publicada salía en Arial. Si se cambia el texto o la marca de la
-// tarjeta, hay que volver a lanzar ese script y subir el `?v=` de
-// `@/lib/og` — de ahí sale `OG_IMAGE`, la misma URL para todas las
-// páginas.
+// Sigue siendo PNG y no SVG, y eso no es indiferente: Twitter/X, Facebook,
+// LinkedIn, Slack y Discord fallan en silencio con tarjetas en SVG y
+// enseñan una miniatura rota o genérica. 1200×630 en PNG es el único
+// formato que renderiza en todas.
+//
+// Ojo con el prefijo de ruta: cuando se escribía la dirección a mano había
+// que ponerla ABSOLUTA, porque una ruta con barra inicial se volvía a
+// resolver contra `metadataBase` y el prefijo de GitHub Pages salía
+// duplicado. Con la imagen generada lo compone Next y sale bien —
+// comprobado en el HTML de las dos compilaciones, no supuesto.
 //
 // `logo.png` es el logotipo de la marca —el libro mayor— rasterizado
 // desde la misma geometría del glifo vectorial. Va en el dato

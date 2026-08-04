@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";
+// Obligatorio con `output: export`, igual que en la tarjeta Open Graph.
+export const dynamic = "force-static";
 export const alt = "CountPips — Tu operativa, medida.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

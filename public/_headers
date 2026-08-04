@@ -41,6 +41,24 @@
 /img/*
   Cache-Control: public, max-age=86400, must-revalidate
 
+# ── Las tarjetas para compartir en redes ──────────────────────────────
+# Next genera estas imágenes SIN extensión en el nombre: el fichero se
+# llama `opengraph-image` a secas, no `opengraph-image.png`. Los
+# servidores estáticos deducen el tipo de la extensión, así que sin ella
+# lo normal es que salgan anunciadas como binario genérico. Y arriba se
+# declara `nosniff`, que prohíbe expresamente al navegador corregir esa
+# deducción mirando el contenido — de modo que la protección de seguridad
+# y la falta de extensión se agravan mutuamente.
+#
+# Facebook, WhatsApp, LinkedIn y X descartan la miniatura cuando el tipo
+# anunciado no es de imagen. El resultado sería el peor posible: la
+# imagen existe, es correcta, pesa 67 KB y se generó bien, pero ningún
+# enlace compartido la enseña — y nada en la compilación lo delata.
+/*opengraph-image
+  Content-Type: image/png
+/*twitter-image
+  Content-Type: image/png
+
 # ── El HTML no se cachea ──────────────────────────────────────────────
 # Cada página vuelve a pedirse. Es lo que hace que un despliegue se vea
 # al instante en vez de esperar a que caduque la copia del navegador.

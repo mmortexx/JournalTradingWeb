@@ -3053,6 +3053,31 @@ button.icon-btn:hover > svg,
   --page-w: min(1080px, 84vw);
   --page-margin: max(0px, calc((100% - var(--page-w)) / 2));
 }
+
+/* ---- En un móvil no hay pliego que enseñar --------------------------
+   La regla de arriba reserva el 16 % del ancho para que se vea el papel.
+   En un monitor eso son 300 px de margen y es justo lo que se busca. En
+   un teléfono de 390 px son 31 px por lado, Y SE SUMAN al relleno de 20
+   que ya trae cada sección: 46 px de margen a cada lado, casi una cuarta
+   parte de la pantalla, para enseñar una franja de papel demasiado
+   estrecha como para leerse como tal.
+
+   Medido en la portada a 390 px, el resultado era peor que un margen
+   grande: márgenes DISTINTOS conviviendo en la misma página. La barra
+   superior arrancaba a 26 px, el titular a 50, casi todas las secciones
+   a 46 y la llamada final a 20 — cuatro alineaciones verticales que el
+   ojo lee como descuadre aunque no sepa medirlas.
+
+   Por debajo de 768 px la mancha pasa a ocupar el ancho completo y el
+   margen lo da UNA sola cosa, el relleno lateral de la sección. Así
+   todas las secciones arrancan en la misma vertical. El margen
+   proporcional vuelve en cuanto hay pantalla que lo justifique. */
+@media (max-width: 767px) {
+  :root[data-palette="clasico"],
+  :root[data-palette="clasico"] #demo {
+    --page-w: 100%;
+  }
+}
 :root[data-palette="clasico"] .max-w-\[1240px\],
 :root[data-palette="clasico"] .max-w-\[1280px\],
 :root[data-palette="clasico"] .max-w-page {

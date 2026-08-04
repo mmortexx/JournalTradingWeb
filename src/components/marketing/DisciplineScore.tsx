@@ -98,8 +98,12 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
   const es = lang === "es";
   const [answers, setAnswers] = useState<(number | null)[]>(QUESTIONS.map(() => null));
 
+  // `reduce<number>` explícito: sobre un array `(number | null)[]`, TypeScript
+  // elige la sobrecarga cuyo acumulador tiene el tipo del propio array, así que
+  // el total se infería como anulable y la suma no compilaba. El acumulador es
+  // un número desde el primer paso — se declara y se acabó.
   const totalPts = useMemo(
-    () => answers.reduce((s, a, i) => s + (a !== null ? QUESTIONS[i].options[a].pts : 0), 0),
+    () => answers.reduce<number>((s, a, i) => s + (a !== null ? QUESTIONS[i].options[a].pts : 0), 0),
     [answers],
   );
   const answeredCount = answers.filter((a) => a !== null).length;

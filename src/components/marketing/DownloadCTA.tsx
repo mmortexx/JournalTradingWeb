@@ -3,7 +3,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
-import { asset } from "@/lib/asset";
 
 /**
  * DownloadCTA — Windows-app download call-to-action. Sits between the
@@ -137,7 +136,7 @@ export function DownloadCTA() {
                   accent-tinted hover shadow + lift for a premium pressable
                   affordance (R20-3c). */}
               <motion.a
-                href={asset("#")}
+                href="#"
                 whileHover={
                   reduce
                     ? undefined

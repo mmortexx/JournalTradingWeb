@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Share2, Check, Link2 } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/tj/Reveal";
-import { asset } from "@/lib/asset";
 
 /**
  * FeaturePageNav — cross-navigation section for feature subpages.
@@ -86,7 +85,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
       const dest = e.key === "ArrowLeft" ? prev : next;
       if (!dest) return;
       e.preventDefault();
-      router.push(asset(AXES[dest].href));
+      router.push(AXES[dest].href);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -145,7 +144,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
           {prev ? (
             <Reveal>
               <Link
-                href={asset(AXES[prev].href)}
+                href={AXES[prev].href}
                 // T2h: min-h-[44px] guarantees the prev/next cards meet
                 // the ≥44px touch target on mobile regardless of label
                 // height. Icon container bumped w-10 h-10 → w-11 h-11 (44px)
@@ -180,7 +179,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
           {next ? (
             <Reveal delay={0.06}>
               <Link
-                href={asset(AXES[next].href)}
+                href={AXES[next].href}
                 className="group liquid-glass depth-1 rounded-card p-5 min-h-[44px] flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {/* R24-1c: mirror of the prev card’s icon-container polish. */}
@@ -251,7 +250,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             return (
               <Reveal key={axis} delay={i * 0.06} className="shrink-0 md:shrink min-w-[260px] md:min-w-0 snap-start md:snap-none">
                 <Link
-                  href={asset(a.href)}
+                  href={a.href}
                   aria-current={isActive ? "page" : undefined}
                   // R20-3b: hover lift refined — inactive cards now lift
                   //   -translate-y-0.5 → -translate-y-1 + gain an accent

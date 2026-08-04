@@ -161,7 +161,7 @@ export function SessionClock({ num = "02" }: { num?: string }) {
                 key={s.id}
                 className="tj-paper rounded-[8px] p-4 transition-[border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
                 style={{
-                  border: `1px solid color-mix(in oklab, ${open ? s.color : "rgb(var(--divider)"} ${open ? "40%" : "14%"}, transparent)`,
+                  border: `1px solid color-mix(in oklab, ${open ? s.color : "rgb(var(--divider))"} ${open ? "40%" : "14%"}, transparent)`,
                 }}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -177,13 +177,13 @@ export function SessionClock({ num = "02" }: { num?: string }) {
                   <span
                     className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.1em]"
                     style={{
-                      background: open ? `color-mix(in oklab, ${s.color} 14%, transparent)` : "color-mix(in oklab, var(--divider) 8%, transparent)",
+                      background: open ? `color-mix(in oklab, ${s.color} 14%, transparent)` : "color-mix(in oklab, rgb(var(--divider)) 8%, transparent)",
                       color: open ? s.color : "var(--ink-3)",
-                      border: `1px solid color-mix(in oklab, ${open ? s.color : "rgb(var(--divider)"} ${open ? "35%" : "12%"}, transparent)`,
+                      border: `1px solid color-mix(in oklab, ${open ? s.color : "rgb(var(--divider))"} ${open ? "35%" : "12%"}, transparent)`,
                     }}
                   >
                     {open && (
-                      <motionPingDot color={s.color} />
+                      <MotionPingDot color={s.color} />
                     )}
                     {!open && <span aria-hidden className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--ink-3)" }} />}
                     {open ? (es ? "Abierta" : "Open") : (es ? "Cerrada" : "Closed")}
@@ -307,8 +307,11 @@ export function SessionClock({ num = "02" }: { num?: string }) {
   );
 }
 
-/* ── motionPingDot — punto pulsante para "Abierta" (live feel) ── */
-function motionPingDot({ color }: { color: string }) {
+/* ── MotionPingDot — punto pulsante para "Abierta" (live feel) ──
+   Mayúscula inicial obligatoria: JSX distingue componente de etiqueta HTML
+   por ahí. Escrito en minúscula, `<motionPingDot />` se compilaba como un
+   elemento nativo desconocido y el punto no llegaba a dibujarse nunca. */
+function MotionPingDot({ color }: { color: string }) {
   return (
     <span className="relative inline-flex w-1.5 h-1.5">
       <span

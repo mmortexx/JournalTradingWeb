@@ -1,6 +1,10 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";
+// Obligatorio con `output: export`. Sin esta línea Next no da por hecho que la
+// imagen puede generarse una sola vez durante la compilación, y aborta al
+// recopilar las páginas en vez de producir el PNG.
+export const dynamic = "force-static";
 export const alt = "CountPips — Tu operativa, medida.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
