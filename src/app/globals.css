@@ -3842,8 +3842,29 @@ button.icon-btn:hover > svg,
 .tj-paper-dense {
   background-color: color-mix(in srgb, var(--surface) 74%, transparent);
 }
+/* ── Por qué esta regla existía y por qué estaba anulando el arreglo ──
+   La barra de navegación y el cajón móvil llevan `tj-paper` Y
+   `tj-paper-dense`. Cuando se arregló el papel del tema claro se tocó
+   `.tj-paper` — pero `.tj-paper-dense` viene DESPUÉS con la misma
+   especificidad (0,3,0), así que su `background-color` ganaba y la
+   barra seguía saliendo de `--surface`, que en claro está a 0,04 de
+   luminosidad de `--bg`. Resultado: en oscuro se veía la lámina y en
+   claro la barra se fundía con la página. El arreglo estaba puesto y
+   no llegaba justo a la superficie más visible del sitio.
+
+   Sale de `--raised` como el resto del papel claro, y sube de opacidad
+   porque esta variante existe precisamente para las superficies que
+   van sobre contenido en movimiento y necesitan más cuerpo. */
 :root[data-theme="light"] .tj-paper-dense {
-  background-color: color-mix(in srgb, var(--surface) 70%, transparent);
+  background-color: color-mix(in srgb, var(--raised) 88%, transparent);
+  /* El canto inferior marca dónde acaba la lámina. Sin él, una barra
+     clara sobre un fondo claro no tiene borde y parece que el contenido
+     empieza sin más. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 -1px 0 rgb(19 29 38 / 0.09),
+    0 1px 2px rgb(19 29 38 / 0.05),
+    0 8px 24px -14px rgb(19 29 38 / 0.18);
 }
 /* Halo opcional — un resplandor del acento muy tenue en el borde
    superior, para tarjetas destacadas. */
