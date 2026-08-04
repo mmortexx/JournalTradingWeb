@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /**
  * Milestones — horizontal scrollable product timeline. Five points mark the
@@ -67,15 +68,10 @@ export function Milestones() {
 
       <div className="relative z-10 tj-container">
         {/* Header */}
-        <div className="max-w-2xl">
-          <Reveal>
-            <Eyebrow>{es ? "Trayectoria" : "Timeline"}</Eyebrow>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <h2
-              className="mt-5 t-h2 text-primary"
-            >
-              {es ? (
+        <SectionHeader
+          composicion="partida"
+          etiqueta={es ? "Trayectoria" : "Timeline"}
+          titulo={es ? (
                 <>
                   De idea a <span className="text-gradient">realidad.</span>
                 </>
@@ -84,16 +80,10 @@ export function Milestones() {
                   From idea to <span className="text-gradient">reality.</span>
                 </>
               )}
-            </h2>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-4 text-secondary leading-[1.6]">
-              {es
+          entradilla={es
                 ? "Doce meses, cinco hitos. Cada uno sale de la misma conversación: traders reales pidiendo una cosa concreta."
                 : "Twelve months, five milestones. Each one comes from the same conversation: real traders asking for one concrete thing."}
-            </p>
-          </Reveal>
-        </div>
+        />
 
         {/* Horizontal rail */}
         <Reveal delay={0.18} y={36}>
