@@ -180,7 +180,13 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 30%, transparent)",
               }}
             >
-              {es ? "60 trades" : "60 trades"}
+              {/* El ternario estaba, pero con el mismo texto en las dos
+                  ramas: una traducción que se dejó a medias. Y quedaba en
+                  contradicción con su propio gráfico — el rótulo decía
+                  «60 trades» mientras el globo de cada barra, treinta
+                  líneas más abajo, dice «operaciones». El resto del sitio
+                  usa «ops» en español sin excepción. */}
+              {es ? "60 ops" : "60 trades"}
             </span>
           </div>
           {/* Histograma hardcoded — R20-3b: each bar now exposes a native

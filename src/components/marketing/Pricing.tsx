@@ -409,10 +409,27 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
         whileTap={{ scale: 0.98, transition: { type: "spring", stiffness: 400, damping: 25 } }}
         className="mt-8 flex justify-center"
       >
-        {/* Buy CTA — `href="#"` is intentional (R20-2b): no payment system
-            is wired yet. Replace with the checkout URL when billing lands. */}
+        {/* Este botón apuntaba a `href="#"` mientras no hubiera pasarela de
+            pago. La intención era correcta —no se puede cobrar todavía—,
+            pero el resultado no: es el ÚLTIMO clic del embudo. «Comprar»
+            en la barra, en la portada y en el resumen traen hasta aquí,
+            el visitante compara los dos planes, elige, pulsa... y la
+            página salta al principio sin decir nada. Se pierde justo a
+            quien ya había decidido.
+
+            La lista de espera existe, funciona y está en ESTA misma
+            página, dos secciones más abajo. Mientras no haya cobro, ese
+            es el destino: en lugar de perder al interesado, se recoge su
+            correo. `scroll-behavior: smooth` y `scroll-padding-top` ya
+            están en `html`, así que baja suave y sin quedar tapado por la
+            barra.
+
+            Cuando entre el cobro, esto pasa a ser la URL del carrito.
+
+            Pendiente de decisión del fundador: el rótulo sigue diciendo
+            «Comprar Core» / «Comprar Pro». Es su territorio, no el mío. */}
         <MagneticButton
-          href="#"
+          href="#waitlist"
           strength={0.18}
           className={
             // Pro: gold accent fill + accent-ink text + accent-tinted hover

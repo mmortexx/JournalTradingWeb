@@ -128,15 +128,23 @@ export function DownloadCTA() {
 
             {/* Right: download button + meta */}
             <div className="shrink-0 flex flex-col items-center md:items-end gap-3">
-              {/* Download CTA — `href="#"` is intentional (R20-2b): the Windows
-                  installer is not yet shipped. Replace with the real .exe URL
-                  when the build is released. See header comment for context.
-                  Button uses the theme's primary text/bg tokens (white-on-dark
-                  in dark theme, near-black on paper in light theme) with an
-                  accent-tinted hover shadow + lift for a premium pressable
-                  affordance (R20-3c). */}
+              {/* Mismo caso que el botón de compra de los planes: apuntaba a
+                  `href="#"` porque el instalador de Windows todavía no
+                  existe. Cierto, pero el visitante que pulsa «Descargar»
+                  no lo sabe — la página le daba un salto al principio y
+                  ningún motivo para volver.
+
+                  Esta sección sólo sale en /pricing, que es justo donde
+                  vive la lista de espera, así que el ancla lleva a quien
+                  quería el programa al único sitio donde hoy puede pedir
+                  que le avisen. Cuando haya instalador, esto pasa a ser la
+                  URL del .exe.
+
+                  El resto del estilo del botón se queda como estaba: usa
+                  los colores primarios del tema con realce al pasar por
+                  encima (R20-3c). */}
               <motion.a
-                href="#"
+                href="#waitlist"
                 whileHover={
                   reduce
                     ? undefined
