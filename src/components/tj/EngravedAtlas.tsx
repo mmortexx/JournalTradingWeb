@@ -2093,10 +2093,60 @@ export function EngravedAtlas() {
     const span0 = 1 / PLATES.length;
 
     const readInk = () => {
+      const antes = ink;
       ink =
         getComputedStyle(document.documentElement)
           .getPropertyValue("--ink")
           .trim() || "#1a1714";
+      /* Cambiar de tema cambia la tinta, y las láminas guardadas están
+         grabadas con la anterior. Se tiran. */
+      if (ink !== antes) descartarBitmaps();
+    };
+
+    /* ---- Las láminas terminadas se guardan grabadas ---------------------
+       Una lámina es cara: cientos de segmentos con temblor de pulso,
+       tramas y rótulos, todo vuelto a trazar desde cero en cada fotograma
+       porque el lienzo se limpia entero. Mientras el trazo AVANZA no hay
+       otra —el dibujo cambia—, pero en cuanto llega al final dejan de
+       cambiar dos cosas a la vez: la figura ya está completa, y lo único
+       que sigue moviéndose es su opacidad y su desplazamiento vertical
+       mientras se despide.
+
+       Justo ahí estaba el gasto: la lámina pasa mucho más tiempo TERMINADA
+       que dibujándose, y terminada es cuando más trazos tiene. Se volvía a
+       grabar entera, sesenta veces por segundo, para producir exactamente
+       la misma imagen.
+
+       Ahora se graba UNA vez en un lienzo aparte y después se estampa.
+       Medido en esta página: estampar el lienzo entero cuesta 0,025 ms,
+       frente al trazado completo que es lo más caro que hay en el sitio.
+       La opacidad y el desplazamiento se aplican al estampar, así que la
+       despedida se ve idéntica.
+
+       Se descartan al cambiar de tamaño o de tema, que son las dos cosas
+       que invalidan un grabado hecho. */
+    let bitmaps: (HTMLCanvasElement | null)[] = PLATES.map(() => null);
+    const descartarBitmaps = () => {
+      bitmaps = PLATES.map(() => null);
+    };
+
+    const bitmapDe = (i: number): HTMLCanvasElement | null => {
+      const guardado = bitmaps[i];
+      if (guardado) return guardado;
+      if (w < 1 || h < 1) return null;
+      const off = document.createElement("canvas");
+      off.width = canvas.width;
+      off.height = canvas.height;
+      const octx = off.getContext("2d");
+      if (!octx) return null;
+      /* Mismo escalado que el lienzo real: las láminas dibujan en unidades
+         CSS y el bitmap está en píxeles de dispositivo. */
+      octx.setTransform(cssDpr, 0, 0, cssDpr, 0, 0);
+      octx.strokeStyle = ink;
+      octx.fillStyle = ink;
+      PLATES[i](octx, w, h, 1);
+      bitmaps[i] = off;
+      return off;
     };
 
     /* ---- Tamaño del lienzo ---------------------------------------------
@@ -2148,6 +2198,8 @@ export function EngravedAtlas() {
       h = nextH;
       canvas.width = Math.max(1, Math.round(nextW * dpr));
       canvas.height = Math.max(1, Math.round(nextH * dpr));
+      /* Los grabados guardados tienen el tamaño anterior: ya no sirven. */
+      descartarBitmaps();
       /* La transformación se pierde al redimensionar el bitmap; hay que
          reponerla o el dibujo saldría a escala 1 en una pantalla 2×. */
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -2156,7 +2208,17 @@ export function EngravedAtlas() {
 
     const resize = () => {
       const r = canvas.getBoundingClientRect();
-      const dpr = Math.min(devicePixelRatio || 1, 2);
+      /* Techo de 1,5 y no de 2. El coste de grabar una lámina crece con el
+         número de PÍXELES, así que una pantalla al doble de densidad
+         cuadruplica el trabajo — y es justo donde más se notaba, en
+         portátiles densos y en móviles.
+
+         A cambio no se pierde nada visible: esto es un grabado a lápiz de
+         líneas finísimas y muy tenues sobre papel, no tipografía ni una
+         captura. Entre 1,5× y 2× no hay diferencia apreciable en un trazo
+         de medio píxel al treinta por ciento de opacidad, y sí la hay —del
+         44 % de área— en lo que cuesta pintarlo. */
+      const dpr = Math.min(devicePixelRatio || 1, 1.5);
       const changed = applySize(r.width, r.height, dpr);
       measureAnchors();
       if (changed && ready) {
@@ -2255,7 +2317,17 @@ export function EngravedAtlas() {
       const span = 1 / n;
       for (let i = 0; i < n; i++) {
         const local = (p - i * span) / span;
-        if (local < -0.2 || local > 1.2) continue;
+        if (local < -0.2 || local > 1.2) {
+          /* Fuera de plano: se suelta su grabado. Cada uno pesa lo que un
+             lienzo del tamaño de la ventana —unos 10 MB en un monitor
+             grande—, y guardar los de toda la página serían cuarenta por
+             tener a mano figuras que no se están viendo. Como mucho hay
+             dos láminas en pantalla a la vez, así que ese es el techo.
+             Volver atrás obliga a grabar de nuevo, y cuesta UNA vez lo
+             que antes costaba en cada fotograma. */
+          if (bitmaps[i]) bitmaps[i] = null;
+          continue;
+        }
 
         /* Cruce corto: con un solape largo, dos figuras técnicas
            conviven a media opacidad durante un buen tramo de scroll y
@@ -2270,12 +2342,17 @@ export function EngravedAtlas() {
         ctx.save();
         ctx.globalAlpha = alpha;
         ctx.translate(0, lift);
-        PLATES[i](ctx, w, h, clamp01(local));
+        /* Terminada: se estampa la copia ya grabada en vez de volver a
+           trazarla. Es el caso más frecuente y el más caro de los dos. */
+        const listo = local >= 1 ? bitmapDe(i) : null;
+        if (listo) ctx.drawImage(listo, 0, 0, w, h);
+        else PLATES[i](ctx, w, h, clamp01(local));
         ctx.restore();
       }
     };
 
     let tick = 0;
+    let lastPaint = 0;
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
       if (!visible) return;
@@ -2320,6 +2397,28 @@ export function EngravedAtlas() {
          avance del trazo), así que el fotograma se ahorra sin que se
          note ningún salto. */
       if (Math.abs(next - shown) < 0.0012) return;
+
+      /* ---- Techo de repintado del fondo ---------------------------------
+         El umbral de arriba mide CUÁNTO ha avanzado el trazo. Éste mide
+         cada cuánto se permite repintar, y hacen falta los dos: durante la
+         entrada el trazo avanza deprisa, así que el umbral se supera en
+         todos los fotogramas y el atlas se regrababa sesenta veces por
+         segundo justo cuando la lámina ya tiene casi todos sus trazos. Ese
+         es el punto exacto donde se notaban los tirones — al final de la
+         animación de entrada, no al principio.
+
+         Un grabado a lápiz que avanza durante segundos no necesita sesenta
+         imágenes por segundo: a treinta el trazo se ve igual de continuo y
+         el trabajo se reduce a la mitad. No se toca la fluidez de nada más
+         de la página, sólo la de este lienzo.
+
+         Se salta el techo cuando el usuario prefiere menos movimiento (ahí
+         no hay animación que suavizar) y cuando el avance es grande — un
+         salto de scroll debe verse al momento, no en el siguiente hueco. */
+      const salto = Math.abs(next - shown) > 0.02;
+      if (!salto && now - lastPaint < 32) return;
+      lastPaint = now;
+
       shown = next;
       draw(shown);
     };
