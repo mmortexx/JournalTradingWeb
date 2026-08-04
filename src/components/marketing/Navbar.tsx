@@ -693,6 +693,12 @@ export function Navbar() {
             </div>
 
             {navLink("/demo", "Demo")}
+            {/* El test, con enlace DIRECTO y no sólo dentro del megamenú.
+                Estar en el desplegable de Producto lo deja a un clic de
+                distancia y sin verse: hay que abrir algo para saber que
+                existe. Aquí se lee de entrada, que es lo que se pedía al
+                llevarlo al menú principal. */}
+            {navLink("/test", es ? "Test" : "Quiz")}
             {navLink("/pricing", es ? "Precios" : "Pricing")}
           </div>
 
