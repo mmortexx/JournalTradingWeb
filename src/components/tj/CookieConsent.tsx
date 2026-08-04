@@ -199,7 +199,7 @@ export function CookieConsent() {
               <button
                 type="button"
                 onClick={() => choose("accepted")}
-                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-[13px] font-medium bg-[rgb(var(--accent-base))] text-[#06130d] hover:brightness-110 active:scale-[0.98] transition-[filter,transform] duration-150"
+                className="min-h-[44px] w-full px-3 py-2 rounded-lg text-[13px] font-medium bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] hover:brightness-110 active:scale-[0.98] transition-[filter,transform] duration-150"
               >
                 {es ? "Aceptar" : "Accept"}
               </button>

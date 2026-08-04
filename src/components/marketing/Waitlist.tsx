@@ -465,7 +465,7 @@ export function Waitlist() {
                           type="submit"
                           disabled={sending || !ready}
                           aria-busy={sending}
-                          className="h-12 px-6 w-full sm:w-auto rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform,opacity] duration-200 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                          className="h-12 px-6 w-full sm:w-auto rounded-[4px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform,opacity] duration-200 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                         >
                           {sending
                             ? es ? "Apuntando…" : "Joining…"

@@ -3495,19 +3495,38 @@ button.icon-btn:hover > svg,
     inset 0 -1px 0 rgb(0 0 0 / 0.05);
 }
 :root[data-theme="light"] .tj-paper {
-  /* En claro el papel es más luminoso: 60% deja intuir el atlas (líneas
-     oscuras) sin que el texto pierda contraste. Catch-light blanco más
-     marcado porque el papel claro refleja más luz. Subido desde 52%
-     (P9): el atlas asoma como filigrana, no como dibujo. */
-  background-color: color-mix(in srgb, var(--surface) 60%, transparent);
+  /* ── El papel tiene que DESPEGAR del fondo ─────────────────────────
+     En el tema oscuro esto funcionaba solo: una lámina clara sobre un
+     fondo oscuro se lee como material aunque no lleve sombra. En claro
+     no, y aquí estaba el fallo — el papel salía de `--surface`, que
+     está a 0,05 de luminosidad de `--bg`. Al 60 % de opacidad esa
+     diferencia se quedaba en nada: las tarjetas de precio flotaban
+     sobre un fondo de su mismo tono, sin canto y sin sombra. No era
+     que faltara la clase; era que no se veía.
+
+     La lámina pasa a salir de `--raised` —el escalón más claro— y sube
+     de opacidad. La separación con el fondo pasa de 0,050 a 0,090 de
+     luminosidad, casi el doble, y el texto oscuro encima gana contraste
+     en vez de perderlo, porque el papel es más claro que antes.
+
+     Y sobre todo: SOMBRA PROYECTADA. Es lo que convierte una mancha más
+     clara en una lámina que está encima de algo. Va en dos alturas —un
+     filo de contacto a 1 px y una difusa larga— porque una sola sombra
+     lee como pegatina. La difusa lleva el tono del gris, no negro puro:
+     una sombra sobre chapa gris no es negra, es gris más oscuro. */
+  background-color: color-mix(in srgb, var(--raised) 78%, transparent);
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.35'/%3E%3C/svg%3E"),
     linear-gradient(180deg,
-      color-mix(in srgb, var(--surface) 64%, transparent) 0%,
-      color-mix(in srgb, var(--surface) 54%, transparent) 100%);
+      color-mix(in srgb, var(--raised) 84%, transparent) 0%,
+      color-mix(in srgb, var(--surface) 74%, transparent) 100%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.75),
-    inset 0 -1px 0 rgb(0 0 0 / 0.04);
+    /* canto: luz arriba, contacto abajo */
+    inset 0 1px 0 rgb(255 255 255 / 0.85),
+    inset 0 -1px 0 rgb(19 29 38 / 0.07),
+    /* elevación */
+    0 1px 2px rgb(19 29 38 / 0.07),
+    0 10px 28px -12px rgb(19 29 38 / 0.22);
 }
 /* Variante más densa para superficies que necesitan más opacidad
    (navbar sobre hero animado, drawers). Sigue siendo translúcida pero

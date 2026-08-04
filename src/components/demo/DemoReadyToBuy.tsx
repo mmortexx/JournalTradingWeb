@@ -77,7 +77,7 @@ export function DemoReadyToBuy() {
                 <MagneticButton
                   href={asset(withLocale("/pricing", lang))}
                   strength={0.25}
-                  className="group inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent-base))] text-[#06130d] px-8 py-3 font-medium hover:-translate-y-0.5 transition-[transform,filter,box-shadow] duration-200 shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                  className="group inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] px-8 py-3 font-medium hover:-translate-y-0.5 transition-[transform,filter,box-shadow] duration-200 shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                 >
                   {es ? "Ver precios" : "See pricing"}
                   <svg

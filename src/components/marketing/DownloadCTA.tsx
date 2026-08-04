@@ -159,7 +159,7 @@ export function DownloadCTA() {
                 // restores the canonical text-base + px-5 padding when the
                 // viewport has room. Touch target stays ≥44px (py-3 = 24px
                 // + line ~22px = 46px).
-                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-4 sm:px-5 md:px-8 py-3 text-sm sm:text-base rounded-[4px] bg-[rgb(var(--accent-base))] text-[#06130d] font-medium transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[rgb(var(--accent-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-4 sm:px-5 md:px-8 py-3 text-sm sm:text-base rounded-[4px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-medium transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[rgb(var(--accent-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <WindowsIcon className="shrink-0 transition-transform duration-200 group-hover:scale-105" />
                 {/* P6 — responsive label: short on mobile (one line), full
