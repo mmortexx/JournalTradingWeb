@@ -48,8 +48,18 @@ local-*
 *.log
 dev.log
 dev.out.log
-test
-prompt
+# Anclados a la RAÍZ con la barra inicial, y no es un detalle de estilo.
+# Sin ella, `test` ignora CUALQUIER fichero o carpeta con ese nombre a
+# cualquier profundidad. Se llevó por delante `src/app/test/` —la página
+# del diagnóstico— sin decir nada: el commit salió limpio, el despliegue
+# en verde, y el sitio quedó publicado con un enlace en el menú a una
+# página que no existía, porque el menú y el mapa del sitio SÍ viajaron y
+# la página no. Un 404 servido con toda naturalidad.
+#
+# Estas dos entradas eran para ficheros sueltos de trabajo en la raíz; ahí
+# se quedan.
+/test
+/prompt
 
 server.log
 # Skills directory
