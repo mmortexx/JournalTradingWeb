@@ -573,6 +573,86 @@
      explicit opt-in on non-heading elements (paragraphs, etc.). */
   h1, h2, h3 { text-wrap: balance; }
 
+  /* ══════════════════════════════════════════════════════════════
+     AJUSTE FINO DE COMPOSICIÓN
+     ══════════════════════════════════════════════════════════════
+     La escala de tamaños ya estaba resuelta. Lo que no había era
+     nada de lo que un tipógrafo da por descontado, y su ausencia es
+     de las cosas que hacen que una página se lea como plantilla
+     aunque los tamaños sean correctos: cero control de huérfanas en
+     los párrafos, cero partición de palabra, cero ligaduras
+     declaradas, cero medida de lectura. Se comprobó antes de
+     escribir esto — ninguna de estas propiedades aparecía una sola
+     vez en el archivo.
+
+     Va en el elemento, no en clases nuevas: el objetivo es que las
+     44 secciones del sitio mejoren sin tocar 44 ficheros. */
+
+  html {
+    /* Ligaduras y kerning EXPLÍCITOS. El navegador los aplica por su
+       cuenta casi siempre, pero los desactiva en cuanto algo toca
+       `font-feature-settings` o `letter-spacing` fuerte — y aquí el
+       tracking negativo está en todos los titulares. Declararlos
+       evita que el display serif pierda la «fi» y la «fl». */
+    font-kerning: normal;
+    font-variant-ligatures: common-ligatures contextual;
+    /* Las fuentes variables ajustan su propio grosor de trazo al
+       tamaño con el que se pintan: el titular a 5,5rem no lleva el
+       mismo grosor de asta que el pie de foto a 0,75rem. */
+    font-optical-sizing: auto;
+    /* La puntuación de apertura cuelga del margen en vez de meter el
+       texto hacia dentro. Sólo lo hace Safari hoy; donde no, no
+       cambia nada. Es gratis y es correcto. */
+    hanging-punctuation: first last;
+  }
+
+  /* Huérfanas: `balance` es para titulares —reparte 2 o 3 líneas—
+     pero el navegador deja de aplicarlo pasadas unas pocas, así que
+     en un párrafo no hace nada. `pretty` sí: optimiza el final del
+     bloque para que la última línea no sea una palabra suelta.
+     Es el defecto tipográfico más visible que tenía el sitio. */
+  p, li, dd, figcaption, blockquote {
+    text-wrap: pretty;
+  }
+
+  /* Partición de palabra. El español encadena palabras largas
+     («significancia», «diversificación», «apalancamiento») que en
+     una columna estrecha de móvil abren ríos enormes de espacio o
+     se salen. Se limita a pantallas pequeñas y a texto corrido: en
+     un titular una palabra partida canta, y en una tabla de datos
+     no debe pasar nunca.
+     `lang="es"` ya está en <html> (lo fija el script anti-parpadeo
+     antes del primer pintado), que es lo que le dice al navegador
+     qué diccionario de guionado usar. Sin ese atributo esta regla
+     no haría nada. */
+  @media (max-width: 640px) {
+    p, li, dd, blockquote {
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      /* Nunca dejar sílabas de una letra colgando de una línea. */
+      hyphenate-limit-chars: 7 3 3;
+    }
+  }
+
+  /* Medida de lectura. Una línea de texto deja de leerse cómoda
+     pasados unos 75 caracteres: el ojo pierde el renglón al volver
+     al margen. En pantallas anchas los párrafos del sitio corrían
+     hasta donde diera el contenedor.
+     Se aplica por CLASE y no a todo `p` a propósito: hay párrafos
+     dentro de tarjetas, tablas y pies que ya están acotados por su
+     caja, y meterles un tope los descolocaría. */
+  .medida { max-width: 68ch; }
+  .medida-corta { max-width: 52ch; }
+
+  /* Cifras. Cualquier número que el lector vaya a comparar —una
+     columna de resultados, un precio junto a otro, un contador que
+     cambia— necesita que todos los dígitos ocupen lo mismo, o el
+     texto «baila» al actualizarse. `.tnum` ya lo hacía; esto lo
+     extiende a los elementos donde el dato es el contenido. */
+  th, td, time, output, [data-cifra] {
+    font-variant-numeric: tabular-nums;
+  }
+
   /* Standardized baseline transition for interactive + material
      surfaces. Buttons / links use the spec's `all 0.2s` cadence so
      every press / hover across the site shares the same tactile
@@ -1068,13 +1148,64 @@
     color: transparent;
   }
 
+  /* ══════════════════════════════════════════════════════════════
+     RITMO VERTICAL
+     ══════════════════════════════════════════════════════════════
+     Había dos espaciados —`.section` y `.section-tight`— y los dos
+     simétricos. Dos consecuencias, y las dos se ven en pantalla:
+
+     1. EL AIRE MUERTO. Con el mismo relleno arriba y abajo, entre
+        dos secciones seguidas se acumulan los dos: hasta 14rem de
+        nada entre el final de una y el titular de la siguiente. Es
+        la razón de que la página se sienta estirada y vacía y de
+        que haya que hacer scroll sobre superficie en blanco.
+     2. TODO IGUAL DE SEPARADO. Con un único valor no hay forma de
+        decir «estas dos cosas van juntas» y «aquí cambiamos de
+        tema». El espacio deja de significar algo, y una página
+        donde el espacio no significa nada se lee como plantilla.
+
+     Se sustituye por una escala de cuatro pasos en proporción ~1,4
+     (la misma razón que usa la escala de tamaños de letra, para que
+     espacio y tipografía sean el mismo sistema) y por relleno
+     ASIMÉTRICO: más arriba que abajo, en proporción 1,25:1. No es
+     un capricho — un titular pertenece al contenido que va DEBAJO,
+     así que tiene que estar más cerca de él que de lo que acaba de
+     terminar. Es la regla de proximidad aplicada al eje vertical. */
+  :root {
+    --ritmo-1: clamp(2rem, 4vw, 3rem);
+    --ritmo-2: clamp(3rem, 6vw, 4.5rem);
+    --ritmo-3: clamp(4rem, 8vw, 6.5rem);
+    --ritmo-4: clamp(5.5rem, 11vw, 9rem);
+  }
+
   .section {
-    padding-top: clamp(4rem, 8vw, 7rem);
-    padding-bottom: clamp(4rem, 8vw, 7rem);
+    padding-top: var(--ritmo-3);
+    padding-bottom: calc(var(--ritmo-3) * 0.8);
   }
   .section-tight {
-    padding-top: clamp(3rem, 6vw, 5rem);
-    padding-bottom: clamp(3rem, 6vw, 5rem);
+    padding-top: var(--ritmo-2);
+    padding-bottom: calc(var(--ritmo-2) * 0.8);
+  }
+  /* Para el cierre de una página o un cambio de capítulo, donde el
+     aire SÍ tiene que notarse porque separa dos ideas distintas. */
+  .section-suelta {
+    padding-top: var(--ritmo-4);
+    padding-bottom: calc(var(--ritmo-4) * 0.8);
+  }
+
+  /* Y el arreglo del aire muerto: cuando dos secciones se tocan, la
+     de abajo no vuelve a abrir el hueco entero — ya lo puso la de
+     arriba. Se queda con la mitad. Sin esto, la escala de arriba no
+     serviría de nada: los valores se seguirían sumando de dos en
+     dos. */
+  .section + .section,
+  .section + .section-tight,
+  .section-tight + .section,
+  .section-tight + .section-tight {
+    padding-top: calc(var(--ritmo-3) * 0.5);
+  }
+  .section-tight + .section-tight {
+    padding-top: calc(var(--ritmo-2) * 0.5);
   }
 
   /* Velo de sección — sustituye al antiguo `bg-black` opaco de las

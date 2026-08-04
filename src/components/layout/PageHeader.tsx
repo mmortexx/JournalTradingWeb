@@ -161,8 +161,16 @@ export function PageHeader({
             and leading-relaxed (1.625) → leading-[1.6] per the page-header
             brief: comfortable measure + 1.6 line-height for the lead
             paragraph on every subpage. */}
+        {/* La medida va en `ch`, no en `em`. Aquí ponía `max-w-[44em]`,
+            que suena acotado pero no lo está: `em` mide contra el tamaño
+            de letra, y a 20 px da ~880 px, o sea unos 88 caracteres por
+            línea. Pasados los ~75 el ojo pierde el renglón al volver al
+            margen izquierdo y hay que releer.
+            `ch` mide en anchos de carácter, que es la unidad en la que
+            de verdad se define una medida de lectura: 62ch son 62
+            caracteres, y lo siguen siendo si mañana cambia el cuerpo. */}
         <FadeIn delay={400} duration={800}>
-          <p className="mt-5 text-lg md:text-xl text-secondary leading-[1.6] max-w-[44em]">
+          <p className="mt-5 text-lg md:text-xl text-secondary leading-[1.6] max-w-[62ch]">
             {es ? subtitleEs : subtitleEn}
           </p>
         </FadeIn>
