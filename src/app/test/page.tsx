@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
+import { QUESTIONS } from "@/lib/trading/disciplineQuestions";
 import { SITE_URL } from "@/lib/site";
 
 /**
@@ -37,7 +38,10 @@ const breadcrumbSchema = {
 
 /* Datos estructurados de cuestionario. Google entiende `Quiz` y puede
    mostrarlo como resultado enriquecido; describe lo que la página HACE,
-   no lo que dice, que es la diferencia entre un test y un artículo. */
+   no lo que dice, que es la diferencia entre un test y un artículo.
+   `educationalLevel` con texto libre («beginner to advanced») no es un
+   valor que el vocabulario reconozca — se retira en vez de dejar un
+   campo que no aporta nada a cambio de parecer más completo. */
 const quizSchema = {
   "@context": "https://schema.org",
   "@type": "Quiz",
@@ -46,10 +50,27 @@ const quizSchema = {
     "@type": "Thing",
     name: "Disciplina en trading",
   },
-  educationalLevel: "beginner to advanced",
   inLanguage: "es",
   url: `${SITE_URL}/test/`,
   publisher: { "@type": "Organization", name: "CountPips" },
+  /* `hasPart` con las quince preguntas es lo que exige el vocabulario de
+     `Quiz` para el resultado enriquecido — sin él, el bloque entero es
+     válido pero no genera nada visible en el buscador. Las preguntas se
+     importan de `DisciplineScore`, que es donde viven de verdad: si un
+     día cambia una pregunta ahí, este bloque cambia solo. */
+  hasPart: QUESTIONS.map((q) => ({
+    "@type": "Question",
+    text: q.qEs,
+    /* Es autoevaluación, no examen: no hay una respuesta "correcta" que
+       marcar. `Answer` con el texto de la opción menos disciplinada —la
+       primera, ver el comentario en DisciplineScore.tsx sobre el orden—
+       basta para que el marcado sea válido sin fingir un acierto que no
+       existe. */
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: q.options[0].es,
+    },
+  })),
 };
 
 export const metadata: Metadata = {

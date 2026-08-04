@@ -16,6 +16,7 @@ import { IntroSequence } from "@/components/tj/IntroSequence";
 import { SectionReveal } from "@/components/tj/SectionReveal";
 import { DecorFX } from "@/components/tj/DecorFX";
 import { SITE_URL } from "@/lib/site";
+import { SUPPORT_EMAIL } from "@/lib/forms";
 
 /**
  * Viewport — `viewport-fit=cover` lets the layout extend into the notch /
@@ -110,24 +111,33 @@ const softwareApplicationSchema = {
   description:
     "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
   inLanguage: ["es", "en"],
-  offers: [
-    {
-      "@type": "Offer",
-      name: "Core",
-      price: "29",
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      url: `${SITE_URL}/pricing/`,
-    },
-    {
-      "@type": "Offer",
-      name: "Pro",
-      price: "49",
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      url: `${SITE_URL}/pricing/`,
-    },
+  softwareVersion: "1.0",
+  /* Capturas reales de la aplicación. Estaban en `public/img/` sin que
+     ningún dato estructurado las mencionara: Google las admite en
+     `SoftwareApplication` y son gratis, ya existen. */
+  screenshot: [
+    `${SITE_URL}/img/app-resumen.webp`,
+    `${SITE_URL}/img/app-curva.webp`,
+    `${SITE_URL}/img/app-operaciones.webp`,
   ],
+  /* Este bloque se emite en TODAS las páginas, así que sus ofertas
+     convivían con las del `Product` de /pricing: dos entidades distintas
+     declarando Core a 29 y Pro a 49 sobre la misma dirección. No es
+     penalizable, pero es ambiguo, y ante la duda un buscador se queda con
+     lo que menos se compromete.
+     El precio se declara UNA vez, donde se vende, que es /pricing.
+     Aquí queda el enlace a esa página, que es la relación real. */
+  offers: {
+    "@type": "AggregateOffer",
+    lowPrice: "29",
+    highPrice: "49",
+    priceCurrency: "USD",
+    offerCount: 2,
+    /* `PreOrder` y no `InStock`, por lo mismo que en /pricing: el
+       producto todavía no se puede comprar. */
+    availability: "https://schema.org/PreOrder",
+    url: `${SITE_URL}/pricing/`,
+  },
   featureList: [
     "Métricas institucionales (Sharpe, Profit Factor, Expectancy, R-multiple)",
     "Curva de equity y drawdown en tiempo real",
@@ -163,11 +173,57 @@ const organizationSchema = {
   "@type": "Organization",
   name: "CountPips",
   url: SITE_URL,
-  logo: LOGO_URL,
+  /* `ImageObject` en vez de la dirección suelta: Google prefiere el objeto
+     porque así puede validar las dimensiones sin descargar la imagen. */
+  logo: {
+    "@type": "ImageObject",
+    url: LOGO_URL,
+    width: 512,
+    height: 512,
+  },
   description:
     "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
   foundingDate: "2024",
+  /* Sólo el repositorio, que es el único perfil que existe de verdad. Los
+     iconos de X, YouTube y Discord se retiraron del pie por apuntar a
+     ninguna parte; añadirlos aquí sería el mismo error en otro sitio. */
   sameAs: ["https://github.com/mmortexx/CountPipsWeb"],
+  /* Faltaba, y es lo que permite que un buscador sepa a dónde escribir.
+     La dirección sale de la misma constante que usan el formulario y las
+     cinco pantallas donde aparece. */
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    email: SUPPORT_EMAIL,
+    availableLanguage: ["Spanish", "English"],
+  },
+};
+
+/**
+ * WebSite — faltaba por completo, y con él la posibilidad de que Google
+ * muestre un cuadro de búsqueda del sitio en sus resultados.
+ *
+ * El buscador que se declara aquí EXISTE y funciona: la FAQ lee el
+ * parámetro `q` de la dirección y filtra en vivo — es el mismo mecanismo
+ * que usa la página de error 404 para rescatar a quien se pierde. No se
+ * anuncia nada que no esté construido.
+ */
+const webSiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "CountPips",
+  alternateName: "CountPips — Diario de trading",
+  url: SITE_URL,
+  inLanguage: "es",
+  publisher: { "@type": "Organization", name: "CountPips", url: SITE_URL },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/faq/?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export const metadata: Metadata = {
@@ -178,36 +234,12 @@ export const metadata: Metadata = {
   },
   description:
     "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina que te frena antes de la tontería y tus datos 100 % en tu máquina. Pago único. Sin suscripciones.",
-  keywords: [
-    "trading journal",
-    "diario de trading",
-    "trading metrics",
-    "risk management",
-    "gestión de riesgo",
-    "trading discipline",
-    "disciplina de trading",
-    "Windows app",
-    "aplicación de escritorio",
-    "prop firm",
-    "futures prop firm",
-    "equity curve",
-    "curva de equity",
-    "trade analytics",
-    "análisis de operaciones",
-    "profit factor",
-    "sharpe ratio",
-    "expectancy",
-    "R-multiple",
-    "drawdown",
-    "playbook de trading",
-    "journal de trading",
-    "trading psychology",
-    "psicología del trading",
-    "backtesting",
-    "local-first",
-    "pago único",
-    "sin suscripciones",
-  ],
+  /* Aquí iban 28 palabras clave. Se retiran: Google dejó de usar
+     `meta keywords` en 2009 y lo anunció públicamente, Bing lo trata como
+     señal de spam, y lo único que hacían era viajar en cada una de las
+     páginas del sitio.
+     Lo que sí posiciona es lo que hay debajo: un título y una descripción
+     escritos para quien los va a leer. Eso ya está. */
   authors: [{ name: "CountPips" }],
   creator: "CountPips",
   alternates: {
@@ -287,6 +319,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteSchema),
           }}
         />
         <Providers>

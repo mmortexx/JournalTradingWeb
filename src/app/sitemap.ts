@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { TERMINOS } from "@/lib/glosario";
 import { HERRAMIENTAS } from "@/lib/herramientas";
+import { ULTIMA_ACTUALIZACION } from "@/lib/fechas";
 
 export const dynamic = "force-static";
 
@@ -68,15 +69,17 @@ const PAGES: PageMeta[] = [
   })),
 ];
 
-// Use a frozen build-time date so the static export is deterministic
-// (otherwise `new Date()` would emit a different sitemap.xml on every
-// rebuild, even when content is unchanged).
-const LAST_MODIFIED = new Date("2025-01-01T00:00:00.000Z");
+/* La fecha sale del último commit, no de una constante escrita a mano.
+   Aquí había `2025-01-01` congelada, y la razón para congelarla era buena
+   —con la hora del sistema, cada compilación produciría un mapa distinto
+   aunque no cambiara nada— pero el efecto era que el sitio afirmaba llevar
+   más de año y medio sin tocarse, publicara lo que publicara.
+   Ver `src/lib/fechas.ts`. */
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return PAGES.map(({ path, priority, changeFrequency }) => ({
     url: `${SITE_URL}${path === "/" ? "/" : `${path}/`}`,
-    lastModified: LAST_MODIFIED,
+    lastModified: ULTIMA_ACTUALIZACION,
     changeFrequency,
     priority,
   }));

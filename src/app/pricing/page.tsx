@@ -5,6 +5,7 @@ import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL } from "@/lib/site";
+import { PRECIO_VALIDO_HASTA } from "@/lib/fechas";
 
 // Estimated reading time (pricing cards + comparison + pricing FAQ +
 // trust strip + stats + lista de espera + download CTA).
@@ -108,14 +109,28 @@ const productSchema = {
   category: "Software",
   // Sin `aggregateRating` a propósito: no hay reseñas reales todavía.
   // Ver la nota equivalente en src/app/layout.tsx.
+  /* Dos correcciones en las ofertas, y la segunda no es menor:
+
+     · `priceValidUntil` estaba escrito a mano como `2026-12-31`, a menos
+       de cinco meses vista. Pasada esa fecha el buscador da la oferta por
+       caducada y deja de mostrar el precio, sin avisar. Ahora se calcula.
+
+     · `availability` declaraba `InStock` — «disponible, en existencias»—
+       de un producto QUE NO SE PUEDE COMPRAR. Contradice al resto del
+       sitio, donde los botones de compra llevan a una lista de espera y
+       los términos dicen que las condiciones se publicarán al abrir la
+       venta. Declarar disponible lo que no lo está es justo lo que hace
+       que un buscador deje de fiarse de tus datos estructurados.
+       `PreOrder` es lo que corresponde: anunciado, todavía no a la venta.
+       El día que se abra el cobro, esto pasa a `InStock`. */
   offers: [
     {
       "@type": "Offer",
       name: "CountPips — Core",
       price: "29",
       priceCurrency: "USD",
-      priceValidUntil: "2026-12-31",
-      availability: "https://schema.org/InStock",
+      priceValidUntil: PRECIO_VALIDO_HASTA,
+      availability: "https://schema.org/PreOrder",
       url: `${SITE_URL}/pricing/`,
       description:
         "Journal completo, 40+ métricas, 2 cuentas, gestión de riesgo, disciplina, informes PDF básicos.",
@@ -125,8 +140,8 @@ const productSchema = {
       name: "CountPips — Pro",
       price: "49",
       priceCurrency: "USD",
-      priceValidUntil: "2026-12-31",
-      availability: "https://schema.org/InStock",
+      priceValidUntil: PRECIO_VALIDO_HASTA,
+      availability: "https://schema.org/PreOrder",
       url: `${SITE_URL}/pricing/`,
       description:
         "Todo lo de Core + cuentas ilimitadas, modo prop firm, Monte Carlo, track record, risk of ruin, PDF avanzado, importador de rivales.",

@@ -25,6 +25,20 @@
   # alguna dependencia intentara pedir cámara o micrófono, el navegador
   # lo deniega sin preguntar al visitante.
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  # Le dice al navegador que memorice, un año entero, que este dominio se
+  # sirve por HTTPS y que nunca debe intentar la versión sin cifrar — ni
+  # siquiera si alguien teclea `http://` a mano o un enlace viejo lo
+  # apunta ahí. Cloudflare Pages ya fuerza HTTPS por su cuenta; esto
+  # cierra el instante entre la primera petición y esa redirección, que
+  # es donde un atacante en la misma red podría interceptar la conexión
+  # sin cifrar antes de que llegue a redirigirse.
+  #
+  # SIN `preload`, a propósito. Ese añadido somete el dominio a una lista
+  # que llevan los propios navegadores, y salir de ella una vez dentro es
+  # cosa de meses, no de un despliegue. Se añade el día que el dominio
+  # esté ya estable en `countpips.com`, como paso deliberado y no como
+  # efecto secundario de esta cabecera.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
 
 # ── Recursos con huella en el nombre ──────────────────────────────────
 # Next incrusta un hash en el nombre de cada fichero de `_next/static`,

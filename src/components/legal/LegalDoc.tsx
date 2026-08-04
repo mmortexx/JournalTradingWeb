@@ -82,19 +82,22 @@ export function LegalDoc({ doc }: { doc: DocumentoLegal }) {
               style={{ borderColor: "rgb(var(--divider) / 0.12)" }}
             >
               <p className="eyebrow m-0">{es ? "Contenido" : "Contents"}</p>
-              <ol className="mt-3 m-0 flex list-none flex-col gap-1.5 p-0">
+              <ol className="mt-1 m-0 flex list-none flex-col p-0">
                 {doc.secciones.map((s, i) => (
-                  <li key={s.id} className="flex gap-2.5">
-                    <span
-                      className="tnum shrink-0 text-[12px] font-semibold"
-                      style={{ color: "rgb(var(--accent-base))" }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
+                  /* `min-h-[44px]` en el enlace, no en el `<li>`: son doce
+                     entradas en la más larga de las cuatro páginas, y
+                     medían 21 px de alto. */
+                  <li key={s.id}>
                     <a
                       href={`#${s.id}`}
-                      className="link-underline-host text-[14px] text-secondary transition-colors hover:text-primary"
+                      className="link-underline-host flex min-h-[44px] items-center gap-2.5 text-[14px] text-secondary transition-colors hover:text-primary"
                     >
+                      <span
+                        className="tnum shrink-0 text-[12px] font-semibold"
+                        style={{ color: "rgb(var(--accent-base))" }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                       <span className="link-underline">
                         {es ? s.tituloEs : s.tituloEn}
                       </span>

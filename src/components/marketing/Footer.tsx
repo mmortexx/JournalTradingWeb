@@ -257,14 +257,24 @@ export function Footer() {
               can jump between sections. */}
           {cols.map((col) => (
             <nav key={col.title} aria-label={col.title}>
-              {/* h3, no h4. El último encabezado de contenido de cualquier
-                  página es un h2, así que un h4 aquí saltaba de 2 a 4 y
-                  dejaba un hueco en el esquema: quien navega por
-                  encabezados percibe un nivel que no existe y no sabe si
-                  se ha perdido algo por el camino. El tamaño no depende de
-                  la etiqueta —lo pone `.eyebrow`—, así que el aspecto no
-                  cambia. */}
-              <h3 className="eyebrow mb-3.5">{col.title}</h3>
+              {/* NO es un encabezado, y antes lo era (h3). El pie se
+                  publica igual en las diez páginas, y esta web genera el
+                  HTML con streaming: el marcador de carga de `<main>` se
+                  serializa antes de que el contenido real —con su h1—
+                  se inyecte, así que en el documento tal como llega al
+                  navegador el `<footer>` va ANTES del titular de la
+                  página. Con tres `<h3>` aquí, cualquiera que recorra el
+                  documento por encabezados —o lo lea antes de que
+                  termine de hidratarse— topaba con tres de nivel 3 sin
+                  que existiera todavía ningún h1 ni h2.
+
+                  No hacía falta que fueran encabezados para empezar: el
+                  `<nav aria-label={col.title}>` que envuelve cada columna
+                  ya le da nombre a la sección para quien navega por
+                  regiones, que es la vía pensada para esto. El tamaño no
+                  depende de la etiqueta —lo pone `.eyebrow`—, así que el
+                  aspecto no cambia. */}
+              <p className="eyebrow mb-3.5">{col.title}</p>
               {/* Each link is an inline-flex row with `min-h-[44px]` so the
                   tap target clears the WCAG 2.5.5 (AAA) 44 px threshold on
                   mobile without bloating the desktop rhythm — the row's

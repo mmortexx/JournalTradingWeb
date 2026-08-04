@@ -6,6 +6,7 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL } from "@/lib/site";
+import { ULTIMA_ACTUALIZACION_ISO } from "@/lib/fechas";
 
 // Estimated reading time (guardian + discipline cost + before/after + comparison
 // slider). ~600 words across four sections at 220 wpm = ~3 min.
@@ -41,7 +42,10 @@ const articleSchema = {
   // without datePublished the Article schema earns no rich result.
   // See worklog Task R20-1d (E2) + R20-2d.
   datePublished: "2025-01-01",
-  dateModified: "2025-01-01",
+  /* La de modificación sale del último commit, no clavada. Con las dos
+     iguales y congeladas, la página declaraba no haberse tocado desde
+     hace año y medio — y la frescura pesa en el posicionamiento. */
+  dateModified: ULTIMA_ACTUALIZACION_ISO,
   // Reuse the OG image (1200×630 PNG, meets Google's 1.91:1 spec).
   // See worklog Task R20-1d (E3) + R20-2d.
   image: `${SITE_URL}/opengraph-image`,
