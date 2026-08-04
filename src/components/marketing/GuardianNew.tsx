@@ -51,10 +51,14 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
           className="tj-paper-dense relative rounded-[2px] p-5 sm:p-6 md:p-8"
           style={{
             border: "1px solid rgb(var(--divider) / 0.13)",
-            // Elevación neutra: se retiró el resplandor teñido de acento
-            // (era un glow de color puro sin función informativa).
-            boxShadow:
-              "inset 0 1px 0 rgb(255 255 255 / 0.10), 0 2px 4px rgb(0 0 0 / 0.22), 0 8px 18px rgb(0 0 0 / 0.22)",
+            // La sombra la pone el material, no esta línea. Aquí había un
+            // `boxShadow` en NEGRO PURO al 22 %, y al ser inline ganaba
+            // siempre: anulaba la sombra que `.tj-paper` define para el
+            // tema claro, que va teñida con `--sombra` (19 29 38, el
+            // grafito del material) y no con negro. En una chapa gris
+            // clara el negro puro ensucia en vez de levantar, y esta es
+            // la sección con más exposición del sitio — sale en la
+            // portada y en /features/disciplina.
           }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">

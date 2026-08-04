@@ -29,7 +29,16 @@
 
      `rounded-full` NO se toca y no está aquí: un punto de estado o una
      píldora tienen que seguir siendo redondos. Afilar un círculo no es
-     coherencia, es un error. */
+     coherencia, es un error.
+
+     ⚠ ESTA ES LA ESCALA BASE, PERO NO LA QUE MANDA EN PANTALLA. Debajo,
+     `:root[data-palette="clasico"]` colapsa los cinco a 2 px, y como esa
+     es la paleta que el sitio fuerza siempre, 2 px es lo que se ve. Aquí
+     había además un TERCER bloque —4/8/8/8 px, de la fase anterior— que
+     seguía escrito más abajo en este mismo `@theme` y ganaba por orden;
+     se ha retirado. Antes de tocar un radio: los valores conviven en dos
+     sitios y el que gana es el de la paleta, así que compruébalo
+     computado en el navegador, no leyendo esta lista. */
   --radius-sm: 1px;
   --radius-md: 2px;
   --radius-lg: 3px;
@@ -76,33 +85,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  /* ---- Radios: DOS valores, no siete ----------------------------------
-     Estos cuatro tokens son los que consumen `rounded-sm/md/lg/xl`. Salían
-     de la escala por defecto de shadcn derivada de --radius (0.625rem), y
-     daban 6 / 8 / 10 / 14 px. Sumados al 4 px que usan los controles y al
-     8 px de `.rounded-card`, la página acababa con SIETE radios distintos
-     conviviendo — auditado en /demo: 8 px ×70, 6 px ×31, 4 px ×30,
-     14 px ×16, 10 px ×9, 3 px ×1, más las píldoras.
-
-     Siete radios no es una escala, es ruido: el ojo no llega a leerlos
-     como categorías, solo nota que nada encaja del todo. La referencia
-     además es una aplicación de escritorio de Windows, donde el radio es
-     pequeño y constante; los 14 px hacían que la ventana de la demo
-     pareciera una tarjeta de móvil y no una ventana del sistema.
-
-     Se colapsan a la escala real del producto:
-       4 px — controles (botones, chips, iconos), el radio de control de
-              la propia app.
-       8 px — superficies: tarjetas, paneles y ventanas.
-     Y la píldora, que se pide siempre a mano con `rounded-full` para los
-     puntos de estado. `lg` y `xl` valen lo mismo que `md` a propósito: no
-     hay una tercera categoría de superficie que justifique un tercer
-     radio, y dejarlos abiertos es lo que reabre la puerta al ruido. */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 8px;
-  --radius-xl: 8px;
-
   /* ---- CountPips brand tokens mapped to Tailwind ----
      NOTE: `--color-tj-accent*` mappings removed (R1-a) — they auto-
      generated ~108 unused `*-tj-accent` Tailwind utilities. Components
@@ -3194,6 +3176,11 @@ button.icon-btn:hover > svg,
   --radius-md: 2px;
   --radius-lg: 2px;
   --radius-xl: 2px;
+  /* `2xl` entra en la lista: quedaba fuera y heredaba los 5 px del
+     `@theme`, así que un solo `rounded-2xl` habría metido un segundo
+     radio en la página sin que nadie lo notara. Hoy no se usa en ningún
+     sitio; se cierra ahora para que no dependa de que siga sin usarse. */
+  --radius-2xl: 2px;
 }
 
 /* ---- Material: papel, no cristal -------------------------------------

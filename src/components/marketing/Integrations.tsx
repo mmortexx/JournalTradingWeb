@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
-import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
@@ -58,14 +57,27 @@ export function Integrations() {
               </>
             )}
           entradilla={es
-              ? "CSV universal. Mapea columnas una sola vez y olídate."
+              ? "CSV universal. Mapea columnas una sola vez y olvídate."
               : "Universal CSV. Map columns once and forget."}
         />
 
-        {/* T2h: 2-col mobile gap-3 → gap-3.5 (14px) for slight breathing
-            between broker cards on 320–390px viewports without losing the
-            dense logo-wall feel. */}
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-3">
+        {/* ── Muro de brókers en retícula ──────────────────────────────
+            Eran diez cajas separadas por hueco, cada una levantándose al
+            pasar el ratón. Pero esto es una lista de compatibilidad —
+            qué entra y qué no—, y una lista de compatibilidad se publica
+            como cuadro, no como diez objetos sueltos.
+
+            Se retira el paso intermedio de 3 columnas: 10 no es
+            divisible por 3 y dejaba la última fila con una sola celda,
+            con el trazo colgando sobre el hueco. 2 y 5 sí dividen a 10,
+            así que ambas retículas cierran exactas.
+
+            Filete izquierdo en todas las celdas y −1 px en la rejilla:
+            el trazo de la primera columna se sale del contenedor y se
+            recorta, sin encadenar reglas `nth-child` por cada punto de
+            ruptura. */}
+        <div className="mt-10 overflow-hidden border-t border-[rgb(var(--divider)/0.14)]">
+          <div className="-ml-px grid grid-cols-2 lg:grid-cols-5">
           {BROKERS.map((b, i) => (
             <motion.div
               key={b.name}
@@ -77,8 +89,7 @@ export function Integrations() {
                 delay: (i % 5) * 0.08,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              className="group relative liquid-glass depth-1 rounded-card border border-transparent p-4 h-full min-w-0 flex flex-col gap-3 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)]"
+              className="group relative p-4 min-w-0 flex flex-col gap-3 border-b border-l border-[rgb(var(--divider)/0.14)]"
             >
               {/* Row: monogram mark (left) + CSV chip (right). */}
               <div className="relative flex items-center justify-between">
@@ -103,6 +114,7 @@ export function Integrations() {
               </div>
             </motion.div>
           ))}
+          </div>
         </div>
 
         {/* Universal-CSV reminder line. */}

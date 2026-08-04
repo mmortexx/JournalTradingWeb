@@ -1,29 +1,34 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
-import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /**
- * BeforeAfter — "Antes vs Después" transformation section.
+ * BeforeAfter — la sección «Antes vs Después».
  *
- * Two liquid-glass cards side-by-side on desktop, stacked on mobile, separated by a
- * center arrow divider (→ desktop / ↓ mobile) labelled
- * "La transformación" / "The transformation".
+ * Dos láminas de papel en paralelo en escritorio, apiladas en móvil,
+ * separadas por una flecha (→ en escritorio, ↓ en móvil) rotulada «La
+ * transformación».
  *
- * Left card (Antes / Before): muted, slightly desaturated, opacity 0.7,
- *   red ✗ icons, red-tinted border + wash.
- * Right card (Después / After): vibrant, full opacity, accent-glow border,
- *   green ✓ icons, slightly larger padding.
+ * Conservan superficie y no pasan a retícula: lo que hay dentro son dos
+ * listas de frases contrapuestas —narrativa, no dato—, y la comparación
+ * se sostiene en que se lean como dos hojas enfrentadas.
+ *
+ * Izquierda (Antes): iconos ✗ rojos, filete y lavado rojos, y el texto en
+ *   terciario. El apagado lo da el color, NO la opacidad del contenedor:
+ *   reposaba en `opacity: 0.7` y eso dejaba su texto en 3,68:1, por
+ *   debajo del mínimo exigible.
+ * Derecha (Después): iconos ✓ verdes y filete de acento. Ninguna de las
+ *   dos se levanta al pasar el ratón — no son botones, y levantar sólo
+ *   una desnivelaba la comparación.
  */
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function BeforeAfter() {
   const { lang } = useLang();
   const es = lang === "es";
-  const reduce = useReducedMotion();
 
   const before = es
     ? [
@@ -93,17 +98,29 @@ export function BeforeAfter() {
                 {es ? "Antes del journal" : "Before the journal"}
               </span>
             </div>
-            {/* Muted, desaturated, lower-opacity liquid-glass card */}
+            {/* ── La tarjeta «antes», apagada sin bajar la opacidad ──────
+                Reposaba en `opacity: 0.7` con un `saturate(0.85)` encima,
+                y eso NO era un recurso de estilo: dejaba su texto —14 px,
+                `text-secondary`— en 3,68:1 sobre la chapa clara, por
+                debajo del 4,5:1 que exige un texto normal. Apagar un
+                bloque bajándole la opacidad apaga también su legibilidad,
+                y con el material translúcido del papel el efecto sería
+                aún peor.
+
+                El apagado ahora lo da el COLOR del contenido (el texto
+                baja a terciario, 4,53:1, que sí cumple) y el lavado rojo
+                del fondo. La opacidad vuelve a 1.
+
+                Fuera también el `saturate(0.85)`: lo único con color aquí
+                es el rojo de resultado, y desaturar precisamente eso va
+                en contra de la regla de la página — el color significa
+                dinero y nada más lo usa. */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 0.7, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.7, ease: EASE }}
-              // R20-3b: border bumped pnl-neg/25 → 30 so the Before card’s red
-              // edge reads as a hard “past / avoided” signal even at the
-              // rest opacity (0.7); previously the border faded almost to
-              // invisible against the dark backdrop.
-              className="relative flex-1 min-w-0 rounded-card liquid-glass depth-2 overflow-hidden border border-pnl-neg/30 saturate-[0.85] transition-shadow duration-300"
+              className="tj-paper relative flex-1 min-w-0 rounded-[2px] overflow-hidden border border-pnl-neg/30"
             >
               {/* Soft red wash */}
               <div
@@ -133,7 +150,10 @@ export function BeforeAfter() {
                         <path d="M3 3l6 6M9 3l-6 6" stroke="rgb(var(--pnl-neg))" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     </span>
-                    <span className="text-[14px] text-secondary">{line}</span>
+                    {/* Terciario, no secundario: es aquí donde vive ahora
+                        el «apagado» de esta columna, en vez de en la
+                        opacidad del contenedor. 4,53:1 sobre la chapa. */}
+                    <span className="text-[14px] text-tertiary">{line}</span>
                   </motion.li>
                 ))}
               </ul>
@@ -180,20 +200,20 @@ export function BeforeAfter() {
                 {es ? "Con CountPips" : "With CountPips"}
               </span>
             </div>
-            {/* Vibrant liquid-glass card with static accent border glow + slightly
-                larger padding. No breathing animation — clean and premium. */}
+            {/* La tarjeta «después», en el mismo papel que su pareja. El
+                borde de acento es lo único que las distingue, y con eso
+                basta: son dos estados del mismo trader, no dos productos.
+
+                Fuera el salto de 4 px al pasar el ratón. Estas dos
+                tarjetas no se pulsan ni llevan a ningún sitio, y levantar
+                sólo una de las dos rompía además la comparación, que se
+                sostiene precisamente en que estén al mismo nivel. */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-              whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-              // El borde ya se encarga de marcar el estado "después" en
-              // acento (antes llevaba además un halo de sombra teñida de
-              // acento redundante con el propio borde — se retiró; la
-              // elevación pasa a ser la neutra `depth-2`, igual que la
-              // tarjeta "antes").
-              className="relative flex-1 min-w-0 rounded-card liquid-glass depth-2 overflow-hidden border border-[rgb(var(--accent-base)/0.28)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="tj-paper relative flex-1 min-w-0 rounded-[2px] overflow-hidden border border-[rgb(var(--accent-base)/0.28)]"
             >
               {/* Accent wash */}
               <div

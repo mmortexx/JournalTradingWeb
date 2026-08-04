@@ -155,10 +155,18 @@ function TarjetaTermino({
     <li>
       {/* La tarjeta ENTERA es el enlace, no solo el título: en móvil
           apuntar a dos palabras con el pulgar es peor que apuntar a un
-          bloque de 100 px de alto. */}
+          bloque de 100 px de alto.
+
+          El `border` en reposo NO es decorativo: sin él, el
+          `hover:border-…` de al lado no pintaba nada. `.tj-paper` no
+          declara borde y el reglaje base deja el grosor a 0, así que
+          cambiar sólo el COLOR en el hover no produce ninguna línea
+          visible. La tarjeta respondía al puntero en el papel y no en la
+          pantalla. Mismo arreglo en las otras cinco tarjetas de glosario
+          y herramientas. */}
       <Link
         href={`/glosario/${termino.slug}`}
-        className="tj-paper group flex h-full flex-col rounded-[2px] p-4 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
+        className="tj-paper group flex h-full flex-col rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-4 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
       >
         <span
           lang="en"

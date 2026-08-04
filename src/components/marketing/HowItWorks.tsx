@@ -2,8 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
-import { Eyebrow } from "@/components/tj/Eyebrow";
-import { Reveal } from "@/components/tj/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /** 3-step "how it works" — capture, analyze, improve. */
@@ -93,13 +91,21 @@ export function HowItWorks() {
                 {/* Numbered circle + illustration */}
                 <div className="relative mb-6">
                 <motion.div
-                  whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                  // T2h: step illustration circle responsive — 120px on
-                  // mobile (saves ~24px vertical per step on small
-                  // viewports), 144px from sm+ where the 3-col grid has
-                  // room. The connector line top-[72px] is hidden md:block
-                  // so it only renders at md+ where the circle is 144px.
-                  className="relative w-[120px] h-[120px] sm:w-[144px] sm:h-[144px] rounded-card liquid-glass depth-1 flex items-center justify-center transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  // Placa de la ilustración. Pasa de `liquid-glass depth-1`
+                  // a papel: el cristal degradaba a un fondo plano sin
+                  // grano ni translucidez, y dejaba estos tres pasos
+                  // planos al lado de las secciones que ya son de papel.
+                  //
+                  // Conserva superficie —no pasa a retícula— porque lo que
+                  // hay dentro es un dibujo, y un dibujo necesita lienzo:
+                  // sin él, los tres iconos quedarían flotando sobre el
+                  // grabado del fondo.
+                  //
+                  // T2h: 120px en móvil (ahorra ~24px verticales por paso),
+                  // 144px desde sm+, donde la rejilla de 3 columnas tiene
+                  // sitio. La línea conectora `top-[72px]` es `hidden
+                  // md:block`, así que sólo aparece en md+ con 144px.
+                  className="tj-paper relative w-[120px] h-[120px] sm:w-[144px] sm:h-[144px] rounded-[2px] border border-[rgb(var(--divider)/0.13)] flex items-center justify-center"
                 >
                     {/* Step illustration */}
                     <div className="relative">

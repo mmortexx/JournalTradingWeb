@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
-import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
@@ -88,12 +87,19 @@ export function Comparison() {
               : "Excel is free but silent. The cloud is convenient but costly and foreign. This app is local, honest and yours."}
         />
 
+        {/* ── La comparativa ya era una tabla; le sobraba el marco ──────
+            Estaba metida en una caja con esquina, sombra de tercer nivel
+            y un `scale` de 1,005 al pasar el ratón. Una matriz de
+            comparación no necesita que la presenten como objeto: sus
+            propios filetes de fila y columna YA son la retícula. Lo
+            único que hacía el envoltorio era añadir un segundo sistema
+            de trazos alrededor del primero.
+
+            Fuera la caja y fuera el `scale`: ampliar la tabla entera al
+            acercar el puntero sugiere que se puede manipular, y no se
+            puede — se lee. */}
         <Reveal delay={0.08} className="mt-10">
-          <motion.div
-            whileHover={{ scale: 1.005 }}
-            transition={{ type: "spring", stiffness: 200, damping: 22 }}
-            className="liquid-glass depth-3 rounded-card overflow-hidden relative transition-shadow duration-300"
-          >
+          <div className="relative border-t border-[rgb(var(--divider)/0.14)]">
             {/* Horizontal scroll wrapper for mobile. The 4-column comparison
                 table has min-w-[680px] so on a 375px viewport it scrolls
                 horizontally inside this container. Two mobile-only scroll
@@ -111,13 +117,19 @@ export function Comparison() {
                     <col className="w-[17%]" />
                     <col className="w-[17%]" />
                   </colgroup>
-                {/* Header — `sticky top-0` is a progressive enhancement:
-                    true viewport-sticky is blocked by the
-                    `overflow-hidden` + `overflow-x-auto` ancestors
-                    (needed for the rounded-card clip + horizontal
-                    scroll on mobile); a split-table or JS-synced
-                    header restructure would unlock it but is out of
-                    scope for this polish round.
+                {/* Cabecera — el `sticky top-0` es una mejora que hoy no
+                    llega a activarse: el `overflow-x-auto` que necesita
+                    el desplazamiento lateral en móvil crea su propio
+                    contexto y bloquea el anclaje respecto al viewport.
+                    (El `overflow-hidden` que también lo impedía se fue
+                    con la caja; el que queda basta para bloquearlo.)
+                    Desbloquearlo pide partir la tabla o sincronizar la
+                    cabecera por JS, y eso es otra tarea.
+
+                    Lo que SÍ funciona es el `sticky left-0` de la
+                    primera columna: al desplazar en horizontal las
+                    celdas pasan por debajo, y por eso su fondo tiene que
+                    ser opaco de verdad.
 
                     El fondo de cada `th` es OPACO y sin desenfoque.
                     Antes era `--bg` al 92 % con `backdrop-blur-md`, y
@@ -150,11 +162,19 @@ export function Comparison() {
                       <th
                         key={c.key}
                         scope="col"
-                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 bg-[rgb(var(--bg))] ${
+                        className={`p-5 md:p-6 text-left align-top relative h-14 md:h-16 ${
                           c.highlight
                             ? "shadow-[inset_3px_0_0_0_rgb(var(--accent-base)),inset_0_-1px_0_0_rgb(var(--accent-base)/0.18)]"
                             : ""
                         }`}
+                        /* Mismo arreglo que en las dos columnas fijas: el
+                           `bg-[rgb(var(--bg))]` que había aquí era CSS
+                           inválido —`--bg` es un hex— y dejaba la banda
+                           de cabecera sin fondo. Ahora que la tabla no
+                           vive dentro de una caja, ese fondo es lo único
+                           que separa la cabecera del material de la
+                           sección, así que tiene que pintar de verdad. */
+                        style={{ backgroundColor: "color-mix(in srgb, var(--bg) 100%, transparent)" }}
                       >
                         {/* Premium top accent rail on the highlighted column —
                             a 2px gradient bar pinned to the top inside edge,
@@ -205,7 +225,15 @@ export function Comparison() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-30px" }}
                       transition={{ duration: 0.45, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                      className={`group border-b last:border-b-0 transition-colors hover:bg-[rgb(var(--divider)/0.07)] ${
+                      /* La última fila conserva su filete: antes lo
+                         descolgaba con `last:border-b-0` porque el canto
+                         de la caja ya cerraba la tabla por abajo, y sin
+                         caja ese trazo es lo único que la cierra. El
+                         alfa pasa a 0,14, que es el del sistema — el
+                         `border-b` a secas heredaba el 0,10 del reglaje
+                         global y quedaba medio tono por debajo del resto
+                         de retículas de la página. */
+                      className={`group border-b border-[rgb(var(--divider)/0.14)] transition-colors hover:bg-[rgb(var(--divider)/0.07)] ${
                         i % 2 === 1 ? "bg-[rgb(var(--divider)/0.015)]" : ""
                       }`}
                     >
@@ -233,20 +261,25 @@ export function Comparison() {
                 </tbody>
               </table>
               </div>
-              {/* Mobile-only right-edge gradient fade — theme-aware via the
-                  --bg token so it reads as a soft depth cue in both dark
-                  and light themes. pointer-events-none keeps taps flowing
-                  through to the underlying scrollable cells. */}
+              {/* Degradado del borde derecho, sólo en móvil: avisa de que
+                  la tabla sigue hacia ese lado sin bloquear el toque.
+
+                  Va por `color-mix` y no por `rgb(var(--bg) / 0.92)`:
+                  `--bg` es un hex (#d4d9dd en el tema vivo), así que
+                  `rgb()` recibía un hex, la declaración era inválida y
+                  el degradado no llegaba a pintarse. Mismo fallo que ya
+                  se había corregido en las dos columnas fijas, pero aquí
+                  quedó sin corregir. */}
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 md:hidden"
                 style={{
                   background:
-                    "linear-gradient(to left, rgb(var(--bg) / 0.92), transparent)",
+                    "linear-gradient(to left, color-mix(in srgb, var(--bg) 92%, transparent), transparent)",
                 }}
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Mobile-only scroll hint — tiny eyebrow-style label with
               bidirectional arrows. Sits below the table so it doesn't

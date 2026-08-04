@@ -250,7 +250,16 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         </Reveal>
 
         <Reveal delay={0.12} y={32}>
-          <div className="relative mt-6 max-w-3xl mx-auto liquid-glass depth-2 rounded-card p-2 md:p-3 transition-shadow duration-300">
+          {/* Pasa de cristal a papel, pero NO a retícula: dentro hay un
+              acordeón de trece preguntas que se abren y se cierran, y una
+              superficie es lo que dice «aquí se actúa». Una retícula
+              desnuda es para leer un dato, no para operar sobre él.
+
+              El cristal, además, no era cristal: la paleta viva le quita
+              el desenfoque y lo deja en un fondo plano sin grano, que es
+              justo lo que hacía que esta caja se viera apagada al lado
+              de las secciones de papel de la misma página. */}
+          <div className="tj-paper relative mt-6 max-w-3xl mx-auto rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-2 md:p-3">
             {noResults ? (
               /* ───── No-results panel — links to the GlossaryModal ───── */
               <div className="relative px-4 py-12 text-center">

@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
 import { useLang } from "@/lib/i18n";
-import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
@@ -16,18 +15,19 @@ interface SpecRow {
 }
 
 /**
- * Tech specs — platform, storage, RAM, import/export, languages,
- * updates and privacy. Renders as a single `liquid-glass rounded-card p-6`
- * surface with a 2-column grid of `<dl>` rows; each row exposes a
- * `<dt>` (label, tertiary) and `<dd>` (value, primary) so the markup
- * stays semantics-first.
+ * Ficha técnica — plataforma, almacenamiento, RAM, importación y
+ * exportación, idiomas, actualizaciones y privacidad.
  *
- * Bottom-border handling: every row gets a border-white/10 `border-b` for
- * visual rhythm; the truly-last row drops the border via
- * `border-b-0`, and on `sm+` (2 columns) the second-to-last row also
- * drops its border via `sm:border-b-0` so the final two cells — which
- * sit side-by-side in the last row — both end cleanly without a
- * dangling divider.
+ * Se publica como RETÍCULA, no como tarjeta: ocho pares etiqueta/valor
+ * en una cuadrícula de filetes, sin fondo, sin sombra y sin esquina. El
+ * marcado sigue siendo `<dl>` / `<dt>` / `<dd>`, que es lo que
+ * corresponde a un par término-definición.
+ *
+ * Los filetes: `border-t` en el contenedor cierra la retícula por
+ * arriba, cada celda pone su `border-b`, y la segunda columna añade un
+ * `border-l` sólo a partir de `sm` — en móvil hay una sola columna y esa
+ * raya no separaría nada. Ninguna celda descuelga su borde inferior: el
+ * último trazo es el que cierra la cuadrícula.
  */
 export function TechSpecs() {
   const { lang } = useLang();
@@ -91,8 +91,13 @@ export function TechSpecs() {
     <section className="section bg-veil relative overflow-hidden">
       <div className="relative tj-container">
         {/* Header */}
+        {/* `partida` y no `apilada`: en /features/seguridad esta sección e
+            `Integrations` iban seguidas con la misma composición, y dos
+            cabeceras idénticas una detrás de otra convierten la cadencia
+            en plantilla. La entradilla tiene cuerpo suficiente para
+            sostener la segunda columna, que es el criterio para partirla. */}
         <SectionHeader
-          composicion="apilada"
+          composicion="partida"
           etiqueta={es ? "Técnico" : "Technical"}
           titulo={es ? (
               <>
@@ -108,47 +113,49 @@ export function TechSpecs() {
               : "No external dependencies, no background processes, no telemetry. Once installed, it's yours."}
         />
 
-        {/* Spec card */}
+        {/* ── Pliego de especificaciones, no tarjeta ───────────────────
+            Era una lámina con esquina, sombra y relleno de 32 px que
+            envolvía ocho pares etiqueta/valor. Pero una hoja de
+            especificaciones no es un objeto que se coge: es la última
+            página del manual, donde el fabricante declara lo que la
+            máquina es. Eso se publica en retícula.
+
+            Fuera la caja; quedan los filetes. `gap` a 0 a propósito —
+            con hueco los trazos se rompen y dejan de leerse como
+            cuadrícula continua; la separación la da el relleno interior
+            de cada celda. Y todas las celdas conservan su filete
+            inferior, incluidas las dos últimas: en una tarjeta el borde
+            final sobra porque ya está el canto, pero aquí es el trazo
+            que cierra la retícula por abajo. */}
         <Reveal delay={0.1} y={28} className="mt-10">
-          <div className="liquid-glass depth-2 rounded-card p-6 md:p-8 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10">
-              {rows.map((r, i) => {
-                const isLast = i === rows.length - 1;
-                const isSecondToLast = i === rows.length - 2;
-                const cellClasses = [
-                  "flex flex-col gap-1 py-3.5 border-b ",
-                  isLast ? "border-b-0" : "",
-                  isSecondToLast ? "sm:border-b-0" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ");
-                return (
-                  <motion.dl
-                    key={r.labelEn}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-30px" }}
-                    transition={{
-                      duration: 0.5,
-                      delay: (i % 2) * 0.06 + Math.floor(i / 2) * 0.04,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    className={cellClasses}
-                  >
-                    <dt className="text-tertiary text-[11px] uppercase tracking-[0.14em] font-semibold flex items-center gap-1.5">
-                      {/* R25-1e — accent dot prefix ties each spec row to
-                          the accent palette, matching the StatsBandNew
-                          accent-dot vocabulary. */}
-                      <span aria-hidden className="size-1.5 rounded-full bg-[rgb(var(--accent-base))]" />
-                      {es ? r.labelEs : r.labelEn}
-                    </dt>
-                    <dd className="text-primary text-sm font-medium leading-snug tnum tracking-[-0.005em]">
-                      {es ? r.valueEs : r.valueEn}
-                    </dd>
-                  </motion.dl>
-                );
-              })}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 border-t border-[rgb(var(--divider)/0.14)]">
+            {rows.map((r, i) => (
+              <motion.dl
+                key={r.labelEn}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{
+                  duration: 0.5,
+                  delay: (i % 2) * 0.06 + Math.floor(i / 2) * 0.04,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                /* El filete vertical sólo en la segunda columna y sólo
+                   cuando hay dos: en móvil la retícula es una sola
+                   columna y una raya a la izquierda no separaría nada. */
+                className="flex flex-col gap-1 min-w-0 py-4 pr-6 border-b border-[rgb(var(--divider)/0.14)] sm:[&:nth-child(even)]:pl-6 sm:[&:nth-child(even)]:border-l sm:[&:nth-child(even)]:border-l-[rgb(var(--divider)/0.14)]"
+              >
+                {/* Sin el punto de acento que llevaba delante. Con el
+                    acento ya acromático era un lunar gris que no decía
+                    nada, y en una retícula el separador es el filete. */}
+                <dt className="text-tertiary text-[10px] uppercase tracking-[0.14em] font-semibold tnum">
+                  {es ? r.labelEs : r.labelEn}
+                </dt>
+                <dd className="text-primary text-sm font-medium leading-snug tnum tracking-[-0.005em]">
+                  {es ? r.valueEs : r.valueEn}
+                </dd>
+              </motion.dl>
+            ))}
           </div>
         </Reveal>
 

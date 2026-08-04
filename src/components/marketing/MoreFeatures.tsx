@@ -2,8 +2,6 @@
 
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
-import { Eyebrow } from "@/components/tj/Eyebrow";
-import { Reveal } from "@/components/tj/Reveal";
 import type { ReactNode } from "react";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
@@ -76,8 +74,12 @@ export function MoreFeatures() {
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
       <div className="relative tj-container">
+        {/* `apilada` y no `partida`: en /features esta sección viene justo
+            detrás de `HowItWorks`, que ya parte su cabecera en dos
+            columnas. Dos cabeceras partidas seguidas dejan de leerse
+            como una decisión y empiezan a leerse como una plantilla. */}
         <SectionHeader
-          composicion="partida"
+          composicion="apilada"
           etiqueta={es ? "Y mucho más" : "And much more"}
           titulo={es ? (
               <>
@@ -93,40 +95,52 @@ export function MoreFeatures() {
               : "Each one exists because a trader asked for it to make better decisions — not to fill up the landing."}
         />
 
-        {/* T2h: gap-5 → gap-5 sm:gap-5 (consistent 20px gaps per the
-            brief's ≥20px floor on all breakpoints — the previous
-            sm:gap-4 was 16px on sm+ which fell below the spec). The
-            3-col desktop rhythm stays tight at 20px. */}
-        <div className="mt-10 grid md:grid-cols-3 sm:grid-cols-2 gap-5">
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{
-                duration: 0.5,
-                delay: Math.min(i * 0.06, 0.3),
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="h-full min-w-0"
-            >
+        {/* ── Ocho entradas de un índice, no ocho tarjetas ─────────────
+            Eran cajas con hueco de 20 px entre ellas y un salto de 4 px
+            al pasar el ratón. Ocho funciones enumeradas no son ocho
+            objetos que se cogen: son las entradas de un índice, y un
+            índice se compone en retícula.
+
+            La rejilla pasa de 3 a 2/4 columnas por una razón de trazo,
+            no de gusto: 8 no es divisible por 3, así que en tres
+            columnas la última fila quedaba coja y el filete inferior
+            colgaba sobre el hueco, con la cuadrícula abierta por la
+            esquina. En 2 (sm) y en 4 (lg) las filas cierran exactas.
+
+            El filete vertical se resuelve con un margen de −1 px y el
+            recorte del contenedor, no con `nth-child`: así el trazo
+            izquierdo de la primera columna se sale y se recorta, y la
+            regla vale igual para 2 columnas que para 4 sin que un
+            punto de ruptura tenga que deshacer lo que hizo el anterior.
+            Ese encadenado de reglas es justo lo que se rompe callado
+            cuando alguien cambia el número de columnas. */}
+        <div className="mt-10 overflow-hidden border-t border-[rgb(var(--divider)/0.14)]">
+          <div className="-ml-px grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map((f, i) => (
               <motion.article
-                whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                className="group liquid-glass depth-1 rounded-card border border-transparent p-5 h-full min-w-0 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
+                key={f.title}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{
+                  duration: 0.5,
+                  delay: Math.min(i * 0.06, 0.3),
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="group min-w-0 p-5 border-b border-l border-[rgb(var(--divider)/0.14)]"
               >
-                  {/* Icon */}
-                  <div
-                    className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-base)/0.14)] border border-[rgb(var(--accent-base)/0.20)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-[rgb(var(--accent-base))] mb-4 transition-colors duration-300 group-hover:bg-[rgb(var(--accent-base)/0.20)] group-hover:border-[rgb(var(--accent-base)/0.34)]"
-                  >
-                    {f.icon}
-                  </div>
-                  <h3 className="t-h4 text-primary">{f.title}</h3>
-                  {/* T2h: leading-relaxed (1.625) → leading-[1.6] per spec. */}
-                  <p className="mt-1.5 text-[13px] text-secondary leading-[1.6]">{f.desc}</p>
+                {/* Icon */}
+                <div
+                  className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-base)/0.14)] border border-[rgb(var(--accent-base)/0.20)] shadow-[inset_0_1px_0_rgb(var(--divider)/0.08)] flex items-center justify-center text-[rgb(var(--accent-base))] mb-4 transition-colors duration-300 group-hover:bg-[rgb(var(--accent-base)/0.20)] group-hover:border-[rgb(var(--accent-base)/0.34)]"
+                >
+                  {f.icon}
+                </div>
+                <h3 className="t-h4 text-primary">{f.title}</h3>
+                {/* T2h: leading-relaxed (1.625) → leading-[1.6] per spec. */}
+                <p className="mt-1.5 text-[13px] text-secondary leading-[1.6]">{f.desc}</p>
               </motion.article>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

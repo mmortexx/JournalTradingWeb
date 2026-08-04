@@ -6,7 +6,7 @@ import { useLang } from "@/lib/i18n";
 import { fmtNum } from "@/lib/trading/format";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eyebrow } from "@/components/tj/Eyebrow";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 import {
   fetchWaitlistCount,
   joinWaitlist,
@@ -261,42 +261,53 @@ export function Waitlist() {
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
       <div className="relative z-10 tj-container">
+        {/* ── La cabecera sale de la tarjeta ───────────────────────────
+            Estaba escrita a mano y DENTRO de la caja, y por eso no
+            encajaba: el titular no venía acotado en `ch`, la entradilla
+            medía `max-w-md` en vez de las 58 líneas del sistema y le
+            faltaba el cuerpo (`text-lg`), y las tres piezas entraban de
+            golpe con la tarjeta en lugar de escalonarse.
+
+            Una cabecera dentro de la caja rotula un objeto; ésta rotula
+            una SECCIÓN, así que va fuera y por `SectionHeader`. Queda
+            además una jerarquía legible: primero la sección, luego la
+            superficie donde se actúa. */}
+        <SectionHeader
+          composicion="centrada"
+          etiqueta={es ? "Acceso anticipado" : "Early access"}
+          titulo={es ? (
+              <>
+                Entra en la <span className="text-gradient">lista</span>
+              </>
+            ) : (
+              <>
+                Join the <span className="text-gradient">waitlist</span>
+              </>
+            )}
+          entradilla={es
+              ? "Te avisamos en cuanto abramos el acceso. Un solo correo, cuando toque — ni antes ni de más."
+              : "We'll let you know the moment access opens. One email, when it matters — no filler."}
+        />
+
         <motion.div
           initial={{ opacity: 0, scale: 0.94, y: 24 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-          // T3c — swap `liquid-glass` por `.tj-paper-glow` (papel cálido
-          // translúcido + halo champagne muy tenue): la tarjeta de waitlist
-          // es el único objeto destacado de la sección, le sienta bien un
-          // papel con halo. `depth-3`, rounded-card, padding y max-w-2xl
-          // intactos.
-          className="tj-paper tj-paper-glow depth-3 rounded-card p-6 sm:p-8 max-w-2xl mx-auto relative transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          // Conserva superficie —papel con halo— y no pasa a retícula:
+          // aquí se escribe un correo y se pulsa un botón, y una lámina
+          // es lo que dice «esto se puede tocar».
+          //
+          // Fuera `depth-3` y `rounded-card`, que eran restos del sistema
+          // anterior conviviendo con el papel: con la paleta viva
+          // `depth-3` no pinta sombra, impone un borde propio y de paso
+          // pisaba la sombra que `.tj-paper` ya define. Fuera también el
+          // salto de 4 px al pasar el ratón: un formulario no es un
+          // botón, y moverlo mientras alguien apunta al campo de texto
+          // es justo lo que no debe hacer.
+          className="tj-paper tj-paper-glow rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-6 sm:p-8 max-w-2xl mx-auto mt-10 relative"
         >
           <div className="flex flex-col items-center text-center">
-            <div className="flex justify-center">
-              <Eyebrow>{es ? "Acceso anticipado" : "Early access"}</Eyebrow>
-            </div>
-
-            <h2 className="mt-5 t-h2 text-primary">
-              {es ? (
-                <>
-                  Entra en la <span className="text-gradient">lista</span>
-                </>
-              ) : (
-                <>
-                  Join the <span className="text-gradient">waitlist</span>
-                </>
-              )}
-            </h2>
-
-            <p className="mt-4 text-secondary leading-relaxed max-w-md">
-              {es
-                ? "Te avisamos en cuanto abramos el acceso. Un solo correo, cuando toque — ni antes ni de más."
-                : "We'll let you know the moment access opens. One email, when it matters — no filler."}
-            </p>
-
             {/* Contador en vivo. Sale del script de la hoja de cálculo,
                 no de una cifra escrita a mano: si no se puede leer, no
                 se enseña nada. */}

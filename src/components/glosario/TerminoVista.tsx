@@ -82,7 +82,7 @@ export function TerminoVista({ termino }: { termino: TerminoGlosario }) {
             <Reveal delay={0.1}>
               <Link
                 href={herramienta}
-                className="tj-paper mt-8 flex items-center justify-between gap-4 rounded-[2px] p-4 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
+                className="tj-paper mt-8 flex items-center justify-between gap-4 rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-4 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
               >
                 <span className="min-w-0">
                   <span className="block text-[11px] uppercase tracking-[0.14em] text-tertiary">
@@ -132,7 +132,7 @@ export function TerminoVista({ termino }: { termino: TerminoGlosario }) {
                     <li key={t.slug}>
                       <Link
                         href={`/glosario/${t.slug}`}
-                        className="tj-paper group flex h-full flex-col rounded-[2px] p-3.5 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
+                        className="tj-paper group flex h-full flex-col rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-3.5 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
                       >
                         <span
                           lang="en"
