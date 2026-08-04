@@ -337,7 +337,11 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
               trigger={
                 <button
                   type="button"
-                  className="text-sm text-tertiary hover:text-primary transition-colors inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.5)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm"
+                  /* `min-h-[44px] px-3` — es un botón de verdad, no un
+                     enlace suelto en mitad de un párrafo, y medía 20 px
+                     de alto. El relleno lateral además separa el foco
+                     del texto para que el anillo no lo estrangule. */
+                  className="min-h-[44px] px-3 text-sm text-tertiary hover:text-primary transition-colors inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.5)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm"
                 >
                   {es
                     ? "¿No encuentras tu término? Consulta el glosario →"

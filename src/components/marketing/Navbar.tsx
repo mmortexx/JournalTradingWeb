@@ -176,15 +176,44 @@ export function Navbar() {
   // botón BackToTop se OCULTEN mientras el drawer está abierto — antes
   // el cookie sheet se veía difuminado a través del backdrop y leía
   // como "compitiendo" con el menú.
+  //
+  // `overflow: hidden` a secas NO basta, y justo falla donde este menú
+  // vive: Safari en iPhone lo ignora para el gesto táctil. El síntoma es
+  // el clásico —abres el menú, deslizas el dedo, y la página de debajo
+  // se desplaza por detrás del panel; al cerrar apareces en otro punto
+  // de la página, sin haber tocado nada del contenido.
+  //
+  // Lo que sí lo frena es sacar el body del flujo con `position: fixed`.
+  // Eso tiene un precio que hay que pagar a mano: un body fijo pierde su
+  // desplazamiento y la página saltaría al principio. Por eso se anota
+  // la altura antes de fijar, se compensa con `top: -Ypx` para que se
+  // siga viendo exactamente lo mismo, y se restaura al cerrar.
+  //
+  // El `behavior: "instant"` del regreso no es un adorno: `html` lleva
+  // `scroll-behavior: smooth`, así que sin él la vuelta se animaría y
+  // cerrar el menú se vería como un viaje por la página entera.
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-      document.body.dataset.drawerOpen = "true";
-    }
+    if (!mobileOpen) return;
+    const body = document.body;
+    const y = window.scrollY;
+    const prev = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    };
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${y}px`;
+    body.style.width = "100%";
+    body.dataset.drawerOpen = "true";
     return () => {
-      document.body.style.overflow = prev;
-      delete document.body.dataset.drawerOpen;
+      body.style.overflow = prev.overflow;
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.width = prev.width;
+      delete body.dataset.drawerOpen;
+      window.scrollTo({ top: y, behavior: "instant" });
     };
   }, [mobileOpen]);
 

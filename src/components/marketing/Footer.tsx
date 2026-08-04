@@ -158,9 +158,15 @@ export function Footer() {
               chrome — same `text-[15px] font-semibold tracking-tight`
               wordmark ratio (Stripe / Linear / Vercel product-mark). */}
           <div className="col-span-2 md:col-span-1">
+            {/* `-my-2 py-2` es un truco con un motivo: el bloque medía 28 px
+                de alto, y un dedo no acierta 28 px. El relleno lo lleva a
+                44; el margen negativo devuelve exactamente esos 8 px por
+                arriba y por abajo, así que la zona que se puede tocar
+                crece y NADA se mueve de sitio. Subir el alto a secas
+                habría empujado el resto de la columna. */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 group rounded-md"
+              className="flex items-center gap-2.5 group rounded-md -my-2 py-2"
               aria-label={t("appName")}
             >
               <BrandMark />
@@ -342,19 +348,16 @@ export function Footer() {
               />
               <span>{es ? "Sistemas operativos" : "All systems operational"}</span>
             </span>
-            <span aria-hidden className="opacity-30">·</span>
-            <Link
-              href="#"
-              className="hover:text-primary transition-colors duration-200"
-            >
-              {es ? "Privacidad" : "Privacy"}
-            </Link>
-            <Link
-              href="#"
-              className="hover:text-primary transition-colors duration-200"
-            >
-              {es ? "Términos" : "Terms"}
-            </Link>
+            {/* Aquí vivían otra vez «Privacidad» y «Términos», los mismos
+                dos enlaces que la columna «Empresa» de arriba ya lista a
+                unos centímetros. Duplicados y, además, rotos de otra
+                manera: sin altura propia medían 16 px de alto, la mitad
+                del mínimo que se puede acertar con el pulgar, mientras
+                que los de la columna sí tienen sus 44 px.
+
+                Se quedan los de la columna y desaparecen éstos: un mismo
+                destino repetido dos veces en el mismo pie no da acceso,
+                da ruido — y el que se retira era justo el inservible. */}
             <span aria-hidden className="opacity-30">·</span>
             <span className="tnum text-tertiary">v1.4.2</span>
             <span aria-hidden className="opacity-30">·</span>
