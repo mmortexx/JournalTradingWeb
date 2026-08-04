@@ -97,7 +97,25 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
               asientan a la vez, leyendo como placa de ratios, no como
               cascada decorativa. */}
           <Reveal delay={0.18}>
-          <ul className="m-0 p-0 list-none grid grid-cols-2 gap-4">
+          {/* ── Cuadro de cifras, no rejilla de tarjetas ─────────────
+              Esto eran cuatro cajas redondeadas con borde, fondo propio
+              y un punto de color: el patrón por defecto de cualquier
+              panel, y lo que hacía que la sección se leyera como un
+              cuadro de mandos de plantilla en vez de como la ficha de
+              datos de una institución.
+
+              El registro correcto para una cifra financiera no es la
+              caja: es la RETÍCULA. Un informe de mercado, una terminal
+              o una memoria anual alinean los datos con reglas finas y
+              dejan que manden las cifras — la caja compite con el dato
+              que tiene dentro. Se retiran los recuadros y queda una
+              cuadrícula de filetes: separador arriba de cada celda,
+              vertical entre columnas, y nada más.
+
+              `gap` pasa a 0 a propósito: con hueco, los filetes se
+              rompen y dejan de leerse como una cuadrícula continua. La
+              separación la da el relleno interior de cada celda. */}
+          <ul className="m-0 p-0 list-none grid grid-cols-2 border-t border-[rgb(var(--divider)/0.14)]">
             {[
               { l: "Sharpe", v: "3,34", c: "rgb(var(--pnl-pos))" },
               { l: "Profit factor", v: "1,56", c: "var(--ink)" },
@@ -114,32 +132,39 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 // R24-1c: added a tiny color-coded 3×3 dot before each label
                 // so the metric direction reads at a glance (pos / neg /
                 // accent / ink) without needing to parse the value first.
-                className="tj-paper group/metric relative flex min-w-0 items-center justify-between gap-2 sm:gap-3 rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-[transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.35)]"
-                style={{
-                  // T2c — padding 14×16 → 16×20: más respiro interno en
-                  // móvil para que número y etiqueta no se toquen.
-                  // T3c — fondo swap a `.tj-paper`: papel translúcido cálido
-                  // para que las KPIs floten sobre el atlas animado. Padding
-                  // y border de T2c se conservan intactos.
-                  padding: "16px 20px",
-                }}
+                /* La celda: filete arriba y filete a la izquierda salvo
+                   en la primera columna, que ya tiene el margen. Así los
+                   trazos forman una cuadrícula y no cuatro marcos
+                   sueltos. El único movimiento al pasar por encima es
+                   que el filete superior se marca — en un cuadro de
+                   cifras, levantar la celda sería tratar un dato como
+                   un botón. */
+                className="group/metric relative min-w-0 border-b border-[rgb(var(--divider)/0.14)] py-4 pr-5 [&:nth-child(even)]:pl-5 [&:nth-child(even)]:border-l [&:nth-child(even)]:border-l-[rgb(var(--divider)/0.14)] transition-colors duration-200"
               >
-                <span className="relative inline-flex items-center gap-2 min-w-0 break-words">
-                  <span
-                    aria-hidden
-                    className="w-1.5 h-1.5 rounded-full flex-none"
-                    style={{ background: m.c }}
-                  />
-                  <span className="text-[12px] sm:text-[13px]" style={{ color: "var(--ink-2)" }}>{m.l}</span>
+                {/* Etiqueta arriba, en versalita: es el encabezado de la
+                    cifra, no su compañera. Apilar en vez de enfrentar
+                    label y valor es lo que convierte una tarjeta en una
+                    entrada de tabla. */}
+                <span
+                  className="block text-[10px] uppercase"
+                  style={{ letterSpacing: "0.14em", color: "var(--ink-3)" }}
+                >
+                  {m.l}
                 </span>
-                {/* R27-1d — bumped mobile size 17→19px so text-pnl-pos KPI
-                    values (Sharpe, Expectancy) clear WCAG AA in light theme.
-                    At 17px/700 the green (#0B8B4B ≈ 4.0:1 on the KPI tile
-                    surface) failed AA normal-text (4.5:1). At 19px/700 the
-                    value qualifies as WCAG "large text" (≥14pt bold = 18.66px
-                    bold) which only requires 3:1 — passes comfortably. Desktop
-                    was already 19px so no visual change there. */}
-                <span className="tnum relative shrink-0 text-[19px]" style={{ fontWeight: 700, color: m.c }}>{m.v}</span>
+                {/* La cifra manda: cuerpo grande, cifras tabulares y el
+                    color semántico. `tnum` para que las cuatro alineen
+                    sus dígitos en columna — sin eso, un cuadro de datos
+                    baila.
+                    Se mantiene en ≥19px y peso 700 porque a ese tamaño
+                    el verde y el rojo de P&L cuentan como texto grande
+                    para WCAG y les basta 3:1; por debajo tendrían que
+                    despejar 4,5:1 y no lo hacen. */}
+                <span
+                  className="tnum mt-1.5 block text-[22px] sm:text-[26px]"
+                  style={{ fontWeight: 600, color: m.c, letterSpacing: "-0.02em", lineHeight: 1.1 }}
+                >
+                  {m.v}
+                </span>
               </li>
             ))}
           </ul>

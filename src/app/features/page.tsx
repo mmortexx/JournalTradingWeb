@@ -26,7 +26,7 @@ const breadcrumbSchema = {
 };
 
 // Article schema — overview page that aggregates the feature deep dives
-// (FeaturesBento + Gallery + HowItWorks + MoreFeatures). Tells search
+// (FeaturesBento + HowItWorks + MoreFeatures). Tells search
 // engines this is an in-depth product overview article (not just a nav
 // page), with a headline, description, and reading time. Mirrors the
 // Article schema pattern used by /features/metricas, /features/disciplina
@@ -99,10 +99,6 @@ const FeatureExplorer = dynamic(
   () => import("@/components/marketing/FeatureExplorer").then((m) => m.FeatureExplorer),
   { loading: () => sectionFallback }
 );
-const Gallery = dynamic(
-  () => import("@/components/marketing/Gallery").then((m) => m.Gallery),
-  { loading: () => sectionFallback }
-);
 const HowItWorks = dynamic(
   () => import("@/components/marketing/HowItWorks").then((m) => m.HowItWorks),
   { loading: () => sectionFallback }
@@ -142,9 +138,6 @@ export function FeaturesBody() {
       <FeatureExplorer num="02" />
 
       <PlateInterlude index={0} />
-      <Gallery />
-
-      <PlateInterlude index={1} />
       <HowItWorks />
 
       <PlateInterlude index={2} />
