@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useId, useEffect } from "react";
 import { useLang } from "@/lib/i18n";
 
 /**
@@ -312,10 +312,60 @@ const QUESTIONS: Q[] = [
 /** Puntos máximos de una pregunta: cuatro opciones, de 0 a 3. */
 const MAX_OPT = 3;
 
+/**
+ * Dónde se recuerdan las respuestas. Son quince preguntas: perderlas por
+ * recargar, cambiar de idioma o volver desde otra página es motivo
+ * suficiente para no rehacer el test, y el test es la pieza que más
+ * engancha del sitio.
+ *
+ * Vive en el navegador de quien responde y no sale de ahí — el sitio no
+ * tiene servidor donde guardarlo ni falta que hace.
+ */
+const CLAVE_GUARDADO = "tj-test-disciplina-v1";
+
 export function DisciplineScore({ num = "04" }: { num?: string }) {
   const { lang } = useLang();
   const es = lang === "es";
   const [answers, setAnswers] = useState<(number | null)[]>(QUESTIONS.map(() => null));
+
+  /* Recuperar lo respondido. Va en un efecto y no en el estado inicial a
+     propósito: el HTML se genera en el build, sin navegador, y leer el
+     almacenamiento durante el primer pintado haría que servidor y cliente
+     dibujaran cosas distintas — React lo detecta y descarta el árbol.
+     Primero se pinta el test vacío, después se rellena. */
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    try {
+      const crudo = localStorage.getItem(CLAVE_GUARDADO);
+      if (!crudo) return;
+      const guardado: unknown = JSON.parse(crudo);
+      /* La comprobación de longitud NO es paranoia de más: el día que se
+         añada o quite una pregunta, un guardado antiguo encajaría a medias
+         y desplazaría cada respuesta a la pregunta equivocada, dando un
+         diagnóstico falso sin que nada fallara a la vista. */
+      if (
+        Array.isArray(guardado) &&
+        guardado.length === QUESTIONS.length &&
+        guardado.every(
+          (v) => v === null || (Number.isInteger(v) && v >= 0 && v <= MAX_OPT),
+        )
+      ) {
+        setAnswers(guardado as (number | null)[]);
+      }
+    } catch {
+      /* Almacenamiento bloqueado (modo privado, cookies de terceros) o
+         dato corrupto. El test funciona igual, solo que sin memoria. */
+    }
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(answers));
+    } catch {
+      /* Sin almacenamiento no se guarda, y no pasa nada más. */
+    }
+  }, [answers]);
 
   const answeredCount = answers.filter((a) => a !== null).length;
   const allAnswered = answeredCount === QUESTIONS.length;
@@ -410,6 +460,49 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
       next[qi] = oi;
       return next;
     });
+
+  /* `useId` y no un contador: si algún día el diagnóstico saliera dos
+     veces en la misma página, dos `id="q-0"` romperían la asociación
+     entre la pregunta y su grupo de respuestas — y el fallo sería
+     invisible salvo con lector de pantalla. */
+  const uid = useId();
+  const idPregunta = (qi: number) => `${uid}-q${qi}`;
+
+  /* Flechas dentro de un grupo de opciones. Es el comportamiento que un
+     lector de pantalla ANUNCIA al entrar en el grupo ("1 de 4"), así que
+     si no estuviera implementado estaríamos prometiendo algo que no
+     ocurre. Home/End saltan a los extremos; la selección sigue al foco,
+     que es como se comporta un grupo de opción nativo. */
+  const onKeyOption = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    qi: number,
+    oi: number,
+    total: number,
+  ) => {
+    let destino: number;
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        destino = (oi + 1) % total;
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        destino = (oi - 1 + total) % total;
+        break;
+      case "Home":
+        destino = 0;
+        break;
+      case "End":
+        destino = total - 1;
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
+    setAnswer(qi, destino);
+    const grupo = e.currentTarget.parentElement;
+    grupo?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[destino]?.focus();
+  };
 
   const barColor = (pct: number) =>
     pct < 40
@@ -515,21 +608,48 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
                         {dim ? (es ? dim.es : dim.en) : ""}
                       </span>
                     </div>
-                    <p className="m-0 mb-3" style={{ fontSize: 14.5, lineHeight: 1.5, color: "var(--ink)" }}>
+                    <p
+                      id={idPregunta(qi)}
+                      className="m-0 mb-3"
+                      style={{ fontSize: 14.5, lineHeight: 1.5, color: "var(--ink)" }}
+                    >
                       {es ? q.qEs : q.qEn}
                     </p>
                     {/* Una columna en móvil y dos desde `sm`: las respuestas
                         son frases, no etiquetas, y en 390 px apiladas se
-                        leen sin cortes. */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        leen sin cortes.
+
+                        `radiogroup` + `radio`, y no cuatro botones con
+                        `aria-pressed` como estaba: `aria-pressed` describe
+                        un interruptor que se queda hundido, así que quien
+                        usa lector de pantalla oía cuatro interruptores
+                        independientes —sin saber que son excluyentes, ni
+                        cuántos hay, ni a qué pregunta responden—. Con el
+                        grupo se anuncia la pregunta al entrar y cada
+                        opción como "2 de 4".
+
+                        El tabulador, además, pasaba por las 60 opciones
+                        del test una a una. Ahora cada grupo es UNA parada
+                        y dentro se elige con las flechas: 60 → 15. */}
+                    <div
+                      role="radiogroup"
+                      aria-labelledby={idPregunta(qi)}
+                      className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                    >
                       {q.options.map((o, oi) => {
                         const activa = answers[qi] === oi;
+                        /* Un grupo de opción tiene UNA parada de tabulador:
+                           la elegida, o la primera si aún no hay ninguna. */
+                        const enfocable = answers[qi] === null ? oi === 0 : activa;
                         return (
                           <button
                             key={oi}
                             type="button"
+                            role="radio"
+                            aria-checked={activa}
+                            tabIndex={enfocable ? 0 : -1}
                             onClick={() => setAnswer(qi, oi)}
-                            aria-pressed={activa}
+                            onKeyDown={(e) => onKeyOption(e, qi, oi, q.options.length)}
                             className="text-left rounded-[6px] transition-[background-color,border-color,color] duration-200"
                             style={{
                               minHeight: 44,
