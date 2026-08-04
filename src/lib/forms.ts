@@ -48,7 +48,23 @@ const WAITLIST_URL = (process.env.NEXT_PUBLIC_WAITLIST_URL ?? "").trim();
 /** `false` mientras no se haya configurado la URL de la lista. */
 export const waitlistConfigured = WAITLIST_URL.length > 0;
 
-/** Buzón de respaldo que se le ofrece al usuario si el envío falla. */
+/**
+ * Buzón de soporte. ÚNICO sitio del proyecto donde se escribe.
+ *
+ * No es sólo el respaldo cuando falla un envío: es la dirección que sale
+ * en la tarjeta de contacto, al pie de la FAQ y en la llamada de "¿no
+ * encuentras tu respuesta?". Esas tres la llevaban copiada a mano
+ * mientras el formulario y la lista de espera sí importaban esta
+ * constante — media web centralizada y media duplicada, que es como
+ * empiezan estas cosas.
+ *
+ * OJO, sigue con el dominio ANTERIOR al renombrado. Es deliberado, por el
+ * mismo motivo que la dirección canónica del sitio: `countpips.com` aún no
+ * está comprado, y un buzón que no existe pierde los correos en silencio,
+ * que es peor que uno con el nombre viejo. Cuando el dominio esté
+ * registrado y con buzón, se cambia AQUÍ y queda cambiado en las cinco
+ * pantallas donde aparece.
+ */
 export const SUPPORT_EMAIL = "soporte@tradingjournal.app";
 
 export type SubmitFailure =

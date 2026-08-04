@@ -5,6 +5,7 @@ import type { ComponentType } from "react";
 import { Mail, BookOpen, MessagesSquare, ArrowRight } from "lucide-react";
 
 import { useLang } from "@/lib/i18n";
+import { SUPPORT_EMAIL } from "@/lib/forms";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 
@@ -38,13 +39,20 @@ const CARDS: Card[] = [
     icon: Mail,
     titleEs: "Email",
     titleEn: "Email",
-    descEs: "soporte@tradingjournal.app",
-    descEn: "soporte@tradingjournal.app",
+    // La dirección sale de `@/lib/forms` y NO se escribe aquí. Estaba
+    // copiada a mano en este archivo, en la FAQ y en StillHaveQuestions,
+    // mientras el formulario de contacto y la lista de espera sí usaban la
+    // constante: media web centralizada y media duplicada. Es la misma
+    // trampa que dejó la miniatura de redes apuntando al dominio viejo —
+    // una cadena repetida no da error de compilación, sólo se queda atrás
+    // el día que cambia.
+    descEs: SUPPORT_EMAIL,
+    descEn: SUPPORT_EMAIL,
     metaEs: "Respuesta en 24h",
     metaEn: "Reply in 24h",
     ctaEs: "Escribir",
     ctaEn: "Write us",
-    href: "mailto:soporte@tradingjournal.app",
+    href: `mailto:${SUPPORT_EMAIL}`,
   },
   // `href="#"` for the two cards below is intentional (R20-2b): the docs
   // portal and the Discord/Telegram community are not live yet. Replace

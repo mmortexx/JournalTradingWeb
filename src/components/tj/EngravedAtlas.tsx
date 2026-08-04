@@ -1785,6 +1785,245 @@ function plateTenure(ctx: Ctx, w: number, h: number, t: number) {
   }
 }
 
+/**
+ * `sessions` — el día partido en husos.
+ *
+ * Una banda de veinticuatro horas y, encima, las tres plazas que se van
+ * pasando el mercado: Asia, Londres y Nueva York. Lo que la figura tiene
+ * que dejar claro no son los horarios, sino los SOLAPES — las franjas en
+ * que dos plazas están abiertas a la vez y la liquidez se dobla. Por eso
+ * son lo único con doble trama: son la respuesta a "¿a qué hora opero?",
+ * que es la pregunta que hay detrás.
+ */
+function plateSessions(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const x0 = m + w * 0.08;
+  const gw = Math.min(w - x0 - m - w * 0.06, 920);
+  const bandH = Math.min(h * 0.1, 46);
+  /* El eje NO va en el centro geométrico. Las tres plazas se apilan por
+     encima de él y abajo sólo quedan las horas, así que centrar el eje
+     dejaba la figura entera en la mitad superior y media lámina vacía —
+     se vio en pantalla, no en el código. Se baja el eje justo la mitad de
+     esa asimetría para que sea el DIBUJO lo que quede centrado. */
+  const cy = h / 2 + (3.4 * bandH + 30 - 40) / 2;
+  const hx = (hour: number) => x0 + (hour / 24) * gw;
+
+  /* El eje del día, con su marca cada tres horas. Es la única referencia
+     absoluta de la lámina: todo lo demás se mide contra él. */
+  const ap = phase(t, 0.03, 0.22);
+  engraveLine(ctx, [[x0, cy], [x0 + gw, cy]], ap, 1, 0.44, 1301);
+  for (let hh = 0; hh <= 24; hh += 3) {
+    const p = phase(t, 0.06 + hh * 0.006, 0.2);
+    if (p <= 0.01) continue;
+    engraveLine(ctx, [[hx(hh), cy], [hx(hh), cy + 7]], p, 0.6, 0.34, hh + 1311);
+    label(ctx, `${String(hh).padStart(2, "0")}`, hx(hh), cy + 21, 8.5, 0.4, p, "center");
+  }
+  label(ctx, "HORA UTC", x0, cy + 40, 9, 0.42, ap, "left");
+
+  /* Las tres plazas. Cada una es una barra a su propia altura para que
+     los solapes se vean por superposición vertical y no por mezcla. */
+  const plazas: [string, number, number, number][] = [
+    ["ASIA", 0, 9, -1],
+    ["LONDRES", 7, 16, -2],
+    ["NUEVA YORK", 12, 21, -3],
+  ];
+  const bh = bandH;
+  plazas.forEach(([nombre, ini, fin, nivel], i) => {
+    const p = phase(t, 0.2 + i * 0.12, 0.28);
+    if (p <= 0.01) return;
+    const y = cy + nivel * (bh + 10) - bh * 0.4;
+    const bx = hx(ini);
+    const bw = hx(fin) - bx;
+    handRect(ctx, bx, y, bw, bh, p, 0.95, 0.42, i * 31 + 1321, 3);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(bx, y, bw, bh);
+    ctx.clip();
+    hatch(ctx, bx, y, bw, bh, Math.PI / 4, 5.6, 0.36, 0.24, p, i + 1331);
+    ctx.restore();
+    label(ctx, nombre, bx + 6, y + bh * 0.62, 9.5, 0.5, p, "left");
+  });
+
+  /* LOS SOLAPES. Se graban al final, sobre las barras ya trazadas: son
+     lectura de segundo orden, la que solo tiene sentido cuando ya se ve
+     quién está abierto. Doble trama cruzada, que es como un grabado
+     marca una zona sin disponer de color. */
+  const sp = phase(t, 0.62, 0.32);
+  if (sp > 0.02) {
+    const solapes: [number, number][] = [
+      [7, 9],
+      [12, 16],
+    ];
+    const yTop = cy - 3 * (bh + 10) - bh * 0.4;
+    const alto = cy - yTop - 6;
+    solapes.forEach(([a, b], i) => {
+      const bx = hx(a);
+      const bw = hx(b) - bx;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(bx, yTop, bw, alto);
+      ctx.clip();
+      hatch(ctx, bx, yTop, bw, alto, Math.PI / 4, 4.4, 0.42, 0.22, sp, i + 1341);
+      hatch(ctx, bx, yTop, bw, alto, -Math.PI / 4, 4.4, 0.42, 0.22, sp, i + 1351);
+      ctx.restore();
+      for (const X of [bx, bx + bw])
+        engraveLine(ctx, [[X, yTop], [X, cy - 4]], sp, 0.55, 0.3, Math.round(X) + 1361);
+    });
+    label(ctx, "SOLAPE", hx(14), yTop - 9, 9, 0.46, sp, "center");
+  }
+}
+
+/**
+ * `significance` — dónde acaba la suerte.
+ *
+ * La campana de lo que una racha cualquiera produce por puro azar, y a su
+ * derecha el umbral a partir del cual un resultado deja de explicarse así.
+ * La cola sombreada es la zona de la que se puede decir algo; todo lo que
+ * queda a la izquierda, por bueno que parezca, cabe dentro del ruido.
+ *
+ * Es deliberadamente incómoda: la parte tramada es pequeña comparada con
+ * el cuerpo de la campana, y esa desproporción ES el argumento. Casi
+ * cualquier racha corta vive bajo la joroba.
+ */
+function plateSignificance(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const x0 = m + w * 0.09;
+  const gw = Math.min(w - x0 - m - w * 0.07, 900);
+  const gh = Math.min(h - m * 2 - h * 0.28, 420);
+  const yBase = h / 2 + gh / 2;
+  const cx = x0 + gw * 0.44;
+  const sigma = gw * 0.14;
+  const campana = (x: number) => yBase - gh * Math.exp(-Math.pow((x - cx) / sigma, 2) / 2);
+
+  const ap = phase(t, 0.03, 0.22);
+  engraveLine(ctx, [[x0, yBase], [x0 + gw, yBase]], ap, 1, 0.44, 1401);
+
+  /* La curva. Se traza de un tirón porque una campana partida en tramos
+     deja de leerse como una sola cosa. */
+  const pts: Pt[] = [];
+  for (let i = 0; i <= 120; i++) {
+    const X = x0 + (i / 120) * gw;
+    pts.push([X, campana(X)]);
+  }
+  const cp = phase(t, 0.14, 0.36);
+  engraveLine(ctx, pts, cp, 1.3, 0.5, 1411);
+
+  /* El umbral. Una vertical y su rótulo: la frontera del argumento. */
+  const xU = cx + sigma * 1.96;
+  const up = phase(t, 0.46, 0.26);
+  if (up > 0.02) {
+    const dash: Pt[] = [];
+    for (let Y = yBase; Y > yBase - gh * 0.98; Y -= 13) dash.push([xU, Y], [xU, Y - 7]);
+    for (let i = 0; i + 1 < dash.length; i += 2)
+      engraveLine(ctx, [dash[i], dash[i + 1]], up, 0.7, 0.4, i + 1421);
+    label(ctx, "UMBRAL", xU + 7, yBase - gh * 0.9, 9.5, 0.5, up, "left");
+  }
+
+  /* La cola: lo que ya no cabe en la casualidad. Franjas verticales
+     estrechas bajo la curva, no un bloque, para que se vea que se agota
+     poco a poco y no de golpe. */
+  const tp = phase(t, 0.62, 0.34);
+  if (tp > 0.02) {
+    const paso = 5.2;
+    for (let X = xU; X < x0 + gw; X += paso) {
+      const yTop = campana(X);
+      if (yBase - yTop < 0.6) continue;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(X, yTop, paso * 0.82, yBase - yTop);
+      ctx.clip();
+      hatch(ctx, X, yTop, paso * 0.82, yBase - yTop, Math.PI / 4, 3.4, 0.4, 0.26, tp, Math.round(X) + 1431);
+      ctx.restore();
+    }
+    label(ctx, "AQUÍ YA NO ES SUERTE", x0 + gw, yBase + 22, 9, 0.46, tp, "right");
+  }
+
+  /* Y el nombre de lo que ocupa casi todo el ancho, que es lo que se
+     suele confundir con una ventaja. */
+  label(ctx, "LO QUE EL AZAR PRODUCE SOLO", cx, yBase + 22, 9, 0.44, cp, "center");
+}
+
+/**
+ * `workspace` — la mesa de trabajo.
+ *
+ * El alzado de la aplicación: marco, barra de título, columna de
+ * navegación y la mancha de contenido dividida en paneles. No es un
+ * pantallazo —un grabado no reproduce una interfaz—, es el plano de
+ * cómo está repartida.
+ *
+ * Va en `/demo`, y ahí tiene una función que ninguna figura prestada
+ * podía cumplir: la página enseña la aplicación funcionando, y el fondo
+ * la dibuja como se dibujaría un instrumento en un tratado.
+ */
+function plateWorkspace(ctx: Ctx, w: number, h: number, t: number) {
+  plateChrome(ctx, w, h, t);
+  const m = Math.min(w, h) * 0.055;
+  const bw = Math.min(w - m * 2 - w * 0.1, 940);
+  const bh = Math.min(h - m * 2 - h * 0.2, 560);
+  const x0 = (w - bw) / 2;
+  const y0 = (h - bh) / 2;
+
+  /* El marco y su barra de título. */
+  const fp = phase(t, 0.03, 0.28);
+  handRect(ctx, x0, y0, bw, bh, fp, 1.25, 0.46, 1501, 6);
+  const tbh = Math.min(bh * 0.1, 44);
+  engraveLine(ctx, [[x0, y0 + tbh], [x0 + bw, y0 + tbh]], fp, 0.9, 0.4, 1503);
+  for (let i = 0; i < 3; i++) {
+    const p = phase(t, 0.1 + i * 0.03, 0.2);
+    if (p <= 0.01) continue;
+    rosette(ctx, x0 + bw - 26 - i * 22, y0 + tbh / 2, 1, 1, 5, p);
+  }
+  label(ctx, "COUNTPIPS", x0 + 16, y0 + tbh * 0.66, 9.5, 0.46, fp, "left");
+
+  /* La columna de navegación, con sus entradas como renglones. */
+  const navW = Math.min(bw * 0.22, 190);
+  const np = phase(t, 0.22, 0.26);
+  engraveLine(ctx, [[x0 + navW, y0 + tbh], [x0 + navW, y0 + bh]], np, 0.85, 0.38, 1511);
+  for (let i = 0; i < 6; i++) {
+    const p = phase(t, 0.26 + i * 0.022, 0.22);
+    if (p <= 0.01) continue;
+    const ry = y0 + tbh + 26 + i * 30;
+    if (ry > y0 + bh - 18) break;
+    engraveLine(ctx, [[x0 + 16, ry], [x0 + navW - 18, ry]], p, 0.6, i === 1 ? 0.44 : 0.26, i + 1521);
+    if (i === 1) handRect(ctx, x0 + 10, ry - 11, navW - 22, 20, p, 0.5, 0.24, i + 1531, 2);
+  }
+
+  /* La mancha de contenido: una gráfica arriba y dos paneles debajo. Es
+     el reparto real de la aplicación, no un relleno. */
+  const cx0 = x0 + navW + 18;
+  const cw = x0 + bw - cx0 - 18;
+  const cy0 = y0 + tbh + 18;
+  const ch = y0 + bh - cy0 - 18;
+
+  const gp = phase(t, 0.42, 0.3);
+  const gh2 = ch * 0.52;
+  handRect(ctx, cx0, cy0, cw, gh2, gp, 0.7, 0.3, 1541, 3);
+  /* Dentro, una curva: lo que la aplicación enseña de verdad. */
+  const curva: Pt[] = [];
+  for (let i = 0; i <= 40; i++) {
+    const p = i / 40;
+    const yy = cy0 + gh2 * (0.78 - p * 0.5 + Math.sin(p * 7.1) * 0.08 + rnd(i + 1551) * 0.05);
+    curva.push([cx0 + 12 + p * (cw - 24), yy]);
+  }
+  engraveLine(ctx, curva, phase(t, 0.5, 0.3), 1.1, 0.44, 1553);
+
+  const pp = phase(t, 0.66, 0.28);
+  const py = cy0 + gh2 + 14;
+  const ph = ch - gh2 - 14;
+  const pw = (cw - 14) / 2;
+  for (let i = 0; i < 2; i++) {
+    handRect(ctx, cx0 + i * (pw + 14), py, pw, ph, pp, 0.7, 0.3, i + 1561, 3);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(cx0 + i * (pw + 14), py, pw, ph);
+    ctx.clip();
+    hatch(ctx, cx0 + i * (pw + 14), py, pw, ph, i === 0 ? Math.PI / 4 : -Math.PI / 4, 6.2, 0.34, 0.16, pp, i + 1571);
+    ctx.restore();
+  }
+}
+
 /* ---- El reparto por ruta ---------------------------------------------
    Cada entrada es el guion de una sección: qué se graba, en qué orden y
    cuántas figuras. No todas llevan cuatro — el número sale de lo larga
@@ -1813,6 +2052,9 @@ const PLATE_FN: Record<PlateId, PlateFn> = {
   vault: plateVault,
   ledger: plateLedger,
   tenure: plateTenure,
+  sessions: plateSessions,
+  significance: plateSignificance,
+  workspace: plateWorkspace,
 };
 
 /** Juego de láminas de una ruta, ya resuelto a funciones de dibujo. */

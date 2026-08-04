@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 import { useLang } from "@/lib/i18n";
+import { SUPPORT_EMAIL } from "@/lib/forms";
 import { Reveal } from "@/components/tj/Reveal";
 import { asset } from "@/lib/asset";
 
@@ -56,7 +57,7 @@ export function StillHaveQuestions() {
                 even when the link text itself is short. */}
             <div className="relative mt-5 flex flex-wrap items-center justify-center gap-3">
               <a
-                href="mailto:soporte@tradingjournal.app"
+                href={`mailto:${SUPPORT_EMAIL}`}
                 className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[4px] bg-[rgb(var(--accent-base))] px-5 text-sm font-semibold text-[rgb(var(--accent-ink))] transition-[background-color,transform] duration-200 hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {es ? "Escríbenos" : "Email us"}

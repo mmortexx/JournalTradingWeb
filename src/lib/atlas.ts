@@ -24,7 +24,10 @@ export type PlateId =
   | "streak"
   | "vault"
   | "ledger"
-  | "tenure";
+  | "tenure"
+  | "sessions"
+  | "significance"
+  | "workspace";
 
 export type PlateMeta = {
   titleEs: string;
@@ -127,6 +130,30 @@ export const PLATE_META: Record<PlateId, PlateMeta> = {
     noteEn:
       "Two strokes on the same axis of years: the staircase of a subscription, climbing a step each time it renews, and the flat line of a payment made once. Neither line is the argument — the hatched gap between them is, and it widens on its own, with nobody adding anything.",
   },
+  sessions: {
+    titleEs: "El día partido en husos",
+    titleEn: "The day divided into sessions",
+    noteEs:
+      "Asia, Londres y Nueva York sobre una misma banda de veinticuatro horas. Lo que importa no es cuándo abre cada plaza, sino dónde se pisan: en esas franjas cruzadas hay dos mercados despiertos a la vez, y es cuando el precio se mueve de verdad.",
+    noteEn:
+      "Asia, London and New York on a single twenty-four-hour band. What matters is not when each opens, but where they overlap: in those cross-hatched strips two markets are awake at once, and that is when price really moves.",
+  },
+  significance: {
+    titleEs: "Dónde acaba la suerte",
+    titleEn: "Where luck runs out",
+    noteEs:
+      "La campana es lo que una racha cualquiera produce sola, sin ventaja ninguna. Sólo la cola tramada, más allá del umbral, dice algo. Fíjese en la desproporción: casi cualquier buen mes cabe todavía bajo la joroba.",
+    noteEn:
+      "The bell is what any run produces on its own, with no edge at all. Only the hatched tail, beyond the threshold, says anything. Note the disproportion: almost any good month still fits under the hump.",
+  },
+  workspace: {
+    titleEs: "El alzado del instrumento",
+    titleEn: "The instrument, in elevation",
+    noteEs:
+      "Marco, barra, columna de navegación y la mancha repartida en paneles. No es una captura —un grabado no reproduce una pantalla—, es el plano de cómo está ordenado lo que aquí al lado se puede tocar.",
+    noteEn:
+      "Frame, title bar, navigation column and the working area split into panels. Not a screenshot — an engraving does not reproduce a screen — but the plan of how the thing you can try right here is laid out.",
+  },
 };
 
 /**
@@ -149,9 +176,19 @@ export const ATLAS_ROUTES: Record<string, PlateId[]> = {
      de otra cosa. La curva de capital se queda de segunda porque lo que
      se compra aquí sirve para eso. */
   "/pricing": ["tenure", "equity"],
-  "/demo": ["heatmap"],
-  "/faq": ["distribution", "calendar"],
-  "/about": ["ledger", "rolling"],
+  /* Una sola lámina, y ahora es la que toca: la página enseña la
+     aplicación funcionando y el fondo la dibuja en alzado. Antes llevaba
+     el mapa de calor, prestado de métricas. */
+  "/demo": ["workspace"],
+  /* `significance` abre y la distribución la sigue, en ese orden porque
+     el orden es un argumento: primero dónde acaba la suerte, después
+     cómo se reparten tus operaciones. Antes abría la distribución sola,
+     prestada de la portada y de métricas. */
+  "/faq": ["significance", "distribution"],
+  /* El reloj de sesiones es propio de esta página —el mismo que se puede
+     tocar más abajo— y va primero. La media móvil se queda de segunda; el
+     libro mayor sale, que ya titula en seguridad y en características. */
+  "/about": ["sessions", "rolling"],
 };
 
 const ROMAN = ["I", "II", "III", "IV", "V"];

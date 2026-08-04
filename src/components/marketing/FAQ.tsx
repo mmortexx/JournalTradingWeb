@@ -4,6 +4,7 @@ import * as React from "react";
 import { Search } from "lucide-react";
 
 import { useLang } from "@/lib/i18n";
+import { SUPPORT_EMAIL } from "@/lib/forms";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 import { GlossaryModal } from "@/components/tj/GlossaryModal";
@@ -317,7 +318,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
           <p className="mt-6 text-center text-sm text-tertiary">
             {es ? "¿No encuentras tu respuesta?" : "Didn't find your answer?"}{" "}
             <a
-              href="mailto:soporte@tradingjournal.app"
+              href={`mailto:${SUPPORT_EMAIL}`}
               className="link-underline text-primary hover:text-[rgb(var(--accent-hover))] font-medium transition-colors"
             >
               {es ? "Escríbenos" : "Email us"}

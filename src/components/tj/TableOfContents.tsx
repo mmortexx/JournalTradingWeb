@@ -79,6 +79,20 @@ export function TableOfContents() {
       // Find closest element with a real id (not main-content).
       let target: HTMLElement | null = h.closest("[id]") as HTMLElement | null;
       let id = target?.id;
+      /* Un id existente no basta: tiene que servir de ANCLA. React reparte
+         ids propios a algunos contenedores —del estilo `S:1`— y los dos
+         puntos no son válidos en un `href="#..."` sin escapar, así que el
+         enlace del índice apuntaba a un destino inexistente y al pulsarlo
+         no ocurría nada. Se coló porque el id SÍ estaba en el DOM: la
+         comprobación de "existe" pasaba y la de "funciona" no la hacía
+         nadie. Aquí se veía en el índice de `/about`, con la misma lámina
+         dos veces, una con su slug y otra con el id de React.
+
+         Si el id no vale como ancla, se trata igual que si no hubiera: se
+         genera el slug a partir del texto. Y como ese slug coincide con el
+         de la entrada buena, el duplicado se descarta solo unas líneas más
+         abajo. */
+      if (id && !/^[A-Za-z][\w-]*$/.test(id)) id = undefined;
       if (!id || id === "main-content") {
         // Generate a slug and assign to the h2 itself.
         id = slugify(h.textContent || "");
