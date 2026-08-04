@@ -90,13 +90,14 @@ const instrumentSerif = Instrument_Serif({
 // duplicado. Con la imagen generada lo compone Next y sale bien —
 // comprobado en el HTML de las dos compilaciones, no supuesto.
 //
-// `logo.png` es el logotipo de la marca —el libro mayor— rasterizado
-// desde la misma geometría del glifo vectorial. Va en el dato
-// estructurado de Organization, que es de donde Google saca el logotipo
-// del sitio. Se regenera con `python scripts/generate-brand.py`, que
-// produce además el apple-icon y el favicon.ico; si se toca el glifo de
-// `BrandGlyph.tsx` hay que volver a lanzarlo o la marca se parte entre
-// la web y lo que ven el buscador y el sistema operativo.
+// `logo.png` es el logotipo de la marca —el cuaderno con las tres velas,
+// el mismo icono que la aplicación de escritorio— rasterizado desde la
+// misma geometría del glifo vectorial. Va en el dato estructurado de
+// Organization, que es de donde Google saca el logotipo del sitio. Se
+// regenera con `python scripts/generate-brand.py`, que produce además el
+// apple-icon y el favicon.ico; si se toca el glifo de `BrandGlyph.tsx`
+// hay que volver a lanzarlo o la marca se parte entre la web y lo que
+// ven el buscador y el sistema operativo.
 const LOGO_URL = `${SITE_URL}/logo.png`;
 
 const softwareApplicationSchema = {

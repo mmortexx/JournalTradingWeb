@@ -1,15 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
-  <!-- Favicon: el libro mayor, el mismo glifo que BrandGlyph.
-       Aquí los colores van FIJOS y no en currentColor: el icono vive en
-       la pestaña del navegador, fuera de la página, donde no hay ningún
-       tema del que heredar. El papel de fondo además lo despega tanto de
-       una barra clara como de una oscura; en transparente, la tinta
-       desaparecía sobre las pestañas oscuras.
-       El trazo es más grueso que en el glifo de la web porque un favicon
-       se dibuja a 16 px: a ese tamaño, la línea fina se rompe. -->
-  <rect width="48" height="48" rx="8" fill="#F0EDE4"/>
-  <g fill="none" stroke="#1A1714" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M24 15C20.5 12 16.5 10.5 10 10.5v24c6.5 0 10.5 1.5 14 4.5 3.5-3 7.5-4.5 14-4.5v-24c-6.5 0-10.5 1.5-14 4.5z" stroke-width="3.2"/>
-    <path d="M24 15v24" stroke-width="2.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Favicon: el cuaderno con las tres velas, el mismo logotipo que la
+       aplicacion de escritorio y que BrandGlyph.
+
+       Es la variante REDUCIDA del logotipo (02-diseno/logo/countpips-logo-small.svg),
+       no la completa, y por el mismo motivo por el que la aplicacion tiene
+       dos: un favicon se dibuja a 16 px. A ese tamano la sombra proyectada,
+       el filete de encuadernacion y el rayado del canto no son detalle,
+       son suciedad alrededor de la silueta.
+
+       El papel de fondo se conserva del icono anterior: despega el
+       cuaderno tanto de una barra clara como de una oscura. En
+       transparente, el lomo oscuro desaparecia sobre las pestanas negras.
+
+       Los identificadores de los degradados van fijos y sin sufijo — este
+       archivo es un documento independiente, no comparte pagina con nada,
+       asi que aqui no pueden chocar con los de otra instancia. -->
+  <defs>
+    <linearGradient id="cover" x1="0.05" y1="0" x2="0.95" y2="1">
+      <stop offset="0" stop-color="#C67E41"/>
+      <stop offset="0.34" stop-color="#A85F2A"/>
+      <stop offset="1" stop-color="#6E3512"/>
+    </linearGradient>
+    <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4F240B"/>
+      <stop offset="0.5" stop-color="#82471C"/>
+      <stop offset="1" stop-color="#9A5A27"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C6A87F"/>
+      <stop offset="0.34" stop-color="#FCF4E3"/>
+      <stop offset="1" stop-color="#A98B61"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#FFF3DC"/>
+      <stop offset="0.5" stop-color="#F5D6A4"/>
+      <stop offset="1" stop-color="#D09E63"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="0.2">
+      <stop offset="0" stop-color="#EFBE86"/>
+      <stop offset="1" stop-color="#94571F"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="86" fill="#F0EDE4"/>
+
+  <!-- Bloque de hojas -->
+  <rect x="352" y="98" width="56" height="322" rx="12" fill="url(#pages)"/>
+  <rect x="132" y="386" width="272" height="38" rx="12" fill="url(#pages)"/>
+
+  <!-- Marcapaginas -->
+  <path d="M292 380 L346 380 L346 470 L319 446 L292 470 Z" fill="url(#ribbon)"/>
+
+  <!-- Tapa -->
+  <rect x="104" y="84" width="264" height="318" rx="20" fill="url(#cover)"/>
+  <path d="M104 104 Q104 84 124 84 L162 84 L162 402 L124 402 Q104 402 104 382 Z" fill="url(#spine)"/>
+  <rect x="150" y="92" width="9" height="302" rx="4.5" fill="#FFD9A8" opacity="0.34"/>
+
+  <!-- Velas: tres, gruesas y bien separadas -->
+  <g fill="url(#gold)">
+    <rect x="192" y="256" width="46" height="86" rx="10"/>
+    <rect x="208" y="228" width="14" height="28" rx="7"/>
+    <rect x="208" y="342" width="14" height="26" rx="7"/>
+
+    <rect x="252" y="196" width="46" height="102" rx="10"/>
+    <rect x="268" y="166" width="14" height="30" rx="7"/>
+    <rect x="268" y="298" width="14" height="26" rx="7"/>
+
+    <rect x="312" y="140" width="46" height="92" rx="10"/>
+    <rect x="328" y="112" width="14" height="28" rx="7"/>
+    <rect x="328" y="232" width="14" height="26" rx="7"/>
   </g>
 </svg>

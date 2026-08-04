@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";
@@ -26,6 +28,28 @@ export const contentType = "image/png";
  * bajada de 3 KPIs abajo. Estilo Anthropic: minimalista, espaciado
  * generoso, jerarquía tipográfica fuerte.
  */
+
+/**
+ * El logotipo, incrustado como datos.
+ *
+ * Aquí arriba a la izquierda había un cuadrado dorado dentro de otro
+ * cuadrado: un marcador de posición, no la marca. Y ésta es justamente la
+ * imagen que se ve cuando alguien pega el enlace en WhatsApp, X o
+ * LinkedIn — el sitio donde la marca más trabaja hacia fuera.
+ *
+ * Se lee el PNG en vez de dibujar el SVG a mano por una razón práctica:
+ * esta tarjeta la compone Satori, que soporta un subconjunto de SVG, y
+ * un fallo suyo NO da un logotipo feo, aborta la compilación entera y
+ * deja el sitio sin publicar. Un PNG en base64 es lo que Satori maneja
+ * sin sorpresas.
+ *
+ * Se lee UNA vez al cargar el módulo, no en cada invocación: son ocho
+ * rutas las que generan tarjeta y todas reexportan de aquí.
+ */
+const LOGO_DATA_URI = `data:image/png;base64,${readFileSync(
+  join(process.cwd(), "public", "logo.png"),
+).toString("base64")}`;
+
 export default async function Image() {
   return new ImageResponse(
     (
@@ -48,21 +72,17 @@ export default async function Image() {
         {/* Marco superior — marca + etiqueta */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {/* Glifo de marca — cuadrado gold + anillo */}
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 8,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "rgba(199,167,107,0.14)",
-                border: "1px solid rgba(199,167,107,0.42)",
-              }}
-            >
-              <div style={{ width: 14, height: 14, background: "#C7A76B", borderRadius: 2 }} />
-            </div>
+            {/* El logotipo: el cuaderno con las tres velas, el mismo que
+                la barra del sitio y el icono del escritorio. Conserva su
+                fondo de papel —no se recorta— porque la tapa es marrón
+                oscuro y sobre el #0b0c0d de esta tarjeta se perdería. */}
+            <img
+              src={LOGO_DATA_URI}
+              alt=""
+              width={44}
+              height={44}
+              style={{ borderRadius: 8 }}
+            />
             <span style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em" }}>CountPips</span>
           </div>
           <span
@@ -86,10 +106,40 @@ export default async function Image() {
               Tu operativa, medida.
             </span>
           </div>
-          <div style={{ display: "flex", fontSize: 78, fontWeight: 700, lineHeight: 1.02, letterSpacing: "-0.035em", maxWidth: 900 }}>
-            Opera como una
-            <br />
-            mesa <span style={{ color: "#C7A76B" }}>institucional.</span>
+          {/* El titular salía como «Opera como unamesainstitucion»:
+              pegado, sin el salto de línea y cortado por el borde
+              derecho. Y salía así en las diez tarjetas del sitio, que es
+              exactamente lo que ve quien pega el enlace en WhatsApp o en
+              LinkedIn.
+
+              La causa es una diferencia de Satori —el motor que compone
+              esta imagen— con un navegador: aquí un contenedor `flex`
+              coloca a TODOS sus hijos en una fila horizontal, y los
+              trozos de texto sueltos cuentan como hijos. El `<br>` se
+              descartaba, los espacios entre trozos desaparecían al
+              tratarse como cajas contiguas, y la fila seguía creciendo
+              hacia la derecha porque una fila flex no se parte sola
+              (`maxWidth` no la envuelve sin `flexWrap`).
+
+              Por eso ahora las dos líneas son explícitas, en columna, y
+              el espacio entre «mesa» e «institucional.» lo pone un `gap`
+              en vez de un espacio de texto que se perdería igual. */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              fontSize: 78,
+              fontWeight: 700,
+              lineHeight: 1.02,
+              letterSpacing: "-0.035em",
+              maxWidth: 900,
+            }}
+          >
+            <div style={{ display: "flex" }}>Opera como una</div>
+            <div style={{ display: "flex", gap: 20 }}>
+              <span>mesa</span>
+              <span style={{ color: "#C7A76B" }}>institucional.</span>
+            </div>
           </div>
           <div style={{ fontSize: 24, fontWeight: 300, color: "#a7abac", maxWidth: 720, lineHeight: 1.35 }}>
             40+ métricas institucionales, disciplina que te frena antes del error y tus datos 100 % en tu máquina.

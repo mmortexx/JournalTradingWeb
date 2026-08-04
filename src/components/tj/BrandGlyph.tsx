@@ -1,39 +1,134 @@
+import { useId } from "react";
+
 /**
- * BrandGlyph — el logotipo de CountPips: el libro mayor.
+ * BrandGlyph — el logotipo de CountPips: el cuaderno con las tres velas.
  *
- * Un libro abierto. En la página izquierda, los renglones del registro;
- * en la derecha, la curva que sale de haberlo llevado. Eso es el
- * producto entero en un dibujo: se anota, y de anotar sale la medida.
+ * Es EL MISMO dibujo que la aplicación de escritorio, no una versión para
+ * web: sale de `02-diseno/logo/countpips-logo.svg` y de su variante
+ * pequeña, los dos archivos de los que también salen el icono de la app,
+ * el de la bandeja del sistema y la barra de título.
  *
- * ── Qué sustituye y por qué ───────────────────────────────────────────
- * Hasta ahora esto renderizaba `/logo.png`, el ojo de iris rojo y
- * amarillo de la aplicación de escritorio. Era un mapa de bits a todo
- * color en medio de una web que ahora es papel y tinta: el único
- * elemento del sitio que no estaba dibujado a línea, y se notaba. El
- * glifo nuevo es trazo, del mismo grabado que el fondo, y hereda la
- * tinta del tema con `currentColor` — oscuro sobre papel, crema sobre
- * tinta, sin dos archivos ni dos versiones.
+ * ── Por qué cambió, y esto conviene leerlo ────────────────────────────
+ * Aquí había un libro ABIERTO dibujado a línea, heredado de la marca
+ * anterior. No es el logotipo del producto. Y no fue un descuido
+ * cualquiera: el comentario que justificaba el cambio afirmaba que el
+ * archivo de la aplicación era «el ojo de iris rojo y amarillo», y en
+ * `WindowChrome` otro decía que era «el ojo de trazo champagne sobre
+ * placa oscura». Ninguna de las dos cosas es cierta — basta abrir
+ * `CountPips.App/Assets/app-logo.png` para ver un cuaderno de piel con
+ * tres velas japonesas en la tapa. Se retiró el motivo correcto por
+ * describir mal el archivo que se tenía al lado, y la web anduvo desde
+ * entonces con un logotipo que su producto no usa en ninguna parte.
  *
- * ── Grosor óptico constante ───────────────────────────────────────────
- * El `stroke-width` NO es fijo. En un viewBox de 48, un grosor de 1,8
- * mide 1,8 px cuando el glifo se dibuja a 48 px y solo 0,64 px cuando se
- * dibuja a 17 — a ese tamaño la línea se rompe y el logotipo se
- * desvanece. Aquí el grosor se calcula al revés, desde los píxeles
- * REALES que debe medir el trazo en pantalla, así que el glifo pesa
- * igual a cualquier tamaño. Es lo que hace un logotipo bien dibujado y
- * lo que un SVG con grosor fijo nunca consigue.
+ * El sitio es papel y tinta, y este glifo entra a todo color. Es
+ * deliberado: una marca se reconoce o no se reconoce, y quien vea el
+ * cuaderno en la barra tiene que reconocer el mismo icono que va a
+ * tener en su escritorio. La placa de vidrio de alrededor —que ponen
+ * la barra, el pie y la intro— sigue siendo el material de la web y
+ * hace de encuadre.
  *
- * ── Versión reducida ──────────────────────────────────────────────────
- * Por debajo de 22 px se caen los renglones y la curva. No es una
- * simplificación por comodidad: a 17 px esos detalles miden menos de un
- * píxel, y lo que producen no es detalle sino suciedad alrededor de la
- * silueta. La silueta y el lomo bastan para reconocerlo, que es lo
- * único que se le pide a un logotipo a tamaño de barra.
+ * ── Dos versiones, como en la aplicación ──────────────────────────────
+ * Por debajo de 32 px se dibuja la variante reducida: sin sombra
+ * proyectada, sin filete de encuadernación, sin el rayado del canto de
+ * las hojas, y con las velas más gruesas y separadas. No es pereza —
+ * a 16 px esos detalles miden menos de un píxel y lo que producen no es
+ * detalle, es suciedad. El canto de las hojas y el marcapáginas se
+ * conservan y se ensanchan, porque son las dos señales que distinguen
+ * un cuaderno de un rectángulo con cosas encima.
+ *
+ * ── Los identificadores llevan sufijo, y hace falta ───────────────────
+ * Los degradados de un SVG se referencian por `id`, y ese `id` es
+ * GLOBAL a la página. La barra y el pie dibujan este glifo a la vez: con
+ * identificadores fijos, ambos apuntarían a la primera definición y al
+ * desmontarse esa —cambiar de ruta, cerrar el menú— el otro se quedaría
+ * sin relleno, negro o invisible. `useId` le da a cada instancia los
+ * suyos.
  */
 
-/** Grosor que debe medir el trazo EN PANTALLA, en píxeles CSS. */
-const STROKE_PX = 1.15;
-const VIEW = 48;
+/** Paleta del logotipo. Fija a propósito: es la marca, no el tema. */
+const PARADAS = {
+  cover: [
+    ["0", "#C67E41"],
+    ["0.30", "#AC632C"],
+    ["0.68", "#8A4A1E"],
+    ["1", "#66310F"],
+  ],
+  coverSmall: [
+    ["0", "#C67E41"],
+    ["0.34", "#A85F2A"],
+    ["1", "#6E3512"],
+  ],
+  spine: [
+    ["0", "#4F240B"],
+    ["0.38", "#7A421A"],
+    ["0.74", "#A05F28"],
+    ["1", "#78411A"],
+  ],
+  spineSmall: [
+    ["0", "#4F240B"],
+    ["0.5", "#82471C"],
+    ["1", "#9A5A27"],
+  ],
+  pages: [
+    ["0", "#BFA179"],
+    ["0.26", "#FBF3E1"],
+    ["0.62", "#E4D3B0"],
+    ["1", "#AC8E64"],
+  ],
+  pagesSmall: [
+    ["0", "#C6A87F"],
+    ["0.34", "#FCF4E3"],
+    ["1", "#A98B61"],
+  ],
+  gold: [
+    ["0", "#FFF0D4"],
+    ["0.42", "#F2CE96"],
+    ["1", "#C68B45"],
+  ],
+  goldSmall: [
+    ["0", "#FFF3DC"],
+    ["0.5", "#F5D6A4"],
+    ["1", "#D09E63"],
+  ],
+  ribbon: [
+    ["0", "#EFBE86"],
+    ["0.55", "#CE8C4C"],
+    ["1", "#8E5220"],
+  ],
+  ribbonSmall: [
+    ["0", "#EFBE86"],
+    ["1", "#94571F"],
+  ],
+} as const;
+
+/** A partir de este tamaño se dibuja el logotipo con todo su detalle. */
+const UMBRAL_DETALLE = 32;
+
+type Parada = readonly (readonly [string, string])[];
+
+function Degradado({
+  id,
+  paradas,
+  x1 = 0,
+  y1 = 0,
+  x2 = 1,
+  y2 = 0,
+}: {
+  id: string;
+  paradas: Parada;
+  x1?: number;
+  y1?: number;
+  x2?: number;
+  y2?: number;
+}) {
+  return (
+    <linearGradient id={id} x1={x1} y1={y1} x2={x2} y2={y2}>
+      {paradas.map(([offset, color]) => (
+        <stop key={offset} offset={offset} stopColor={color} />
+      ))}
+    </linearGradient>
+  );
+}
 
 export function BrandGlyph({
   size = 17,
@@ -42,67 +137,243 @@ export function BrandGlyph({
   size?: number;
   className?: string;
 }) {
-  const sw = (STROKE_PX * VIEW) / size;
-  const detail = size >= 22;
+  const uid = useId().replace(/:/g, "");
+  const detalle = size >= UMBRAL_DETALLE;
+  const g = (n: string) => `cp-${uid}-${n}`;
+  const u = (n: string) => `url(#${g(n)})`;
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox={`0 0 ${VIEW} ${VIEW}`}
+      viewBox="0 0 512 512"
       fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
       aria-hidden="true"
       className={className}
     >
-      {/* Silueta: dos páginas abiertas, con la caída del papel hacia el
-          lomo. Un solo trazado cerrado. */}
-      <path
-        d="M24 13C20 9.5 15.5 8 8 8v27c7.5 0 12 1.5 16 5 4-3.5 8.5-5 16-5V8c-7.5 0-12 1.5-16 5z"
-        strokeWidth={sw}
-      />
-      {/* Lomo */}
-      <path d="M24 13v27" strokeWidth={sw * 0.8} />
+      <defs>
+        <Degradado
+          id={g("cover")}
+          paradas={detalle ? PARADAS.cover : PARADAS.coverSmall}
+          x1={0.05}
+          y1={0}
+          x2={0.95}
+          y2={1}
+        />
+        <Degradado id={g("spine")} paradas={detalle ? PARADAS.spine : PARADAS.spineSmall} />
+        <Degradado id={g("pages")} paradas={detalle ? PARADAS.pages : PARADAS.pagesSmall} />
+        <Degradado
+          id={g("gold")}
+          paradas={detalle ? PARADAS.gold : PARADAS.goldSmall}
+          x2={0.6}
+          y2={1}
+        />
+        <Degradado
+          id={g("ribbon")}
+          paradas={detalle ? PARADAS.ribbon : PARADAS.ribbonSmall}
+          y2={0.2}
+        />
+        {detalle && (
+          <>
+            {/* Abombado de la piel: un realce ancho y suave, no un brillo
+                de plástico. */}
+            <radialGradient id={g("bulge")} cx="0.34" cy="0.28" r="0.78">
+              <stop offset="0" stopColor="#FFD9A8" stopOpacity="0.26" />
+              <stop offset="0.55" stopColor="#FFD9A8" stopOpacity="0.06" />
+              <stop offset="1" stopColor="#3F1B06" stopOpacity="0.20" />
+            </radialGradient>
+            <linearGradient id={g("pagesBottom")} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#F6EBD4" />
+              <stop offset="1" stopColor="#AC8E64" />
+            </linearGradient>
+            <filter id={g("sh")} x="-25%" y="-25%" width="150%" height="150%">
+              <feGaussianBlur stdDeviation="13" />
+            </filter>
+            <filter id={g("shs")} x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="4" />
+            </filter>
+          </>
+        )}
+      </defs>
 
-      {detail && (
+      {detalle ? (
         <>
-          {/* Renglones del registro, en la página izquierda. */}
+          {/* Sombra proyectada */}
+          <g filter={`url(#${g("sh")})`} opacity="0.28">
+            <rect
+              x="140"
+              y="126"
+              width="266"
+              height="306"
+              rx="18"
+              fill="#2A1204"
+              transform="translate(6,14)"
+            />
+          </g>
+
+          {/* Bloque de hojas: asoma por la derecha y por abajo */}
+          <rect x="362" y="110" width="42" height="300" rx="10" fill={u("pages")} />
+          <rect x="148" y="384" width="252" height="30" rx="10" fill={u("pagesBottom")} />
+          <g stroke="#AD8F66" strokeOpacity="0.5" strokeWidth="2.6" strokeLinecap="round">
+            <path d="M370 148 L398 148" />
+            <path d="M370 184 L398 184" />
+            <path d="M370 220 L398 220" />
+            <path d="M370 256 L398 256" />
+            <path d="M370 292 L398 292" />
+            <path d="M370 328 L398 328" />
+          </g>
+
+          {/* Cinta marcapáginas, saliendo de entre las hojas */}
+          <path d="M300 378 L348 378 L348 458 L324 438 L300 458 Z" fill={u("ribbon")} />
+          <path d="M300 378 L311 378 L311 454 L300 458 Z" fill="#FFFFFF" opacity="0.22" />
+
+          {/* Tapa */}
+          <rect x="126" y="96" width="250" height="300" rx="18" fill={u("cover")} />
+          <rect x="126" y="96" width="250" height="300" rx="18" fill={`url(#${g("bulge")})`} />
+          {/* Lomo */}
           <path
-            d="M11.5 19.5h9M11.5 24.5h9M11.5 29.5h6"
-            strokeWidth={sw * 0.62}
-            opacity={0.42}
+            d="M126 114 Q126 96 144 96 L174 96 L174 396 L144 396 Q126 396 126 378 Z"
+            fill={u("spine")}
           />
-          {/* La curva, en la página derecha: sube, devuelve un poco y
-              vuelve a subir. Una diagonal limpia sería una promesa que
-              el producto no hace. */}
+          <rect x="164" y="103" width="6" height="286" rx="3" fill="#FFD9A8" opacity="0.32" />
+          {/* Filo superior iluminado y canto inferior en sombra */}
           <path
-            d="M28.5 30c1.7-.6 2.4-4 3.9-4s1.9 2.2 3 2.2 1.9-4.2 3-4.2"
-            strokeWidth={sw * 0.9}
-            opacity={0.72}
+            d="M146 99 L370 99"
+            stroke="#FFE1B8"
+            strokeOpacity="0.38"
+            strokeWidth="4"
+            strokeLinecap="round"
+            fill="none"
           />
+          <path
+            d="M150 393 L370 393"
+            stroke="#3F1B06"
+            strokeOpacity="0.38"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+          />
+          {/* Filete de encuadernación */}
+          <rect
+            x="198"
+            y="122"
+            width="152"
+            height="248"
+            rx="9"
+            fill="none"
+            stroke="#FFD9A8"
+            strokeOpacity="0.22"
+            strokeWidth="2.6"
+          />
+
+          {/* Velas japonesas en relieve sobre la tapa */}
+          <g filter={`url(#${g("shs")})`} fill="#3F1B06" opacity="0.55" transform="translate(4,6)">
+            <rect x="210" y="262" width="38" height="72" rx="8" />
+            <rect x="223" y="236" width="12" height="26" rx="6" />
+            <rect x="223" y="334" width="12" height="24" rx="6" />
+            <rect x="256" y="204" width="38" height="88" rx="8" />
+            <rect x="269" y="176" width="12" height="28" rx="6" />
+            <rect x="269" y="292" width="12" height="24" rx="6" />
+            <rect x="302" y="150" width="38" height="78" rx="8" />
+            <rect x="315" y="124" width="12" height="26" rx="6" />
+            <rect x="315" y="228" width="12" height="24" rx="6" />
+          </g>
+          <g fill={u("gold")}>
+            <rect x="210" y="262" width="38" height="72" rx="8" />
+            <rect x="223" y="236" width="12" height="26" rx="6" />
+            <rect x="223" y="334" width="12" height="24" rx="6" />
+            <rect x="256" y="204" width="38" height="88" rx="8" />
+            <rect x="269" y="176" width="12" height="28" rx="6" />
+            <rect x="269" y="292" width="12" height="24" rx="6" />
+            <rect x="302" y="150" width="38" height="78" rx="8" />
+            <rect x="315" y="124" width="12" height="26" rx="6" />
+            <rect x="315" y="228" width="12" height="24" rx="6" />
+          </g>
+        </>
+      ) : (
+        <>
+          {/* Bloque de hojas */}
+          <rect x="352" y="98" width="56" height="322" rx="12" fill={u("pages")} />
+          <rect x="132" y="386" width="272" height="38" rx="12" fill={u("pages")} />
+
+          {/* Marcapáginas */}
+          <path d="M292 380 L346 380 L346 470 L319 446 L292 470 Z" fill={u("ribbon")} />
+
+          {/* Tapa */}
+          <rect x="104" y="84" width="264" height="318" rx="20" fill={u("cover")} />
+          <path
+            d="M104 104 Q104 84 124 84 L162 84 L162 402 L124 402 Q104 402 104 382 Z"
+            fill={u("spine")}
+          />
+          <rect x="150" y="92" width="9" height="302" rx="4.5" fill="#FFD9A8" opacity="0.34" />
+
+          {/* Velas: tres, gruesas y bien separadas */}
+          <g fill={u("gold")}>
+            <rect x="192" y="256" width="46" height="86" rx="10" />
+            <rect x="208" y="228" width="14" height="28" rx="7" />
+            <rect x="208" y="342" width="14" height="26" rx="7" />
+            <rect x="252" y="196" width="46" height="102" rx="10" />
+            <rect x="268" y="166" width="14" height="30" rx="7" />
+            <rect x="268" y="298" width="14" height="26" rx="7" />
+            <rect x="312" y="140" width="46" height="92" rx="10" />
+            <rect x="328" y="112" width="14" height="28" rx="7" />
+            <rect x="328" y="232" width="14" height="26" rx="7" />
+          </g>
         </>
       )}
     </svg>
   );
 }
 
-/** El mismo glifo como cadena de marcado, para los pocos sitios que
- *  construyen HTML a mano (la intro monta su nodo con innerHTML). */
-export const BRAND_GLYPH_SVG = (size = 22) => {
-  const sw = (STROKE_PX * VIEW) / size;
-  const detail = size >= 22;
+/**
+ * El mismo logotipo como cadena de marcado, para los pocos sitios que
+ * construyen HTML a mano (la intro monta su nodo con `innerHTML`).
+ *
+ * `sufijo` cumple aquí el papel que `useId` cumple en el componente: si
+ * esta cadena se inserta mientras hay otro glifo en la página, los
+ * identificadores de los degradados chocan. Por defecto lleva uno propio
+ * que no colisiona con los que genera React.
+ */
+export const BRAND_GLYPH_SVG = (size = 22, sufijo = "intro") => {
+  const g = (n: string) => `cp-${sufijo}-${n}`;
+  const grad = (
+    id: string,
+    paradas: Parada,
+    coords = 'x1="0" y1="0" x2="1" y2="0"',
+  ) =>
+    `<linearGradient id="${g(id)}" ${coords}>` +
+    paradas.map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join("") +
+    `</linearGradient>`;
+
+  /* Siempre las paradas de la variante reducida, porque el cuerpo de
+     abajo es el reducido. Mezclar los degradados de una versión con la
+     geometría de la otra es la clase de incoherencia que no se ve en
+     pantalla y luego nadie sabe explicar. */
+  const defs =
+    grad("cover", PARADAS.coverSmall, 'x1="0.05" y1="0" x2="0.95" y2="1"') +
+    grad("spine", PARADAS.spineSmall) +
+    grad("pages", PARADAS.pagesSmall) +
+    grad("gold", PARADAS.goldSmall, 'x1="0" y1="0" x2="0.6" y2="1"') +
+    grad("ribbon", PARADAS.ribbonSmall, 'x1="0" y1="0" x2="1" y2="0.2"');
+
+  /* La cadena se usa sólo en la intro, a 22-30 px, así que dibuja la
+     variante reducida: es la que está pensada para ese tamaño. */
+  const cuerpo =
+    `<rect x="352" y="98" width="56" height="322" rx="12" fill="url(#${g("pages")})"/>` +
+    `<rect x="132" y="386" width="272" height="38" rx="12" fill="url(#${g("pages")})"/>` +
+    `<path d="M292 380 L346 380 L346 470 L319 446 L292 470 Z" fill="url(#${g("ribbon")})"/>` +
+    `<rect x="104" y="84" width="264" height="318" rx="20" fill="url(#${g("cover")})"/>` +
+    `<path d="M104 104 Q104 84 124 84 L162 84 L162 402 L124 402 Q104 402 104 382 Z" fill="url(#${g("spine")})"/>` +
+    `<rect x="150" y="92" width="9" height="302" rx="4.5" fill="#FFD9A8" opacity="0.34"/>` +
+    `<g fill="url(#${g("gold")})">` +
+    `<rect x="192" y="256" width="46" height="86" rx="10"/><rect x="208" y="228" width="14" height="28" rx="7"/><rect x="208" y="342" width="14" height="26" rx="7"/>` +
+    `<rect x="252" y="196" width="46" height="102" rx="10"/><rect x="268" y="166" width="14" height="30" rx="7"/><rect x="268" y="298" width="14" height="26" rx="7"/>` +
+    `<rect x="312" y="140" width="46" height="92" rx="10"/><rect x="328" y="112" width="14" height="28" rx="7"/><rect x="328" y="232" width="14" height="26" rx="7"/>` +
+    `</g>`;
+
   return (
-    `<svg width="${size}" height="${size}" viewBox="0 0 ${VIEW} ${VIEW}" fill="none" ` +
-    `stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" ` +
+    `<svg width="${size}" height="${size}" viewBox="0 0 512 512" fill="none" ` +
     `aria-hidden="true" style="display:block">` +
-    `<path d="M24 13C20 9.5 15.5 8 8 8v27c7.5 0 12 1.5 16 5 4-3.5 8.5-5 16-5V8c-7.5 0-12 1.5-16 5z" stroke-width="${sw}"/>` +
-    `<path d="M24 13v27" stroke-width="${sw * 0.8}"/>` +
-    (detail
-      ? `<path d="M11.5 19.5h9M11.5 24.5h9M11.5 29.5h6" stroke-width="${sw * 0.62}" opacity="0.42"/>` +
-        `<path d="M28.5 30c1.7-.6 2.4-4 3.9-4s1.9 2.2 3 2.2 1.9-4.2 3-4.2" stroke-width="${sw * 0.9}" opacity="0.72"/>`
-      : "") +
-    `</svg>`
+    `<defs>${defs}</defs>${cuerpo}</svg>`
   );
 };

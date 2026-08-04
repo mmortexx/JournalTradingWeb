@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
 Genera los mapas de bits de la marca a partir de la MISMA geometría que
-el glifo vectorial de la web (src/components/tj/BrandGlyph.tsx).
+el logotipo vectorial (src/components/tj/BrandGlyph.tsx, variante
+reducida — que a su vez sale de 02-diseno/logo/countpips-logo-small.svg
+en el repositorio de la aplicación).
 
     public/logo.png        512x512  — dato estructurado de Organization
                                       (es el logotipo que toma Google) e
@@ -11,16 +13,23 @@ el glifo vectorial de la web (src/components/tj/BrandGlyph.tsx).
                                       resuelven src/app/icon.svg
 
 POR QUÉ EXISTE ESTE SCRIPT
-El logotipo de la web es SVG y hereda la tinta del tema, pero hay tres
-sitios donde el formato lo impone quien consume el archivo, no nosotros:
-el buscador, el sistema operativo al instalar la PWA y la pestaña del
-navegador. Si esos tres se quedan con el mapa de bits antiguo (el ojo de
-iris rojo), la marca se parte justo donde más se ve desde fuera.
+El logotipo de la web es SVG, pero hay tres sitios donde el formato lo
+impone quien consume el archivo, no nosotros: el buscador, el sistema
+operativo al instalar la PWA y la pestaña del navegador. Si esos tres se
+quedan con el mapa de bits antiguo, la marca se parte justo donde más se
+ve desde fuera.
 
-Escribir la geometría dos veces sería garantizar que se desincronicen a
-la primera modificación, así que las curvas de aquí son las MISMAS
-coordenadas del componente, en el mismo viewBox de 48. Si se cambia el
-glifo, hay que tocar los dos sitios y volver a lanzar esto.
+QUÉ DIBUJA, Y QUÉ DIBUJABA ANTES
+El cuaderno de piel con las tres velas japonesas en la tapa: el mismo
+icono que la aplicación de escritorio. Antes dibujaba un libro ABIERTO a
+línea que no es el logotipo del producto — llegó ahí porque los
+comentarios del código afirmaban que el archivo de la aplicación era «el
+ojo de iris rojo», y no lo es.
+
+Se dibuja la variante REDUCIDA y no la completa a propósito: estos tres
+destinos se ven a 16-180 px, y a esos tamaños la sombra proyectada, el
+filete de encuadernación y el rayado del canto no aportan detalle, sólo
+ensucian la silueta.
 
 USO
     python scripts/generate-brand.py
@@ -32,92 +41,188 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 
-PAPER = (240, 237, 228, 255)  # #F0EDE4
-INK = (26, 23, 20, 255)  # #1A1714
+PAPER = (240, 237, 228, 255)  # #F0EDE4 — el papel del sitio
 
-VIEW = 48.0
-# Supermuestreo: se dibuja 4x y se reduce. PIL no antialiasa el trazo, y
-# sin esto los bordes curvos salen escalonados a 32 px.
+# El logotipo se dibuja en el mismo lienzo de 512 que el SVG, así que las
+# coordenadas de aquí son literalmente las del componente.
+VIEW = 512.0
+
+# Supermuestreo: se dibuja 4x y se reduce. PIL no antialiasa, y sin esto
+# las esquinas redondeadas salen escalonadas.
 SS = 4
 
+# ── Paletas ───────────────────────────────────────────────────────────
+# Mismas paradas que la variante reducida del componente. Cada degradado
+# es (x1, y1, x2, y2, [(offset, "#rrggbb"), ...]) con las coordenadas en
+# fracción de la caja de la forma, que es como se comporta un
+# `linearGradient` de SVG sin `gradientUnits`.
+COVER = (0.05, 0.0, 0.95, 1.0, [(0.0, "#C67E41"), (0.34, "#A85F2A"), (1.0, "#6E3512")])
+SPINE = (0.0, 0.0, 1.0, 0.0, [(0.0, "#4F240B"), (0.5, "#82471C"), (1.0, "#9A5A27")])
+PAGES = (0.0, 0.0, 1.0, 0.0, [(0.0, "#C6A87F"), (0.34, "#FCF4E3"), (1.0, "#A98B61")])
+GOLD = (0.0, 0.0, 0.6, 1.0, [(0.0, "#FFF3DC"), (0.5, "#F5D6A4"), (1.0, "#D09E63")])
+RIBBON = (0.0, 0.0, 1.0, 0.2, [(0.0, "#EFBE86"), (1.0, "#94571F")])
 
-def bezier(p0, p1, p2, p3, steps=48):
-    """Cúbica de Bézier muestreada en `steps` puntos."""
+
+def hex_rgb(s):
+    s = s.lstrip("#")
+    return tuple(int(s[i : i + 2], 16) for i in (0, 2, 4))
+
+
+def interpola(stops, t):
+    """Color en la posición `t` (0-1) de una lista de paradas."""
+    if t <= stops[0][0]:
+        return hex_rgb(stops[0][1])
+    if t >= stops[-1][0]:
+        return hex_rgb(stops[-1][1])
+    for (o0, c0), (o1, c1) in zip(stops, stops[1:]):
+        if o0 <= t <= o1:
+            f = 0.0 if o1 == o0 else (t - o0) / (o1 - o0)
+            a, b = hex_rgb(c0), hex_rgb(c1)
+            return tuple(round(a[i] + (b[i] - a[i]) * f) for i in range(3))
+    return hex_rgb(stops[-1][1])
+
+
+def pinta_degradado(lienzo, mascara, caja, grad):
+    """Rellena `mascara` con un degradado lineal y lo pega en `lienzo`.
+
+    `caja` es (x0, y0, x1, y1) en píxeles: la caja de la forma, porque un
+    degradado de SVG se escala a la caja de CADA forma, no al lienzo.
+    """
+    x0, y0, x1, y1 = caja
+    an, al = max(1, int(x1 - x0)), max(1, int(y1 - y0))
+    gx1, gy1, gx2, gy2, stops = grad
+
+    # Vector del degradado, en píxeles dentro de la caja.
+    ax, ay = gx1 * an, gy1 * al
+    bx, by = gx2 * an, gy2 * al
+    dx, dy = bx - ax, by - ay
+    largo2 = dx * dx + dy * dy or 1.0
+
+    tira = Image.new("RGB", (an, al))
+    px = tira.load()
+    for j in range(al):
+        for i in range(an):
+            # Proyección del píxel sobre el vector del degradado.
+            t = ((i - ax) * dx + (j - ay) * dy) / largo2
+            px[i, j] = interpola(stops, min(1.0, max(0.0, t)))
+
+    capa = Image.new("RGBA", lienzo.size, (0, 0, 0, 0))
+    capa.paste(tira, (int(x0), int(y0)))
+    lienzo.paste(capa, (0, 0), mascara)
+
+
+def forma(lienzo, dibuja_en_mascara, caja, grad):
+    """Dibuja una forma con relleno degradado."""
+    m = Image.new("L", lienzo.size, 0)
+    dibuja_en_mascara(ImageDraw.Draw(m))
+    pinta_degradado(lienzo, m, caja, grad)
+
+
+def q_bezier(p0, p1, p2, pasos=24):
+    """Cuadrática de Bézier muestreada — las esquinas del lomo."""
     out = []
-    for i in range(steps + 1):
-        t = i / steps
+    for i in range(pasos + 1):
+        t = i / pasos
         u = 1 - t
-        x = u**3 * p0[0] + 3 * u**2 * t * p1[0] + 3 * u * t**2 * p2[0] + t**3 * p3[0]
-        y = u**3 * p0[1] + 3 * u**2 * t * p1[1] + 3 * u * t**2 * p2[1] + t**3 * p3[1]
-        out.append((x, y))
+        out.append(
+            (
+                u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0],
+                u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1],
+            )
+        )
     return out
 
 
-def book_outline():
-    """La silueta del libro abierto, en coordenadas del viewBox de 48.
-
-    Es el mismo trazado que el `<path>` del componente:
-      M24 13 C20 9.5 15.5 8 8 8 v27 c7.5 0 12 1.5 16 5
-             c4 -3.5 8.5 -5 16 -5 V8 c-7.5 0 -12 1.5 -16 5 z
-    """
-    pts = []
-    pts += bezier((24, 13), (20, 9.5), (15.5, 8), (8, 8))
-    pts += [(8, 35)]
-    pts += bezier((8, 35), (15.5, 35), (20, 36.5), (24, 40))
-    pts += bezier((24, 40), (28, 36.5), (32.5, 35), (40, 35))
-    pts += [(40, 8)]
-    pts += bezier((40, 8), (32.5, 8), (28, 9.5), (24, 13))
-    return pts
-
-
-def render(size, radius_ratio=1 / 6, stroke_px=1.15, with_bg=True):
-    """Dibuja el glifo a `size` px.
-
-    `stroke_px` es el grosor que debe medir el trazo EN PANTALLA a ese
-    tamaño — el mismo criterio de grosor óptico constante que usa el
-    componente. A tamaños de favicon se sube a mano, porque por debajo
-    de 32 px un trazo de 1,15 px se rompe al reducir.
-    """
+def render(size, with_bg=True):
+    """Dibuja el logotipo a `size` px."""
     s = size * SS
+    k = s / VIEW  # factor del viewBox de 512 a píxeles reales
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
 
     if with_bg:
-        r = int(s * radius_ratio)
-        d.rounded_rectangle([0, 0, s - 1, s - 1], radius=r, fill=PAPER)
+        ImageDraw.Draw(img).rounded_rectangle(
+            [0, 0, s - 1, s - 1], radius=int(s * 86 / 512), fill=PAPER
+        )
 
-    k = s / VIEW
-    w = max(2, int(round(stroke_px * SS)))
+    def E(*v):
+        """Escala coordenadas del viewBox a píxeles."""
+        return [x * k for x in v]
 
-    outline = [(x * k, y * k) for x, y in book_outline()]
-    d.line(outline + [outline[0]], fill=INK, width=w, joint="curve")
+    def rect(x, y, w, h, r, grad):
+        X, Y, W, H, R = E(x, y, w, h, r)
+        caja = (X, Y, X + W, Y + H)
+        forma(img, lambda d: d.rounded_rectangle([X, Y, X + W, Y + H], radius=R, fill=255), caja, grad)
 
-    # Lomo
-    d.line([(24 * k, 13 * k), (24 * k, 40 * k)], fill=INK, width=max(2, int(w * 0.8)))
+    # ── Bloque de hojas ───────────────────────────────────────────────
+    rect(352, 98, 56, 322, 12, PAGES)
+    rect(132, 386, 272, 38, 12, PAGES)
+
+    # ── Marcapáginas ──────────────────────────────────────────────────
+    cinta = [(292, 380), (346, 380), (346, 470), (319, 446), (292, 470)]
+    pts = [(x * k, y * k) for x, y in cinta]
+    caja = (min(p[0] for p in pts), min(p[1] for p in pts),
+            max(p[0] for p in pts), max(p[1] for p in pts))
+    forma(img, lambda d: d.polygon(pts, fill=255), caja, RIBBON)
+
+    # ── Tapa ──────────────────────────────────────────────────────────
+    rect(104, 84, 264, 318, 20, COVER)
+
+    # ── Lomo ──────────────────────────────────────────────────────────
+    # M104 104 Q104 84 124 84 L162 84 L162 402 L124 402 Q104 402 104 382 Z
+    lomo = [(104, 104)]
+    lomo += q_bezier((104, 104), (104, 84), (124, 84))
+    lomo += [(162, 84), (162, 402), (124, 402)]
+    lomo += q_bezier((124, 402), (104, 402), (104, 382))
+    pts = [(x * k, y * k) for x, y in lomo]
+    caja = (min(p[0] for p in pts), min(p[1] for p in pts),
+            max(p[0] for p in pts), max(p[1] for p in pts))
+    forma(img, lambda d: d.polygon(pts, fill=255), caja, SPINE)
+
+    # Filete claro del lomo — color plano con transparencia, no degradado.
+    filete = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    X, Y, W, H, R = E(150, 92, 9, 302, 4.5)
+    ImageDraw.Draw(filete).rounded_rectangle(
+        [X, Y, X + W, Y + H], radius=R, fill=(255, 217, 168, int(255 * 0.34))
+    )
+    img = Image.alpha_composite(img, filete)
+
+    # ── Velas ─────────────────────────────────────────────────────────
+    # Cuerpo y mechas de las tres, en las coordenadas del componente.
+    velas = [
+        (192, 256, 46, 86, 10), (208, 228, 14, 28, 7), (208, 342, 14, 26, 7),
+        (252, 196, 46, 102, 10), (268, 166, 14, 30, 7), (268, 298, 14, 26, 7),
+        (312, 140, 46, 92, 10), (328, 112, 14, 28, 7), (328, 232, 14, 26, 7),
+    ]
+    # Un solo degradado para el grupo entero, como el `<g fill=...>` del
+    # SVG: si cada vela llevara el suyo, las tres saldrían idénticas y se
+    # perdería el barrido de luz que las recorre en diagonal.
+    m = Image.new("L", img.size, 0)
+    d = ImageDraw.Draw(m)
+    for x, y, w, h, r in velas:
+        X, Y, W, H, R = E(x, y, w, h, r)
+        d.rounded_rectangle([X, Y, X + W, Y + H], radius=R, fill=255)
+    xs = [E(v[0])[0] for v in velas] + [E(v[0] + v[2])[0] for v in velas]
+    ys = [E(v[1])[0] for v in velas] + [E(v[1] + v[3])[0] for v in velas]
+    pinta_degradado(img, m, (min(xs), min(ys), max(xs), max(ys)), GOLD)
 
     return img.resize((size, size), Image.LANCZOS)
 
 
 def main():
-    # logo.png — se usa a tamaños grandes (Google lo pide de 112 px como
-    # mínimo; la PWA lo escala). Trazo proporcionalmente más fino porque
-    # aquí hay píxeles de sobra.
-    logo = render(512, stroke_px=13.5)
+    logo = render(512)
     logo.save(ROOT / "public" / "logo.png")
     print("public/logo.png                512x512")
 
-    apple = render(180, stroke_px=5.4)
-    apple.save(ROOT / "src" / "app" / "apple-icon.png")
+    render(180).save(ROOT / "src" / "app" / "apple-icon.png")
     print("src/app/apple-icon.png        180x180")
 
-    # favicon.ico — tres tamaños en un archivo. El trazo engorda al bajar
-    # de tamaño: a 16 px, un grosor proporcional desaparecería.
-    ico_sizes = [(48, 1.9), (32, 1.5), (16, 1.1)]
-    frames = [render(sz, stroke_px=sw) for sz, sw in ico_sizes]
+    # favicon.ico — tres tamaños en un archivo.
+    tam = [48, 32, 16]
+    frames = [render(t) for t in tam]
     frames[0].save(
         ROOT / "src" / "app" / "favicon.ico",
         format="ICO",
-        sizes=[(s, s) for s, _ in ico_sizes],
+        sizes=[(t, t) for t in tam],
         append_images=frames[1:],
     )
     print("src/app/favicon.ico           48/32/16")

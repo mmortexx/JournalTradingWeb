@@ -370,28 +370,29 @@ export function Footer() {
 }
 
 /**
- * BrandMark — el ojo de la marca (`BrandGlyph`, el mismo glifo que la
- * barra superior, la intro y el cromo de la demo) sobre un cuadrado de
- * vidrio mecanizado.
+ * BrandMark — el logotipo (`BrandGlyph`, el mismo que la barra superior,
+ * la intro y el cromo de la demo) sobre un cuadrado de vidrio mecanizado.
  *
  * Antes dibujaba aquí su propio trío de velas, "idéntico" al de la barra
  * superior salvo que no lo era: las mechas iban a 0,5 de opacidad en vez
- * de 0,45 y los cuerpos a otras alturas. Dos copias de una marca que ya
- * no era la marca. Ahora hay un único glifo y esto solo pone la placa.
+ * de 0,45 y los cuerpos a otras alturas. Dos copias de una marca. Ahora
+ * hay un único glifo y esto sólo pone la placa.
  *
- * The container pairs:
- *  - `bg-black/40` dark glass base so the gold pops,
- *  - `ring-1 ring-white/10` hairline border (matches the rest of the
- *    design system's `border-white/10` hairline language),
- *  - `shadow-[inset_0_1px_0_rgb(255_255_255/0.08)]` 1px white top
- *    highlight (the same machined edge `.liquid-glass` uses),
- *  - a radial accent-gradient backdrop (`--accent-base` at 35% →
- *    transparent) so the mark glows faintly from the top edge.
+ * La placa combina:
+ *  - base de vidrio para que el dorado del logotipo resalte,
+ *  - filete de 1 px con el mismo lenguaje que el resto del sistema,
+ *  - realce blanco de 1 px arriba (el canto mecanizado de
+ *    `.liquid-glass`),
+ *  - un halo radial del acento desde el borde superior.
  *
- * `overflow-hidden` clips the radial gradient to the rounded square. The
- * SVG itself uses `currentColor` so a parent `text-[rgb(var(--accent-base))]`
- * (or any future palette swap) drives both the bodies and the wicks in
- * one place.
+ * `overflow-hidden` recorta el halo al cuadrado redondeado.
+ *
+ * Ya NO se le pasa un color de texto: el logotipo lleva su propia paleta
+ * —la piel marrón, el dorado de las velas, el crema del canto—, que es lo
+ * que lo hace reconocible como el icono del escritorio. Heredar la tinta
+ * del tema lo convertiría en otra cosa. El glifo sube de 16 a 20 px por
+ * el mismo motivo que en la barra: es un icono macizo y no una silueta
+ * abierta, así que necesita menos aire alrededor.
  */
 function BrandMark() {
   return (
@@ -411,7 +412,7 @@ function BrandMark() {
             "radial-gradient(120% 120% at 50% 0%, rgb(var(--accent-base) / 0.35) 0%, rgb(var(--accent-base) / 0) 60%)",
         }}
       />
-      <BrandGlyph size={16} className="relative text-[rgb(var(--accent-base))]" />
+      <BrandGlyph size={20} className="relative" />
     </span>
   );
 }

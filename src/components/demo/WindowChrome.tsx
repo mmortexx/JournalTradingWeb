@@ -353,21 +353,16 @@ function AccountChip() {
 /**
  * Icono de la app en la barra de título de la ventana simulada.
  *
- * El comentario anterior afirmaba que estas tres velas eran "el mismo
- * motivo que Assets/app-logo.png". No lo eran: ese archivo es el ojo de
- * trazo champagne sobre placa oscura. Esta barra imita la de la
- * aplicación real, así que ahora lleva el icono real — placa oscura y
- * ojo en acento, exactamente el orden de colores de la app, y no una
- * placa de acento con el glifo recortado en oscuro.
+ * Aquí ponía que `Assets/app-logo.png` era «el ojo de trazo champagne
+ * sobre placa oscura». No lo es: es el cuaderno de piel con las tres
+ * velas japonesas. Sobre esa descripción equivocada se montó una placa
+ * oscura con un glifo dentro, imitando algo que la aplicación no hace.
+ *
+ * Esta barra reproduce la de la ventana real, y ahí el icono va suelto,
+ * sin placa: el logotipo ya trae su propio cuerpo. Por eso desaparece el
+ * cuadrado `#1A1917` y el glifo pasa a ocupar los 18 px enteros que antes
+ * ocupaba la placa — el ancho de la fila no cambia.
  */
 function AppIcon() {
-  return (
-    <span
-      className="w-[18px] h-[18px] rounded-[4px] flex items-center justify-center shrink-0"
-      style={{ background: "#1A1917" }}
-      aria-hidden="true"
-    >
-      <BrandGlyph size={12} />
-    </span>
-  );
+  return <BrandGlyph size={18} className="shrink-0" />;
 }
