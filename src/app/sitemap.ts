@@ -26,6 +26,10 @@ const PAGES: PageMeta[] = [
   { path: "/features/seguridad", priority: 0.85, changeFrequency: "weekly" },
   { path: "/pricing", priority: 0.9, changeFrequency: "monthly" },
   { path: "/demo", priority: 0.8, changeFrequency: "monthly" },
+  /* El diagnóstico. Prioridad alta pese a no vender nada directamente:
+     es la página que más gente comparte y por la que más se entra, porque
+     se sale de ella con una cifra propia. */
+  { path: "/test", priority: 0.8, changeFrequency: "monthly" },
   // Lower-velocity editorial / trust pages.
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },

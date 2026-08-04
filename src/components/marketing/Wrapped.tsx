@@ -37,10 +37,21 @@ export function Wrapped() {
       key: "streak",
       tone: "accent" as const,
       label: es ? "Tu mejor racha" : "Your best streak",
+      /* La cifra va MUCHO más grande que en el resto de tarjetas, y es a
+         propósito: ésta ocupa dos filas de la rejilla, así que tiene el
+         doble de alto que sus vecinas. Con el tamaño de las pequeñas, el
+         sobrante se repartía como aire arriba y abajo y la tarjeta se leía
+         descolgada — mucho hueco vacío y un número perdido en medio, justo
+         al lado de dos tarjetas bien servidas.
+
+         Una pieza que ocupa el doble tiene que PESAR el doble; si no, no
+         hay motivo para que ocupe el doble. Los límites suben en vez de
+         subir sólo el `cqi` porque las dos columnas miden lo mismo de
+         ancho: por ancho no se distinguiría. */
       value: (
-        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
-          <CountUp to={METRICS.maxWinStreak} className="t-display text-[clamp(1.75rem,9cqi,2.75rem)] tnum text-primary whitespace-nowrap" />
-          <span className="text-base text-tertiary font-medium">{es ? "ganadoras seguidas" : "winners in a row"}</span>
+        <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1 min-w-0">
+          <CountUp to={METRICS.maxWinStreak} className="t-display text-[clamp(3rem,17cqi,5.5rem)] tnum text-primary whitespace-nowrap leading-none" />
+          <span className="text-[clamp(0.95rem,3cqi,1.25rem)] text-tertiary font-medium">{es ? "ganadoras seguidas" : "winners in a row"}</span>
         </span>
       ),
       sub: es

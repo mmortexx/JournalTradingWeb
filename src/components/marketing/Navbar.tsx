@@ -259,6 +259,23 @@ export function Navbar() {
         </svg>
       ),
     },
+    {
+      /* El diagnóstico. Estaba al final de la página de disciplina, donde
+         sólo lo encontraba quien ya había bajado del todo, y es la pieza
+         que más engancha: se sale de ella con una cifra propia. */
+      href: "/test",
+      labelEs: "Test de disciplina",
+      labelEn: "Discipline test",
+      descEs: "Mídete en cinco ejes, sin email",
+      descEn: "Measure yourself across five axes, no email",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M8 14.5A6.5 6.5 0 1 1 8 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          <path d="M8 8l4-3.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          <circle cx="8" cy="8" r="1.4" fill="currentColor" />
+        </svg>
+      ),
+    },
   ];
 
   // Enlaces del drawer móvil — mantiene Acerca de y FAQ (en desktop
@@ -317,6 +334,21 @@ export function Navbar() {
           <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.3" />
           <path d="M8 7v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
           <circle cx="8" cy="5" r="0.85" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      /* El test va ANTES de la FAQ: es una acción, no una consulta, y en
+         un menú corto lo que se puede hacer pesa más que lo que se puede
+         leer. */
+      href: "/test",
+      labelEs: "Test de disciplina",
+      labelEn: "Discipline test",
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M8 14.5A6.5 6.5 0 1 1 8 1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          <path d="M8 8l4-3.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+          <circle cx="8" cy="8" r="1.4" fill="currentColor" />
         </svg>
       ),
     },

@@ -42,6 +42,19 @@ import { useLang } from "@/lib/i18n";
  *
  * `num` — ordinal del eyebrow (las páginas internas pasan el suyo).
  */
+/* Extremos del riesgo por operación y las marcas que se rotulan bajo la
+   pista. Viven fuera del componente porque los usan tres cosas —el
+   control, el relleno de la pista y los rótulos— y tenían que ser el
+   mismo número en las tres: cuando el rango estaba escrito a mano en cada
+   sitio, bastaba tocar uno para que la bolita dejara de coincidir con su
+   etiqueta, que es justo lo que pasaba. */
+const RISK_MIN = 0.25;
+const RISK_MAX = 3;
+const RISK_MARKS = [0.25, 1, 2, 3];
+
+/** Posición de un valor de riesgo dentro de la pista, en % del recorrido. */
+const riskAt = (v: number) => ((v - RISK_MIN) / (RISK_MAX - RISK_MIN)) * 100;
+
 export function RiskCalculator({ num = "04·c" }: { num?: string }) {
   const { lang } = useLang();
   const es = lang === "es";
@@ -308,38 +321,66 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
                 {fmtNum(riskPct)} %
               </span>
             </div>
-            <div
-              className="relative h-1 rounded-[3px] mb-1.5 overflow-hidden"
-              style={{ background: "rgb(var(--divider) / 0.13)" }}
-            >
-              <div
-                className="absolute left-0 top-0 h-full rounded-[3px]"
-                style={{
-                  width: `${((riskPct - 0.25) / (3 - 0.25)) * 100}%`,
-                  background: "linear-gradient(90deg, color-mix(in oklab, rgb(var(--accent-base)) 45%, transparent), rgb(var(--accent-base)))",
-                  transition: "width 0.18s cubic-bezier(0.22, 1, 0.36, 1)",
-                }}
-              />
-            </div>
+            {/* Una sola pista: la del propio control. La barra de progreso
+                que había aquí encima era un elemento aparte, así que se
+                veían dos líneas paralelas y la de arriba no respondía al
+                arrastre. Ahora el tramo recorrido se pinta dentro de la
+                pista real a partir de `--pct`. */}
             <input
               type="range"
-              min={0.25}
-              max={3}
+              min={RISK_MIN}
+              max={RISK_MAX}
               step={0.05}
               value={riskPct}
               onChange={(e) => setRiskPct(parseFloat(e.target.value))}
               className="tj-range w-full"
-              style={{ accentColor: "rgb(var(--accent-base))", height: 44 }}
+              style={
+                {
+                  accentColor: "rgb(var(--accent-base))",
+                  height: 44,
+                  "--pct": `${riskAt(riskPct)}%`,
+                } as React.CSSProperties
+              }
               aria-label={es ? "Riesgo por operación en porcentaje" : "Risk per trade percentage"}
-              aria-valuemin={0.25}
-              aria-valuemax={3}
+              aria-valuemin={RISK_MIN}
+              aria-valuemax={RISK_MAX}
               aria-valuenow={riskPct}
               aria-valuetext={`${fmtNum(riskPct)} %`}
             />
-            <div className="flex items-center justify-between mt-1">
-              {["0,25 %", "1,00 %", "2,00 %", "3,00 %"].map((t) => (
-                <span key={t} className="tnum" style={{ fontSize: 9.5, color: "var(--ink-3)" }}>{t}</span>
-              ))}
+            {/* Las marcas van DONDE CAEN, no repartidas a partes iguales.
+                Estaban en una fila con separación uniforme, así que 1,00 %
+                aparecía en mitad de la pista cuando su sitio real está en
+                el 27 % del recorrido: la bolita nunca coincidía con su
+                propia etiqueta y el control parecía descalibrado.
+
+                El 0,25 se alinea por la izquierda y el 3,00 por la derecha
+                para que ninguno se salga de la caja; los de en medio van
+                centrados sobre su posición. */}
+            <div className="relative mt-1 h-3">
+              {RISK_MARKS.map((v, i) => {
+                const pct = riskAt(v);
+                const extremoIzq = i === 0;
+                const extremoDer = i === RISK_MARKS.length - 1;
+                return (
+                  <span
+                    key={v}
+                    className="tnum absolute top-0"
+                    style={{
+                      left: `${pct}%`,
+                      transform: extremoIzq
+                        ? "none"
+                        : extremoDer
+                          ? "translateX(-100%)"
+                          : "translateX(-50%)",
+                      fontSize: 9.5,
+                      color: "var(--ink-3)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {fmtNum(v)} %
+                  </span>
+                );
+              })}
             </div>
           </div>
 

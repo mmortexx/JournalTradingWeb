@@ -189,6 +189,10 @@ export const ATLAS_ROUTES: Record<string, PlateId[]> = {
      tocar más abajo— y va primero. La media móvil se queda de segunda; el
      libro mayor sale, que ya titula en seguridad y en características. */
   "/about": ["sessions", "rolling"],
+  /* Una sola lámina: la página es corta a propósito y el diagnóstico se
+     lleva toda la atención. `rules` es la que corresponde — el test mide
+     exactamente eso, si hay reglas y si se cumplen. */
+  "/test": ["rules"],
 };
 
 const ROMAN = ["I", "II", "III", "IV", "V"];

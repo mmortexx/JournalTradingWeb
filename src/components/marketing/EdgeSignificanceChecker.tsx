@@ -131,7 +131,14 @@ export function EdgeSignificanceChecker({ num = "01" }: { num?: string }) {
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="tj-range w-full"
-        style={{ accentColor: "rgb(var(--accent-base))", height: 44 }}
+        /* `--pct` pinta el tramo recorrido dentro de la pista del control. */
+        style={
+          {
+            accentColor: "rgb(var(--accent-base))",
+            height: 44,
+            "--pct": `${((value - min) / (max - min)) * 100}%`,
+          } as React.CSSProperties
+        }
         aria-label={ariaLabel}
         aria-valuemin={min}
         aria-valuemax={max}

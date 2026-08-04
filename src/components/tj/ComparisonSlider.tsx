@@ -21,19 +21,23 @@ import { Reveal } from "@/components/tj/Reveal";
 /**
  * ComparisonSlider — "Antes vs Después" con arrastre intuitivo.
  *
- * ── La dirección que NO confunde ──────────────────────────────────────
- * En un slider de marketing, arrastrar a la DERECHA debe revelar MÁS
- * DEL DESPUÉS (el estado mejorado, verde). Izquierda = pasado, derecha
- * = progreso. La versión anterior hacía lo contrario — el overlay del
- * "antes" se extendía hacia la derecha al arrastrar — y se leía "al
- * revés".
+ * ── Hacia dónde se arrastra, y por qué ────────────────────────────────
+ * Este bloque llevaba escrito que arrastrar a la DERECHA revelaba más
+ * del después, y el texto de la página lo repetía. Es imposible con esta
+ * disposición, y se notaba usándolo: el "antes" ocupa el lado izquierdo
+ * a sangre y el "después" es el recorte de la derecha, cuyo borde
+ * izquierdo va pegado al tirador. Si el tirador avanza hacia la derecha,
+ * el recorte se estrecha — o sea, aparece MÁS "antes", justo lo
+ * contrario de lo prometido.
  *
- * Aquí el DESPUÉS es el overlay recortado: su borde izquierdo sigue
- * al handle. Antes = base a sangre. Así:
- *   · handle a la izquierda  → se ve todo ANTES (rojo)
- *   · handle al centro       → mitad antes / mitad después
- *   · handle a la derecha    → se ve todo DESPUÉS (verde)
- *   · arrastrar a la derecha → CRECE el después ✓
+ * No es un fallo de la mecánica sino del rótulo: en cualquier comparador
+ * con el antes a la izquierda, lo nuevo se descubre tirando HACIA LA
+ * IZQUIERDA. Eso es lo que dice ahora la página.
+ *
+ *   · tirador a la derecha   → se ve casi todo ANTES (rojo)
+ *   · tirador al centro      → mitad y mitad
+ *   · tirador a la izquierda → se ve casi todo DESPUÉS (verde)
+ *   · arrastrar a la izquierda → CRECE el después
  *
  * ── Animación de bienvenida ───────────────────────────────────────────
  * Al entrar en viewport, el handle viaja 50 → 88 → 50 % en ~1,4 s con
@@ -102,9 +106,13 @@ export function ComparisonSlider() {
   );
 
   // El DESPUÉS es el overlay recortado: su borde izquierdo sigue al
-  // handle. `inset(0 0 0 v%)` recorta v% desde la izquierda → visible
-  // de v% a 100%. A v=50 → visible la mitad derecha (después). A v=96
-  // → visible casi todo (todo después). A v=4 → casi nada (todo antes).
+  // tirador. `inset(0 0 0 v%)` oculta desde la izquierda hasta v% y deja
+  // visible de v% a 100%. Así que cuanto MAYOR es v, MENOS después se ve:
+  //   v=4  → el después ocupa casi todo
+  //   v=50 → mitad y mitad
+  //   v=96 → apenas una franja: se ve casi todo el antes
+  // El comentario anterior decía justo lo contrario y de ahí salió el
+  // rótulo equivocado de la página.
   const afterClip = useTransform(
     pos,
     (v) =>
@@ -132,8 +140,13 @@ export function ComparisonSlider() {
         for (const e of entries) {
           if (e.isIntersecting && !autoPlayedRef.current) {
             autoPlayedRef.current = true;
-            // 50 → 88 (ida, 0.7s) → 50 (vuelta, 0.7s). Spring suave.
-            const a1 = animate(pos, 88, {
+            /* 50 → 12 (ida) → 50 (vuelta). Va hacia la IZQUIERDA porque
+               es el lado que descubre el después: la bienvenida tiene que
+               enseñar lo que se gana, no lo que ya se sufre. Estaba
+               puesta hacia el 88, así que el gesto que hacía sola era
+               destapar más "antes" — y encima enseñaba al visitante el
+               sentido equivocado justo antes de que probara. */
+            const a1 = animate(pos, 12, {
               type: "spring",
               stiffness: 90,
               damping: 18,
@@ -250,8 +263,8 @@ export function ComparisonSlider() {
           </h2>
           <p className="mt-4 text-secondary leading-[1.6]">
             {es
-              ? "Arrastra la barra hacia la derecha para descubrir lo que cambia con CountPips. La transformación no es magia: es disciplina medida."
-              : "Drag the bar to the right to uncover what changes with CountPips. The transformation isn't magic: it's measured discipline."}
+              ? "Arrastra la barra hacia la izquierda para descubrir lo que cambia con CountPips. La transformación no es magia: es disciplina medida."
+              : "Drag the bar to the left to uncover what changes with CountPips. The transformation isn't magic: it's measured discipline."}
           </p>
         </Reveal>
 
@@ -319,10 +332,9 @@ export function ComparisonSlider() {
             </div>
 
             {/* ─────────── AFTER (clipped overlay, right side) ─────────── */}
-            {/* El "después" es el overlay recortado por la izquierda: su
-                borde izquierdo sigue al handle. Arrastrar a la derecha
-                hace CRECER el después — la dirección intuitiva de
-                progreso. */}
+            {/* El "después" es el recorte de la derecha: su borde izquierdo va
+                pegado al tirador, así que arrastrar hacia la IZQUIERDA lo
+                hace crecer. Ver la nota de cabecera. */}
             <motion.div
               className="absolute inset-0"
               style={{ clipPath: afterClip, willChange: "clip-path" }}
@@ -442,7 +454,7 @@ export function ComparisonSlider() {
                 style={{ animation: "tj-float 2.4s ease-in-out infinite" }}
               >
                 <span className="text-[10px] uppercase tracking-[0.18em] text-tertiary font-semibold">
-                  {es ? "Arrastra →" : "Drag →"}
+                  {es ? "← Arrastra" : "← Drag"}
                 </span>
               </div>
             )}

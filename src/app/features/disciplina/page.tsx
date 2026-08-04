@@ -106,10 +106,6 @@ const RMultipleSimulator = dynamic(
   () => import("@/components/marketing/RMultipleSimulator").then((m) => m.RMultipleSimulator),
   { loading: () => sectionFallback }
 );
-const DisciplineScore = dynamic(
-  () => import("@/components/marketing/DisciplineScore").then((m) => m.DisciplineScore),
-  { loading: () => sectionFallback }
-);
 
 export default function DisciplinaPage() {
   return (
@@ -146,7 +142,14 @@ export default function DisciplinaPage() {
 
       <RMultipleSimulator num="03" />
 
-      <DisciplineScore num="04" />
+      {/* El diagnóstico de disciplina se mudó a `/test`, con página y
+          entrada propias en el menú. Aquí estaba al final del todo, así
+          que sólo lo encontraba quien ya había bajado la página entera —
+          y es la pieza que más engancha del sitio.
+
+          No se deja también aquí a propósito: el mismo cuestionario en
+          dos direcciones es contenido duplicado, y el buscador reparte
+          entre ambas lo que debería ir a una. */}
 
       <PlateInterlude index={2} />
       <FeaturePageNav current="disciplina" />
