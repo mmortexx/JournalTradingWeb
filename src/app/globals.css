@@ -411,15 +411,25 @@
        enough that headings/labels still override via their own
        letter-spacing rules above. */
     letter-spacing: -0.01em;
-    /* Near-black canvas (≈ #0B0C0E, "Bloomberg terminal" depth) — a
-       whisper cooler than pure #000 so the void reads as a richer
-       institutional dark with a barely-perceptible blue-gray cast,
-       rather than a flat synthetic black. The hero section's video
-       background has no overlay, so the rest of the site reads as a
-       continuation: deep near-black void with liquid-glass cards
-       floating on top. Fixed so the backdrop stays anchored while
-       content scrolls, reinforcing the "stage" metaphor. */
-    background: #0B0C0E;
+    /* El lienzo de fondo. Casi todo el tiempo NO se ve: una capa
+       `fixed inset-0` con `background: var(--bg)` lo tapa, y es la que
+       da el color del tema.
+       Se asoma en un solo sitio, y es en móvil: el rebote al estirar
+       más allá del final. Ahí el navegador pinta el color del body, así
+       que con un negro clavado a mano —como estaba— el tema claro
+       enseñaba una franja negra al rebotar. Con la paleta «clásico»
+       oscuro pasaba lo mismo al revés: el fondo real es #15130f y el
+       rebote sacaba #0B0C0E, un tono más frío.
+       Usando la misma variable que la capa, el rebote enseña
+       exactamente el fondo que se está viendo, sea cual sea el tema y
+       la paleta.
+       Cuidado si se toca: `--bg` es un hex en pantalla pero un triplete
+       RGB dentro de `@media print`, así que `rgb(var(--bg))` aquí
+       fallaría. Al imprimir da igual — la hoja de impresión fuerza
+       `background: #fff !important` sobre html y body.
+       `fixed` se conserva: ancla el fondo mientras el contenido pasa
+       por delante, que es la metáfora de escenario del sitio. */
+    background: var(--bg);
     background-attachment: fixed;
     min-height: 100vh;
   }
