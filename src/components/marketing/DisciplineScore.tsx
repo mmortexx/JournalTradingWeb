@@ -132,6 +132,18 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
   const es = lang === "es";
   const [answers, setAnswers] = useState<(number | null)[]>(QUESTIONS.map(() => null));
 
+  /* ── Una pregunta por pantalla ────────────────────────────────────
+     El test enseñaba las quince preguntas apiladas. Con sesenta
+     opciones a la vista de golpe, lo primero que hace quien llega no
+     es responder: es calcular cuánto le va a costar. Y ese cálculo es
+     el que hace que se vaya. Un diagnóstico se contesta de una en una
+     —es como funciona cualquier cuestionario serio— y además concentra
+     la atención en la pregunta que toca en lugar de repartirla entre
+     quince.
+     El índice vive aparte de las respuestas: se puede volver atrás a
+     revisar sin perder nada de lo contestado. */
+  const [actual, setActual] = useState(0);
+
   /* Recuperar lo respondido. Va en un efecto y no en el estado inicial a
      propósito: el HTML se genera en el build, sin navegador, y leer el
      almacenamiento durante el primer pintado haría que servidor y cliente
@@ -395,6 +407,12 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
 
             <ol className="list-none p-0 m-0 flex flex-col gap-5">
               {QUESTIONS.map((q, qi) => {
+                /* Solo se dibuja la pregunta en curso. Se recorre el
+                   array entero en vez de indexar directamente para no
+                   tocar nada del cuerpo que ya funciona —índices,
+                   accesibilidad, teclado—: lo único que cambia es
+                   cuántas se pintan. */
+                if (qi !== actual) return null;
                 const dim = DIMS.find((d) => d.id === q.dim);
                 return (
                   <li key={qi} className="tj-paper rounded-[2px] p-4">
@@ -479,6 +497,51 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
                 );
               })}
             </ol>
+
+            {/* ── Recorrido ────────────────────────────────────────────
+                Anterior y Siguiente, más la posición en el conjunto. El
+                avance NO es automático al responder: en un test de
+                autodiagnóstico la gente cambia de opinión sobre la
+                marcha, y saltar solo al tocar una opción impide
+                corregir sin tener que retroceder. Se avanza cuando uno
+                decide que ha terminado con la pregunta. */}
+            <div className="mt-6 flex items-center justify-between gap-4 border-t pt-4"
+                 style={{ borderColor: "rgb(var(--divider) / 0.14)" }}>
+              <button
+                type="button"
+                onClick={() => setActual((i) => Math.max(0, i - 1))}
+                disabled={actual === 0}
+                className="inline-flex items-center gap-2 rounded-[2px] transition-colors duration-200 disabled:opacity-35 disabled:cursor-not-allowed"
+                style={{ minHeight: 44, padding: "10px 16px", fontSize: 13, cursor: "pointer",
+                         color: "var(--ink-2)", border: "1px solid rgb(var(--divider) / 0.16)" }}
+              >
+                ← {es ? "Anterior" : "Back"}
+              </button>
+
+              <span className="tnum" style={{ fontSize: 12, color: "var(--ink-3)" }}>
+                {actual + 1} / {QUESTIONS.length}
+              </span>
+
+              {actual < QUESTIONS.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={() => setActual((i) => Math.min(QUESTIONS.length - 1, i + 1))}
+                  /* Se puede seguir sin responder: obligar a contestar
+                     para avanzar convierte un diagnóstico en un peaje.
+                     El resultado ya avisa de cuántas faltan. */
+                  className="inline-flex items-center gap-2 rounded-[2px] transition-colors duration-200"
+                  style={{ minHeight: 44, padding: "10px 18px", fontSize: 13, fontWeight: 600,
+                           cursor: "pointer", color: "rgb(var(--accent-ink))",
+                           background: "rgb(var(--accent-base))" }}
+                >
+                  {es ? "Siguiente" : "Next"} →
+                </button>
+              ) : (
+                <span className="tnum" style={{ fontSize: 12, color: "var(--ink-3)" }}>
+                  {es ? "Última" : "Last"}
+                </span>
+              )}
+            </div>
 
             {answeredCount > 0 && (
               <button

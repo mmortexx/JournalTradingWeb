@@ -68,10 +68,6 @@ export const metadata: Metadata = {
 const sectionFallback = (
   <div className="section" aria-hidden="true" style={{ minHeight: 360 }} />
 );
-const DemoGallery = dynamic(
-  () => import("@/components/demo/DemoGallery").then((m) => m.DemoGallery),
-  { loading: () => sectionFallback }
-);
 const StatsBandNew = dynamic(
   () => import("@/components/marketing/StatsBandNew").then((m) => m.StatsBandNew),
   { loading: () => sectionFallback }
@@ -107,9 +103,6 @@ export function DemoBody() {
             bandera el visitante leía el titular dos veces seguidas. */}
         <AppDemoClient hideHeader />
       </section>
-      {/* Screenshot gallery — all 8 optimized webp images */}
-      <DemoGallery />
-
       <PlateInterlude index={0} />
       <StatsBandNew />
       {/* Ready-to-buy CTA — catches visitors who just played with the demo */}
