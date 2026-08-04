@@ -1083,8 +1083,8 @@
 }
 .depth-1:hover {
   box-shadow:
-    0 2px 4px rgb(0 0 0 / 0.22),
-    0 8px 18px rgb(0 0 0 / 0.22);
+    0 2px 4px rgb(var(--sombra) / 0.22),
+    0 8px 18px rgb(var(--sombra) / 0.22);
 }
 /* Elevación SIN tinte de acento.
    Estas tres reglas llevaban un halo de color incrustado
@@ -1098,38 +1098,144 @@
    señales con significado (ruta activa, foco, CTA). */
 .depth-2:hover {
   box-shadow:
-    0 4px 10px rgb(0 0 0 / 0.26),
-    0 18px 40px rgb(0 0 0 / 0.30);
+    0 4px 10px rgb(var(--sombra) / 0.26),
+    0 18px 40px rgb(var(--sombra) / 0.30);
 }
 .depth-3:hover {
   box-shadow:
-    0 6px 14px rgb(0 0 0 / 0.30),
-    0 24px 56px rgb(0 0 0 / 0.36);
+    0 6px 14px rgb(var(--sombra) / 0.30),
+    0 24px 56px rgb(var(--sombra) / 0.36);
 }
 .depth-4:hover {
   box-shadow:
-    0 8px 18px rgb(0 0 0 / 0.34),
-    0 30px 72px rgb(0 0 0 / 0.42);
+    0 8px 18px rgb(var(--sombra) / 0.34),
+    0 30px 72px rgb(var(--sombra) / 0.42);
 }
 :root[data-theme="light"] .depth-1:hover {
   box-shadow:
-    0 2px 4px rgb(0 0 0 / 0.08),
-    0 8px 18px rgb(0 0 0 / 0.10);
+    0 2px 4px rgb(var(--sombra) / 0.08),
+    0 8px 18px rgb(var(--sombra) / 0.10);
 }
 :root[data-theme="light"] .depth-2:hover {
   box-shadow:
-    0 4px 10px rgb(0 0 0 / 0.12),
-    0 18px 40px rgb(0 0 0 / 0.14);
+    0 4px 10px rgb(var(--sombra) / 0.12),
+    0 18px 40px rgb(var(--sombra) / 0.14);
 }
 :root[data-theme="light"] .depth-3:hover {
   box-shadow:
-    0 6px 14px rgb(0 0 0 / 0.16),
-    0 24px 56px rgb(0 0 0 / 0.20);
+    0 6px 14px rgb(var(--sombra) / 0.16),
+    0 24px 56px rgb(var(--sombra) / 0.20);
 }
 :root[data-theme="light"] .depth-4:hover {
   box-shadow:
-    0 8px 18px rgb(0 0 0 / 0.20),
-    0 30px 72px rgb(0 0 0 / 0.26);
+    0 8px 18px rgb(var(--sombra) / 0.20),
+    0 30px 72px rgb(var(--sombra) / 0.26);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ELEVACIÓN EN REPOSO, Y SOMBRAS QUE NO SON NEGRAS
+   ══════════════════════════════════════════════════════════════════
+   Dos defectos de acabado del sistema anterior:
+
+   1. LA SOMBRA SOLO EXISTÍA EN :hover. En reposo, todas las tarjetas
+      del sitio estaban planas contra el fondo, y solo despegaban al
+      pasar el ratón por encima. Eso deja la página sin profundidad
+      justo cuando se está leyendo —que es el 99 % del tiempo— y
+      además no existe en táctil, donde no hay hover: en un móvil la
+      elevación de este sitio no se veía NUNCA.
+      Ahora cada nivel tiene su sombra en reposo y el hover la
+      PROFUNDIZA. Es lo que hace que un hover se sienta como levantar
+      algo en vez de como encenderlo.
+
+   2. SOMBRAS DE NEGRO PURO. Una sombra es luz que falta, así que
+      lleva el color de lo que la rodea: sobre chapa gris es gris más
+      oscuro, no negra. El negro puro sobre un neutro frío se ve
+      sucio y apagado — el efecto «pegatina gris» clásico.
+      El tinte sale del mismo tono que el material (246°). */
+:root {
+  --sombra: 3 6 10;
+}
+:root[data-theme="light"] {
+  --sombra: 19 29 38;
+}
+
+.depth-1 { box-shadow: 0 1px 2px rgb(var(--sombra) / 0.16); }
+.depth-2 {
+  box-shadow:
+    0 1px 2px rgb(var(--sombra) / 0.14),
+    0 4px 10px -4px rgb(var(--sombra) / 0.20);
+}
+.depth-3 {
+  box-shadow:
+    0 1px 2px rgb(var(--sombra) / 0.14),
+    0 8px 20px -8px rgb(var(--sombra) / 0.26);
+}
+.depth-4 {
+  box-shadow:
+    0 2px 4px rgb(var(--sombra) / 0.16),
+    0 14px 34px -12px rgb(var(--sombra) / 0.32);
+}
+:root[data-theme="light"] .depth-1 { box-shadow: 0 1px 2px rgb(var(--sombra) / 0.07); }
+:root[data-theme="light"] .depth-2 {
+  box-shadow:
+    0 1px 2px rgb(var(--sombra) / 0.06),
+    0 4px 10px -4px rgb(var(--sombra) / 0.10);
+}
+:root[data-theme="light"] .depth-3 {
+  box-shadow:
+    0 1px 2px rgb(var(--sombra) / 0.06),
+    0 8px 20px -8px rgb(var(--sombra) / 0.14);
+}
+:root[data-theme="light"] .depth-4 {
+  box-shadow:
+    0 2px 4px rgb(var(--sombra) / 0.08),
+    0 14px 34px -12px rgb(var(--sombra) / 0.18);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FILO CAPILAR
+   ══════════════════════════════════════════════════════════════════
+   Un borde de 1 px en CSS son 2 o 3 píxeles FÍSICOS en cualquier
+   pantalla moderna, y a ese grosor una línea deja de ser un filo y
+   pasa a ser un marco: es de las cosas que más abaratan el aspecto de
+   una interfaz. El detalle fino son medias líneas, que es lo que usan
+   las interfaces nativas de escritorio — de donde viene este producto.
+
+   Se hace con un borde falso de 0,5 px físico vía `device-pixel-ratio`
+   en lugar de con `border`, porque `border: 0.5px` lo redondea a 1 en
+   varios navegadores y en otros lo desaparece. */
+.filo,
+.filo-t,
+.filo-b {
+  position: relative;
+}
+.filo::after,
+.filo-t::after,
+.filo-b::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 0 solid rgb(var(--divider) / 0.14);
+  border-radius: inherit;
+}
+.filo::after { border-width: 1px; }
+.filo-t::after { border-top-width: 1px; }
+.filo-b::after { border-bottom-width: 1px; }
+
+@media (min-resolution: 1.5dppx) {
+  .filo::after,
+  .filo-t::after,
+  .filo-b::after {
+    /* El truco: se dibuja al DOBLE de tamaño con un borde de 1 px y se
+       encoge a la mitad, con lo que ese píxel acaba midiendo medio. */
+    width: 200%;
+    height: 200%;
+    inset: 0 auto auto 0;
+    transform: scale(0.5);
+    transform-origin: 0 0;
+    border-radius: calc(var(--radius) * 2);
+  }
 }
 
 @layer utilities {

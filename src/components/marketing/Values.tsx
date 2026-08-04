@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /**
  * Values — the four product principles. Local always · One-time payment ·
@@ -77,34 +78,33 @@ export function Values() {
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
 
       <div className="relative z-10 tj-container">
-        {/* Header */}
-        <div className="max-w-2xl">
-          <Reveal>
-            <Eyebrow>{es ? "Principios" : "Principles"}</Eyebrow>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <h2
-              className="mt-5 t-h2 text-primary"
-            >
-              {es ? (
-                <>
-                  Lo que <span className="text-gradient">creemos.</span>
-                </>
-              ) : (
-                <>
-                  What we <span className="text-gradient">believe.</span>
-                </>
-              )}
-            </h2>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-4 text-lg text-secondary leading-relaxed">
-              {es
-                ? "Cuatro ideas que no son negociables. Si algún día dejamos de cumplirlas, la app deja de tener sentido."
-                : "Four ideas that aren't negotiable. If we ever stop delivering on them, the app stops making sense."}
-            </p>
-          </Reveal>
-        </div>
+        {/* Cabecera PARTIDA — titular a un lado, entradilla al otro.
+            Aquí estaba el `max-w-2xl` con todo apilado a la izquierda,
+            igual que en las otras diecisiete secciones del sitio: media
+            pantalla vacía a la derecha y la misma presentación por
+            enésima vez. Esta sección es la que mejor admite la partida
+            porque su entradilla tiene cuerpo suficiente para sostener
+            una columna propia. Ver `SectionHeader`. */}
+        <SectionHeader
+          composicion="partida"
+          etiqueta={es ? "Principios" : "Principles"}
+          titulo={
+            es ? (
+              <>
+                Lo que <span className="text-gradient">creemos.</span>
+              </>
+            ) : (
+              <>
+                What we <span className="text-gradient">believe.</span>
+              </>
+            )
+          }
+          entradilla={
+            es
+              ? "Cuatro ideas que no son negociables. Si algún día dejamos de cumplirlas, la app deja de tener sentido."
+              : "Four ideas that aren't negotiable. If we ever stop delivering on them, the app stops making sense."
+          }
+        />
 
         {/* 2×2 grid
             T2d — `gap-5 md:gap-6` (20px / 24px) entre tarjetas (era
