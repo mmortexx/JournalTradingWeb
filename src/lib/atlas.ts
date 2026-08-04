@@ -23,7 +23,8 @@ export type PlateId =
   | "rules"
   | "streak"
   | "vault"
-  | "ledger";
+  | "ledger"
+  | "tenure";
 
 export type PlateMeta = {
   titleEs: string;
@@ -118,6 +119,14 @@ export const PLATE_META: Record<PlateId, PlateMeta> = {
     noteEn:
       "The ledger, open, with its columns and its ruled lines. No statistic exists until someone writes the trade down: that is where this product's name and its mark come from.",
   },
+  tenure: {
+    titleEs: "Lo que separa alquilar de comprar",
+    titleEn: "What separates renting from owning",
+    noteEs:
+      "Dos trazos sobre el mismo eje de años: la escalera de una suscripción, que sube un peldaño cada vez que vence, y la horizontal de un pago que se hace una sola vez. Lo que argumenta no es ninguna de las dos líneas, sino el hueco tramado entre ellas — crece solo, sin que nadie añada nada.",
+    noteEn:
+      "Two strokes on the same axis of years: the staircase of a subscription, climbing a step each time it renews, and the flat line of a payment made once. Neither line is the argument — the hatched gap between them is, and it widens on its own, with nobody adding anything.",
+  },
 };
 
 /**
@@ -134,7 +143,12 @@ export const ATLAS_ROUTES: Record<string, PlateId[]> = {
   "/features/metricas": ["rolling", "distribution", "heatmap"],
   "/features/disciplina": ["rules", "gauge", "streak"],
   "/features/seguridad": ["vault", "ledger"],
-  "/pricing": ["ledger", "equity"],
+  /* `tenure` es propia de esta ruta y va PRIMERA a propósito: la lámina
+     que abre una sección es la que le pone tema. Antes abría el libro
+     mayor, que es de seguridad, y la página de precios empezaba hablando
+     de otra cosa. La curva de capital se queda de segunda porque lo que
+     se compra aquí sirve para eso. */
+  "/pricing": ["tenure", "equity"],
   "/demo": ["heatmap"],
   "/faq": ["distribution", "calendar"],
   "/about": ["ledger", "rolling"],

@@ -57,7 +57,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
     { label: "25k $", v: 25000 },
   ];
 
-  // ── Estado editable: la operacion del usuario ─────────────────────
+  // ── Estado editable: la operación del usuario ─────────────────────
   const [riskPct, setRiskPct] = useState(1.0);
   const [balance, setBalance] = useState(10000);
   const [entry, setEntry] = useState(100);
@@ -226,7 +226,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             }}
           >
             {es
-              ? "Introduce tu balance y tu operacion. Te decimos cuántas unidades, cuánto arriesgas y dónde poner el stop. Vale para largos y cortos."
+              ? "Introduce tu balance y tu operación. Te decimos cuántas unidades, cuánto arriesgas y dónde poner el stop. Vale para largos y cortos."
               : "Enter your balance and your trade. We tell you how many units, how much you risk, and where to place your stop. Works for longs and shorts."}
           </p>
           {/* Chips de plantilla */}
@@ -343,9 +343,22 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             </div>
           </div>
 
-          {/* Entrada / Stop / Target — EDITABLES */}
+          {/* Entrada / Stop / Target — EDITABLES.
+
+              DOS columnas en móvil y tres desde `sm`. Con tres columnas en
+              un teléfono cada campo se quedaba en 83 px, de los que 57 son
+              útiles: entra el valor de ejemplo (100) y poco más. Medido con
+              la tipografía real, NO entraba ningún precio de verdad —
+              1.08450 pide 60 px, 2345.75 pide 58, 18450.25 pide 67.
+
+              Es decir, la calculadora funcionaba mientras nadie la usara: se
+              rompía justo al hacer lo que el propio texto pide, que es meter
+              tu operación. Y no lo delata nada, porque los valores de
+              ejemplo caben. Con dos columnas quedan ~130 px útiles y entra
+              cualquier precio con holgura. El reparto 2+1 ya es el que
+              tienen los chips de plantilla de aquí arriba. */}
           <div
-            className="grid grid-cols-3 gap-2 p-3 rounded-[8px] mb-4"
+            className="grid grid-cols-2 gap-2 p-3 rounded-[8px] mb-4 sm:grid-cols-3"
             style={{
               background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
               border: "1px solid rgb(var(--divider) / 0.06)",

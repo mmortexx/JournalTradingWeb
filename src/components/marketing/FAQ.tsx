@@ -184,7 +184,7 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
   return (
     <section
       id="faq"
-      /* En `/faq` la cabecera de pagina ya titula, asi que aqui el h2 se
+      /* En `/faq` la cabecera de página ya titula, así que aquí el h2 se
          vuelve invisible (sigue existiendo para el indice y para SEO).
          Con el padding completo de `.section` eso dejaba ~145 px de
          vacio absoluto entre la regla del hero y el buscador. */
