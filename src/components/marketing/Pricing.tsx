@@ -240,26 +240,33 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
 
   return (
     <motion.div
-      whileHover={
+      /* Sin `whileHover`. Los planes se levantaban y escalaban al pasar
+         el ratón: eso es lo que hace una tarjeta que se puede coger, y
+         una columna de una tabla de tarifas no se coge. Además el
+         escalado desplazaba el precio medio píxel y lo dejaba borroso
+         durante la transición — en la cifra que decide la compra. La
+         respuesta al puntero la da ahora el filete superior. */
+      /* ── Tabla de tarifas, no tarjetas flotantes ──────────────────
+         Los dos planes eran cajas: papel translúcido, borde propio,
+         sombra de elevación, esquina redondeada y —en el Pro— un halo
+         de acento. Ese es el patrón del SaaS de consumo, y es lo que
+         hacía que la página que MÁS tiene que transmitir seriedad
+         pareciera la de una aplicación de suscripción cualquiera.
+
+         Cómo publica sus tarifas una institución: en columnas, con
+         filetes. El plan recomendado no se ilumina — se marca con un
+         filete superior más grueso, que es una señal y no un adorno.
+         La caja compite con lo que contiene; aquí lo que tiene que
+         mandar es el precio y lo que incluye.
+
+         Se retira también la elevación: una columna de tabla no flota.
+         El `isolation: isolate` se conserva porque el Pro sigue
+         necesitando su propio contexto de apilado para la marca de
+         agua. */
+      className={`relative p-6 sm:p-8 h-full flex flex-col transition-[border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isPro
-          ? { scale: 1.005, transition: { type: "spring", stiffness: 300, damping: 24 } }
-          : { y: -4, scale: 1.005, transition: { type: "spring", stiffness: 300, damping: 24 } }
-      }
-      transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      // T3c — swap `liquid-glass` por papel translúcido cálido:
-      //  · Pro: `.tj-paper .tj-paper-glow` (papel + halo champagne, sigue
-      //    destacado sin necesidad de borde-degradado).
-      //  · Core: `.tj-paper-dense` (86 % de opacidad — su lista de 8
-      //    features con texto pequeño necesita más opacidad para AA).
-      // `depth-2` y los borders de Tailwind se conservan; el `isolation:
-      // isolate` del Pro sigue haciendo de stacking context para el
-      // watermark PREMIUM a z-index: -1.
-      className={`relative ${
-        isPro ? "tj-paper tj-paper-glow" : "tj-paper-dense"
-      } rounded-card p-6 sm:p-8 h-full flex flex-col border transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-        isPro
-          ? "depth-2 border-[rgb(var(--accent-base)/0.35)]"
-          : "depth-2 border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--divider)/0.18)]"
+          ? "border-t-2 border-t-[rgb(var(--accent-base))] border-x border-b border-x-[rgb(var(--divider)/0.14)] border-b-[rgb(var(--divider)/0.14)]"
+          : "border-t-2 border-t-[rgb(var(--divider)/0.28)] border-x border-b border-x-[rgb(var(--divider)/0.14)] border-b-[rgb(var(--divider)/0.14)] hover:border-t-[rgb(var(--divider)/0.45)]"
       }`}
       style={
         isPro

@@ -112,18 +112,25 @@ export function Values() {
             4px para que las 4 tarjetas respiren sin abrirse un hueco
             tipográfico. El grid sigue 1-col en móvil, 2-col en md+ (que
             es el 2×2 efectivo en lg). */}
-        <div className="mt-10 grid md:grid-cols-2 gap-5 md:gap-6">
+        {/* ── Cuatro asientos, no cuatro tarjetas ─────────────────────
+            Eran cajas de papel translúcido con sombra, esquina
+            redondeada y un salto de 4 px al pasar el ratón. Cuatro
+            afirmaciones de principios no son cuatro objetos que se
+            cogen: son las entradas de una declaración.
+
+            Pasan a una retícula de filetes, como el cuadro de cifras.
+            `gap` a 0 para que los trazos se toquen y formen cuadrícula
+            en vez de cuatro marcos sueltos; la separación la da el
+            relleno interior. */}
+        <div className="mt-10 grid md:grid-cols-2 border-t border-[rgb(var(--divider)/0.14)]">
           {VALUES.map((v, i) => (
             <Reveal key={v.num} delay={0.1 + i * 0.08} className="h-full">
               <motion.article
-                whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                // T3c — swap `liquid-glass` por `.tj-paper`: las 4 tarjetas
-                // de principios ahora son papel cálido translúcido, igual
-                // que los bento cards (cohesión entre secciones de cards).
-                // depth-2, rounded-card, p-6, hover lift y accent edge
-                // intactos.
-                className="group relative tj-paper depth-2 rounded-card p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                /* Sin salto al pasar por encima: una entrada de
+                   declaración no se levanta. La única respuesta al
+                   puntero es que el filo de acento del lateral se
+                   marque — ya estaba y se conserva. */
+                className="group relative h-full overflow-hidden border-b border-[rgb(var(--divider)/0.14)] py-6 pr-6 md:[&]:pl-0 transition-colors duration-300"
               >
                 {/* Accent edge — grows on hover. Scaled up from 1.25 → 1.4
                     for a more pronounced lift; the base color is now a low
