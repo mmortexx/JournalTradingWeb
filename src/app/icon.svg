@@ -42,7 +42,13 @@
     </linearGradient>
   </defs>
 
-  <rect width="512" height="512" rx="86" fill="#F0EDE4"/>
+  <!-- La placa del icono. Era #F0EDE4, el papel hueso de la marca
+       anterior: se escapó de la conversión a gris porque el mapa de
+       colores cubría las piezas del dibujo y no el fondo sobre el que
+       van. Se ve en la pestaña del navegador, que es donde más veces
+       aparece la marca. Mismo criterio que en el resto del logotipo:
+       se conserva la luminosidad y sólo cambia el matiz. -->
+  <rect width="512" height="512" rx="86" fill="#EBEDEF"/>
 
   <!-- Bloque de hojas -->
   <rect x="352" y="98" width="56" height="322" rx="12" fill="url(#pages)"/>

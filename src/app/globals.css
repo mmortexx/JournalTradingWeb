@@ -300,10 +300,10 @@
      propósito (#0B8B4B/#991B1B) para cumplir WCAG AA sobre los
      fondos translúcidos de la web, que la app nativa no tiene.
      Copiar los de la app sería revertir esa corrección. */
-  --tint: 203 208 212; /* #CBD0D4 */
-  --canvas: 203 208 212;
-  --chrome: 203 208 212;
-  --card: 203 208 212;
+  --tint: 212 217 221; /* #D4D9DD */
+  --canvas: 212 217 221;
+  --chrome: 212 217 221;
+  --card: 212 217 221;
   --canvas-op: 0.07;
   --chrome-op: 0.8;
   --card-op: 0.60;
@@ -2974,7 +2974,7 @@ button.icon-btn:hover > svg,
   --accent-hover: 7 15 23; /* #070F17 */
   --accent-pressed: 38 47 55; /* #262F37 */
   --accent-soft: 19 29 38;
-  --accent-ink: 235 237 239; /* #EBEDEF — 14,53:1 sobre el grafito */
+  --accent-ink: 238 240 243; /* #EEF0F3 — 14,8:1 sobre el grafito */
 
   /* Oscurecidos respecto al tema anterior: sobre la chapa gris, los
      valores de papel se quedaban en 2,7–3,7:1. Conservan su TONO —el
@@ -2988,7 +2988,7 @@ button.icon-btn:hover > svg,
   --sig-amber: 123 53 0;
   --sig-red: 147 19 21;
 
-  --tint: 203 208 212; /* #CBD0D4 */
+  --tint: 212 217 221; /* #D4D9DD */
   --canvas: 203 208 212;
   --chrome: 203 208 212;
   --card: 203 208 212;
@@ -2997,42 +2997,45 @@ button.icon-btn:hover > svg,
   --card-op: 0.6;
 
   /* Un paso por detrás del acento, que aquí es la tinta plena. */
-  --txt-primary: 41 47 52; /* #292F34 — 7,63:1 en el peor fondo */
-  --txt-secondary: 60 66 71; /* #3C4247 — 5,74:1 */
-  --txt-tertiary: 76 81 86; /* #4C5156 — 4,52:1 */
-  --divider: 41 47 52;
+  /* Los ratios son sobre el PEOR fondo real, que no es la superficie
+     limpia sino la superficie hundida CON el grabado del fondo encima
+     (#B9BDC2). Ver la nota del velo en `.bg-veil`. */
+  --txt-primary: 38 44 49; /* #262C31 — 7,48:1 */
+  --txt-secondary: 57 62 67; /* #393E43 — 5,72:1 */
+  --txt-tertiary: 72 77 81; /* #484D51 — 4,53:1 */
+  --divider: 38 44 49;
 
-  --bg: #cbd0d4;
-  --surface: #dce0e3;
-  --surface-2: #bec3c8;
-  --raised: #ebedef;
-  --ink: #292f34;
-  --ink-2: #3c4247;
-  --ink-3: #4c5156;
+  --bg: #d4d9dd;
+  --surface: #e2e6e9;
+  --surface-2: #cdd2d8;
+  --raised: #eef0f3;
+  --ink: #262c31;
+  --ink-2: #393e43;
+  --ink-3: #484d51;
   --line: rgba(19, 29, 38, 0.16);
   --line-2: rgba(19, 29, 38, 0.28);
 
-  --background: #cbd0d4;
-  --foreground: #292f34;
-  --card-foreground: #292f34;
-  --popover: #ebedef;
-  --popover-foreground: #292f34;
+  --background: #d4d9dd;
+  --foreground: #262c31;
+  --card-foreground: #262c31;
+  --popover: #eef0f3;
+  --popover-foreground: #262c31;
   --primary: rgb(var(--accent-base));
   --primary-foreground: rgb(var(--accent-ink));
-  --secondary: #bec3c8;
-  --secondary-foreground: #292f34;
-  --muted: #bec3c8;
-  --muted-foreground: #4c5156;
+  --secondary: #cdd2d8;
+  --secondary-foreground: #262c31;
+  --muted: #cdd2d8;
+  --muted-foreground: #484d51;
   --accent: rgb(var(--accent-base));
   --accent-foreground: rgb(var(--accent-ink));
   --destructive: #931315;
   --border: rgba(19, 29, 38, 0.17);
   --input: rgba(19, 29, 38, 0.21);
   --ring: rgb(var(--accent-base));
-  --sidebar: #dce0e3;
-  --sidebar-foreground: #292f34;
-  --sidebar-accent: #bec3c8;
-  --sidebar-accent-foreground: #292f34;
+  --sidebar: #e2e6e9;
+  --sidebar-foreground: #262c31;
+  --sidebar-accent: #cdd2d8;
+  --sidebar-accent-foreground: #262c31;
   --sidebar-border: rgba(19, 29, 38, 0.17);
 }
 
@@ -3444,8 +3447,11 @@ button.icon-btn:hover > svg,
    encima de una línea del grabado. Con el atlas al 0,62 y el velo
    dejando pasar un 16 %, la línea aporta como mucho un 10 % de tinta —y
    eso solo si la línea va a opacidad plena, cosa que casi ninguna hace—,
-   lo que lleva el papel de #F0EDE4 a ≈#D9D6CD en ese punto exacto: el
-   terciario #635B4B se queda en 4,7:1, por encima del 4,5:1 de AA.
+   lo que lleva la superficie hundida de #CDD2D8 a ≈#B9BDC2 en ese punto
+   exacto: el terciario #484D51 se queda en 4,53:1, por encima del 4,5:1
+   de AA. CUENTA REHECHA al cambiar el material — con el papel anterior
+   daba 4,7:1, y al pasar a chapa gris sin rehacerla el terciario se
+   habia quedado en 4,15:1, por DEBAJO del minimo.
 
    El velo SUBIÓ de 66 a 84 al oscurecer el lápiz, y ese es el
    compromiso: el trazo se ve mucho más donde importa —el hero y los
