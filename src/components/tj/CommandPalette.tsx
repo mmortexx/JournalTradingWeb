@@ -16,6 +16,7 @@ import {
 import { useLang } from "@/lib/i18n";
 import { useTheme, PALETTES, type PaletteName } from "@/lib/theme";
 import { asset } from "@/lib/asset";
+import { withLocale } from "@/lib/locale";
 
 /**
  * Cached at module load — used by `navigate()` to switch the in-page
@@ -197,8 +198,14 @@ export function CommandPalette({
   const navigate = useCallback(
     (path: string) => {
       setOpen(false);
+      // `withLocale` ANTES de comparar, no sólo antes de navegar: en
+      // inglés, `pathname` es `/en/pricing` pero `path` en `PAGES` sigue
+      // siendo `/pricing` a secas. Comparar sin prefijar habría dado
+      // "páginas distintas" estando en la misma, y el resultado habría
+      // sido una recarga completa en vez de un scroll suave.
+      const destino = withLocale(path, lang);
       // Same page? Smooth scroll to top — no reload.
-      if (pathname === path) {
+      if (pathname === destino) {
         requestAnimationFrame(() => {
           window.scrollTo({
             top: 0,
@@ -208,7 +215,7 @@ export function CommandPalette({
         return;
       }
       // Cross-page — full navigation.
-      window.location.href = asset(path);
+      window.location.href = asset(destino);
     },
     /* `setOpen` es ahora una PROP (`onOpenChange`), no el setter estable
        de un `useState`, así que tiene que ir en las dependencias. Sin
@@ -217,7 +224,7 @@ export function CommandPalette({
        hoy funcionaría de milagro —porque el anfitrión pasa siempre la
        misma referencia— y dejaría de hacerlo en cuanto alguien montara
        la paleta desde otro sitio. */
-    [pathname, setOpen]
+    [pathname, setOpen, lang]
   );
 
   // Run a side-effecting action then close the palette.

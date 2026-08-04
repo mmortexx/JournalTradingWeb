@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";

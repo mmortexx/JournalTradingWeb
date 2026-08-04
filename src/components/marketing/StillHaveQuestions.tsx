@@ -6,6 +6,7 @@ import { useLang } from "@/lib/i18n";
 import { SUPPORT_EMAIL } from "@/lib/forms";
 import { Reveal } from "@/components/tj/Reveal";
 import { asset } from "@/lib/asset";
+import { withLocale } from "@/lib/locale";
 
 /**
  * StillHaveQuestions — small transitional banner placed between the FAQ
@@ -64,7 +65,7 @@ export function StillHaveQuestions() {
                 <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
               </a>
               <a
-                href={asset("/faq")}
+                href={asset(withLocale("/faq", lang))}
                 className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.15)] bg-[rgb(var(--divider)/0.04)] px-5 text-sm font-medium text-primary transition-[background-color,border-color,transform] duration-200 hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--divider)/0.08)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {es ? "Ver FAQ" : "See FAQ"}

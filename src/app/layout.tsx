@@ -18,6 +18,10 @@ import { DecorFX } from "@/components/tj/DecorFX";
 import { SITE_URL } from "@/lib/site";
 import { SUPPORT_EMAIL } from "@/lib/forms";
 
+/** Mismo valor que usa `asset()`; vacío en Cloudflare, `/CountPipsWeb` en
+ *  GitHub Pages. Lo necesita el script de `lang` de más abajo. */
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 /**
  * Viewport — `viewport-fit=cover` lets the layout extend into the notch /
  * home-indicator area on iOS so the safe-area-inset CSS env() values
@@ -283,7 +287,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning data-theme="light" data-palette="clasico">
+    <html
+      // El literal "es" es correcto para casi todo el sitio —el español
+      // vive en la raíz sin prefijo— y para las diez páginas que sí
+      // tienen versión inglesa (bajo `/en`) lo corrige, ANTES del primer
+      // pintado, el script embebido de aquí abajo. Es el mismo patrón que
+      // ya usa el tema: un valor de partida razonable en el propio JSX,
+      // corregido por un script bloqueante que lee la dirección real
+      // antes de que el navegador pinte nada, así que no hay parpadeo ni
+      // una declaración incorrecta que un lector de pantalla o un
+      // buscador puedan llegar a ver.
+      lang="es"
+      suppressHydrationWarning
+      data-theme="light"
+      data-palette="clasico"
+    >
       <head>
         <script
           // Prevent FOUC: apply saved theme/palette before paint
@@ -303,6 +321,20 @@ export default function RootLayout({
           // paint (IntroSequence los revela tras el loader).
           dangerouslySetInnerHTML={{
             __html: `(function(){try{if(!sessionStorage.getItem('tj_intro'))document.documentElement.classList.add('tj-preload')}catch(e){}})();`,
+          }}
+        />
+        <script
+          // Corrige `lang` antes de pintar en las páginas bajo `/en`.
+          // `location.pathname` SÍ lleva el prefijo de GitHub Pages
+          // (`/CountPipsWeb/en/...`), a diferencia del `usePathname()` de
+          // React que consume `LanguageProvider` —ese lo devuelve Next ya
+          // sin el prefijo—, así que aquí hay que descontarlo a mano
+          // antes de comprobar si el segmento es `/en`. `BASE_PATH` se
+          // interpola en la compilación con el mismo valor que usa
+          // `asset()`, y en Cloudflare —donde no hay prefijo— la cadena
+          // sale vacía y la resta no hace nada.
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=location.pathname;var b='${BASE_PATH}';if(b&&p.indexOf(b)===0)p=p.slice(b.length)||'/';document.documentElement.lang=(p==='/en'||p.indexOf('/en/')===0)?'en':'es';}catch(e){}})();`,
           }}
         />
       </head>

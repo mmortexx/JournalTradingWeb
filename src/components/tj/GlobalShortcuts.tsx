@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "@/lib/i18n";
+import { withLocale } from "@/lib/locale";
 import { useTheme } from "@/lib/theme";
 import { openShortcutsHelp } from "@/lib/overlays";
 
@@ -146,7 +147,11 @@ export function GlobalShortcuts() {
         const dest = G_NAV_MAP[lower];
         if (dest) {
           e.preventDefault();
-          router.push(dest);
+          // `withLocale`: los atajos `g`+letra navegan directamente con
+          // `router.push`, sin pasar por `LocaleLink`, así que `g p`
+          // debe llevar a `/en/pricing` y no a `/pricing` si el
+          // visitante está leyendo en inglés.
+          router.push(withLocale(dest, lang));
         }
         return;
       }
@@ -171,7 +176,7 @@ export function GlobalShortcuts() {
       window.removeEventListener("keydown", onKey);
       if (gPrefixTimer.current) window.clearTimeout(gPrefixTimer.current);
     };
-  }, [toggleTheme, toggleLang, router]);
+  }, [toggleTheme, toggleLang, router, lang]);
 
   return (
     <AnimatePresence>

@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLang, type Lang } from "@/lib/i18n";
+import { sinPrefijoEn } from "@/lib/locale";
 import { useTheme } from "@/lib/theme";
 import { BrandGlyph } from "@/components/tj/BrandGlyph";
 
@@ -468,9 +469,16 @@ export function Navbar() {
     },
   ];
 
-  /** ¿Esta ruta (o una subruta suya) es la página actual? */
+  /** ¿Esta ruta (o una subruta suya) es la página actual?
+   *
+   * `sinPrefijoEn` antes de comparar: en inglés, `pathname` viene como
+   * `/en/pricing`, pero los enlaces de este menú siguen escritos como
+   * `/pricing` a secas —es `LocaleLink` quien añade el prefijo al
+   * navegar, no antes—. Sin este descuento, ningún elemento del menú se
+   * habría marcado nunca como activo mientras se navegaba en inglés. */
+  const rutaActual = sinPrefijoEn(pathname);
   const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + "/");
+    rutaActual === href || rutaActual.startsWith(href + "/");
 
   /**
    * Realce compartido. Una línea inferior fina que crece desde el centro
@@ -530,7 +538,7 @@ export function Navbar() {
     );
   };
 
-  const productActive = pathname.startsWith("/features");
+  const productActive = rutaActual.startsWith("/features");
 
   return (
     <>

@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 import { PRECIO_VALIDO_HASTA } from "@/lib/fechas";
 
 // Estimated reading time (pricing cards + comparison + pricing FAQ +
@@ -155,6 +155,7 @@ export const metadata: Metadata = {
     "Pago único. Sin suscripciones. Core $29 · Pro $49. Tus datos 100% locales para siempre.",
   alternates: {
     canonical: `${SITE_URL}/pricing/`,
+    languages: hreflangDe("/pricing"),
   },
   openGraph: {
     title: "Precios — CountPips",
@@ -214,7 +215,9 @@ const FinalCTANew = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function PricingPage() {
+/** Exportado con nombre para que `app/en/pricing/page.tsx` lo reutilice.
+ *  Sin los `<script>` de datos estructurados. */
+export function PricingBody() {
   return (
     <>
       <PageHeader
@@ -229,18 +232,6 @@ export default function PricingPage() {
         breadcrumbEs="Precios"
         breadcrumbEn="Pricing"
         readingTimeMin={READING_TIME_MIN}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <Pricing standalone />
       <SavingsCalculator />
@@ -261,6 +252,26 @@ export default function PricingPage() {
       <DownloadCTA />
       <FinalCTANew />
       <TableOfContents />
+    </>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <PricingBody />
     </>
   );
 }

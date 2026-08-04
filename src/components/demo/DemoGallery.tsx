@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { asset } from "@/lib/asset";
+import { withLocale } from "@/lib/locale";
 import { Reveal } from "@/components/tj/Reveal";
 import { FeatureImage } from "@/components/tj/FeatureImage";
 import { WindowFrame } from "@/components/tj/WindowFrame";
@@ -262,7 +263,7 @@ export function DemoGallery() {
             </svg>
           </motion.a>
           <motion.a
-            href={asset("/features")}
+            href={asset(withLocale("/features", lang))}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
             className="liquid-glass group inline-flex items-center gap-2 h-11 px-6 rounded-lg text-sm font-medium text-primary border border-[rgb(var(--divider)/0.18)] hover:border-[rgb(var(--accent-base)/0.35)] hover:bg-[rgb(var(--accent-base)/0.06)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgb(0_0_0/0.40)] transition-[background-color,border-color,box-shadow,transform] duration-200"

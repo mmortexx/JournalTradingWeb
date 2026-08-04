@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/tj/Reveal";
 import {

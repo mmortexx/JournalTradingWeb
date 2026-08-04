@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactElement } from "react";
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { useLang } from "@/lib/i18n";
 import { GlossaryLauncher } from "@/components/tj/GlossaryLauncher";
 import { MagneticButton } from "@/components/tj/MagneticButton";

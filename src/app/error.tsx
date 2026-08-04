@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 

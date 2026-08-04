@@ -5,7 +5,7 @@ import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 import { ULTIMA_ACTUALIZACION_ISO } from "@/lib/fechas";
 
 // Estimated reading time for this page's body content (metrics showcase
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   title: { absolute: "Métricas — CountPips" },
   description:
     "40+ ratios institucionales: Sharpe, Sortino, Calmar, profit factor, expectancy en R. Calculadora de riesgo. Métricas que correlacionan con la consistencia.",
-  alternates: { canonical: `${SITE_URL}/features/metricas/` },
+  alternates: { canonical: `${SITE_URL}/features/metricas/`, languages: hreflangDe("/features/metricas") },
   openGraph: {
     title: "Métricas — CountPips",
     description: "40+ ratios institucionales y calculadora de riesgo. Métricas que separan un edge real de una racha.",
@@ -110,7 +110,11 @@ const Wrapped = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function MetricasPage() {
+/** Exportado con nombre para que `app/en/features/metricas/page.tsx` lo
+ *  reutilice. Sin los `<script>` de datos estructurados — van en el
+ *  `default export` de cada idioma, porque cambian de idioma ellos
+ *  también. */
+export function MetricasBody() {
   return (
     <>
       <PageHeader
@@ -126,14 +130,6 @@ export default function MetricasPage() {
         breadcrumbEn="Features · Metrics"
         readingTimeMin={READING_TIME_MIN}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
       <MetricsShowcaseNew num="01" />
       <RiskCalculator num="02" />
       <EquityProjector num="03" />
@@ -147,6 +143,22 @@ export default function MetricasPage() {
       <PlateInterlude index={2} />
       <FinalCTANew />
       <TableOfContents />
+    </>
+  );
+}
+
+export default function MetricasPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <MetricasBody />
     </>
   );
 }

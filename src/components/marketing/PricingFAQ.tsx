@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 import { asset } from "@/lib/asset";
+import { withLocale } from "@/lib/locale";
 import {
   Accordion,
   AccordionItem,
@@ -206,7 +207,7 @@ export function PricingFAQ() {
           >
             {es ? "¿Más dudas?" : "More questions?"}{" "}
             <a
-              href={asset("/faq")}
+              href={asset(withLocale("/faq", lang))}
               /* `-my-2 py-2` amplía la zona que se puede tocar sin
                  desplazar la línea: medía 20 px de alto y es la salida
                  hacia la FAQ desde la página que más importa vender. */

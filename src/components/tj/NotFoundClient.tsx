@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useLang } from "@/lib/i18n";
+import { withLocale } from "@/lib/locale";
 import { MarketBackground } from "@/components/tj/MarketBackground";
 import { ParticleField } from "@/components/tj/ParticleField";
 
@@ -67,7 +68,11 @@ export function NotFoundClient() {
     e.preventDefault();
     const term = q.trim();
     // No query → just land on FAQ; otherwise pre-fill the search box.
-    router.push(term ? `/faq?q=${encodeURIComponent(term)}` : "/faq");
+    // `withLocale` para que quien busca desde una 404 en inglés aterrice
+    // en `/en/faq`, no en la FAQ española con el buscador en el idioma
+    // que no pidió. `router.push` no pasa por `LocaleLink`, así que aquí
+    // hay que aplicarlo a mano.
+    router.push(withLocale(term ? `/faq?q=${encodeURIComponent(term)}` : "/faq", lang));
   }
 
   return (

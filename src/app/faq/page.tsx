@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FAQ } from "@/components/marketing/FAQ";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 // Estimated reading time (16 Q&A entries + contact sections). ~650 words
 // across all answers at 220 wpm = ~3 min.
@@ -162,6 +162,7 @@ export const metadata: Metadata = {
     "Preguntas frecuentes sobre CountPips: precio, privacidad, compatibilidad, importación, actualizaciones y más.",
   alternates: {
     canonical: `${SITE_URL}/faq/`,
+    languages: hreflangDe("/faq"),
   },
   openGraph: {
     title: "FAQ — CountPips",
@@ -205,7 +206,9 @@ const FinalCTANew = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function FaqPage() {
+/** Exportado con nombre para que `app/en/faq/page.tsx` lo reutilice. Sin
+ *  los `<script>` de datos estructurados. */
+export function FaqBody() {
   return (
     <>
       <PageHeader
@@ -220,14 +223,6 @@ export default function FaqPage() {
         breadcrumbEs="FAQ"
         breadcrumbEn="FAQ"
         readingTimeMin={READING_TIME_MIN}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <FAQ standalone />
       <EdgeSignificanceChecker num="01" />
@@ -245,6 +240,22 @@ export default function FaqPage() {
       <PlateInterlude index={1} />
       <FinalCTANew />
       <TableOfContents />
+    </>
+  );
+}
+
+export default function FaqPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <FaqBody />
     </>
   );
 }

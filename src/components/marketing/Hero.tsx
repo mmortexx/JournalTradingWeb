@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { ArrowRight, Play } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 
@@ -57,7 +57,12 @@ export function Hero() {
     { k: es ? "DATOS" : "DATA", v: es ? "100 % locales" : "100 % local" },
     { k: es ? "LICENCIA" : "LICENSE", v: es ? "Pago único" : "One-time" },
     { k: es ? "IDIOMAS" : "LANGUAGES", v: "ES · EN" },
-    { k: es ? "VERSIÓN" : "VERSION", v: "1.4.2" },
+    /* Aquí había una quinta fila, «VERSIÓN: 1.4.2», del mismo historial
+       de versiones inventado que ya se retiró del pie: un número de
+       versión publicada de un producto que todavía no se puede
+       descargar. Esta era la única instancia que quedaba en todo el
+       sitio — el resto de la limpieza buscaba «v1.4.2» con la uve por
+       delante, y aquí estaba escrita sin ella. */
   ];
 
   return (

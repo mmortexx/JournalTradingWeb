@@ -5,7 +5,7 @@ import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 import { ULTIMA_ACTUALIZACION_ISO } from "@/lib/fechas";
 
 // Estimated reading time (security + tech specs + integrations).
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
   title: { absolute: "Seguridad — CountPips" },
   description:
     "Local-first: tus datos 100% en tu máquina, sin nube ni cuentas. Especificaciones técnicas, integraciones con tu flujo y privacidad por diseño.",
-  alternates: { canonical: `${SITE_URL}/features/seguridad/` },
+  alternates: { canonical: `${SITE_URL}/features/seguridad/`, languages: hreflangDe("/features/seguridad") },
   openGraph: {
     title: "Seguridad — CountPips",
     description: "Local-first, sin nube ni cuentas. Tus datos 100% en tu máquina.",
@@ -107,7 +107,9 @@ const Integrations = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function SeguridadPage() {
+/** Exportado con nombre para que `app/en/features/seguridad/page.tsx` lo
+ *  reutilice. Sin los `<script>` de datos estructurados. */
+export function SeguridadBody() {
   return (
     <>
       <PageHeader
@@ -123,14 +125,6 @@ export default function SeguridadPage() {
         breadcrumbEn="Features · Security"
         readingTimeMin={READING_TIME_MIN}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
       <SecuritySection num="01" />
       <DataFlowComparison num="02" />
       <TechSpecs />
@@ -142,6 +136,22 @@ export default function SeguridadPage() {
       <FeaturePageNav current="seguridad" />
       <FinalCTANew />
       <TableOfContents />
+    </>
+  );
+}
+
+export default function SeguridadPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <SeguridadBody />
     </>
   );
 }

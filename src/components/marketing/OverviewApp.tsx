@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { motion } from "framer-motion";
 import { ShieldCheck, ArrowRight, Play } from "lucide-react";
 import { useLang } from "@/lib/i18n";
@@ -8,6 +8,7 @@ import { getKpis, getPerf, getCal } from "@/lib/trading/fixtures";
 import { WindowFrame } from "@/components/tj/WindowFrame";
 import { FeatureImage } from "@/components/tj/FeatureImage";
 import { asset } from "@/lib/asset";
+import { withLocale } from "@/lib/locale";
 
 /**
  * OverviewApp — sección `#overview` del HTML. Muestra la app con el
@@ -433,7 +434,7 @@ export function OverviewApp() {
                 <span className="tnum" style={{ fontSize: 10, color: "var(--ink-3)" }}>
                   {es ? "Vista Resumen · la app real" : "Summary view · the real app"}
                 </span>
-                <a href={asset("/demo")} style={{ fontSize: 11, color: "rgb(var(--accent-base))" }}>
+                <a href={asset(withLocale("/demo", lang))} style={{ fontSize: 11, color: "rgb(var(--accent-base))" }}>
                   {es ? "Explorar la demo →" : "Explore the demo →"}
                 </a>
               </div>

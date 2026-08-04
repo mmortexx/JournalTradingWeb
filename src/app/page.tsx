@@ -4,7 +4,7 @@ import { Ticker } from "@/components/marketing/Ticker";
 import { Hero } from "@/components/marketing/Hero";
 import { SideRail } from "@/components/tj/SideRail";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 // PNG (not SVG) — see layout.tsx for the rationale (social platforms
 // silently fail to render SVG OG images). Absolute URL bypasses the
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   description: PAGE_DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}/`,
+    languages: hreflangDe("/"),
   },
   openGraph: {
     title: "CountPips — Opera como una mesa institucional.",
@@ -145,7 +146,14 @@ const FinalCTANew = dynamic(
  * scroll, pero no la indexamos para evitar la colisión "Demo" (ancla
  * de la home) vs "/demo" (ruta independiente).
  */
-export default function Home() {
+/**
+ * Exportada con nombre, no sólo como default: `app/en/page.tsx` la
+ * reutiliza para no duplicar 25 líneas de composición. El cuerpo no
+ * necesita saber en qué idioma está — cada sección lee `useLang()` por
+ * su cuenta —, así que lo único que cambia entre `/` y `/en` es la
+ * `metadata` de cada fichero, no esto.
+ */
+export function HomeBody() {
   return (
     <>
       {/* Raíl lateral 01–02 — índice local de la home (solo ≥1100px) */}
@@ -172,4 +180,8 @@ export default function Home() {
       <FinalCTANew />
     </>
   );
+}
+
+export default function Home() {
+  return <HomeBody />;
 }

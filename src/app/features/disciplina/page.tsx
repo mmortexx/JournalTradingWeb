@@ -5,7 +5,7 @@ import { FeaturePageNav } from "@/components/marketing/FeaturePageNav";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 import { ULTIMA_ACTUALIZACION_ISO } from "@/lib/fechas";
 
 // Estimated reading time (guardian + discipline cost + before/after + comparison
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
   title: { absolute: "Disciplina — CountPips" },
   description:
     "El Guardián frena antes del error: bloquea tamaños sobre tu riesgo, te obliga a respetar el plan y audita cada excepción. Indisciplina medida en dinero.",
-  alternates: { canonical: `${SITE_URL}/features/disciplina/` },
+  alternates: { canonical: `${SITE_URL}/features/disciplina/`, languages: hreflangDe("/features/disciplina") },
   openGraph: {
     title: "Disciplina — CountPips",
     description: "El Guardián frena antes del error. Disciplina que actúa, no que sermonea.",
@@ -111,7 +111,9 @@ const RMultipleSimulator = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function DisciplinaPage() {
+/** Exportado con nombre para que `app/en/features/disciplina/page.tsx`
+ *  lo reutilice. Sin los `<script>` de datos estructurados. */
+export function DisciplinaBody() {
   return (
     <>
       <PageHeader
@@ -126,14 +128,6 @@ export default function DisciplinaPage() {
         breadcrumbEs="Características · Disciplina"
         breadcrumbEn="Features · Discipline"
         readingTimeMin={READING_TIME_MIN}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <GuardianNew num="01" />
       <DisciplineCost num="02" />
@@ -159,6 +153,22 @@ export default function DisciplinaPage() {
       <FeaturePageNav current="disciplina" />
       <FinalCTANew />
       <TableOfContents />
+    </>
+  );
+}
+
+export default function DisciplinaPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <DisciplinaBody />
     </>
   );
 }

@@ -2,12 +2,14 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { sinPrefijoEn } from "@/lib/locale";
 
 export type Lang = "es" | "en";
 
@@ -390,28 +392,76 @@ interface LangCtx {
 
 const Ctx = createContext<LangCtx | null>(null);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("es");
+/** `/en` o `/en/lo-que-sea` → inglés. Cualquier otra cosa → español. */
+function langDeRuta(pathname: string): Lang {
+  return pathname === "/en" || pathname.startsWith("/en/") ? "en" : "es";
+}
 
-  // Keep the <html lang> attribute in sync with the active language so screen
-  // readers pronounce content with the correct voice/profile and search
-  // engines index the page under the right locale. SSR-safe: the document
-  // object only exists in the browser, so the guard prevents hydration
-  // warnings and the effect is a no-op during server rendering.
+/**
+ * LanguageProvider — el idioma ya NO es un interruptor en memoria, es la
+ * dirección.
+ *
+ * ── Qué cambió, y por qué ─────────────────────────────────────────────
+ * Antes `lang` era un `useState("es")`: cambiar de idioma mutaba una
+ * variable sin tocar la URL, así que Google veía siempre la misma
+ * dirección con el mismo contenido —español—, y una recarga o un enlace
+ * compartido volvían a caer en español aunque el visitante hubiera
+ * elegido inglés. Es justo el motivo por el que el inglés, pese a estar
+ * escrito entero, no existía para ningún buscador.
+ *
+ * Ahora `lang` se DEDUCE de `usePathname()`: estar en `/en/pricing` es lo
+ * que hace que la página se lea en inglés, y estar en `/pricing` es lo
+ * que hace que se lea en español. `setLang`/`toggle` ya no cambian un
+ * estado — NAVEGAN a la dirección equivalente en el otro idioma. El
+ * selector de idioma de la barra no tuvo que tocarse: sigue llamando a
+ * los mismos `setLang`/`toggle` de siempre, sólo que ahora hacen otra
+ * cosa por dentro.
+ *
+ * Al derivarse del pathname en cada render —no de un estado que se fija
+ * después en un efecto— no hay parpadeo: el primer pintado ya sabe en
+ * qué idioma está, tanto al compilar como al hidratarse.
+ *
+ * Se conservan el `search` y el `hash` al cambiar de idioma: cambiar
+ * de idioma en `/faq?q=stop+loss` lleva a `/en/faq?q=stop+loss`, no a la
+ * FAQ inglesa en blanco.
+ */
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const lang = langDeRuta(pathname);
+
+  // Mantiene sincronizado el `lang` del documento para lectores de
+  // pantalla y buscadores. El script embebido en `layout.tsx` ya fija el
+  // valor correcto ANTES del primer pintado (mismo patrón que el tema);
+  // este efecto es el respaldo para cuando el idioma cambia sin recargar
+  // —caso que hoy no ocurre, porque cambiar de idioma navega a otra
+  // página, pero cubre cualquier futuro cambio de cliente sin recarga—.
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.documentElement.lang = lang;
   }, [lang]);
 
+  const irA = useCallback(
+    (destino: Lang) => {
+      if (destino === lang) return;
+      const base = sinPrefijoEn(pathname);
+      const sufijo =
+        typeof window !== "undefined" ? window.location.search + window.location.hash : "";
+      const ruta = destino === "en" ? (base === "/" ? "/en" : `/en${base}`) : base;
+      router.push(`${ruta}${sufijo}`);
+    },
+    [lang, pathname, router]
+  );
+
   const value = useMemo<LangCtx>(
     () => ({
       lang,
-      setLang,
-      toggle: () => setLang((p) => (p === "es" ? "en" : "es")),
+      setLang: irA,
+      toggle: () => irA(lang === "es" ? "en" : "es"),
       t: (key: StrKey) => t(key, lang),
       tf: (key: StrKey, n: number) => tf(key, lang, n),
     }),
-    [lang]
+    [lang, irA]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

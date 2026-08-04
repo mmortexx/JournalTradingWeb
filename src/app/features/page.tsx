@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 import { ULTIMA_ACTUALIZACION_ISO } from "@/lib/fechas";
 
 // Estimated reading time (features bento + gallery + how it works + more
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   title: "Características",
   description:
     "Todo para operar con disciplina: bento de características, galería, cómo funciona y más. Métricas, disciplina y seguridad tienen su propia página enfocada.",
-  alternates: { canonical: `${SITE_URL}/features/` },
+  alternates: { canonical: `${SITE_URL}/features/`, languages: hreflangDe("/features") },
   openGraph: {
     title: "Características — CountPips",
     description: "Explora cada característica de CountPips en profundidad.",
@@ -112,7 +112,15 @@ const MoreFeatures = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function FeaturesPage() {
+/**
+ * Exportado con nombre para que `app/en/features/page.tsx` lo reutilice.
+ *
+ * NO lleva los `<script>` de datos estructurados — esos son distintos por
+ * idioma (el `BreadcrumbList` y el `Article` cambian sus nombres,
+ * descripciones e `inLanguage`), así que cada `page.tsx` de cada idioma
+ * los pone por su cuenta, alrededor de este cuerpo compartido.
+ */
+export function FeaturesBody() {
   return (
     <>
       <PageHeader
@@ -127,14 +135,6 @@ export default function FeaturesPage() {
         breadcrumbEs="Características"
         breadcrumbEn="Features"
         readingTimeMin={READING_TIME_MIN}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       {/* Overview sections — broad strokes. Deep dives moved to
           /features/metricas, /features/disciplina, /features/seguridad. */}
@@ -153,6 +153,22 @@ export default function FeaturesPage() {
       <PlateInterlude index={3} />
       <FinalCTANew />
       <TableOfContents />
+    </>
+  );
+}
+
+export default function FeaturesPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <FeaturesBody />
     </>
   );
 }

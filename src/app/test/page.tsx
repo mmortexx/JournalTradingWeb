@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { QUESTIONS } from "@/lib/trading/disciplineQuestions";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /test — el diagnóstico de disciplina, con página propia.
@@ -79,6 +79,7 @@ export const metadata: Metadata = {
     "Quince preguntas sobre riesgo, plan, registro, temple y constancia. Tu perfil por ejes, una cifra global ponderada y qué arreglar primero. Sin email.",
   alternates: {
     canonical: `${SITE_URL}/test/`,
+    languages: hreflangDe("/test"),
   },
   openGraph: {
     title: "Test de disciplina — CountPips",
@@ -98,7 +99,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TestPage() {
+/** Exportado con nombre para que `app/en/test/page.tsx` lo reutilice.
+ *  Sin los `<script>` de datos estructurados. */
+export function TestBody() {
   return (
     <>
       <PageHeader
@@ -114,6 +117,17 @@ export default function TestPage() {
         breadcrumbEn="Quiz"
         readingTimeMin={READING_TIME_MIN}
       />
+      <DisciplineScore num="01" />
+
+      <PlateInterlude index={0} />
+      <FinalCTANew />
+    </>
+  );
+}
+
+export default function TestPage() {
+  return (
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -122,11 +136,7 @@ export default function TestPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(quizSchema) }}
       />
-
-      <DisciplineScore num="01" />
-
-      <PlateInterlude index={0} />
-      <FinalCTANew />
+      <TestBody />
     </>
   );
 }

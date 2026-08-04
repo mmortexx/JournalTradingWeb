@@ -59,3 +59,32 @@ export const SITE_NAME = "CountPips";
 export function siteUrl(path = "/"): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+/**
+ * Las etiquetas `hreflang` recíprocas de una ruta que existe en los dos
+ * idiomas.
+ *
+ * ── Por qué existe ────────────────────────────────────────────────────
+ * Cada una de las veinte páginas —diez en español, diez en inglés— tiene
+ * que declarar TRES direcciones: la suya, la de su pareja en el otro
+ * idioma, y cuál de las dos es la que Google debe ofrecer por defecto a
+ * quien no encaja en ninguna de las dos. Son las mismas tres direcciones
+ * mirando desde dos sitios distintos, y escribir ese objeto a mano veinte
+ * veces es exactamente la clase de repetición donde un día una de las
+ * copias se queda desincronizada sin que nada avise.
+ *
+ * `path` va sin el prefijo `/en` — es la ruta española, la que existe en
+ * `LOCALIZED_PATHS` — y esta función construye las dos direcciones a
+ * partir de ella. `x-default` apunta siempre a la española: es el
+ * mercado principal, y es la versión que corresponde a quien llega sin
+ * que el idioma se pueda determinar.
+ */
+export function hreflangDe(path: string): {
+  es: string;
+  en: string;
+  "x-default": string;
+} {
+  const es = siteUrl(path === "/" ? "/" : `${path}/`);
+  const en = siteUrl(path === "/" ? "/en/" : `/en${path}/`);
+  return { es, en, "x-default": es };
+}

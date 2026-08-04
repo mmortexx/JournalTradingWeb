@@ -6,7 +6,7 @@ import { Values } from "@/components/marketing/Values";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 // Estimated reading time (story + values + social proof + testimonials +
 // changelog + milestones + lista de espera). ~700 words at 220 wpm = ~4 min.
@@ -45,6 +45,7 @@ export const metadata: Metadata = {
     "La historia de CountPips: por qué existe, para quién es, y cómo evoluciona. Hecho para el trader manual serio.",
   alternates: {
     canonical: `${SITE_URL}/about/`,
+    languages: hreflangDe("/about"),
   },
   openGraph: {
     title: "Acerca de — CountPips",
@@ -84,7 +85,9 @@ const SessionClock = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function AboutPage() {
+/** Exportado con nombre para que `app/en/about/page.tsx` lo reutilice.
+ *  Sin el `<script>` de datos estructurados. */
+export function AboutBody() {
   return (
     <>
       <PageHeader
@@ -99,10 +102,6 @@ export default function AboutPage() {
         breadcrumbEs="Acerca de"
         breadcrumbEn="About"
         readingTimeMin={READING_TIME_MIN}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <Story />
       <Values />
@@ -120,6 +119,18 @@ export default function AboutPage() {
       <Waitlist />
       <FinalCTANew />
       <TableOfContents />
+    </>
+  );
+}
+
+export default function AboutPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <AboutBody />
     </>
   );
 }

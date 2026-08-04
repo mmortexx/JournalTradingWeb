@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 // Estimated reading time (capabilities + demo + gallery + stats + ready-to-buy).
 // ~400 words at 220 wpm = ~2 min.
@@ -43,6 +43,7 @@ export const metadata: Metadata = {
     "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra realistas. No es un vídeo: es la app.",
   alternates: {
     canonical: `${SITE_URL}/demo/`,
+    languages: hreflangDe("/demo"),
   },
   openGraph: {
     title: "Demo en vivo — CountPips",
@@ -80,7 +81,9 @@ const FinalCTANew = dynamic(
   { loading: () => sectionFallback }
 );
 
-export default function DemoPage() {
+/** Exportado con nombre para que `app/en/demo/page.tsx` lo reutilice.
+ *  Sin el `<script>` de datos estructurados. */
+export function DemoBody() {
   return (
     <>
       <PageHeader
@@ -95,10 +98,6 @@ export default function DemoPage() {
         breadcrumbEs="Demo"
         breadcrumbEn="Demo"
         readingTimeMin={READING_TIME_MIN}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       {/* What you can do — 6 feature cards previewing the demo */}
       <DemoCapabilities />
@@ -119,6 +118,18 @@ export default function DemoPage() {
           botones dos veces seguidas. FinalCTANew cierra la página. El
           componente sigue en el repositorio. */}
       <FinalCTANew />
+    </>
+  );
+}
+
+export default function DemoPage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <DemoBody />
     </>
   );
 }

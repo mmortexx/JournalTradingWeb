@@ -14,11 +14,14 @@ import { useLang } from "@/lib/i18n";
  * - When the user is within ~140 px of the bottom of the page, the button
  *   is shifted UP by 5.5 rem (88 px) via a CSS `transform: translateY()` on
  *   the outer container. This lifts it clear of the footer's bottom-bar
- *   cluster (copyright + status + legal links + version + locale) so the
- *   floating button never sits on top of the "v1.4.2 · Privacidad ·
- *   Términos" text — the overlap VLM flagged on mobile. The transform is
- *   GPU-accelerated and transitions over 200 ms so the lift reads as a
- *   deliberate reposition, not a jump.
+ *   cluster (copyright + status + locale) so the floating button never
+ *   sits on top of that text — the overlap VLM flagged on mobile. The
+ *   transform is GPU-accelerated and transitions over 200 ms so the lift
+ *   reads as a deliberate reposition, not a jump.
+ *   (The bar used to also carry an inline "v1.4.2 · Privacidad ·
+ *   Términos" — a fabricated version number and a duplicate of the
+ *   footer's own legal column — since retired; the 88 px clearance still
+ *   applies to whatever text remains in that row.)
  * - COOKIE-BANNER AVOIDANCE — additionally lifts above the CookieConsent
  *   banner (`[data-cookie-consent="visible"]`) when both are mounted. The
  *   banner is anchored bottom-left and the button bottom-right; they

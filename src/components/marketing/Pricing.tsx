@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "@/components/tj/LocaleLink";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";

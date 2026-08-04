@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 import { TERMINOS } from "@/lib/glosario";
 import { HERRAMIENTAS } from "@/lib/herramientas";
 import { ULTIMA_ACTUALIZACION } from "@/lib/fechas";
+import { LOCALIZED_PATHS } from "@/lib/locale";
 
 export const dynamic = "force-static";
 
@@ -77,10 +78,33 @@ const PAGES: PageMeta[] = [
    Ver `src/lib/fechas.ts`. */
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return PAGES.map(({ path, priority, changeFrequency }) => ({
+  const paginasEs = PAGES.map(({ path, priority, changeFrequency }) => ({
     url: `${SITE_URL}${path === "/" ? "/" : `${path}/`}`,
     lastModified: ULTIMA_ACTUALIZACION,
     changeFrequency,
     priority,
+    /* Sólo en las diez rutas que existen en los dos idiomas —las mismas
+       de `LOCALIZED_PATHS`—: las etiquetas hreflang recíprocas, para que
+       el buscador entienda que la versión en español y la inglesa son
+       la MISMA página en dos idiomas y no dos páginas distintas con
+       contenido parecido. */
+    ...(LOCALIZED_PATHS.includes(path) ? { alternates: { languages: hreflangDe(path) } } : {}),
   }));
+
+  /* Las direcciones `/en/...`: la MISMA lista de páginas base, con su
+     propia prioridad —una idea, dos idiomas, la misma importancia
+     relativa entre ellas— y las mismas etiquetas recíprocas, vistas
+     desde el otro lado. El glosario y las herramientas no aparecen aquí
+     porque no tienen versión inglesa todavía; ver `LOCALIZED_PATHS`. */
+  const paginasEn = PAGES.filter((p) => LOCALIZED_PATHS.includes(p.path)).map(
+    ({ path, priority, changeFrequency }) => ({
+      url: path === "/" ? `${SITE_URL}/en/` : `${SITE_URL}/en${path}/`,
+      lastModified: ULTIMA_ACTUALIZACION,
+      changeFrequency,
+      priority,
+      alternates: { languages: hreflangDe(path) },
+    }),
+  );
+
+  return [...paginasEs, ...paginasEn];
 }
