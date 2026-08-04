@@ -646,6 +646,19 @@ export function Navbar() {
                 type="button"
                 id="navbar-producto-trigger"
                 ref={megaButtonRef}
+                /* NO se abre en `pointerdown`, y conviene dejar escrito
+                   por qué, porque la regla general dice lo contrario.
+                   «Los menús deben abrirse en la pulsación y no en el
+                   clic» vale para menús que se abren PULSANDO: ahí el
+                   `click` no llega hasta que sueltas, y ese retardo se
+                   nota. Este menú no es de esos — se abre solo al pasar
+                   el ratón por encima (`megaEnter`), así que cuando el
+                   dedo baja ya está abierto. Adelantar el disparo a la
+                   pulsación no lo hacía más rápido: lo CERRABA, porque
+                   el hover ya lo había abierto y la pulsación alternaba
+                   el estado. Se probó y se revirtió.
+                   El clic sigue haciendo falta para teclado y para
+                   táctil, donde no hay hover que valga. */
                 onClick={() => setMegaOpen((o) => !o)}
                 onFocus={() => setHovered("product")}
                 aria-expanded={megaOpen}
@@ -685,6 +698,39 @@ export function Navbar() {
                   <motion.div
                     role="menu"
                     aria-labelledby="navbar-producto-trigger"
+                    /* Navegación con flechas. Un menú abierto tiene que
+                       poder recorrerse con ↑ y ↓ — es lo que espera
+                       cualquiera que use el teclado, y su ausencia es de
+                       las cosas que hacen que un menú se sienta a medio
+                       hacer aunque por fuera esté bien dibujado.
+                       Antes solo se podía tabular, que recorre la página
+                       entera en vez de quedarse dentro del menú.
+                       Inicio/Fin saltan a los extremos, y el recorrido
+                       da la vuelta al llegar al final: en una lista
+                       corta, toparse con un tope es peor que ciclar. */
+                    onKeyDown={(e) => {
+                      const teclas = ["ArrowDown", "ArrowUp", "Home", "End"];
+                      if (!teclas.includes(e.key)) return;
+                      const opciones = Array.from(
+                        e.currentTarget.querySelectorAll<HTMLElement>(
+                          'a[href], button:not([disabled])',
+                        ),
+                      ).filter((el) => el.offsetParent !== null);
+                      if (opciones.length === 0) return;
+                      e.preventDefault();
+                      const actual = opciones.indexOf(
+                        document.activeElement as HTMLElement,
+                      );
+                      let siguiente: number;
+                      if (e.key === "Home") siguiente = 0;
+                      else if (e.key === "End") siguiente = opciones.length - 1;
+                      else if (e.key === "ArrowDown")
+                        siguiente = actual < 0 ? 0 : (actual + 1) % opciones.length;
+                      else
+                        siguiente =
+                          actual <= 0 ? opciones.length - 1 : actual - 1;
+                      opciones[siguiente]?.focus();
+                    }}
                     /* Apertura corta y plana: sin muelle ni escala. Un
                        menú de herramientas aparece, no rebota. */
                     initial={{ opacity: 0, y: -4 }}
