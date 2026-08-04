@@ -2103,50 +2103,82 @@ export function EngravedAtlas() {
       if (ink !== antes) descartarBitmaps();
     };
 
-    /* ---- Las láminas terminadas se guardan grabadas ---------------------
-       Una lámina es cara: cientos de segmentos con temblor de pulso,
-       tramas y rótulos, todo vuelto a trazar desde cero en cada fotograma
-       porque el lienzo se limpia entero. Mientras el trazo AVANZA no hay
-       otra —el dibujo cambia—, pero en cuanto llega al final dejan de
-       cambiar dos cosas a la vez: la figura ya está completa, y lo único
-       que sigue moviéndose es su opacidad y su desplazamiento vertical
-       mientras se despide.
+    /* ---- Trazar y componer son dos cosas distintas ----------------------
+       Aquí está la decisión de fondo, y viene de un error propio: la
+       versión anterior bajaba el fondo a treinta imágenes por segundo para
+       que costara menos. Costaba menos y se movía peor, que es exactamente
+       lo contrario de lo que hay que hacer en un monitor de alta tasa. No
+       se trata de dibujar MENOS VECES, sino de que cada vez cueste poco.
 
-       Justo ahí estaba el gasto: la lámina pasa mucho más tiempo TERMINADA
-       que dibujándose, y terminada es cuando más trazos tiene. Se volvía a
-       grabar entera, sesenta veces por segundo, para producir exactamente
-       la misma imagen.
+       Son dos trabajos con precios muy distintos:
 
-       Ahora se graba UNA vez en un lienzo aparte y después se estampa.
-       Medido en esta página: estampar el lienzo entero cuesta 0,025 ms,
-       frente al trazado completo que es lo más caro que hay en el sitio.
-       La opacidad y el desplazamiento se aplican al estampar, así que la
-       despedida se ve idéntica.
+         TRAZAR una lámina —cientos de segmentos con temblor de pulso,
+         tramas, rótulos— es lo más caro que hay en la página, y solo hace
+         falta cuando el trazo AVANZA.
 
-       Se descartan al cambiar de tamaño o de tema, que son las dos cosas
-       que invalidan un grabado hecho. */
-    let bitmaps: (HTMLCanvasElement | null)[] = PLATES.map(() => null);
-    const descartarBitmaps = () => {
-      bitmaps = PLATES.map(() => null);
+         COMPONER —estampar una imagen ya hecha con su opacidad y su
+         desplazamiento— cuesta 0,025 ms medidos en esta página, y es lo
+         único que necesita ir al ritmo del monitor, porque es lo que
+         produce el movimiento que se ve.
+
+       Así que cada lámina tiene su propio lienzo, donde se traza a su
+       ritmo, y el lienzo visible NO traza nunca: solo estampa. El
+       resultado es que la composición puede correr a 165 fotogramas por
+       segundo sin despeinarse, mientras el trazo se rehace bastante menos
+       a menudo sin que se note — porque entre dos rehechos el trazo avanza
+       una fracción de píxel.
+
+       Una lámina terminada, además, no vuelve a trazarse nunca más: su
+       lienzo ya es definitivo y solo se estampa. Que es el caso en el que
+       la lámina pasa la mayor parte del tiempo. */
+    type Capa = { cv: HTMLCanvasElement; ctx: CanvasRenderingContext2D; t: number };
+    let capas: (Capa | null)[] = PLATES.map(() => null);
+
+    const soltarCapa = (i: number) => {
+      const c = capas[i];
+      if (!c) return;
+      /* Encoger el bitmap antes de soltarlo libera su memoria de vídeo sin
+         esperar al recolector, que con lienzos grandes puede tardar. */
+      c.cv.width = 0;
+      c.cv.height = 0;
+      capas[i] = null;
     };
 
-    const bitmapDe = (i: number): HTMLCanvasElement | null => {
-      const guardado = bitmaps[i];
-      if (guardado) return guardado;
+    const descartarBitmaps = () => {
+      for (let i = 0; i < capas.length; i++) soltarCapa(i);
+      capas = PLATES.map(() => null);
+    };
+
+    /** Lienzo de la lámina `i` trazado hasta `t`. `null` si no puede crearse. */
+    const capaDe = (i: number, t: number): HTMLCanvasElement | null => {
       if (w < 1 || h < 1) return null;
-      const off = document.createElement("canvas");
-      off.width = canvas.width;
-      off.height = canvas.height;
-      const octx = off.getContext("2d");
-      if (!octx) return null;
-      /* Mismo escalado que el lienzo real: las láminas dibujan en unidades
-         CSS y el bitmap está en píxeles de dispositivo. */
-      octx.setTransform(cssDpr, 0, 0, cssDpr, 0, 0);
-      octx.strokeStyle = ink;
-      octx.fillStyle = ink;
-      PLATES[i](octx, w, h, 1);
-      bitmaps[i] = off;
-      return off;
+      let c = capas[i];
+      if (!c) {
+        const cv = document.createElement("canvas");
+        cv.width = canvas.width;
+        cv.height = canvas.height;
+        const cctx = cv.getContext("2d");
+        /* Sin contexto no hay capa posible: se devuelve null y quien llama
+           traza directamente sobre el lienzo visible. Peor rendimiento,
+           pero se sigue viendo — nunca una pantalla en blanco. */
+        if (!cctx) return null;
+        c = { cv, ctx: cctx, t: -1 };
+        capas[i] = c;
+      }
+      /* Ya trazada a este progreso: no se toca. Cubre de un golpe el caso
+         de la lámina terminada, que se queda con t = 1 para siempre. */
+      if (c.t === t) return c.cv;
+
+      c.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      c.ctx.clearRect(0, 0, c.cv.width, c.cv.height);
+      /* Las láminas dibujan en unidades CSS; el bitmap está en píxeles de
+         dispositivo. */
+      c.ctx.setTransform(cssDpr, 0, 0, cssDpr, 0, 0);
+      c.ctx.strokeStyle = ink;
+      c.ctx.fillStyle = ink;
+      PLATES[i](c.ctx, w, h, t);
+      c.t = t;
+      return c.cv;
     };
 
     /* ---- Tamaño del lienzo ---------------------------------------------
@@ -2318,14 +2350,12 @@ export function EngravedAtlas() {
       for (let i = 0; i < n; i++) {
         const local = (p - i * span) / span;
         if (local < -0.2 || local > 1.2) {
-          /* Fuera de plano: se suelta su grabado. Cada uno pesa lo que un
-             lienzo del tamaño de la ventana —unos 10 MB en un monitor
-             grande—, y guardar los de toda la página serían cuarenta por
-             tener a mano figuras que no se están viendo. Como mucho hay
-             dos láminas en pantalla a la vez, así que ese es el techo.
-             Volver atrás obliga a grabar de nuevo, y cuesta UNA vez lo
-             que antes costaba en cada fotograma. */
-          if (bitmaps[i]) bitmaps[i] = null;
+          /* Fuera de plano: se suelta su lienzo. Cada uno pesa lo que uno
+             del tamaño de la ventana —unos 10 MB en un monitor grande—, y
+             guardar los de toda la página serían cuarenta por tener a mano
+             figuras que no se están viendo. Como mucho hay dos láminas en
+             pantalla a la vez, así que ese es el techo real de memoria. */
+          soltarCapa(i);
           continue;
         }
 
@@ -2339,20 +2369,32 @@ export function EngravedAtlas() {
 
         const lift = local > 1 ? (local - 1) * -46 : local < 0 ? -local * 30 : 0;
 
+        /* El progreso del TRAZO se redondea a pasos fijos; el de la
+           COMPOSICIÓN no se toca. Así, entre dos pasos, la lámina se
+           estampa tal cual —gratis— y lo que sigue moviéndose de forma
+           continua es su opacidad y su desplazamiento, que es lo que el
+           ojo lee como fluidez.
+
+           1/512 sobre el recorrido de una lámina es en torno a dos píxeles
+           de avance del trazo: por debajo de eso no hay nada que ver, y
+           por encima se rehace. Una lámina terminada cae siempre en el
+           paso 512 y por tanto no se vuelve a trazar jamás. */
+        const tLocal = clamp01(local);
+        const tTrazo = Math.round(tLocal * 512) / 512;
+
         ctx.save();
         ctx.globalAlpha = alpha;
         ctx.translate(0, lift);
-        /* Terminada: se estampa la copia ya grabada en vez de volver a
-           trazarla. Es el caso más frecuente y el más caro de los dos. */
-        const listo = local >= 1 ? bitmapDe(i) : null;
-        if (listo) ctx.drawImage(listo, 0, 0, w, h);
-        else PLATES[i](ctx, w, h, clamp01(local));
+        const capa = capaDe(i, tTrazo);
+        /* Sin capa (contexto no disponible) se traza directo: peor, pero
+           el fondo se sigue viendo. */
+        if (capa) ctx.drawImage(capa, 0, 0, w, h);
+        else PLATES[i](ctx, w, h, tLocal);
         ctx.restore();
       }
     };
 
-    let tick = 0;
-    let lastPaint = 0;
+    let lastMeasure = 0;
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
       if (!visible) return;
@@ -2369,10 +2411,18 @@ export function EngravedAtlas() {
          primera medida y la lámina no coincidía con su pausa — al
          llegar a la tercera seguía dibujándose la primera.
 
-         Medir cuatro rectángulos cada 100 ms cuesta una fracción de
-         milisegundo y es la única forma de que la sincronía sea exacta
-         en una página cuyas alturas cambian mientras se recorre. */
-      if (++tick % 6 === 0) {
+         EL INTERVALO VA POR RELOJ, NO POR FOTOGRAMAS. Estaba escrito como
+         "uno de cada seis", que son diez veces por segundo sólo si la
+         pantalla va a sesenta. En un monitor de 165 Hz eran veintisiete, y
+         cada una mide rectángulos y el alto del documento: lecturas que
+         obligan al navegador a recalcular el diseño ENTERO en ese
+         instante. El efecto era tan absurdo como suena — cuanto mejor la
+         pantalla, más trabajo inútil y menos fluidez, que es justo lo
+         contrario de lo que debe pasar.
+
+         Con reloj, medir cuesta lo mismo a 60 que a 165 o a 240. */
+      if (now - lastMeasure >= 100) {
+        lastMeasure = now;
         measureAnchors();
         target = scrollProgress();
       }
@@ -2387,37 +2437,19 @@ export function EngravedAtlas() {
       const goal = Math.max(target, easeOut(introT) * 0.5 * span0);
 
       const next = shown + (goal - shown) * (1 - Math.exp((-dt * 6) / 1000));
-      /* Umbral de repintado. Estaba en 0,00025, que sobre un recorrido de
-         cuatro láminas equivale a redibujar el atlas entero prácticamente
-         en cada fotograma mientras dura la inercia del scroll — y el
-         atlas es lo más caro que hay en la página.
 
-         0,0012 es la diferencia de progreso por debajo de la cual el
-         dibujo no cambia de forma perceptible (menos de medio píxel de
-         avance del trazo), así que el fotograma se ahorra sin que se
-         note ningún salto. */
-      if (Math.abs(next - shown) < 0.0012) return;
+      /* NO hay techo de fotogramas ni umbral de avance. Los hubo, y eran un
+         error: ahorraban trabajo a costa de lo único que se nota, que es la
+         suavidad. Ahora componer cuesta 0,025 ms —una imagen ya hecha con
+         su opacidad y su desplazamiento—, así que el fondo puede seguir la
+         tasa del monitor, sea de 60 o de 165, sin pagar por ello.
 
-      /* ---- Techo de repintado del fondo ---------------------------------
-         El umbral de arriba mide CUÁNTO ha avanzado el trazo. Éste mide
-         cada cuánto se permite repintar, y hacen falta los dos: durante la
-         entrada el trazo avanza deprisa, así que el umbral se supera en
-         todos los fotogramas y el atlas se regrababa sesenta veces por
-         segundo justo cuando la lámina ya tiene casi todos sus trazos. Ese
-         es el punto exacto donde se notaban los tirones — al final de la
-         animación de entrada, no al principio.
-
-         Un grabado a lápiz que avanza durante segundos no necesita sesenta
-         imágenes por segundo: a treinta el trazo se ve igual de continuo y
-         el trabajo se reduce a la mitad. No se toca la fluidez de nada más
-         de la página, sólo la de este lienzo.
-
-         Se salta el techo cuando el usuario prefiere menos movimiento (ahí
-         no hay animación que suavizar) y cuando el avance es grande — un
-         salto de scroll debe verse al momento, no en el siguiente hueco. */
-      const salto = Math.abs(next - shown) > 0.02;
-      if (!salto && now - lastPaint < 32) return;
-      lastPaint = now;
+         Lo único que se descarta es el fotograma en que no ha cambiado
+         absolutamente nada, y se compara contra el valor exacto, no contra
+         una tolerancia: si el progreso se movió una millonésima, se
+         compone. Cuando el atlas está quieto —sin scroll y con la entrada
+         terminada— esto lo deja a coste cero. */
+      if (next === shown) return;
 
       shown = next;
       draw(shown);
@@ -2504,6 +2536,12 @@ export function EngravedAtlas() {
       dprQuery?.removeEventListener("change", onDprChange);
       document.removeEventListener("visibilitychange", onVis);
       obs.disconnect();
+      /* Y los lienzos de las láminas. Este efecto se rehace en CADA cambio
+         de ruta —el juego de láminas es distinto en cada sección—, así que
+         sin esto cada navegación deja atrás hasta dos lienzos del tamaño
+         de la ventana esperando al recolector. Soltarlos aquí devuelve la
+         memoria en el acto en vez de cuando al navegador le parezca. */
+      descartarBitmaps();
     };
   }, [PLATES]);
 

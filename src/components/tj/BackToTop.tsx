@@ -106,8 +106,15 @@ export function BackToTop() {
     const update = () => {
       const scrollTop = window.scrollY;
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      /* Redondeado a entero A PROPÓSITO. Con decimales, el porcentaje
+         cambia en cada fotograma de scroll y cada cambio vuelve a
+         renderizar este componente: a 165 Hz son 165 renders por segundo
+         para mover un anillo de progreso una centésima de grado, que no
+         se ve. Al entero, React sólo trabaja cuando el número cambia de
+         verdad — unas cien veces en todo el recorrido de la página en vez
+         de en cada fotograma— y el anillo se dibuja idéntico. */
       const pct = scrollable > 0 ? Math.min(100, Math.max(0, (scrollTop / scrollable) * 100)) : 0;
-      setProgress(pct);
+      setProgress(Math.round(pct));
       setVisible(scrollTop > SHOW_AFTER);
       // Lift the button when within SHIFT_THRESHOLD px of the bottom so it
       // never overlaps the footer bottom-bar cluster. `scrollable - scrollTop`
@@ -139,7 +146,8 @@ export function BackToTop() {
           cLift = Math.max(0, window.innerHeight - rect.top - 24 + COOKIE_GAP_PX);
         }
       }
-      setCookieLift(cLift);
+      /* Mismo motivo que el porcentaje: al píxel, no a la fracción. */
+      setCookieLift(Math.round(cLift));
       ticking = false;
     };
     const onScroll = () => {

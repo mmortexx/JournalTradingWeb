@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useAnimationFrame,
@@ -110,11 +110,34 @@ export function Ticker() {
   const trackRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
 
-  useAnimationFrame((_, delta) => {
-    if (reduce || hovered) return;
+  /* El ancho de media pista se MIDE APARTE, no dentro del bucle.
+     Leer `scrollWidth` obliga al navegador a recalcular el diseño de la
+     página en ese mismo instante, y estaba dentro del callback de cada
+     fotograma: a 165 Hz son 165 recálculos de diseño por segundo para
+     obtener un número que sólo cambia cuando cambia el contenido o el
+     ancho de la ventana. Era el freno más caro de la cinta, y no se veía
+     porque el síntoma no aparece aquí sino en la fluidez de TODO lo demás
+     —el diseño es global—, que es justo lo que se estaba notando.
+
+     Ahora se mide una vez y cuando el observador avisa de que la pista ha
+     cambiado de tamaño: al cargar las fuentes, al cambiar de idioma o al
+     redimensionar. Dentro del bucle sólo se lee una variable. */
+  const halfRef = useRef(0);
+  useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
-    const half = el.scrollWidth / 2;
+    const medir = () => {
+      halfRef.current = el.scrollWidth / 2;
+    };
+    medir();
+    const ro = new ResizeObserver(medir);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useAnimationFrame((_, delta) => {
+    if (reduce || hovered) return;
+    const half = halfRef.current;
     if (!half) return;
     // Clamp delta to a single frame's worth (16-32ms) so the first
     // animation frame — which can report a delta of 100ms+ if the tab
