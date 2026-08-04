@@ -100,51 +100,53 @@
 :root {
   --radius: 0.625rem;
 
-  /* Accent — CHAMPAGNE/BRONCE ("Oro"), el acento real de la app.
+  /* Accent — AZUL ACERO, el color de marca.
      ────────────────────────────────────────────────────────────────
-     NO CAMBIAR A VERDE. Esto ya se rompió una vez: el commit 63e7e42
-     puso aquí el verde de --pnl-pos afirmando haberlo "comprobado
-     contra capturas reales". Es falso por partida doble:
+     DOS COSAS QUE NO HAY QUE DESHACER, cada una porque ya se rompió:
 
-       1. La paleta DEFAULT de la app es "Oro" (champagne/bronce), no
-          verde. Fuente:
-          Agenda Trading/03-mvp/app/src/CountPips.App/Resources/
-          Palettes/Oro.xaml:2 → "la original del proyecto, DEFAULT".
-          Valores: #8A6C35 (light) / #C7A76B (dark, Light2).
-       2. Igualar el acento al verde de P&L es EXACTAMENTE lo que el
-          design-system de la app prohíbe. Palettes/Esmeralda.xaml:5-7
-          deja escrito que incluso la paleta verde se eligió
+       1. NO devolverlo al dorado ni a ningún tierra. El acento vivió
+          en champagne (#C7A76B) y en arcilla (#9A4527) y ambos caían
+          dentro del sector de tono que ocupa la marca de Anthropic
+          (39°–84°): la arcilla quedaba a 0,3° de su "book cloth" y el
+          champagne a 1,5° de su "manila". Con el papel hueso de fondo
+          —que estaba a ΔE 0,012 de su ivory— la web reproducía esa
+          identidad entera, no un token suelto. El azul está a 155° de
+          tono de todos ellos.
+       2. NO igualarlo al verde de --pnl-pos. Ya se intentó una vez
+          (commit 63e7e42) alegando capturas reales. El design-system
+          de la app lo prohíbe explícitamente: Palettes/Esmeralda.xaml
+          deja escrito que incluso su paleta verde se eligió
           "deliberadamente distinto del verde P&L puro #00B573/#00F5A0
-          para que nunca se confundan": acento y P&L son dos familias
-          semánticas separadas y confundirlas rompe la lectura del
-          producto.
+          para que nunca se confundan". Acento y P&L son dos familias
+          semánticas separadas; el azul queda a 82° del verde y a 144°
+          del rojo.
 
-     Ojo al verificar: las capturas de public/img MEZCLAN paletas
-     (app-resumen está en Oro, app-nueva en Esmeralda). Las capturas NO
-     son la fuente de verdad — lo es Oro.xaml, que declara el default.
+     Ojo al verificar: las capturas de public/img son de la aplicación
+     de escritorio, que conserva su propio juego de paletas. Que ahí se
+     vea otro color NO es una discrepancia a corregir aquí.
 
      Estos valores en :root son el fallback SSR-safe para que el primer
      paint salga con el tono correcto aunque el script anti-FOUC aún no
      haya aplicado el data-palette. */
-  --accent-base: 199 167 107; /* #C7A76B — champagne (dark) */
-  --accent-hover: 214 188 133; /* #D6BC85 */
-  --accent-pressed: 176 144 90; /* #B0905A */
-  --accent-soft: 199 167 107;
+  --accent-base: 205 217 228; /* #CDD9E4 — plata nardo (oscuro) */
+  --accent-hover: 230 238 246; /* #E6EEF6 */
+  --accent-pressed: 183 195 205; /* #B7C3CD */
+  --accent-soft: 205 217 228;
 
   /* Tinta del texto que va ENCIMA del acento (botón primario, insignias
-     rellenas). Antes cada componente escribía #1A1917 a mano, y ese
-     valor solo funciona cuando el acento es CLARO: sobre el champagne
-     oscuro del tema claro (#8A6C35) se quedaba en 3,58:1, por debajo
-     del 4,5:1 de WCAG AA — el botón "Comprar" de la portada, en claro,
-     era el caso peor. Con el token, cada tema declara su propia tinta:
-     oscura sobre acento claro (7,68:1 aquí) y clara sobre acento
-     oscuro (4,91:1 en el tema claro). */
-  --accent-ink: 26 25 23; /* #1A1917 — 7,68:1 sobre el champagne */
+     rellenas). Antes cada componente escribía el mismo near-black a
+     mano, y ese valor solo funciona cuando el acento es CLARO: sobre un
+     acento oscuro se quedaba en 3,58:1, por debajo del 4,5:1 de WCAG AA
+     — el botón "Comprar" de la portada, en claro, era el caso peor. Con
+     el token, cada tema declara su propia tinta: oscura sobre acento
+     claro (6,34:1 aquí) y clara sobre acento oscuro (5,96:1 en el tema
+     claro). */
+  --accent-ink: 12 17 22; /* #0C1116 — 13,22:1 sobre la plata nardo */
 
   /* P&L — valores exactos de la app real (Resources/Colors.xaml:109-112,
-     rama dark). Familia SEPARADA del acento: el acento es champagne y
-     el P&L es verde/rojo, y nunca deben coincidir (ver la nota larga
-     del bloque de acento). */
+     rama dark). Familia SEPARADA del acento: el acento es azul y el P&L
+     es verde/rojo, y nunca deben coincidir (ver la nota larga del
+     bloque de acento). */
   --pnl-pos: 0 245 160; /* #00F5A0 */
   --pnl-neg: 255 77 77; /* #FF4D4D */
   --pnl-warn: 224 147 43; /* #E0932B */
@@ -183,16 +185,17 @@
   --sig-red: 229 103 90; /* #E5675A */
 
   /* Material de 3 niveles — el tinte de la paleta a opacidad creciente.
-     Tinte CÁLIDO #201E1B, el valor real de la app (Oro.xaml:59-61).
-     Antes era #0E0F12, un near-black azulado ("Bloomberg terminal"):
-     se veía gris frío junto a una app cuyo material es marrón cálido,
-     y era una de las razones de que la demo no se pareciera. El cálido
-     además hace de cama natural al acento champagne — sobre el azulado
-     el dorado viraba a mostaza sucia. */
-  --tint: 32 30 27; /* #201E1B — tinte CÁLIDO de la app (Oro.xaml:59-61) */
-  --canvas: 32 30 27;
-  --chrome: 32 30 27;
-  --card: 32 30 27;
+     Tinte FRÍO #0F1418, del mismo tono que el gris de la carrocería
+     (246°). Durante un tiempo fue el marrón #201E1B, copiado del
+     material de la app, porque hacía de cama al acento champagne —
+     sobre un neutro azulado el dorado viraba a mostaza sucia. Al pasar
+     el acento a azul, ese calor dejó de ser un apoyo y se volvió el
+     problema: era, junto al papel hueso, lo que reproducía la
+     identidad de otra marca. */
+  --tint: 12 17 22; /* #0C1116 — mismo tono que el gris de carrocería */
+  --canvas: 12 17 22;
+  --chrome: 12 17 22;
+  --card: 12 17 22;
   --canvas-op: 0.12;
   --chrome-op: 0.8;
   --card-op: 0.55;
@@ -267,9 +270,9 @@
   --pnl-neg: 153 27 27;   /* #991B1B — más oscuro que el de la app, por contraste */
   --pnl-warn: 146 64 14;  /* #92400E */
 
-  /* Aquí el acento es OSCURO (#8A6C35), así que su tinta se invierte:
-     blanco, 4,91:1. Ver la nota de --accent-ink en :root. */
-  --accent-ink: 255 255 255;
+  /* Aquí el acento es OSCURO (#004D7C), así que su tinta se invierte:
+     casi blanco, 8,23:1. Ver la nota de --accent-ink en :root. */
+  --accent-ink: 235 237 239;
 
   /* Tope del tinte de las celdas del calendario. Sobre papel, el 0.5 del
      tema oscuro ensucia la celda lo justo para que la cifra en verde o
@@ -288,19 +291,19 @@
   --sig-amber: 173 90 0;   /* #AD5A00 */
   --sig-red: 178 59 46;    /* #B23B2E */
 
-  /* Papel CÁLIDO #F7F4EE — el valor real de la app (Oro.xaml:22-24).
-     Sustituye al azulado #F8FAFC: el claro debe ser el mismo papel
-     hueso que la app, no un gris frío, y además es la cama que hace
-     que el acento champagne lea como oro y no como mostaza.
+  /* Chapa clara #CBD0D4 — gris nardo, del mismo
+     tono (246°) que el resto del neutro. Antes fue el papel hueso
+     #F7F4EE de la app, la cama que hacía leer el acento champagne como
+     oro; al retirar el dorado se retira también su cama.
      NOTA: los tokens de P&L de más arriba se quedan como están. La app
      usa #1E7A4C/#D6332A en claro, pero aquí se oscurecieron a
      propósito (#0B8B4B/#991B1B) para cumplir WCAG AA sobre los
      fondos translúcidos de la web, que la app nativa no tiene.
      Copiar los de la app sería revertir esa corrección. */
-  --tint: 247 244 238; /* #F7F4EE */
-  --canvas: 247 244 238;
-  --chrome: 247 244 238;
-  --card: 247 244 238;
+  --tint: 203 208 212; /* #CBD0D4 */
+  --canvas: 203 208 212;
+  --chrome: 203 208 212;
+  --card: 203 208 212;
   --canvas-op: 0.07;
   --chrome-op: 0.8;
   --card-op: 0.60;
@@ -338,36 +341,26 @@
   --ring: rgb(var(--accent-base));
 }
 
-/* ===== Accent: paleta "Oro" (champagne/bronce) =====
-   Los nombres de clave data-palette ("verde"/"grafito") se conservan
-   para no romper selectores ni el localStorage ya escrito en los
-   navegadores de los visitantes, pero AMBOS apuntan ya a la paleta Oro
-   real de la app. El default en <html> es data-palette="grafito", así
-   que ese es el bloque que manda en runtime.
+/* ===== Alias de claves antiguas de data-palette =====
+   "verde" y "grafito" son nombres que quedaron escritos en el
+   localStorage de visitantes anteriores. Los selectores se conservan
+   para que ese valor viejo no deje a nadie con un `data-palette` sin
+   bloque de tokens detrás, pero los tres apuntan ya al MISMO azul acero
+   del estilo vivo: si algún día divergen, un visitante antiguo vería una
+   web de otro color que el resto.
 
-   Valores: Oro.xaml (SystemAccentColor* y AccentFillColor*Brush).
-   Dark  → #C7A76B base · #D6BC85 hover · #B0905A pressed
-   Light → #8A6C35 base · #71581F hover · #5C4718 pressed
-   El base en claro da 4.91:1 sobre blanco (dato del propio
-   Esmeralda.xaml:7), por encima del 4.5:1 que pide WCAG AA para texto
-   normal, así que el acento en claro sigue siendo apto para texto.
-
-   NO devolver esto al verde: ver la nota larga del bloque :root. */
-:root[data-palette="verde"] {
-  --accent-base: 199 167 107; --accent-hover: 214 188 133; --accent-pressed: 176 144 90; --accent-soft: 199 167 107;
-  --tint: 32 30 27;
-}
-:root[data-theme="light"][data-palette="verde"] {
-  --accent-base: 138 108 53; --accent-hover: 113 88 31; --accent-pressed: 92 71 24;
-  --tint: 247 244 238;
-}
+   Antes esto era la paleta "Oro" de la app (champagne #C7A76B/#8A6C35).
+   Se retiró junto con el resto del material cálido — ver la nota del
+   bloque [data-palette="clasico"]. */
+:root[data-palette="verde"],
 :root[data-palette="grafito"] {
-  --accent-base: 199 167 107; --accent-hover: 214 188 133; --accent-pressed: 176 144 90; --accent-soft: 199 167 107;
-  --tint: 32 30 27;
+  --accent-base: 205 217 228; --accent-hover: 230 238 246; --accent-pressed: 183 195 205; --accent-soft: 205 217 228;
+  --tint: 12 17 22;
 }
+:root[data-theme="light"][data-palette="verde"],
 :root[data-theme="light"][data-palette="grafito"] {
-  --accent-base: 138 108 53; --accent-hover: 113 88 31; --accent-pressed: 92 71 24;
-  --tint: 247 244 238;
+  --accent-base: 19 29 38; --accent-hover: 7 15 23; --accent-pressed: 38 47 55; --accent-soft: 19 29 38;
+  --tint: 203 208 212;
 }
 
 /* Keep shadcn `.dark` variant in sync with data-theme dark */
@@ -1495,14 +1488,19 @@ textarea:focus-visible,
 
 ::selection {
   /* Accent-tinted selection at high opacity so the brand color
-     reads as the selection itself — black text on the gold wash
-     gives maximum contrast (WCAG AAA on #C7A76B) and matches the
-     "selection = brand highlight" pattern used by Stripe / Linear.
-     The 0.9 opacity lets a whisper of the underlying surface show
-     through so the selection still reads as translucent glass
-     rather than a flat sticker. */
+     reads as the selection itself, matching the "selection = brand
+     highlight" pattern used by Stripe / Linear. The 0.9 opacity lets a
+     whisper of the underlying surface show through so the selection
+     still reads as translucent glass rather than a flat sticker.
+
+     La tinta sale de `--accent-ink` y NO de un negro fijo. Aquí ponía
+     `color: #000`, que solo funciona cuando el acento es claro: sobre
+     el acento del tema claro (#004D7C, oscuro) el negro se quedaba en
+     3,25:1, por debajo del 4,5:1 de WCAG AA — seleccionar un párrafo lo
+     volvía menos legible que sin seleccionar. Con el token, cada tema
+     pone la suya: 6,34:1 en oscuro y 5,96:1 en claro. */
   background: rgb(var(--accent-base) / 0.9);
-  color: #000;
+  color: rgb(var(--accent-ink));
   text-shadow: none;
 }
 :root[data-theme="light"] ::selection {
@@ -2592,8 +2590,13 @@ button.icon-btn:hover > svg,
    un acento alternativo: redefine el juego COMPLETO de tokens y cambia
    el tratamiento de tipografía, radios y ornamento. El producto es un
    DIARIO, y este estilo lo trata como lo que su nombre dice: un objeto
-   impreso. Papel hueso, tinta cálida, acento arcilla, titulares en
-   serif y el ojo de la marca redibujado como grabado a buril.
+   impreso. Chapa gris nardo, tinta fría, acento azul acero, titulares
+   en serif y el ojo de la marca redibujado como grabado a buril.
+
+   El material era papel hueso con acento arcilla hasta que se midió
+   contra la marca de Anthropic: el acento caía a 0,3° de su "book
+   cloth" y el fondo a ΔE 0,012 de su ivory. No era un token suelto
+   parecido, era la fórmula entera. Ver la nota de :root.
 
    Clásico y moderno a la vez, que es lo que se pidió: el material y la
    tipografía de display vienen del libro; la retícula, el espaciado y
@@ -2620,25 +2623,31 @@ button.icon-btn:hover > svg,
    CUATRO superficies, no solo sobre el fondo de página.
    ============================================================ */
 
-/* ---- Tokens · modo tinta (oscuro) ------------------------------------
-   La contraparte nocturna del papel no es "gris oscuro": es tinta de
-   imprenta sobre la que el texto va en crema. Todo el neutro está
-   sesgado a cálido para que el arcilla del acento no vire a salmón. */
+/* ---- Tokens · modo noche (oscuro) ------------------------------------
+   La contraparte nocturna de la chapa: el mismo gris frío bajo poca luz,
+   no un negro azulado genérico. Todo el neutro comparte el tono del gris
+   nardo (246°) para que el azul del acento se lea como el mismo material
+   con color, y no como un color prestado de otra hoja. */
 :root[data-palette="clasico"] {
-  --accent-base: 208 138 99; /* #D08A63 — arcilla clara, 6,62:1 sobre la tinta */
-  --accent-hover: 222 160 124; /* #DEA07C */
-  --accent-pressed: 184 116 80; /* #B87450 */
-  --accent-soft: 208 138 99;
+  --accent-base: 205 217 228; /* #CDD9E4 — plata nardo, 10,27:1 en el peor fondo */
+  --accent-hover: 230 238 246; /* #E6EEF6 */
+  --accent-pressed: 183 195 205; /* #B7C3CD */
+  --accent-soft: 205 217 228;
   /* Tinta del texto que va ENCIMA del acento (botón primario). Ver la
      nota de `--accent-ink` en :root: el valor fijo que había antes en
      los componentes no servía para un acento oscuro. */
-  --accent-ink: 36 26 18; /* #241A12 — 6,09:1 sobre el arcilla */
+  --accent-ink: 12 17 22; /* #0C1116 — 13,22:1 sobre la plata */
 
   /* P&L atemperado. El #00F5A0 del estilo del producto es un verde de
-     fósforo: correcto en una terminal, imposible sobre un material que
-     imita papel entintado — al lado del arcilla lee como un error de
-     impresión. Estos son los mismos semáforos bajados a tono de tinta,
-     y siguen despejando AA con holgura (9,24:1 y 6,67:1). */
+     fósforo, correcto en una terminal y demasiado crudo aquí. Estos son
+     los mismos semáforos bajados de intensidad, y siguen despejando AA
+     con holgura sobre los cuatro fondos nuevos (7,15:1 el peor del
+     verde, 5,16:1 el peor del rojo). Se conservan al cambiar el material
+     porque su trabajo no es pegar con el fondo, sino distinguirse del
+     acento. Con el acento acromático la confusión es imposible por
+     definición: el verde y el rojo son los ÚNICOS colores de la página.
+     Es exactamente lo que se busca en un diario de trading — el color
+     significa dinero, y nada más lo usa. */
   --pnl-pos: 63 206 146; /* #3FCE92 */
   --pnl-neg: 240 119 106; /* #F0776A */
   --pnl-warn: 224 147 43; /* #E0932B */
@@ -2648,123 +2657,146 @@ button.icon-btn:hover > svg,
   --sig-amber: 224 147 43;
   --sig-red: 240 119 106;
 
-  --tint: 21 19 15; /* #15130F */
-  --canvas: 21 19 15;
-  --chrome: 21 19 15;
-  --card: 21 19 15;
+  --tint: 12 17 22; /* #0C1116 */
+  --canvas: 12 17 22;
+  --chrome: 12 17 22;
+  --card: 12 17 22;
   --canvas-op: 0.12;
   --chrome-op: 0.82;
   --card-op: 0.58;
 
-  --txt-primary: 242 237 224; /* #F2EDE0 — 15,87:1 */
-  --txt-secondary: 192 183 164; /* #C0B7A4 — 9,32:1 */
-  --txt-tertiary: 158 149 131; /* #9E9583 — 4,87:1 en el peor fondo */
-  --divider: 242 237 224;
+  /* La escalera de tinta va POR DEBAJO del acento. Con una marca sin
+     color, lo que llama la atención es lo más claro: el acento es plata
+     y el texto queda un paso por detrás, o el botón de compra no se
+     distinguiría de un párrafo. */
+  --txt-primary: 187 194 200; /* #BBC2C8 — 8,18:1 en el peor fondo */
+  --txt-secondary: 159 165 172; /* #9FA5AC — 5,93:1 */
+  --txt-tertiary: 138 144 150; /* #8A9096 — 4,56:1 */
+  --divider: 187 194 200;
 
   /* Vocabulario --bg/--surface/--ink del HTML de referencia. */
-  --bg: #15130f;
-  --surface: #1e1b15;
-  --surface-2: #26221a;
-  --raised: #2e2920;
-  --ink: #f2ede0;
-  --ink-2: #c0b7a4;
-  --ink-3: #9e9583;
-  --line: rgba(242, 237, 224, 0.09);
-  --line-2: rgba(242, 237, 224, 0.17);
+  --bg: #0c1116;
+  --surface: #161c21;
+  --surface-2: #1e242a;
+  --raised: #22292f;
+  --ink: #bbc2c8;
+  --ink-2: #9fa5ac;
+  --ink-3: #8a9096;
+  --line: rgba(205, 217, 228, 0.10);
+  --line-2: rgba(205, 217, 228, 0.19);
 
   /* Capa de compatibilidad shadcn. */
-  --background: #15130f;
-  --foreground: #f2ede0;
-  --card-foreground: #f2ede0;
-  --popover: #1e1b15;
-  --popover-foreground: #f2ede0;
+  --background: #0c1116;
+  --foreground: #bbc2c8;
+  --card-foreground: #bbc2c8;
+  --popover: #161c21;
+  --popover-foreground: #bbc2c8;
   --primary: rgb(var(--accent-base));
   --primary-foreground: rgb(var(--accent-ink));
-  --secondary: #26221a;
-  --secondary-foreground: #f2ede0;
-  --muted: #26221a;
-  --muted-foreground: #9e9583;
+  --secondary: #1e242a;
+  --secondary-foreground: #bbc2c8;
+  --muted: #1e242a;
+  --muted-foreground: #8a9096;
   --accent: rgb(var(--accent-base));
   --accent-foreground: rgb(var(--accent-ink));
-  /* El rojo de shadcn es frío y aquí todo el neutro es cálido: sobre la
-     tinta leía como un color prestado de otra hoja de estilos. Se usa el
-     mismo rojo de P&L de este estilo, que ya está medido (6,67:1). */
+  /* Se usa el mismo rojo de P&L de este estilo en lugar del rojo de
+     shadcn, para que "destructivo" y "pérdida" no sean dos rojos
+     distintos a diez píxeles de distancia. Ya está medido (5,16:1 en el
+     peor fondo). */
   --destructive: #f0776a;
-  --border: rgba(242, 237, 224, 0.12);
-  --input: rgba(242, 237, 224, 0.16);
+  --border: rgba(205, 217, 228, 0.13);
+  --input: rgba(205, 217, 228, 0.17);
   --ring: rgb(var(--accent-base));
-  --sidebar: #1e1b15;
-  --sidebar-foreground: #f2ede0;
-  --sidebar-accent: #26221a;
-  --sidebar-accent-foreground: #f2ede0;
-  --sidebar-border: rgba(242, 237, 224, 0.12);
+  --sidebar: #161c21;
+  --sidebar-foreground: #bbc2c8;
+  --sidebar-accent: #1e242a;
+  --sidebar-accent-foreground: #bbc2c8;
+  --sidebar-border: rgba(205, 217, 228, 0.13);
 }
 
-/* ---- Tokens · modo papel (claro) ------------------------------------
-   El estado natural de este estilo. #F0EDE4 es papel hueso de verdad,
-   no blanco roto: tiene el amarillo suficiente para que el arcilla se
-   asiente encima sin virar a rosa. */
+/* ---- Tokens · modo día (claro) --------------------------------------
+   El estado natural de este estilo, y el que ve toda primera visita.
+   #CBD0D4 es chapa gris nardo de verdad, no un blanco con matiz: da
+   1,55:1 contra el blanco puro, así que se lee gris sin ambigüedad.
+
+   POR QUÉ NO EL NARDO PURO (#6F7378). Se probó. En la mitad de la
+   escala de luminosidad no despega ni el texto oscuro ni el claro: el
+   fondo a esa altura tumbaba once pares de contraste, incluidos el
+   verde y el rojo de resultado, que no se pueden recolorear porque
+   significan ganancia y pérdida. La solución es la del propio coche —
+   la chapa va gris y lo que lleva información (tarjetas, cifras) va más
+   claro. El nardo entero vive en `--surface-2` y en los filos.
+
+   TODA la paleta está resuelta CONTRA esta chapa, no heredada del
+   material anterior: tintas, acento y P&L se recalcularon uno a uno.
+   Y hay un techo que no lo pone el gusto sino el material: sobre
+   `--surface-2` (#B6BBC0) el negro puro da 10,6:1 y no existe nada por
+   encima, así que la jerarquía de tintas se reparte por debajo. */
 :root[data-theme="light"][data-palette="clasico"] {
-  --accent-base: 154 69 39; /* #9A4527 — arcilla quemada, 5,51:1 sobre el papel */
-  --accent-hover: 130 54 29; /* #82361D */
-  --accent-pressed: 107 44 23; /* #6B2C17 */
-  --accent-soft: 154 69 39;
-  --accent-ink: 247 243 233; /* #F7F3E9 — 5,82:1 sobre el arcilla */
+  --accent-base: 19 29 38; /* #131D26 — grafito nardo, 9,61:1 en el peor fondo */
+  --accent-hover: 7 15 23; /* #070F17 */
+  --accent-pressed: 38 47 55; /* #262F37 */
+  --accent-soft: 19 29 38;
+  --accent-ink: 235 237 239; /* #EBEDEF — 14,53:1 sobre el grafito */
 
-  --pnl-pos: 26 106 66; /* #1A6A42 — verde de tinta, 4,96:1 en el peor fondo */
-  --pnl-neg: 153 27 27; /* #991B1B */
-  --pnl-warn: 150 78 0; /* #964E00 */
-  --pnl-neg-on-tint: 153 27 27;
+  /* Oscurecidos respecto al tema anterior: sobre la chapa gris, los
+     valores de papel se quedaban en 2,7–3,7:1. Conservan su TONO —el
+     verde sigue siendo verde— y bajan solo de luminosidad. */
+  --pnl-pos: 0 85 47; /* #00552F — 5,05:1 en el peor fondo */
+  --pnl-neg: 147 19 21; /* #931315 — 5,05:1 */
+  --pnl-warn: 123 53 0; /* #7B3500 — 5,03:1 */
+  --pnl-neg-on-tint: 147 19 21;
   --cal-tint-max: 0.22;
-  --sig-green: 26 106 66;
-  --sig-amber: 150 78 0;
-  --sig-red: 153 27 27;
+  --sig-green: 0 85 47;
+  --sig-amber: 123 53 0;
+  --sig-red: 147 19 21;
 
-  --tint: 240 237 228; /* #F0EDE4 */
-  --canvas: 240 237 228;
-  --chrome: 240 237 228;
-  --card: 240 237 228;
+  --tint: 203 208 212; /* #CBD0D4 */
+  --canvas: 203 208 212;
+  --chrome: 203 208 212;
+  --card: 203 208 212;
   --canvas-op: 0.07;
   --chrome-op: 0.8;
   --card-op: 0.6;
 
-  --txt-primary: 26 23 20; /* #1A1714 — 15,25:1 */
-  --txt-secondary: 75 68 56; /* #4B4438 — 8,22:1 */
-  --txt-tertiary: 99 91 75; /* #635B4B — 5,05:1 en el peor fondo */
-  --divider: 26 23 20;
+  /* Un paso por detrás del acento, que aquí es la tinta plena. */
+  --txt-primary: 41 47 52; /* #292F34 — 7,63:1 en el peor fondo */
+  --txt-secondary: 60 66 71; /* #3C4247 — 5,74:1 */
+  --txt-tertiary: 76 81 86; /* #4C5156 — 4,52:1 */
+  --divider: 41 47 52;
 
-  --bg: #f0ede4;
-  --surface: #f8f6ef;
-  --surface-2: #e4dfd2;
-  --raised: #fdfbf5;
-  --ink: #1a1714;
-  --ink-2: #4b4438;
-  --ink-3: #635b4b;
-  --line: rgba(26, 23, 20, 0.13);
-  --line-2: rgba(26, 23, 20, 0.24);
+  --bg: #cbd0d4;
+  --surface: #dce0e3;
+  --surface-2: #bec3c8;
+  --raised: #ebedef;
+  --ink: #292f34;
+  --ink-2: #3c4247;
+  --ink-3: #4c5156;
+  --line: rgba(19, 29, 38, 0.16);
+  --line-2: rgba(19, 29, 38, 0.28);
 
-  --background: #f0ede4;
-  --foreground: #1a1714;
-  --card-foreground: #1a1714;
-  --popover: #fdfbf5;
-  --popover-foreground: #1a1714;
+  --background: #cbd0d4;
+  --foreground: #292f34;
+  --card-foreground: #292f34;
+  --popover: #ebedef;
+  --popover-foreground: #292f34;
   --primary: rgb(var(--accent-base));
   --primary-foreground: rgb(var(--accent-ink));
-  --secondary: #e4dfd2;
-  --secondary-foreground: #1a1714;
-  --muted: #e4dfd2;
-  --muted-foreground: #635b4b;
+  --secondary: #bec3c8;
+  --secondary-foreground: #292f34;
+  --muted: #bec3c8;
+  --muted-foreground: #4c5156;
   --accent: rgb(var(--accent-base));
   --accent-foreground: rgb(var(--accent-ink));
-  --destructive: #991b1b;
-  --border: rgba(26, 23, 20, 0.14);
-  --input: rgba(26, 23, 20, 0.18);
+  --destructive: #931315;
+  --border: rgba(19, 29, 38, 0.17);
+  --input: rgba(19, 29, 38, 0.21);
   --ring: rgb(var(--accent-base));
-  --sidebar: #f8f6ef;
-  --sidebar-foreground: #1a1714;
-  --sidebar-accent: #e4dfd2;
-  --sidebar-accent-foreground: #1a1714;
-  --sidebar-border: rgba(26, 23, 20, 0.14);
+  --sidebar: #dce0e3;
+  --sidebar-foreground: #292f34;
+  --sidebar-accent: #bec3c8;
+  --sidebar-accent-foreground: #292f34;
+  --sidebar-border: rgba(19, 29, 38, 0.17);
 }
 
 /* ---- Tipografía: el display pasa a serif -----------------------------
@@ -3246,7 +3278,7 @@ button.icon-btn:hover > svg,
 }
 
 /* El pie era la única superficie que seguía yendo a sangre, y encima en
-   blanco puro (#FFF al 94 %) en una web cuyo material es papel hueso:
+   blanco puro (#FFF al 94 %) en una web cuyo material es chapa gris:
    cortaba la página con una banda más clara que todo lo demás. Pasa al
    papel y se recorta por los lados como las secciones, así que el atlas
    sigue corriendo por debajo hasta el final del documento. */
@@ -3486,8 +3518,8 @@ button.icon-btn:hover > svg,
 :root[data-theme="light"] .tj-paper-dense {
   background-color: color-mix(in srgb, var(--surface) 70%, transparent);
 }
-/* Halo cálido opcional — un resplandor champagne muy tenue en el
-   borde superior, para tarjetas destacadas. */
+/* Halo opcional — un resplandor del acento muy tenue en el borde
+   superior, para tarjetas destacadas. */
 .tj-paper-glow::before {
   content: '';
   position: absolute;
@@ -3495,7 +3527,7 @@ button.icon-btn:hover > svg,
   border-radius: inherit;
   pointer-events: none;
   background: radial-gradient(120% 60% at 50% 0%,
-    color-mix(in srgb, var(--accent-base, rgb(199 167 107)) 8%, transparent),
+    color-mix(in srgb, var(--accent-base, rgb(90 159 212)) 8%, transparent),
     transparent 55%);
 }
 

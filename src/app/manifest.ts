@@ -20,13 +20,13 @@ export default function manifest(): MetadataRoute.Manifest {
       "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
     start_url: `${BASE}/`,
     display: "standalone",
-    // Los dos colores son `--bg` del tema oscuro (globals.css). El tema
-    // era #34B476 (verde), un color que no existe en la paleta del sitio
-    // —cuyo acento es champagne #C7A76B— y que globals.css prohíbe
-    // explícitamente recuperar. Además contradecía al `themeColor` del
-    // layout, que decía otro color distinto.
-    background_color: "#0b0c0d",
-    theme_color: "#0b0c0d",
+    // Los dos colores son `--bg` del tema oscuro del estilo vivo
+    // (globals.css, bloque [data-palette="clasico"]). Antes decían
+    // #0b0c0d, que era el `--bg` de :root y no el del estilo que se
+    // aplica de verdad, así que la barra del navegador quedaba a un
+    // paso del fondo real de la página.
+    background_color: "#0c1116",
+    theme_color: "#0c1116",
     lang: "es",
     icons: [
       {

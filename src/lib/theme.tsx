@@ -32,9 +32,9 @@ export const PALETTES: {
   dark: string;
 }[] = [
   /* El swatch es el acento del estilo, verificado contra WCAG AA sobre
-     sus propios fondos (arcilla #9A4527 → 5,51:1 sobre el papel
-     #F0EDE4; #D08A63 → 6,62:1 sobre la tinta #15130F). */
-  { name: "clasico", light: "#9A4527", dark: "#D08A63" },
+     sus propios fondos (grafito nardo #131D26 → 9,61:1 sobre la chapa
+     #CBD0D4; la plata #CDD9E4 → 10,27:1 sobre el nocturno #0C1116). */
+  { name: "clasico", light: "#131D26", dark: "#CDD9E4" },
 ];
 
 interface ThemeCtx {

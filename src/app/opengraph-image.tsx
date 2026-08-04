@@ -22,8 +22,8 @@ export const contentType = "image/png";
  * preview del sandbox. La tarjeta siempre coincide con la web real.
  *
  * ── Diseño ────────────────────────────────────────────────────────────
- * Fondo oscuro cálido (#0b0c0d, el --bg del tema oscuro del sitio).
- * Acento champagne (#C7A76B, --accent-base). Tipografía sans
+ * Fondo oscuro cálido (#0c1116, el --bg del tema oscuro del sitio).
+ * Acento azul acero (#CDD9E4, --accent-base). Tipografía sans
  * institucional. Marca arriba-izquierda, titular grande centrado,
  * bajada de 3 KPIs abajo. Estilo Anthropic: minimalista, espaciado
  * generoso, jerarquía tipográfica fuerte.
@@ -60,10 +60,10 @@ export default async function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0b0c0d",
+          background: "#0c1116",
           backgroundImage:
             "radial-gradient(120% 80% at 50% -10%, rgba(199,167,107,0.10), transparent 55%), radial-gradient(80% 60% at 50% 110%, rgba(199,167,107,0.06), transparent 60%)",
-          color: "#f1f2ef",
+          color: "#bbc2c8",
           fontFamily: "sans-serif",
           padding: "72px 80px",
           position: "relative",
@@ -75,7 +75,7 @@ export default async function Image() {
             {/* El logotipo: el cuaderno con las tres velas, el mismo que
                 la barra del sitio y el icono del escritorio. Conserva su
                 fondo de papel —no se recorta— porque la tapa es marrón
-                oscuro y sobre el #0b0c0d de esta tarjeta se perdería. */}
+                oscuro y sobre el #0c1116 de esta tarjeta se perdería. */}
             <img
               src={LOGO_DATA_URI}
               alt=""
@@ -90,7 +90,7 @@ export default async function Image() {
               fontSize: 13,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "#818588",
+              color: "#8a9096",
               fontWeight: 600,
             }}
           >
@@ -101,8 +101,8 @@ export default async function Image() {
         {/* Centro — titular */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 6, height: 6, background: "#C7A76B", borderRadius: 1 }} />
-            <span style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#C7A76B", fontWeight: 700 }}>
+            <div style={{ width: 6, height: 6, background: "#CDD9E4", borderRadius: 1 }} />
+            <span style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#CDD9E4", fontWeight: 700 }}>
               Tu operativa, medida.
             </span>
           </div>
@@ -138,10 +138,10 @@ export default async function Image() {
             <div style={{ display: "flex" }}>Opera como una</div>
             <div style={{ display: "flex", gap: 20 }}>
               <span>mesa</span>
-              <span style={{ color: "#C7A76B" }}>institucional.</span>
+              <span style={{ color: "#CDD9E4" }}>institucional.</span>
             </div>
           </div>
-          <div style={{ fontSize: 24, fontWeight: 300, color: "#a7abac", maxWidth: 720, lineHeight: 1.35 }}>
+          <div style={{ fontSize: 24, fontWeight: 300, color: "#9fa5ac", maxWidth: 720, lineHeight: 1.35 }}>
             40+ métricas institucionales, disciplina que te frena antes del error y tus datos 100 % en tu máquina.
           </div>
         </div>
@@ -155,8 +155,8 @@ export default async function Image() {
               { v: "1×", l: "Pago único" },
             ].map((k) => (
               <div key={k.l} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <div style={{ fontSize: 38, fontWeight: 700, color: "#C7A76B", lineHeight: 1 }}>{k.v}</div>
-                <div style={{ fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase", color: "#818588", fontWeight: 600 }}>{k.l}</div>
+                <div style={{ fontSize: 38, fontWeight: 700, color: "#CDD9E4", lineHeight: 1 }}>{k.v}</div>
+                <div style={{ fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8a9096", fontWeight: 600 }}>{k.l}</div>
               </div>
             ))}
           </div>
@@ -167,8 +167,8 @@ export default async function Image() {
               gap: 10,
               padding: "14px 22px",
               borderRadius: 6,
-              background: "#C7A76B",
-              color: "#1a1714",
+              background: "#CDD9E4",
+              color: "#0c1116",
               fontSize: 18,
               fontWeight: 700,
             }}
@@ -178,7 +178,7 @@ export default async function Image() {
         </div>
 
         {/* Filete gold superior */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #C7A76B 30%, #C7A76B 70%, transparent)" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #CDD9E4 30%, #CDD9E4 70%, transparent)" }} />
       </div>
     ),
     { ...size }

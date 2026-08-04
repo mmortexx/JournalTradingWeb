@@ -25,10 +25,10 @@ export default async function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#0b0c0d",
+          background: "#0c1116",
           backgroundImage:
             "radial-gradient(120% 80% at 50% -10%, rgba(199,167,107,0.10), transparent 55%), radial-gradient(80% 60% at 50% 110%, rgba(199,167,107,0.06), transparent 60%)",
-          color: "#f1f2ef",
+          color: "#bbc2c8",
           fontFamily: "sans-serif",
           padding: "72px 80px",
           position: "relative",
@@ -48,28 +48,28 @@ export default async function Image() {
                 border: "1px solid rgba(199,167,107,0.42)",
               }}
             >
-              <div style={{ width: 14, height: 14, background: "#C7A76B", borderRadius: 2 }} />
+              <div style={{ width: 14, height: 14, background: "#CDD9E4", borderRadius: 2 }} />
             </div>
             <span style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em" }}>CountPips</span>
           </div>
-          <span style={{ fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: "#818588", fontWeight: 600 }}>
+          <span style={{ fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", color: "#8a9096", fontWeight: 600 }}>
             Diario de trading · Windows
           </span>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 6, height: 6, background: "#C7A76B", borderRadius: 1 }} />
-            <span style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#C7A76B", fontWeight: 700 }}>
+            <div style={{ width: 6, height: 6, background: "#CDD9E4", borderRadius: 1 }} />
+            <span style={{ fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase", color: "#CDD9E4", fontWeight: 700 }}>
               Tu operativa, medida.
             </span>
           </div>
           <div style={{ display: "flex", fontSize: 78, fontWeight: 700, lineHeight: 1.02, letterSpacing: "-0.035em", maxWidth: 900 }}>
             Opera como una
             <br />
-            mesa <span style={{ color: "#C7A76B" }}>institucional.</span>
+            mesa <span style={{ color: "#CDD9E4" }}>institucional.</span>
           </div>
-          <div style={{ fontSize: 24, fontWeight: 300, color: "#a7abac", maxWidth: 720, lineHeight: 1.35 }}>
+          <div style={{ fontSize: 24, fontWeight: 300, color: "#9fa5ac", maxWidth: 720, lineHeight: 1.35 }}>
             40+ métricas institucionales, disciplina que te frena antes del error y tus datos 100 % en tu máquina.
           </div>
         </div>
@@ -82,8 +82,8 @@ export default async function Image() {
               { v: "1×", l: "Pago único" },
             ].map((k) => (
               <div key={k.l} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <div style={{ fontSize: 38, fontWeight: 700, color: "#C7A76B", lineHeight: 1 }}>{k.v}</div>
-                <div style={{ fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase", color: "#818588", fontWeight: 600 }}>{k.l}</div>
+                <div style={{ fontSize: 38, fontWeight: 700, color: "#CDD9E4", lineHeight: 1 }}>{k.v}</div>
+                <div style={{ fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8a9096", fontWeight: 600 }}>{k.l}</div>
               </div>
             ))}
           </div>
@@ -94,8 +94,8 @@ export default async function Image() {
               gap: 10,
               padding: "14px 22px",
               borderRadius: 6,
-              background: "#C7A76B",
-              color: "#1a1714",
+              background: "#CDD9E4",
+              color: "#0c1116",
               fontSize: 18,
               fontWeight: 700,
             }}
@@ -104,7 +104,7 @@ export default async function Image() {
           </div>
         </div>
 
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #C7A76B 30%, #C7A76B 70%, transparent)" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #CDD9E4 30%, #CDD9E4 70%, transparent)" }} />
       </div>
     ),
     { ...size }

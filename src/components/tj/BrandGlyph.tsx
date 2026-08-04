@@ -48,56 +48,56 @@ import { useId } from "react";
 /** Paleta del logotipo. Fija a propósito: es la marca, no el tema. */
 const PARADAS = {
   cover: [
-    ["0", "#C67E41"],
-    ["0.30", "#AC632C"],
-    ["0.68", "#8A4A1E"],
-    ["1", "#66310F"],
+    ["0", "#8B9299"],
+    ["0.30", "#727980"],
+    ["0.68", "#585E64"],
+    ["1", "#3C4348"],
   ],
   coverSmall: [
-    ["0", "#C67E41"],
-    ["0.34", "#A85F2A"],
-    ["1", "#6E3512"],
+    ["0", "#8B9299"],
+    ["0.34", "#6E757C"],
+    ["1", "#42484E"],
   ],
   spine: [
-    ["0", "#4F240B"],
-    ["0.38", "#7A421A"],
-    ["0.74", "#A05F28"],
-    ["1", "#78411A"],
+    ["0", "#2B333A"],
+    ["0.38", "#4B545C"],
+    ["0.74", "#69727B"],
+    ["1", "#4A535A"],
   ],
   spineSmall: [
-    ["0", "#4F240B"],
-    ["0.5", "#82471C"],
-    ["1", "#9A5A27"],
+    ["0", "#2B333A"],
+    ["0.5", "#515A62"],
+    ["1", "#646D76"],
   ],
   pages: [
-    ["0", "#BFA179"],
-    ["0.26", "#FBF3E1"],
-    ["0.62", "#E4D3B0"],
-    ["1", "#AC8E64"],
+    ["0", "#A4A7A9"],
+    ["0.26", "#F1F4F7"],
+    ["0.62", "#D2D5D8"],
+    ["1", "#919496"],
   ],
   pagesSmall: [
-    ["0", "#C6A87F"],
-    ["0.34", "#FCF4E3"],
-    ["1", "#A98B61"],
+    ["0", "#ABAEB0"],
+    ["0.34", "#F2F5F8"],
+    ["1", "#8E9193"],
   ],
   gold: [
-    ["0", "#FFF0D4"],
-    ["0.42", "#F2CE96"],
-    ["1", "#C68B45"],
+    ["0", "#E8ECF0"],
+    ["0.42", "#C3CBD3"],
+    ["1", "#7E8791"],
   ],
   goldSmall: [
-    ["0", "#FFF3DC"],
-    ["0.5", "#F5D6A4"],
-    ["1", "#D09E63"],
+    ["0", "#EBEFF3"],
+    ["0.5", "#CBD3DA"],
+    ["1", "#949DA6"],
   ],
   ribbon: [
-    ["0", "#EFBE86"],
-    ["0.55", "#CE8C4C"],
-    ["1", "#8E5220"],
+    ["0", "#C0C8D0"],
+    ["0.55", "#8D959E"],
+    ["1", "#5A626B"],
   ],
   ribbonSmall: [
-    ["0", "#EFBE86"],
-    ["1", "#94571F"],
+    ["0", "#C0C8D0"],
+    ["1", "#5E666F"],
   ],
 } as const;
 
@@ -178,13 +178,13 @@ export function BrandGlyph({
             {/* Abombado de la piel: un realce ancho y suave, no un brillo
                 de plástico. */}
             <radialGradient id={g("bulge")} cx="0.34" cy="0.28" r="0.78">
-              <stop offset="0" stopColor="#FFD9A8" stopOpacity="0.26" />
-              <stop offset="0.55" stopColor="#FFD9A8" stopOpacity="0.06" />
-              <stop offset="1" stopColor="#3F1B06" stopOpacity="0.20" />
+              <stop offset="0" stopColor="#DDE0E4" stopOpacity="0.26" />
+              <stop offset="0.55" stopColor="#DDE0E4" stopOpacity="0.06" />
+              <stop offset="1" stopColor="#21272D" stopOpacity="0.20" />
             </radialGradient>
             <linearGradient id={g("pagesBottom")} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#F6EBD4" />
-              <stop offset="1" stopColor="#AC8E64" />
+              <stop offset="0" stopColor="#E9ECEF" />
+              <stop offset="1" stopColor="#919496" />
             </linearGradient>
             <filter id={g("sh")} x="-25%" y="-25%" width="150%" height="150%">
               <feGaussianBlur stdDeviation="13" />
@@ -206,7 +206,7 @@ export function BrandGlyph({
               width="266"
               height="306"
               rx="18"
-              fill="#2A1204"
+              fill="#151A1F"
               transform="translate(6,14)"
             />
           </g>
@@ -214,7 +214,7 @@ export function BrandGlyph({
           {/* Bloque de hojas: asoma por la derecha y por abajo */}
           <rect x="362" y="110" width="42" height="300" rx="10" fill={u("pages")} />
           <rect x="148" y="384" width="252" height="30" rx="10" fill={u("pagesBottom")} />
-          <g stroke="#AD8F66" strokeOpacity="0.5" strokeWidth="2.6" strokeLinecap="round">
+          <g stroke="#929598" strokeOpacity="0.5" strokeWidth="2.6" strokeLinecap="round">
             <path d="M370 148 L398 148" />
             <path d="M370 184 L398 184" />
             <path d="M370 220 L398 220" />
@@ -235,11 +235,11 @@ export function BrandGlyph({
             d="M126 114 Q126 96 144 96 L174 96 L174 396 L144 396 Q126 396 126 378 Z"
             fill={u("spine")}
           />
-          <rect x="164" y="103" width="6" height="286" rx="3" fill="#FFD9A8" opacity="0.32" />
+          <rect x="164" y="103" width="6" height="286" rx="3" fill="#DDE0E4" opacity="0.32" />
           {/* Filo superior iluminado y canto inferior en sombra */}
           <path
             d="M146 99 L370 99"
-            stroke="#FFE1B8"
+            stroke="#E3E6EA"
             strokeOpacity="0.38"
             strokeWidth="4"
             strokeLinecap="round"
@@ -247,7 +247,7 @@ export function BrandGlyph({
           />
           <path
             d="M150 393 L370 393"
-            stroke="#3F1B06"
+            stroke="#21272D"
             strokeOpacity="0.38"
             strokeWidth="6"
             strokeLinecap="round"
@@ -261,13 +261,13 @@ export function BrandGlyph({
             height="248"
             rx="9"
             fill="none"
-            stroke="#FFD9A8"
+            stroke="#DDE0E4"
             strokeOpacity="0.22"
             strokeWidth="2.6"
           />
 
           {/* Velas japonesas en relieve sobre la tapa */}
-          <g filter={`url(#${g("shs")})`} fill="#3F1B06" opacity="0.55" transform="translate(4,6)">
+          <g filter={`url(#${g("shs")})`} fill="#21272D" opacity="0.55" transform="translate(4,6)">
             <rect x="210" y="262" width="38" height="72" rx="8" />
             <rect x="223" y="236" width="12" height="26" rx="6" />
             <rect x="223" y="334" width="12" height="24" rx="6" />
@@ -305,7 +305,7 @@ export function BrandGlyph({
             d="M104 104 Q104 84 124 84 L162 84 L162 402 L124 402 Q104 402 104 382 Z"
             fill={u("spine")}
           />
-          <rect x="150" y="92" width="9" height="302" rx="4.5" fill="#FFD9A8" opacity="0.34" />
+          <rect x="150" y="92" width="9" height="302" rx="4.5" fill="#DDE0E4" opacity="0.34" />
 
           {/* Velas: tres, gruesas y bien separadas */}
           <g fill={u("gold")}>
@@ -364,7 +364,7 @@ export const BRAND_GLYPH_SVG = (size = 22, sufijo = "intro") => {
     `<path d="M292 380 L346 380 L346 470 L319 446 L292 470 Z" fill="url(#${g("ribbon")})"/>` +
     `<rect x="104" y="84" width="264" height="318" rx="20" fill="url(#${g("cover")})"/>` +
     `<path d="M104 104 Q104 84 124 84 L162 84 L162 402 L124 402 Q104 402 104 382 Z" fill="url(#${g("spine")})"/>` +
-    `<rect x="150" y="92" width="9" height="302" rx="4.5" fill="#FFD9A8" opacity="0.34"/>` +
+    `<rect x="150" y="92" width="9" height="302" rx="4.5" fill="#DDE0E4" opacity="0.34"/>` +
     `<g fill="url(#${g("gold")})">` +
     `<rect x="192" y="256" width="46" height="86" rx="10"/><rect x="208" y="228" width="14" height="28" rx="7"/><rect x="208" y="342" width="14" height="26" rx="7"/>` +
     `<rect x="252" y="196" width="46" height="102" rx="10"/><rect x="268" y="166" width="14" height="30" rx="7"/><rect x="268" y="298" width="14" height="26" rx="7"/>` +

@@ -17,28 +17,28 @@
        asi que aqui no pueden chocar con los de otra instancia. -->
   <defs>
     <linearGradient id="cover" x1="0.05" y1="0" x2="0.95" y2="1">
-      <stop offset="0" stop-color="#C67E41"/>
-      <stop offset="0.34" stop-color="#A85F2A"/>
-      <stop offset="1" stop-color="#6E3512"/>
+      <stop offset="0" stop-color="#8B9299"/>
+      <stop offset="0.34" stop-color="#6E757C"/>
+      <stop offset="1" stop-color="#42484E"/>
     </linearGradient>
     <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#4F240B"/>
-      <stop offset="0.5" stop-color="#82471C"/>
-      <stop offset="1" stop-color="#9A5A27"/>
+      <stop offset="0" stop-color="#2B333A"/>
+      <stop offset="0.5" stop-color="#515A62"/>
+      <stop offset="1" stop-color="#646D76"/>
     </linearGradient>
     <linearGradient id="pages" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#C6A87F"/>
-      <stop offset="0.34" stop-color="#FCF4E3"/>
-      <stop offset="1" stop-color="#A98B61"/>
+      <stop offset="0" stop-color="#ABAEB0"/>
+      <stop offset="0.34" stop-color="#F2F5F8"/>
+      <stop offset="1" stop-color="#8E9193"/>
     </linearGradient>
     <linearGradient id="gold" x1="0" y1="0" x2="0.6" y2="1">
-      <stop offset="0" stop-color="#FFF3DC"/>
-      <stop offset="0.5" stop-color="#F5D6A4"/>
-      <stop offset="1" stop-color="#D09E63"/>
+      <stop offset="0" stop-color="#EBEFF3"/>
+      <stop offset="0.5" stop-color="#CBD3DA"/>
+      <stop offset="1" stop-color="#949DA6"/>
     </linearGradient>
     <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="0.2">
-      <stop offset="0" stop-color="#EFBE86"/>
-      <stop offset="1" stop-color="#94571F"/>
+      <stop offset="0" stop-color="#C0C8D0"/>
+      <stop offset="1" stop-color="#5E666F"/>
     </linearGradient>
   </defs>
 
@@ -54,7 +54,7 @@
   <!-- Tapa -->
   <rect x="104" y="84" width="264" height="318" rx="20" fill="url(#cover)"/>
   <path d="M104 104 Q104 84 124 84 L162 84 L162 402 L124 402 Q104 402 104 382 Z" fill="url(#spine)"/>
-  <rect x="150" y="92" width="9" height="302" rx="4.5" fill="#FFD9A8" opacity="0.34"/>
+  <rect x="150" y="92" width="9" height="302" rx="4.5" fill="#DDE0E4" opacity="0.34"/>
 
   <!-- Velas: tres, gruesas y bien separadas -->
   <g fill="url(#gold)">

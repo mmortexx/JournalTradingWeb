@@ -41,7 +41,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0b0c0d",
+  themeColor: "#0c1116",
 };
 
 const geistSans = Geist({
