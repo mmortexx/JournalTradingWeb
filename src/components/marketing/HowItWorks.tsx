@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /** 3-step "how it works" — capture, analyze, improve. */
 export function HowItWorks() {
@@ -46,10 +47,10 @@ export function HowItWorks() {
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
       <div className="relative z-10 tj-container">
         {/* Header */}
-        <Reveal className="max-w-2xl relative">
-          <Eyebrow>{es ? "Cómo funciona" : "How it works"}</Eyebrow>
-          <h2 className="mt-5 t-h2 text-primary">
-            {es ? (
+        <SectionHeader
+          composicion="partida"
+          etiqueta={es ? "Cómo funciona" : "How it works"}
+          titulo={es ? (
               <>
                 Tres pasos. <span className="text-gradient">Cero fricción.</span>
               </>
@@ -58,13 +59,10 @@ export function HowItWorks() {
                 Three steps. <span className="text-gradient">Zero friction.</span>
               </>
             )}
-          </h2>
-          <p className="mt-4 text-lg text-secondary leading-[1.6]">
-            {es
+          entradilla={es
               ? "Diseñado para el trader que opera todos los días: rápido de entrada, brutal de análisis, honesto de diagnóstico."
               : "Designed for the trader who trades every day: fast to enter, brutal on analysis, honest on diagnosis."}
-          </p>
-        </Reveal>
+        />
 
         {/* Steps */}
         <div className="mt-16 relative">

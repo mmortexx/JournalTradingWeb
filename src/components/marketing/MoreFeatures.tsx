@@ -5,6 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
 import type { ReactNode } from "react";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /** Secondary feature grid — 8 cards with icon + title + 1-line description. */
 export function MoreFeatures() {
@@ -75,10 +76,10 @@ export function MoreFeatures() {
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
       <div className="relative tj-container">
-        <Reveal className="max-w-2xl">
-          <Eyebrow>{es ? "Y mucho más" : "And much more"}</Eyebrow>
-          <h2 className="mt-5 t-h2 text-primary">
-            {es ? (
+        <SectionHeader
+          composicion="partida"
+          etiqueta={es ? "Y mucho más" : "And much more"}
+          titulo={es ? (
               <>
                 Funciones que <span className="text-gradient">no son decorativas.</span>
               </>
@@ -87,13 +88,10 @@ export function MoreFeatures() {
                 Features that <span className="text-gradient">aren't decorative.</span>
               </>
             )}
-          </h2>
-          <p className="mt-4 text-lg text-secondary leading-[1.6]">
-            {es
+          entradilla={es
               ? "Cada una existe porque un trader la pidió para tomar mejores decisiones — no para llenar la landing."
               : "Each one exists because a trader asked for it to make better decisions — not to fill up the landing."}
-          </p>
-        </Reveal>
+        />
 
         {/* T2h: gap-5 → gap-5 sm:gap-5 (consistent 20px gaps per the
             brief's ≥20px floor on all breakpoints — the previous

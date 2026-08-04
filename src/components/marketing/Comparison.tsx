@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 type Cell = "yes" | "no" | "partial" | string;
 type Row = { labelEs: string; labelEn: string; cells: [Cell, Cell, Cell] };
@@ -70,10 +71,10 @@ export function Comparison() {
   return (
     <section className="section cv-auto relative overflow-hidden bg-veil">
       <div className="relative z-10 tj-container">
-        <Reveal className="max-w-2xl">
-          <Eyebrow>{es ? "Comparativa" : "Comparison"}</Eyebrow>
-          <h2 className="mt-5 t-h2 text-primary">
-            {es ? (
+        <SectionHeader
+          composicion="partida"
+          etiqueta={es ? "Comparativa" : "Comparison"}
+          titulo={es ? (
               <>
                 No es lo mismo <span className="text-gradient">medir que apuntar.</span>
               </>
@@ -82,13 +83,10 @@ export function Comparison() {
                 Measuring is not <span className="text-gradient">the same as noting.</span>
               </>
             )}
-          </h2>
-          <p className="mt-4 text-lg text-secondary leading-[1.6]">
-            {es
+          entradilla={es
               ? "Excel es libre pero mudo. La nube es cómoda pero cara y ajena. Esta app es local, honesta y tuya."
               : "Excel is free but silent. The cloud is convenient but costly and foreign. This app is local, honest and yours."}
-          </p>
-        </Reveal>
+        />
 
         <Reveal delay={0.08} className="mt-10">
           <motion.div

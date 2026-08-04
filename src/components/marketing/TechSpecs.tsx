@@ -5,6 +5,7 @@ import { Lock } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 interface SpecRow {
   /** Bilingual label and value. */
@@ -90,10 +91,10 @@ export function TechSpecs() {
     <section className="section bg-veil relative overflow-hidden">
       <div className="relative tj-container">
         {/* Header */}
-        <Reveal className="max-w-2xl">
-          <Eyebrow>{es ? "Técnico" : "Technical"}</Eyebrow>
-          <h2 className="mt-5 t-h2 text-primary">
-            {es ? (
+        <SectionHeader
+          composicion="apilada"
+          etiqueta={es ? "Técnico" : "Technical"}
+          titulo={es ? (
               <>
                 Construido <span className="text-gradient">para durar.</span>
               </>
@@ -102,13 +103,10 @@ export function TechSpecs() {
                 Built <span className="text-gradient">to last.</span>
               </>
             )}
-          </h2>
-          <p className="mt-4 text-lg text-secondary leading-[1.6]">
-            {es
+          entradilla={es
               ? "Sin dependencias externas, sin procesos en segundo plano, sin telemetría. Una vez instalado, es tuyo."
               : "No external dependencies, no background processes, no telemetry. Once installed, it's yours."}
-          </p>
-        </Reveal>
+        />
 
         {/* Spec card */}
         <Reveal delay={0.1} y={28} className="mt-10">

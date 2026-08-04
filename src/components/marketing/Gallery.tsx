@@ -6,6 +6,7 @@ import { Reveal } from "@/components/tj/Reveal";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { FeatureImage } from "@/components/tj/FeatureImage";
 import { WindowFrame } from "@/components/tj/WindowFrame";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /**
  * Gallery — visual showcase of the app's key screens using the real
@@ -98,12 +99,10 @@ export function Gallery() {
         {/* Alineada a la izquierda como Caracteristicas, Como funciona y Y
             mucho mas: centrada, el eje de lectura saltaba al medio y
             volvia, y rompia el ritmo editorial de la pagina. */}
-        <Reveal className="max-w-2xl">
-          <Eyebrow>
-            {es ? "Galería" : "Gallery"}
-          </Eyebrow>
-          <h2 className="mt-5 t-h2 text-primary">
-            {es ? (
+        <SectionHeader
+          composicion="apilada"
+          etiqueta={es ? "Galería" : "Gallery"}
+          titulo={es ? (
               <>
                 La app, <span className="text-gradient">en cada pixel.</span>
               </>
@@ -112,13 +111,10 @@ export function Gallery() {
                 The app, <span className="text-gradient">in every pixel.</span>
               </>
             )}
-          </h2>
-          <p className="mt-4 text-lg text-secondary leading-[1.6]">
-            {es
+          entradilla={es
               ? "Cada pantalla entera, sin recortes. Tal cual la verías en tu Windows."
               : "Every screen in full, uncropped. Exactly as you'd see it on your Windows."}
-          </p>
-        </Reveal>
+        />
 
         {/* Uniform grid — no bento spans that force crops. */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

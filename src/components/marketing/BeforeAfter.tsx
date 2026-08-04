@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /**
  * BeforeAfter — "Antes vs Después" transformation section.
@@ -59,14 +60,10 @@ export function BeforeAfter() {
   return (
     <section className="section bg-veil relative overflow-hidden">
       <div className="relative z-10 tj-container">
-        <Reveal className="text-center max-w-2xl mx-auto">
-          <Eyebrow className="justify-center">
-            {es ? "La transformación" : "The transformation"}
-          </Eyebrow>
-          <h2
-            className="mt-5 t-h2 text-primary"
-          >
-            {es ? (
+        <SectionHeader
+          composicion="centrada"
+          etiqueta={es ? "La transformación" : "The transformation"}
+          titulo={es ? (
               <>
                 El mismo trader.{" "}
                 <span className="text-gradient">Dos resultados.</span>
@@ -77,13 +74,10 @@ export function BeforeAfter() {
                 <span className="text-gradient">Two outcomes.</span>
               </>
             )}
-          </h2>
-          <p className="mt-4 text-secondary leading-[1.6]">
-            {es
+          entradilla={es
               ? "No te prometemos magia. Te prometemos un espejo: lo que haces hoy, sin maquillaje, y lo que podrías hacer si cada operación tuviera un plan."
               : "We don't promise magic. We promise a mirror: what you do today, without makeup, and what you could do if every trade had a plan."}
-          </p>
-        </Reveal>
+        />
 
         <div className="mt-10 grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
           {/* ───────── BEFORE — muted, desaturated, red ✗ ───────── */}

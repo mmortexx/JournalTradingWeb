@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 import { Reveal } from "@/components/tj/Reveal";
+import { SectionHeader } from "@/components/layout/SectionHeader";
 
 interface Broker {
   name: string;
@@ -44,10 +45,10 @@ export function Integrations() {
       {/* Section grain — opt-in 3 % fractalNoise overlay. */}
       <div aria-hidden="true" className="grain absolute inset-0 pointer-events-none" />
       <div className="relative tj-container">
-        <Reveal className="max-w-2xl">
-          <Eyebrow>{es ? "Integraciones" : "Integrations"}</Eyebrow>
-          <h2 className="mt-5 t-h2 text-primary">
-            {es ? (
+        <SectionHeader
+          composicion="apilada"
+          etiqueta={es ? "Integraciones" : "Integrations"}
+          titulo={es ? (
               <>
                 Importa de <span className="text-gradient">cualquier broker.</span>
               </>
@@ -56,13 +57,10 @@ export function Integrations() {
                 Import from <span className="text-gradient">any broker.</span>
               </>
             )}
-          </h2>
-          <p className="mt-4 text-lg text-secondary leading-[1.6]">
-            {es
+          entradilla={es
               ? "CSV universal. Mapea columnas una sola vez y olídate."
               : "Universal CSV. Map columns once and forget."}
-          </p>
-        </Reveal>
+        />
 
         {/* T2h: 2-col mobile gap-3 → gap-3.5 (14px) for slight breathing
             between broker cards on 320–390px viewports without losing the
