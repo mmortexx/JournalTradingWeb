@@ -12,6 +12,30 @@
    ============================================================ */
 
 @theme inline {
+  /* ══════════════════════════════════════════════════════════════
+     EL CANTO SE AFILA
+     ══════════════════════════════════════════════════════════════
+     Esto es lo que hacía que el sitio se leyera como una aplicación
+     de consumo y no como una herramienta profesional. La esquina muy
+     redondeada es el gesto por defecto del software de consumo de los
+     últimos diez años, y la interfaz financiera de nivel institucional
+     va justo al revés: alto contraste, tipografía rotunda y CANTO
+     AFILADO, con toda la decoración retirada. La jerarquía se gana por
+     importancia, no por adorno.
+
+     Se redefine la escala entera en el tema en lugar de tocar los ~180
+     sitios donde se usa: así el registro cambia de una vez y no queda
+     media web afilada y media redondeada, que es peor que no tocarlo.
+
+     `rounded-full` NO se toca y no está aquí: un punto de estado o una
+     píldora tienen que seguir siendo redondos. Afilar un círculo no es
+     coherencia, es un error. */
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-2xl: 5px;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   /* Tailwind v4 reads `--font-sans` / `--font-serif` / `--font-mono` here
@@ -98,7 +122,9 @@
 
 /* ===== Default: Verde institucional — DARK theme ===== */
 :root {
-  --radius: 0.625rem;
+  /* El radio base del sistema. Era 0,625rem (10 px) — la esquina del
+     software de consumo. Ver la nota del canto afilado en @theme. */
+  --radius: 3px;
 
   /* Accent — AZUL ACERO, el color de marca.
      ────────────────────────────────────────────────────────────────
@@ -757,7 +783,7 @@
   select {
     background-color: rgb(255 255 255 / 0.04);
     border: 1px solid rgb(var(--divider) / 0.1);
-    border-radius: 8px;
+    border-radius: 3px;
     transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   }
   input:focus,
@@ -823,7 +849,7 @@
     -webkit-backdrop-filter: blur(16px) saturate(150%);
     backdrop-filter: blur(16px) saturate(150%);
     border: 1px solid rgb(var(--accent-base) / 0.35);
-    border-radius: 8px;
+    border-radius: 3px;
     position: relative;
     box-shadow:
       inset 0 1px 0 0 rgb(255 255 255 / 0.08),
@@ -1005,7 +1031,7 @@
     list-style: none;
     padding: 0;
     border: 1px solid rgb(var(--divider) / 0.12);
-    border-radius: 8px;
+    border-radius: 3px;
     background: rgb(var(--divider) / 0.03);
     overflow: hidden;
   }
@@ -1566,7 +1592,7 @@
     margin-inline: auto;
     padding-inline: clamp(1.25rem, 4vw, 2.25rem);
   }
-  .rounded-card { border-radius: 8px; }
+  .rounded-card { border-radius: 3px; }
   .rounded-pill { border-radius: 12px; }
 
   /* Optional scroll-snap helpers — NOT applied globally. Apply `.snap-container`
@@ -2783,7 +2809,7 @@ button.icon-btn:hover > svg,
    lo da el tinte de la paleta; el filo, el degradado de acento. */
 .demo-card {
   position: relative;
-  border-radius: 8px;
+  border-radius: 3px;
   background: rgb(var(--divider) / 0.022);
 }
 .demo-card::before {

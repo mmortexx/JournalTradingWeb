@@ -156,7 +156,7 @@ export function Milestones() {
                           {m.date}
                         </span>
                         <span
-                          className={`inline-flex items-center gap-1 rounded-[4px] px-[0.55rem] py-[0.15rem] text-[11px] font-semibold uppercase tracking-[0.12em] tnum ${
+                          className={`inline-flex items-center gap-1 rounded-[2px] px-[0.55rem] py-[0.15rem] text-[11px] font-semibold uppercase tracking-[0.12em] tnum ${
                             isPast
                               ? "bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)]"
                               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border border-dashed border-[rgb(var(--divider)/0.22)]"

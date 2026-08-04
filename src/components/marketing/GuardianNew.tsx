@@ -48,7 +48,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
           // papel translúcido cálido (86 %) — el atlas sigue filtrándose por
           // los bordes. Estados rojo/verde (checklist + aviso bloqueo) se
           // conservan intactos: tienen sus propios fondos teñidos.
-          className="tj-paper-dense relative rounded-[8px] p-5 sm:p-6 md:p-8"
+          className="tj-paper-dense relative rounded-[2px] p-5 sm:p-6 md:p-8"
           style={{
             border: "1px solid rgb(var(--divider) / 0.13)",
             // Elevación neutra: se retiró el resplandor teñido de acento
@@ -89,7 +89,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
           </div>
           {/* Fila del trade */}
           <div
-            className="rounded-[8px] p-3 mb-4"
+            className="rounded-[2px] p-3 mb-4"
             style={{
               background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
               border: "1px solid rgb(var(--divider) / 0.06)",
@@ -172,7 +172,7 @@ export function GuardianNew({ num = "05" }: { num?: string }) {
               SUPERIOR "OPERACIÓN BLOQUEADA" + el cuerpo de texto respiren
               sin pegarse a los bordes superior/inferior del box. */}
           <div
-            className="rounded-[8px] mb-3 relative overflow-hidden"
+            className="rounded-[2px] mb-3 relative overflow-hidden"
             style={{
               padding: "16px 18px 16px 20px",
               background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",

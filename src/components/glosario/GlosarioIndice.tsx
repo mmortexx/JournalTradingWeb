@@ -61,7 +61,7 @@ export function GlosarioIndice() {
                   ? "Busca por nombre o por lo que significa…"
                   : "Search by name or by what it means…"
               }
-              className="h-12 w-full rounded-[6px] border px-4 text-[15px] text-primary outline-none transition-colors placeholder:text-tertiary"
+              className="h-12 w-full rounded-[2px] border px-4 text-[15px] text-primary outline-none transition-colors placeholder:text-tertiary"
               style={{
                 borderColor: "rgb(var(--divider) / 0.16)",
                 background: "rgb(var(--divider) / 0.04)",
@@ -158,7 +158,7 @@ function TarjetaTermino({
           bloque de 100 px de alto. */}
       <Link
         href={`/glosario/${termino.slug}`}
-        className="tj-paper group flex h-full flex-col rounded-[8px] p-4 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
+        className="tj-paper group flex h-full flex-col rounded-[2px] p-4 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
       >
         <span
           lang="en"

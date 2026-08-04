@@ -81,7 +81,7 @@ export default async function Image() {
               alt=""
               width={44}
               height={44}
-              style={{ borderRadius: 8 }}
+              style={{ borderRadius: 3 }}
             />
             <span style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em" }}>CountPips</span>
           </div>
@@ -166,7 +166,7 @@ export default async function Image() {
               alignItems: "center",
               gap: 10,
               padding: "14px 22px",
-              borderRadius: 6,
+              borderRadius: 3,
               background: "#CDD9E4",
               color: "#0c1116",
               fontSize: 18,

@@ -78,7 +78,7 @@ function DemoSkeleton() {
           <div className="flex items-center px-3 min-w-0">
             {/* App icon placeholder — same 16×16 rounded square as the real
                 AppIcon, kept grey so it doesn't read as a brand mark yet. */}
-            <span className="w-4 h-4 rounded-[3px] bg-[rgb(var(--divider)/0.1)] shrink-0" />
+            <span className="w-4 h-4 rounded-[2px] bg-[rgb(var(--divider)/0.1)] shrink-0" />
             <Skeleton className="h-3 w-28 ml-2 hidden sm:block" />
           </div>
           {/* Center — account chip + market clock skeletons. */}
@@ -123,9 +123,9 @@ function DemoSkeleton() {
             ))}
           </div>
           <div className="flex items-center justify-end gap-0.5 pr-1.5 sm:pr-2">
-            <Skeleton className="h-8 w-8 rounded-[4px] hidden sm:block" />
-            <Skeleton className="h-8 w-8 rounded-[4px]" />
-            <Skeleton className="h-8 w-9 rounded-[4px]" />
+            <Skeleton className="h-8 w-8 rounded-[2px] hidden sm:block" />
+            <Skeleton className="h-8 w-8 rounded-[2px]" />
+            <Skeleton className="h-8 w-9 rounded-[2px]" />
           </div>
         </div>
 

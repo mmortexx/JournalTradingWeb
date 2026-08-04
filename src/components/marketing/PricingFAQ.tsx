@@ -152,7 +152,7 @@ export function PricingFAQ() {
                   delay: 0.18 + i * 0.08,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="pill !rounded-[4px] bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.10)] tnum"
+                className="pill !rounded-[2px] bg-[rgb(var(--divider)/0.05)] text-secondary border border-[rgb(var(--divider)/0.10)] tnum"
               >
                 <span className="size-1.5 rounded-full bg-[rgb(var(--accent-base))]" aria-hidden="true" />
                 {label}

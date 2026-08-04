@@ -178,7 +178,7 @@ export function Comparison() {
                           </span>
                           {c.highlight && (
                             <span
-                              className="pill !rounded-[4px] border !text-[10px] uppercase tracking-[0.1em]"
+                              className="pill !rounded-[2px] border !text-[10px] uppercase tracking-[0.1em]"
                               style={{
                                 background: "rgb(var(--accent-base) / 0.14)",
                                 color: "rgb(var(--accent-base))",
@@ -312,7 +312,7 @@ function CellRenderer({
           <CheckIcon />
         </motion.span>
         <span className="text-[13px] font-medium text-pnl-pos">{es ? "Sí" : "Yes"}</span>
-        <span className="pill !rounded-[4px] bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
+        <span className="pill !rounded-[2px] bg-[rgb(var(--divider)/0.05)] text-primary border border-[rgb(var(--divider)/0.20)] !px-1.5 !py-0 !text-[10px] uppercase tracking-[0.1em]">
           Pro
         </span>
       </span>

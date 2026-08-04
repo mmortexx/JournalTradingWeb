@@ -147,7 +147,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
           onChange(Number.isFinite(v) ? v : 0);
         }}
         aria-label={ariaLabel}
-        className="tnum w-full min-h-[44px] rounded-[6px] outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] transition-colors"
+        className="tnum w-full min-h-[44px] rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] transition-colors"
         style={{
           fontSize: 16,
           fontWeight: 600,
@@ -293,7 +293,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
           className="tj-paper tj-paper-glow relative"
           style={{
             padding: 24,
-            borderRadius: 8,
+            borderRadius: 3,
             border: "1px solid rgb(var(--divider) / 0.13)",
           }}
         >
@@ -313,7 +313,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
                   fontWeight: 700,
                   color: "rgb(var(--accent-base))",
                   padding: "2px 12px",
-                  borderRadius: 8,
+                  borderRadius: 3,
                   background: "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)",
                   border: "1px solid color-mix(in oklab, rgb(var(--accent-base)) 35%, transparent)",
                 }}
@@ -399,7 +399,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               cualquier precio con holgura. El reparto 2+1 ya es el que
               tienen los chips de plantilla de aquí arriba. */}
           <div
-            className="grid grid-cols-2 gap-2 p-3 rounded-[8px] mb-4 sm:grid-cols-3"
+            className="grid grid-cols-2 gap-2 p-3 rounded-[2px] mb-4 sm:grid-cols-3"
             style={{
               background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
               border: "1px solid rgb(var(--divider) / 0.06)",
@@ -413,7 +413,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
           {/* Aviso de validación + dirección */}
           {!c.valid ? (
             <div
-              className="mb-4 rounded-[6px] px-3 py-2.5 text-[12px] leading-[1.5]"
+              className="mb-4 rounded-[2px] px-3 py-2.5 text-[12px] leading-[1.5]"
               style={{
                 background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",
                 border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 30%, transparent)",
@@ -460,7 +460,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 
           {/* Stats adicionales: valor posición + % balance */}
           <div
-            className="grid grid-cols-2 gap-2 mb-5 rounded-[6px] p-3"
+            className="grid grid-cols-2 gap-2 mb-5 rounded-[2px] p-3"
             style={{ background: "color-mix(in oklab, var(--surface-2) 40%, transparent)", border: "1px solid rgb(var(--divider) / 0.05)" }}
           >
             <div>
@@ -515,7 +515,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
               </span>
             </div>
             <div
-              className="relative h-2 rounded-[4px] overflow-hidden"
+              className="relative h-2 rounded-[2px] overflow-hidden"
               style={{ background: "rgb(var(--divider) / 0.13)" }}
             >
               <div
@@ -550,7 +550,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
             onClick={copyPlan}
             disabled={!c.valid}
             aria-label={es ? "Copiar plan de operación al portapapeles" : "Copy trade plan to clipboard"}
-            className="mt-5 w-full sm:w-fit inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-[6px] text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="mt-5 w-full sm:w-fit inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-[2px] text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] disabled:opacity-40 disabled:cursor-not-allowed"
             style={{
               background: copied
                 ? "color-mix(in oklab, rgb(var(--pnl-pos)) 16%, transparent)"
@@ -587,7 +587,7 @@ export function RiskCalculator({ num = "04·c" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      className="group/result relative min-w-0 rounded-[2px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{
         background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
       }}

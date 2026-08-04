@@ -66,7 +66,7 @@ export default function Loading() {
               {/* Window chrome (h-11 mobile / h-10 sm+) */}
               <div className="border-b border-[rgb(var(--divider)/0.1)] flex items-center justify-between h-11 sm:h-10 shrink-0 px-2.5 sm:px-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Skeleton className="w-[18px] h-[18px] rounded-[4px]" />
+                  <Skeleton className="w-[18px] h-[18px] rounded-[2px]" />
                   <Skeleton className="h-3 w-20" />
                 </div>
                 <div className="flex items-stretch h-full">
@@ -101,8 +101,8 @@ export default function Loading() {
                   ))}
                 </div>
                 <div className="flex items-center justify-end gap-0.5 pr-2">
-                  <Skeleton className="h-8 w-8 rounded-[4px] hidden sm:block" />
-                  <Skeleton className="h-8 w-8 rounded-[4px]" />
+                  <Skeleton className="h-8 w-8 rounded-[2px] hidden sm:block" />
+                  <Skeleton className="h-8 w-8 rounded-[2px]" />
                 </div>
               </div>
 

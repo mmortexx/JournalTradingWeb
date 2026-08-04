@@ -62,7 +62,7 @@ export function TerminoVista({ termino }: { termino: TerminoGlosario }) {
                   flex, y eso convierte al hijo en un bloque propio. */}
               <Link
                 href={`/glosario#${termino.category}`}
-                className="inline-flex min-h-[44px] items-center rounded-[4px] border px-3 font-medium transition-colors"
+                className="inline-flex min-h-[44px] items-center rounded-[2px] border px-3 font-medium transition-colors"
                 style={{
                   borderColor: "rgb(var(--accent-base) / 0.35)",
                   color: "rgb(var(--accent-base))",
@@ -82,7 +82,7 @@ export function TerminoVista({ termino }: { termino: TerminoGlosario }) {
             <Reveal delay={0.1}>
               <Link
                 href={herramienta}
-                className="tj-paper mt-8 flex items-center justify-between gap-4 rounded-[8px] p-4 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
+                className="tj-paper mt-8 flex items-center justify-between gap-4 rounded-[2px] p-4 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
               >
                 <span className="min-w-0">
                   <span className="block text-[11px] uppercase tracking-[0.14em] text-tertiary">
@@ -132,7 +132,7 @@ export function TerminoVista({ termino }: { termino: TerminoGlosario }) {
                     <li key={t.slug}>
                       <Link
                         href={`/glosario/${t.slug}`}
-                        className="tj-paper group flex h-full flex-col rounded-[8px] p-3.5 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
+                        className="tj-paper group flex h-full flex-col rounded-[2px] p-3.5 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
                       >
                         <span
                           lang="en"

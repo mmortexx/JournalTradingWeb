@@ -117,7 +117,7 @@ export function HowItWorks() {
                       duration: 0.5,
                       ease: [0.22, 1, 0.36, 1],
                     }}
-                    className="absolute -top-2 -right-2 w-9 h-9 rounded-[4px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] text-xs font-bold tnum flex items-center justify-center ring-2 ring-[var(--bg)] z-10"
+                    className="absolute -top-2 -right-2 w-9 h-9 rounded-[2px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] text-xs font-bold tnum flex items-center justify-center ring-2 ring-[var(--bg)] z-10"
                   >
                     {s.n}
                   </motion.span>

@@ -80,7 +80,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               width so break-words can wrap long labels instead of pushing
               the value column off the right edge. */}
           <div
-            className="rounded-[8px] overflow-hidden"
+            className="rounded-[2px] overflow-hidden"
             style={{
               border: "1px solid rgb(var(--divider) / 0.13)",
               background: "color-mix(in oklab, var(--surface) 50%, transparent)",
@@ -143,7 +143,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
           className="relative"
           style={{
             padding: 22,
-            borderRadius: 8,
+            borderRadius: 3,
             border: "1px solid rgb(var(--divider) / 0.13)",
             background: "color-mix(in oklab, var(--surface) 70%, transparent)",
             backdropFilter: "blur(20px) saturate(1.4)",
@@ -185,9 +185,9 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
                   <span className="min-w-0 break-words" style={{ fontSize: 13, color: "var(--ink)" }}>{row.l}</span>
                   <span className="tnum shrink-0" style={{ fontSize: 12, color: "var(--ink-2)" }}>{row.pct} %</span>
                 </div>
-                <div className="h-1 rounded-[3px] overflow-hidden relative" style={{ background: "rgb(var(--divider) / 0.13)", boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.18)" }}>
+                <div className="h-1 rounded-[2px] overflow-hidden relative" style={{ background: "rgb(var(--divider) / 0.13)", boxShadow: "inset 0 1px 0 rgb(0 0 0 / 0.18)" }}>
                   <div
-                    className="h-full rounded-[3px] relative"
+                    className="h-full rounded-[2px] relative"
                     style={{
                       width: `${row.pct * 2.5}%`,
                       // R20-3b: gradient fill — solid red on the leading edge,
@@ -218,7 +218,7 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
               </li>
             ))}
           </ul>
-          <div className="flex items-center justify-between pt-3 border-t gap-2 relative" style={{ borderColor: "rgb(var(--divider) / 0.06)", marginTop: 4, paddingTop: 14, paddingBottom: 4, background: "color-mix(in oklab, rgb(var(--pnl-neg)) 4%, transparent)", borderRadius: 8, paddingLeft: 12, paddingRight: 12, marginLeft: -4, marginRight: -4 }}>
+          <div className="flex items-center justify-between pt-3 border-t gap-2 relative" style={{ borderColor: "rgb(var(--divider) / 0.06)", marginTop: 4, paddingTop: 14, paddingBottom: 4, background: "color-mix(in oklab, rgb(var(--pnl-neg)) 4%, transparent)", borderRadius: 3, paddingLeft: 12, paddingRight: 12, marginLeft: -4, marginRight: -4 }}>
             {/* R24-1c: total row now reads as a stamped footer — tinted
                 pnl-neg/4 backdrop + tiny accent-red TOTAL badge before the
                 label so the “Month total” row stands apart from the

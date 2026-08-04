@@ -280,7 +280,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
               accent ring + glow already framing the Pro card, so the whole
               Pro surface reads as a single premium object (R20-3c). */}
           <span
-            className="pill !rounded-[4px] border uppercase tracking-[0.1em] backdrop-blur-md backdrop-saturate-150"
+            className="pill !rounded-[2px] border uppercase tracking-[0.1em] backdrop-blur-md backdrop-saturate-150"
             style={{
               /* Fondo de acento PLANO con la tinta que le corresponde.
                  Antes el texto era `--accent-pressed` (#B0905A) sobre un
@@ -338,7 +338,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
             (R24-1d). text-primary kept for full WCAG-AA contrast on the
             tinted backdrop in both themes. */}
         <span
-          className={`pill !rounded-[4px] border shrink-0 ${
+          className={`pill !rounded-[2px] border shrink-0 ${
             isPro
               ? "bg-[rgb(var(--accent-base)/0.12)] text-primary border-[rgb(var(--accent-base)/0.32)]"
               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border-[rgb(var(--divider)/0.10)]"
@@ -463,8 +463,8 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
             // primary surface (txt-primary bg + bg text) with the same
             // shadow + lift treatment for visual parity.
             isPro
-              ? "group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-semibold transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] shadow-[0_1px_2px_rgb(var(--accent-base)/0.25)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgb(var(--accent-base)/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-              : "group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[4px] text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[var(--bg)] shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              ? "group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[2px] text-sm font-semibold transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] shadow-[0_1px_2px_rgb(var(--accent-base)/0.25)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgb(var(--accent-base)/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              : "group w-full max-w-[260px] sm:w-fit sm:max-w-[260px] flex items-center justify-center gap-2 h-12 px-6 rounded-[2px] text-sm font-medium transition-[background-color,box-shadow,transform] duration-200 bg-[rgb(var(--txt-primary))] text-[var(--bg)] shadow-[0_1px_2px_rgb(0_0_0/0.20)] hover:bg-[rgb(var(--txt-primary)/0.88)] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgb(0_0_0/0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           }
         >
           {plan.cta}

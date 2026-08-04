@@ -786,7 +786,7 @@ export function DashboardPage() {
                     {/* Keyboard hint — visible ⌘↵ chip on hover, mirrors the
                         real app's accelerator-key badge on primary CTAs. */}
                     <kbd
-                      className="hidden sm:inline-flex items-center gap-0.5 h-5 px-1.5 rounded-[3px] bg-black/10 text-[10px] font-semibold text-black/70 tabular-nums group-hover:bg-black/15 transition-colors"
+                      className="hidden sm:inline-flex items-center gap-0.5 h-5 px-1.5 rounded-[2px] bg-black/10 text-[10px] font-semibold text-black/70 tabular-nums group-hover:bg-black/15 transition-colors"
                       aria-hidden="true"
                     >
                       <span>⌘</span>
@@ -1300,7 +1300,7 @@ function RealityCheck() {
   if (parts.length === 0) return null;
 
   return (
-    <div className="flex items-start gap-3 rounded-[6px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.02)] px-4 py-3">
+    <div className="flex items-start gap-3 rounded-[2px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.02)] px-4 py-3">
       <svg
         width="15"
         height="15"

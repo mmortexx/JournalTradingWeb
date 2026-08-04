@@ -244,7 +244,7 @@ export function OverviewApp() {
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/pricing"
-                className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
+                className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[2px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
                 style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
               >
                 {es ? "Comprar — desde 29 $" : "Buy — from $29"}
@@ -252,7 +252,7 @@ export function OverviewApp() {
               </Link>
               <Link
                 href="/demo"
-                className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[4px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
+                className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[2px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
                 style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
               >
                 <Play size={14} fill="currentColor" aria-hidden />
@@ -318,7 +318,7 @@ export function OverviewApp() {
                 left: -24,
                 top: 150,
                 border: "1px solid rgb(var(--divider) / 0.13)",
-                borderRadius: 8,
+                borderRadius: 3,
                 background: "color-mix(in oklab, var(--surface) 94%, transparent)",
                 backdropFilter: "blur(8px)",
                 boxShadow: "var(--shadow, 0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78))",
@@ -365,7 +365,7 @@ export function OverviewApp() {
                 left: -56,
                 bottom: 40,
                 border: "1px solid rgb(var(--divider) / 0.13)",
-                borderRadius: 8,
+                borderRadius: 3,
                 background: "color-mix(in oklab, var(--surface) 94%, transparent)",
                 backdropFilter: "blur(8px)",
                 boxShadow: "var(--shadow, 0 1px 2px rgb(0 0 0 / 0.5), 0 44px 84px -30px rgb(0 0 0 / 0.78))",
@@ -378,7 +378,7 @@ export function OverviewApp() {
                 style={{
                   width: 30,
                   height: 30,
-                  borderRadius: 8,
+                  borderRadius: 3,
                   flex: "none",
                   background: "color-mix(in oklab, rgb(var(--accent-base)) 16%, transparent)",
                   color: "rgb(var(--accent-base))",

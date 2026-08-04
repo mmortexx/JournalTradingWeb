@@ -120,7 +120,7 @@ export function PageHeader({
             // área táctil cumple el mínimo de 44 px en móvil sin alterar
             // la altura visual de la fila de migas (el margin negativo
             // compensa el padding para que el layout no se desplace).
-            className="inline-flex min-h-[44px] items-center -my-2 py-2 pr-2 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] rounded-[4px]"
+            className="inline-flex min-h-[44px] items-center -my-2 py-2 pr-2 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] rounded-[2px]"
           >
             {es ? "Inicio" : "Home"}
           </Link>

@@ -116,7 +116,7 @@ export function FinalCTANew() {
             // `active:translate-y-0`: paridad exacta con Hero. Los dos CTAs
             // de cierre ahora tienen el mismo gesto de lift que los del Hero,
             // cerrando el lenguaje de interacción de la home.
-            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] px-6 sm:px-8 text-base font-semibold outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
+            className="inline-flex h-[52px] items-center gap-2.5 rounded-[2px] px-6 sm:px-8 text-base font-semibold outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
             style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
           >
             {es ? "Empieza hoy — 29 $" : "Start today — $29"}
@@ -124,7 +124,7 @@ export function FinalCTANew() {
           </Link>
           <Link
             href="/demo"
-            className="inline-flex h-[52px] items-center gap-2.5 rounded-[4px] border px-6 sm:px-8 text-base font-semibold text-[var(--ink)] outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
+            className="inline-flex h-[52px] items-center gap-2.5 rounded-[2px] border px-6 sm:px-8 text-base font-semibold text-[var(--ink)] outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
             style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
           >
             {/* R25-1e — Play icon prefix matches the Hero's "Ver la demo"

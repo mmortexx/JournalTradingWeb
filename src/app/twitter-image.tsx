@@ -40,7 +40,7 @@ export default async function Image() {
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: 8,
+                borderRadius: 3,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -93,7 +93,7 @@ export default async function Image() {
               alignItems: "center",
               gap: 10,
               padding: "14px 22px",
-              borderRadius: 6,
+              borderRadius: 3,
               background: "#CDD9E4",
               color: "#0c1116",
               fontSize: 18,

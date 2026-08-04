@@ -397,7 +397,7 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
               {QUESTIONS.map((q, qi) => {
                 const dim = DIMS.find((d) => d.id === q.dim);
                 return (
-                  <li key={qi} className="tj-paper rounded-[8px] p-4">
+                  <li key={qi} className="tj-paper rounded-[2px] p-4">
                     <div className="flex items-baseline gap-2 mb-1">
                       <span
                         className="tnum"
@@ -454,7 +454,7 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
                             tabIndex={enfocable ? 0 : -1}
                             onClick={() => setAnswer(qi, oi)}
                             onKeyDown={(e) => onKeyOption(e, qi, oi, q.options.length)}
-                            className="text-left rounded-[6px] transition-[background-color,border-color,color] duration-200"
+                            className="text-left rounded-[2px] transition-[background-color,border-color,color] duration-200"
                             style={{
                               minHeight: 44,
                               padding: "10px 12px",
@@ -484,7 +484,7 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
               <button
                 type="button"
                 onClick={reset}
-                className="mt-5 inline-flex items-center gap-2 rounded-[6px]"
+                className="mt-5 inline-flex items-center gap-2 rounded-[2px]"
                 style={{
                   minHeight: 44,
                   padding: "10px 18px",
@@ -502,7 +502,7 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
 
           {/* ── Resultado ────────────────────────────────────────────── */}
           <div className="lg:sticky lg:top-24">
-            <div className="tj-paper tj-paper-glow rounded-[10px] p-5">
+            <div className="tj-paper tj-paper-glow rounded-[2px] p-5">
               <div
                 className="tnum mb-4"
                 style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}
@@ -591,7 +591,7 @@ export function DisciplineScore({ num = "04" }: { num?: string }) {
               {/* Qué arreglar primero */}
               {weakest ? (
                 <div
-                  className="rounded-[8px] p-4"
+                  className="rounded-[2px] p-4"
                   style={{
                     background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
                     border: "1px solid rgb(var(--divider) / 0.1)",

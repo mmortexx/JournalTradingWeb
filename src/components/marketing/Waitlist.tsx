@@ -160,7 +160,7 @@ function LiveCount({ count, es, lang }: { count: number | null; es: boolean; lan
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="inline-flex items-center gap-2 rounded-[4px] border border-[rgb(var(--divider)/0.12)] bg-[rgb(var(--divider)/0.04)] px-3 py-1.5 text-xs text-secondary"
+            className="inline-flex items-center gap-2 rounded-[2px] border border-[rgb(var(--divider)/0.12)] bg-[rgb(var(--divider)/0.04)] px-3 py-1.5 text-xs text-secondary"
           >
             <span className="relative inline-flex size-1.5 shrink-0" aria-hidden="true">
               <span className="absolute inset-0 animate-ping rounded-full bg-[rgb(var(--pnl-pos)/0.55)]" />
@@ -417,7 +417,7 @@ export function Waitlist() {
                           aria-invalid={status === "error"}
                           aria-describedby={status === "error" ? "waitlist-error" : undefined}
                           required
-                          className="h-12 rounded-[4px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)] aria-invalid:border-[rgb(var(--pnl-neg)/0.50)] aria-invalid:hover:border-[rgb(var(--pnl-neg)/0.65)] aria-invalid:focus-visible:border-[rgb(var(--pnl-neg)/0.70)] aria-invalid:focus-visible:ring-[rgb(var(--pnl-neg)/0.18)] disabled:opacity-60"
+                          className="h-12 rounded-[2px] bg-[rgb(var(--divider)/0.04)] border-[rgb(var(--divider)/0.10)] text-primary placeholder:text-tertiary hover:border-[rgb(var(--divider)/0.25)] focus-visible:border-[rgb(var(--accent-base)/0.50)] focus-visible:ring-[3px] focus-visible:ring-[rgb(var(--accent-base)/0.12)] aria-invalid:border-[rgb(var(--pnl-neg)/0.50)] aria-invalid:hover:border-[rgb(var(--pnl-neg)/0.65)] aria-invalid:focus-visible:border-[rgb(var(--pnl-neg)/0.70)] aria-invalid:focus-visible:ring-[rgb(var(--pnl-neg)/0.18)] disabled:opacity-60"
                         />
                         {/* Campo trampa — fuera de pantalla, ignorado por
                             personas. Si un bot lo rellena, el script de
@@ -465,7 +465,7 @@ export function Waitlist() {
                           type="submit"
                           disabled={sending || !ready}
                           aria-busy={sending}
-                          className="h-12 px-6 w-full sm:w-auto rounded-[4px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform,opacity] duration-200 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                          className="h-12 px-6 w-full sm:w-auto rounded-[2px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-semibold hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 transition-[background-color,transform,opacity] duration-200 shrink-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                         >
                           {sending
                             ? es ? "Apuntando…" : "Joining…"

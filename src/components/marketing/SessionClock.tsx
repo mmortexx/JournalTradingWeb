@@ -159,7 +159,7 @@ export function SessionClock({ num = "02" }: { num?: string }) {
             return (
               <div
                 key={s.id}
-                className="tj-paper rounded-[8px] p-4 transition-[border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
+                className="tj-paper rounded-[2px] p-4 transition-[border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
                 style={{
                   border: `1px solid color-mix(in oklab, ${open ? s.color : "rgb(var(--divider))"} ${open ? "40%" : "14%"}, transparent)`,
                 }}
@@ -202,7 +202,7 @@ export function SessionClock({ num = "02" }: { num?: string }) {
 
         {/* 24h band */}
         <div
-          className="tj-paper tj-paper-glow rounded-[8px] p-5 mb-4"
+          className="tj-paper tj-paper-glow rounded-[2px] p-5 mb-4"
           style={{ border: "1px solid rgb(var(--divider) / 0.13)" }}
         >
           <div className="flex items-center justify-between mb-3">
@@ -217,7 +217,7 @@ export function SessionClock({ num = "02" }: { num?: string }) {
           </div>
 
           {/* Track */}
-          <div className="relative h-10 rounded-[4px] overflow-hidden" style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}>
+          <div className="relative h-10 rounded-[2px] overflow-hidden" style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}>
             {/* Hour gridlines every 6h */}
             {[0, 6, 12, 18, 24].map((h) => (
               <div
@@ -273,7 +273,7 @@ export function SessionClock({ num = "02" }: { num?: string }) {
           {/* Overlap alert */}
           {overlaps.length > 0 && (
             <div
-              className="mt-4 rounded-[6px] px-3 py-2.5 flex items-start gap-2"
+              className="mt-4 rounded-[2px] px-3 py-2.5 flex items-start gap-2"
               style={{
                 background: "color-mix(in oklab, rgb(var(--pnl-pos)) 8%, transparent)",
                 border: "1px solid color-mix(in oklab, rgb(var(--pnl-pos)) 26%, transparent)",

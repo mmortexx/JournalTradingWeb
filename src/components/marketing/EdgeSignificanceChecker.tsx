@@ -234,7 +234,7 @@ export function EdgeSignificanceChecker({ num = "01" }: { num?: string }) {
         {/* Right: results card */}
         <div
           className="tj-paper tj-paper-glow relative lg:sticky lg:top-24"
-          style={{ padding: 24, borderRadius: 8, border: "1px solid rgb(var(--divider) / 0.13)" }}
+          style={{ padding: 24, borderRadius: 3, border: "1px solid rgb(var(--divider) / 0.13)" }}
         >
           {/* Verdict headline */}
           <div className="mb-5">
@@ -278,9 +278,9 @@ export function EdgeSignificanceChecker({ num = "01" }: { num?: string }) {
                 {trades} / {c.minSample}
               </span>
             </div>
-            <div className="relative h-2 rounded-[3px] overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
+            <div className="relative h-2 rounded-[2px] overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
               <div
-                className="absolute left-0 top-0 h-full rounded-[3px]"
+                className="absolute left-0 top-0 h-full rounded-[2px]"
                 style={{
                   width: `${Math.min(100, (trades / c.minSample) * 100)}%`,
                   background: c.sampleAdequate
@@ -309,7 +309,7 @@ export function EdgeSignificanceChecker({ num = "01" }: { num?: string }) {
 
           {/* Disclaimer */}
           <div
-            className="rounded-[6px] px-3 py-2.5"
+            className="rounded-[2px] px-3 py-2.5"
             style={{ background: "color-mix(in oklab, var(--surface-2) 40%, transparent)", border: "1px solid rgb(var(--divider) / 0.06)" }}
           >
             <p className="tnum m-0 text-[11px] leading-[1.55]" style={{ color: "var(--ink-3)" }}>
@@ -339,7 +339,7 @@ function normalCdf(x: number): number {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      className="group/result relative min-w-0 rounded-[2px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}
     >
       <div className="tnum relative" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>

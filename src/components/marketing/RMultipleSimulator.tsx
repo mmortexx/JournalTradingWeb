@@ -287,7 +287,7 @@ export function RMultipleSimulator({ num = "03" }: { num?: string }) {
           <button
             type="button"
             onClick={() => setSeed((s) => s + 1)}
-            className="mt-6 inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-[6px] text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+            className="mt-6 inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-[2px] text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
             style={{
               background: "color-mix(in oklab, rgb(var(--accent-base)) 12%, transparent)",
               color: "rgb(var(--accent-base))",
@@ -305,7 +305,7 @@ export function RMultipleSimulator({ num = "03" }: { num?: string }) {
         {/* Right: results card */}
         <div
           className="tj-paper tj-paper-glow relative"
-          style={{ padding: 24, borderRadius: 8, border: "1px solid rgb(var(--divider) / 0.13)" }}
+          style={{ padding: 24, borderRadius: 3, border: "1px solid rgb(var(--divider) / 0.13)" }}
         >
           {/* Expectancy + runs headline */}
           <div className="mb-5 flex items-baseline justify-between flex-wrap gap-2">
@@ -378,7 +378,7 @@ export function RMultipleSimulator({ num = "03" }: { num?: string }) {
 
           {/* Probabilities */}
           <div
-            className="grid grid-cols-2 gap-2 rounded-[6px] p-3 mb-4"
+            className="grid grid-cols-2 gap-2 rounded-[2px] p-3 mb-4"
             style={{ background: "color-mix(in oklab, var(--surface-2) 40%, transparent)", border: "1px solid rgb(var(--divider) / 0.05)" }}
           >
             <div>
@@ -407,7 +407,7 @@ export function RMultipleSimulator({ num = "03" }: { num?: string }) {
 
           {/* Disclaimer */}
           <div
-            className="rounded-[6px] px-3 py-2.5"
+            className="rounded-[2px] px-3 py-2.5"
             style={{ background: "color-mix(in oklab, var(--surface-2) 40%, transparent)", border: "1px solid rgb(var(--divider) / 0.06)" }}
           >
             <p className="tnum m-0 text-[11px] leading-[1.55]" style={{ color: "var(--ink-3)" }}>
@@ -425,7 +425,7 @@ export function RMultipleSimulator({ num = "03" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      className="group/result relative min-w-0 rounded-[2px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}
     >
       <div className="tnum relative" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>

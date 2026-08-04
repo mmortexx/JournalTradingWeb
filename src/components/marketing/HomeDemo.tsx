@@ -196,7 +196,7 @@ export function HomeDemo() {
           <Link
             href="/demo"
             aria-label={es ? "Abrir la demo a página completa" : "Open the full-page demo"}
-            className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[4px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
+            className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[2px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
             style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
           >
             <span>{es ? "Abrir demo a página completa" : "Open full-page demo"}</span>

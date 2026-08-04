@@ -111,15 +111,15 @@ export function DownloadCTA() {
                   size are unambiguous at a glance. tnum keeps the version
                   digits + size figure on the tabular baseline. */}
               <div className="mt-5 flex flex-wrap items-center justify-center md:justify-start gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">Windows 10/11</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">64-bit</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-[rgb(var(--divider)/0.10)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-xs text-secondary">
                   <CheckSmall />
                   <span className="tnum">50 MB</span>
                 </span>
@@ -159,7 +159,7 @@ export function DownloadCTA() {
                 // restores the canonical text-base + px-5 padding when the
                 // viewport has room. Touch target stays ≥44px (py-3 = 24px
                 // + line ~22px = 46px).
-                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-4 sm:px-5 md:px-8 py-3 text-sm sm:text-base rounded-[4px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-medium transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[rgb(var(--accent-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-4 sm:px-5 md:px-8 py-3 text-sm sm:text-base rounded-[2px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-medium transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[rgb(var(--accent-hover))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 <WindowsIcon className="shrink-0 transition-transform duration-200 group-hover:scale-105" />
                 {/* P6 — responsive label: short on mobile (one line), full

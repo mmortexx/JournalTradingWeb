@@ -205,7 +205,7 @@ export function Footer() {
                 Signals the "your data never leaves your machine" promise
                 inline in the brand column. Same hairline language as the
                 rest of the design system (`border-white/10`). */}
-            <div className="mt-4 inline-flex items-center gap-1.5 rounded-[4px] border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-[11px] font-medium text-secondary">
+            <div className="mt-4 inline-flex items-center gap-1.5 rounded-[2px] border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-[11px] font-medium text-secondary">
               <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path
                   d="M5 7V5a3 3 0 016 0v2M4 7h8v7H4V7z"
@@ -240,7 +240,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   ariaLabel={label}
                   strength={0.3}
-                  className="icon-btn grid h-11 w-11 place-items-center rounded-[6px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
+                  className="icon-btn grid h-11 w-11 place-items-center rounded-[2px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
                 >
                   <Icon />
                 </MagneticButton>
@@ -339,7 +339,7 @@ export function Footer() {
           {trust.map((item) => (
             <span
               key={item}
-              className="inline-flex items-center rounded-[4px] border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.02)] px-2.5 py-1 text-xs text-tertiary"
+              className="inline-flex items-center rounded-[2px] border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.02)] px-2.5 py-1 text-xs text-tertiary"
             >
               {item}
             </span>

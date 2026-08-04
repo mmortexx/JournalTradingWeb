@@ -26,7 +26,7 @@ export function HerramientasIndice() {
               <li className="h-full">
                 <Link
                   href={`/herramientas/${h.slug}`}
-                  className="tj-paper group flex h-full flex-col rounded-[10px] p-5 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
+                  className="tj-paper group flex h-full flex-col rounded-[2px] p-5 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
                 >
                   <span
                     className="tnum text-[11px] font-semibold"
@@ -57,7 +57,7 @@ export function HerramientasIndice() {
             <li className="h-full">
               <Link
                 href="/test"
-                className="tj-paper group flex h-full flex-col rounded-[10px] p-5 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
+                className="tj-paper group flex h-full flex-col rounded-[2px] p-5 transition-colors duration-200 hover:border-[rgb(var(--accent-base)/0.35)]"
               >
                 <span
                   className="tnum text-[11px] font-semibold"

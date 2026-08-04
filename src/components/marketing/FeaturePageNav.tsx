@@ -121,7 +121,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             onClick={handleShare}
             // T2h: bumped h-10 → min-h-[44px] (h-11 = 44px) so the
             // share control meets the ≥44px touch-target spec on mobile.
-            className="liquid-glass inline-flex items-center gap-2 min-h-[44px] px-5 rounded-[4px] text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-[background-color,transform] duration-200"
+            className="liquid-glass inline-flex items-center gap-2 min-h-[44px] px-5 rounded-[2px] text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-[background-color,transform] duration-200"
             aria-label={es ? "Compartir esta página" : "Share this page"}
           >
             {copied ? (
@@ -284,7 +284,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                     //   "you are here" state reads as deliberate.
                     <span
                       aria-hidden
-                      className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[rgb(var(--accent-base)/0.12)] border border-[rgb(var(--accent-base)/0.35)] text-[10px] uppercase tracking-[0.12em] font-semibold text-[rgb(var(--accent-base))]"
+                      className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] bg-[rgb(var(--accent-base)/0.12)] border border-[rgb(var(--accent-base)/0.35)] text-[10px] uppercase tracking-[0.12em] font-semibold text-[rgb(var(--accent-base))]"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--accent-base))]" />
                       {es ? "Aquí" : "Here"}

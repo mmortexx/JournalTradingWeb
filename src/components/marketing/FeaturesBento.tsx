@@ -112,7 +112,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             // T3c — swap a `.tj-paper`: papel translúcido cálido en vez de
             // glass frío. Border, rounded, hover lift, padding y minHeight
             // intactos. El sweep de acento del top-edge se conserva.
-            className="tj-paper group lg:col-span-7 min-w-0 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
+            className="tj-paper group lg:col-span-7 min-w-0 relative overflow-hidden rounded-[2px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
             style={{
               minHeight: 360,
             }}
@@ -234,7 +234,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="tj-paper group lg:col-span-5 min-w-0 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
+            className="tj-paper group lg:col-span-5 min-w-0 relative overflow-hidden rounded-[2px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
             style={{
               minHeight: 360,
             }}
@@ -361,7 +361,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="tj-paper group lg:col-span-4 min-w-0 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
+            className="tj-paper group lg:col-span-4 min-w-0 relative overflow-hidden rounded-[2px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-2">
               <span
@@ -392,8 +392,8 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               ].map((s) => (
                 <div key={s.n} className="flex items-center gap-3">
                   <span style={{ fontSize: 13, color: "var(--ink)", flex: 1 }}>{s.n}</span>
-                  <div className="flex-1 h-1 rounded-[3px] overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
-                    <div className="h-full rounded-[3px]" style={{ width: s.w, background: s.c }} />
+                  <div className="flex-1 h-1 rounded-[2px] overflow-hidden" style={{ background: "rgb(var(--divider) / 0.13)" }}>
+                    <div className="h-full rounded-[2px]" style={{ width: s.w, background: s.c }} />
                   </div>
                   <span
                     className="tnum"
@@ -413,7 +413,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="tj-paper group lg:col-span-4 min-w-0 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
+            className="tj-paper group lg:col-span-4 min-w-0 relative overflow-hidden rounded-[2px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-2">
               <span
@@ -436,7 +436,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
               {es ? "Lo que pasó, lo que sentiste" : "What happened, what you felt"}
             </h3>
             <div
-              className="mt-4 rounded-[8px] p-4"
+              className="mt-4 rounded-[2px] p-4"
               style={{
                 background: "color-mix(in oklab, var(--surface-2) 50%, transparent)",
                 border: "1px solid rgb(var(--divider) / 0.06)",
@@ -465,7 +465,7 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
             viewport={{ once: true }}
             whileHover={{ y: -3, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="tj-paper group lg:col-span-4 min-w-0 relative overflow-hidden rounded-[8px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
+            className="tj-paper group lg:col-span-4 min-w-0 relative overflow-hidden rounded-[2px] border border-[rgb(var(--divider)/0.13)] transition-colors duration-300 hover:border-[rgb(var(--accent-base)/0.35)] p-5 sm:p-6"
           >
             <div className="flex items-center gap-2 mb-2">
               <span

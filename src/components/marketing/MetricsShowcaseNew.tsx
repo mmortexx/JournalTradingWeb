@@ -181,7 +181,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
           // de histograma, ahora sobre papel translúcido cálido. El border
           // + padding originales se conservan; el `box-shadow` inset se
           // retira porque `.tj-paper` ya aporta su propio catch-light.
-          className="tj-paper relative rounded-[8px]"
+          className="tj-paper relative rounded-[2px]"
           style={{
             padding: 24,
             border: "1px solid rgb(var(--divider) / 0.13)",
@@ -261,7 +261,7 @@ export function MetricsShowcaseNew({ num = "04" }: { num?: string }) {
                 >
                   {i === 4 && (
                     <span
-                      className="tnum absolute -top-5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[4px]"
+                      className="tnum absolute -top-5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[2px]"
                       style={{
                         fontSize: 9,
                         letterSpacing: "0.1em",

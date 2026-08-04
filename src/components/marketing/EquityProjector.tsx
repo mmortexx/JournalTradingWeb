@@ -253,7 +253,7 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
         {/* Right: results card */}
         <div
           className="tj-paper tj-paper-glow relative"
-          style={{ padding: 24, borderRadius: 8, border: "1px solid rgb(var(--divider) / 0.13)" }}
+          style={{ padding: 24, borderRadius: 3, border: "1px solid rgb(var(--divider) / 0.13)" }}
         >
           {/* Expectancy headline */}
           <div className="mb-5">
@@ -277,7 +277,7 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
             </div>
             {!c.hasEdge && (
               <div
-                className="mt-2 text-[12px] leading-[1.5] rounded-[6px] px-3 py-2"
+                className="mt-2 text-[12px] leading-[1.5] rounded-[2px] px-3 py-2"
                 style={{
                   background: "color-mix(in oklab, rgb(var(--pnl-neg)) 10%, transparent)",
                   border: "1px solid color-mix(in oklab, rgb(var(--pnl-neg)) 30%, transparent)",
@@ -326,7 +326,7 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
 
           {/* Disclaimer */}
           <div
-            className="rounded-[6px] px-3 py-2.5"
+            className="rounded-[2px] px-3 py-2.5"
             style={{
               background: "color-mix(in oklab, var(--surface-2) 40%, transparent)",
               border: "1px solid rgb(var(--divider) / 0.06)",
@@ -347,7 +347,7 @@ export function EquityProjector({ num = "03" }: { num?: string }) {
 function Result({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="group/result relative min-w-0 rounded-[8px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
+      className="group/result relative min-w-0 rounded-[2px] border border-[rgb(var(--divider)/0.06)] px-4 py-4 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.30)]"
       style={{ background: "color-mix(in oklab, var(--surface-2) 50%, transparent)" }}
     >
       <div className="tnum relative" style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-3)" }}>

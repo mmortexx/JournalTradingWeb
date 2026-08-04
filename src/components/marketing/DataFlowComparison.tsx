@@ -81,7 +81,7 @@ export function DataFlowComparison({ num = "02" }: { num?: string }) {
         <button
           type="button"
           onClick={send}
-          className="mb-8 inline-flex items-center justify-center gap-2 min-h-[44px] px-6 rounded-[6px] text-[14px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+          className="mb-8 inline-flex items-center justify-center gap-2 min-h-[44px] px-6 rounded-[2px] text-[14px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
           style={{
             background: "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)",
             color: "rgb(var(--accent-base))",
@@ -94,7 +94,7 @@ export function DataFlowComparison({ num = "02" }: { num?: string }) {
           </svg>
           {es ? "Añadir operación" : "Add trade"}
           {pulses > 0 && (
-            <span className="tnum ml-1 px-1.5 py-0.5 rounded-[3px] text-[10px]" style={{ background: "rgb(var(--divider) / 0.16)", color: "var(--ink-2)" }}>
+            <span className="tnum ml-1 px-1.5 py-0.5 rounded-[2px] text-[10px]" style={{ background: "rgb(var(--divider) / 0.16)", color: "var(--ink-2)" }}>
               {pulses}
             </span>
           )}
@@ -172,7 +172,7 @@ function FlowColumn({
 }) {
   return (
     <div
-      className="tj-paper relative rounded-[8px] p-5 sm:p-6 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
+      className="tj-paper relative rounded-[2px] p-5 sm:p-6 transition-[transform,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5"
       style={{ border: `1px solid color-mix(in oklab, ${color} 22%, rgb(var(--divider) / 0.10))` }}
     >
       {/* Column header */}
@@ -193,7 +193,7 @@ function FlowColumn({
             {/* Node */}
             <div className="relative shrink-0">
               <div
-                className="flex items-center justify-center rounded-[6px]"
+                className="flex items-center justify-center rounded-[2px]"
                 style={{
                   width: 40,
                   height: 40,

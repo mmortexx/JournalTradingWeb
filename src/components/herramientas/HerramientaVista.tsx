@@ -86,7 +86,7 @@ export function HerramientaVista({ herramienta }: { herramienta: Herramienta }) 
                     <li key={h.slug}>
                       <Link
                         href={`/herramientas/${h.slug}`}
-                        className="tj-paper group flex h-full flex-col rounded-[8px] p-3.5 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
+                        className="tj-paper group flex h-full flex-col rounded-[2px] p-3.5 transition-colors hover:border-[rgb(var(--accent-base)/0.35)]"
                       >
                         <span className="text-[14px] font-semibold text-primary transition-colors group-hover:text-[rgb(var(--accent-base))]">
                           {es ? h.tituloEs : h.tituloEn}

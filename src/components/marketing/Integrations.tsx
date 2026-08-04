@@ -89,7 +89,7 @@ export function Integrations() {
                 >
                   {b.mark}
                 </span>
-                <span className="inline-flex items-center rounded-[4px] px-[0.55rem] py-[0.15rem] bg-[rgb(var(--accent-base)/0.08)] text-[rgb(var(--accent-base))] border border-[rgb(var(--accent-base)/0.20)] text-[10px] font-semibold uppercase tracking-[0.14em]">
+                <span className="inline-flex items-center rounded-[2px] px-[0.55rem] py-[0.15rem] bg-[rgb(var(--accent-base)/0.08)] text-[rgb(var(--accent-base))] border border-[rgb(var(--accent-base)/0.20)] text-[10px] font-semibold uppercase tracking-[0.14em]">
                   CSV
                 </span>
               </div>

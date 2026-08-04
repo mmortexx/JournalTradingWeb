@@ -254,7 +254,7 @@ export function TopNav() {
           onClick={() => setLang(es ? "en" : "es")}
           aria-label={es ? "Idioma" : "Language"}
           title={es ? "Idioma" : "Language"}
-          className="h-11 min-w-[44px] sm:h-8 sm:min-w-0 px-2 rounded-[4px] flex items-center justify-center gap-1 text-[12px] font-semibold text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
+          className="h-11 min-w-[44px] sm:h-8 sm:min-w-0 px-2 rounded-[2px] flex items-center justify-center gap-1 text-[12px] font-semibold text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
         >
           {es ? "ES" : "EN"}
           <svg
@@ -294,7 +294,7 @@ function GhostButton({
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="h-11 w-11 sm:h-8 sm:w-8 rounded-[4px] flex items-center justify-center text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
+      className="h-11 w-11 sm:h-8 sm:w-8 rounded-[2px] flex items-center justify-center text-secondary hover:text-primary hover:bg-[rgb(var(--txt-primary)/0.06)] transition-colors"
     >
       <svg
         width="16"

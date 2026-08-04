@@ -229,7 +229,7 @@ const TradeRow = memo(function TradeRow({
             onClick={(e) => e.stopPropagation()}
             onChange={() => onToggleSelect(trade.id)}
             aria-label={`${trade.instrument} ${t("selectTrade")}`}
-            className="h-3.5 w-3.5 rounded-[3px] border-[rgb(var(--divider)/0.2)] bg-[rgb(var(--divider)/0.05)] accent-[rgb(var(--accent-base))] cursor-pointer"
+            className="h-3.5 w-3.5 rounded-[2px] border-[rgb(var(--divider)/0.2)] bg-[rgb(var(--divider)/0.05)] accent-[rgb(var(--accent-base))] cursor-pointer"
           />
           <Chip variant={trade.direction === "long" ? "pos" : "neg"}>
             {trade.direction === "long" ? t("long") : t("short")}
@@ -1118,7 +1118,7 @@ export function TradesPage() {
                         }}
                         onChange={toggleSelectAllVisible}
                         aria-label={t("selectAll")}
-                        className="h-3.5 w-3.5 rounded-[3px] border-[rgb(var(--divider)/0.2)] bg-[rgb(var(--divider)/0.05)] accent-[rgb(var(--accent-base))] cursor-pointer"
+                        className="h-3.5 w-3.5 rounded-[2px] border-[rgb(var(--divider)/0.2)] bg-[rgb(var(--divider)/0.05)] accent-[rgb(var(--accent-base))] cursor-pointer"
                       />
                       <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
                         {t("direction")}

@@ -217,7 +217,7 @@ export function FeatureExplorer({ num = "02" }: { num?: string }) {
               <button
                 key={t.id}
                 onClick={() => toggle(t.id)}
-                className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-[6px] text-[13px] font-medium transition-[background,border-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
+                className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-[2px] text-[13px] font-medium transition-[background,border-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)]"
                 style={{
                   background: active
                     ? "color-mix(in oklab, rgb(var(--accent-base)) 14%, transparent)"
@@ -237,7 +237,7 @@ export function FeatureExplorer({ num = "02" }: { num?: string }) {
           {hasSelection && (
             <button
               onClick={() => setSelected([])}
-              className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-[6px] text-[12px] font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-[2px] text-[12px] font-medium transition-colors"
               style={{ color: "var(--ink-3)", border: "1px solid rgb(var(--divider) / 0.12)" }}
               aria-label={es ? "Limpiar selección" : "Clear selection"}
             >
@@ -266,7 +266,7 @@ export function FeatureExplorer({ num = "02" }: { num?: string }) {
               {topMatches.map((f) => (
                 <div
                   key={f.id}
-                  className="tj-paper rounded-[8px] p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5"
+                  className="tj-paper rounded-[2px] p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5"
                   style={{
                     border: f.score >= 75
                       ? "1px solid color-mix(in oklab, rgb(var(--accent-base)) 38%, transparent)"
@@ -337,7 +337,7 @@ export function FeatureExplorer({ num = "02" }: { num?: string }) {
               {FEATURES.map((f) => (
                 <div
                   key={f.id}
-                  className="tj-paper rounded-[8px] p-4 transition-[border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.25)]"
+                  className="tj-paper rounded-[2px] p-4 transition-[border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[rgb(var(--accent-base)/0.25)]"
                   style={{ border: "1px solid rgb(var(--divider) / 0.12)" }}
                 >
                   <h3 className="m-0 mb-2 text-[13px] font-semibold" style={{ color: "var(--ink)" }}>

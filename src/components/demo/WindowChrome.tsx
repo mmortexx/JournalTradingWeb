@@ -323,7 +323,7 @@ function LocalFirstLED() {
 function AccountChip() {
   const { t } = useLang();
   return (
-    <span className="hidden sm:inline-flex items-center gap-2 h-[24px] px-2.5 rounded-[4px] border border-[rgb(var(--divider)/0.12)] pointer-events-none">
+    <span className="hidden sm:inline-flex items-center gap-2 h-[24px] px-2.5 rounded-[2px] border border-[rgb(var(--divider)/0.12)] pointer-events-none">
       <svg
         width="12"
         height="12"
