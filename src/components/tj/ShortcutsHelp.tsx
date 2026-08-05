@@ -263,7 +263,7 @@ export function ShortcutsHelp({
           <motion.div
             ref={panelRef}
             tabIndex={-1}
-            className="relative w-full max-w-md liquid-glass rounded-card shadow-2xl overflow-hidden"
+            className="relative w-full max-w-md tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] shadow-2xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.96, y: -8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: -4 }}

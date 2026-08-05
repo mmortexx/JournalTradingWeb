@@ -44,7 +44,7 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
 
   return (
     <motion.div
-      className={`relative liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card ${className}`}
+      className={`relative tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] ${className}`}
       ref={containerRef}
       role="img"
       aria-label={lang === "es"
@@ -118,7 +118,7 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
       {/* Floating liquid-glass tooltip — day · hour, P&L, trade count */}
       {hovered && (
         <div
-          className="absolute pointer-events-none liquid-glass glass-thin rounded-md px-3 py-2 text-xs whitespace-nowrap z-10"
+          className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"
           style={{
             left: `clamp(92px, ${hovered.x}px, calc(100% - 92px))`,
             top: hovered.y - 6,

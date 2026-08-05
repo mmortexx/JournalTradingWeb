@@ -30,7 +30,7 @@ export function DownloadCTA() {
     <section
       aria-label={es ? "Descarga" : "Download"}
       // R27-1b — `bg-veil` added: the aurora-bg + grain overlays are
-      // transparent in hue, and the liquid-glass download card (while
+      // transparent in hue, and the tj-paper download card (while
       // opaque itself) is `max-w-3xl mx-auto` — so the area around the
       // card (where the eye WebGL background shows through in light
       // theme) was unprotected. `bg-veil` occludes the eye across the
@@ -47,8 +47,7 @@ export function DownloadCTA() {
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-          className="relative liquid-glass depth-3 rounded-card p-6 sm:p-8 md:p-12 max-w-3xl mx-auto overflow-hidden transition-shadow duration-300"
+          className="relative tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-6 sm:p-8 md:p-12 max-w-3xl mx-auto overflow-hidden transition-shadow duration-300"
         >
           {/* Top accent sweep — same motif as GuaranteeBanner. R24-1d
               bumps h-px → h-[2px] so the sweep reads as a deliberate

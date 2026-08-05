@@ -320,7 +320,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
       {isPro && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 overflow-hidden pointer-events-none rounded-card"
+          className="absolute inset-0 overflow-hidden pointer-events-none rounded-[2px]"
         >
           <span
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-bold tracking-tighter whitespace-nowrap text-primary -rotate-12"

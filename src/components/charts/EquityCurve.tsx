@@ -130,7 +130,7 @@ export const EquityCurve = memo(function EquityCurve({
 
   return (
     <motion.div
-      className={`relative liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 rounded-card ${className}`}
+      className={`relative tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] ${className}`}
       whileHover={reduce ? undefined : { scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300, damping: 26 }}
       style={{ transformOrigin: "center" }}
@@ -287,7 +287,7 @@ export const EquityCurve = memo(function EquityCurve({
       {/* Rich hover tooltip — date, balance, P&L since start, drawdown from peak */}
       {hoverPoint && tooltipLeft !== null && (
         <div
-          className="absolute pointer-events-none liquid-glass glass-thin rounded-md px-3 py-2 text-xs whitespace-nowrap z-10"
+          className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"
           style={{
             left: tooltipLeft,
             top: tooltipTop,

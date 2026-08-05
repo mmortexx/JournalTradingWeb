@@ -154,7 +154,7 @@ export function TableOfContents() {
       aria-label={es ? "Índice de la página" : "On this page"}
       className="fixed right-[22px] top-1/2 z-30 hidden -translate-y-1/2 2xl:block"
     >
-      <div className="liquid-glass rounded-card p-3.5 max-w-[200px] border border-[rgb(var(--divider)/0.1)]">
+      <div className="tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] p-3.5 max-w-[200px] border border-[rgb(var(--divider)/0.1)]">
         <span className="tnum block text-[9px] uppercase tracking-[0.18em] text-tertiary font-semibold mb-2.5 px-1">
           {es ? "En esta página" : "On this page"}
         </span>

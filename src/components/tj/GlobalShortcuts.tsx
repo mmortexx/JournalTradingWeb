@@ -189,7 +189,7 @@ export function GlobalShortcuts() {
           transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
           aria-hidden="true"
         >
-          <div className="liquid-glass rounded-full pl-3 pr-3.5 py-1.5 flex items-center gap-2 border border-[rgb(var(--divider)/0.15)] shadow-lg">
+          <div className="tj-paper tj-paper-dense rounded-full pl-3 pr-3.5 py-1.5 flex items-center gap-2 border border-[rgb(var(--divider)/0.15)] shadow-lg">
             {/* Label — tells the user what the prefix does */}
             <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary font-semibold hidden sm:inline">
               {es ? "navegación" : "navigation"}

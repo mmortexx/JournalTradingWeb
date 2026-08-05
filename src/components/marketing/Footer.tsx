@@ -162,6 +162,12 @@ export function Footer() {
     es ? "Actualizaciones 1.x gratuitas" : "Free 1.x updates",
   ];
 
+  // SE QUEDA EN `liquid-glass` a propósito: el pie es una banda a ancho
+  // completo, no una tarjeta, y el papel —con su grano y su sombra
+  // proyectada— convertiría el cierre de la página en una hoja flotando sin
+  // apoyo. `glass-band` cuelga además del selector `.liquid-glass.glass-band`,
+  // así que renombrar la clase apagaría la luz del canto superior. Mismo caso
+  // que la cinta de cotizaciones.
   return (
     <footer className="relative mt-auto liquid-glass glass-band border-t border-[rgb(var(--divider)/0.1)] safe-bottom">
       {/* `tj-container` (T2a's fluid gutter system: clamp(1.25rem, 4vw, 2.25rem))
@@ -240,7 +246,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   ariaLabel={label}
                   strength={0.3}
-                  className="icon-btn grid h-11 w-11 place-items-center rounded-[2px] liquid-glass text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
+                  className="icon-btn grid h-11 w-11 place-items-center rounded-[2px] bg-[rgb(var(--divider)/0.05)] text-secondary transition-colors duration-150 hover:bg-[rgb(var(--divider)/0.08)] hover:text-primary focus-visible:bg-[rgb(var(--divider)/0.08)] focus-visible:text-primary"
                 >
                   <Icon />
                 </MagneticButton>

@@ -155,7 +155,7 @@ export function Values() {
                         color is present before hover. The base ring deepens
                         to 0.30 on hover to match the existing hover shadow. */}
                     <span
-                      className="shrink-0 w-10 h-10 rounded-lg liquid-glass border border-[rgb(var(--accent-base)/0.18)] flex items-center justify-center text-tertiary transition-colors duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:border-[rgb(var(--accent-base)/0.30)]"
+                      className="shrink-0 w-10 h-10 rounded-[2px] bg-[rgb(var(--divider)/0.05)] border border-[rgb(var(--accent-base)/0.18)] flex items-center justify-center text-tertiary transition-colors duration-300 group-hover:text-[rgb(var(--accent-base))] group-hover:border-[rgb(var(--accent-base)/0.30)]"
                       aria-hidden="true"
                     >
                       {v.icon}

@@ -67,7 +67,7 @@ export function Wrapped() {
           <span className="t-display text-[clamp(1.5rem,7cqi,2.25rem)] text-pnl-pos break-words leading-tight">{topSetup.name}</span>
           <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 tnum min-w-0">
             {/* R27-1d — bumped text-xl→text-2xl (always 24px) so the green
-                P&L figure (text-pnl-pos #0B8B4B ≈ 4.3:1 on the liquid-glass
+                P&L figure (text-pnl-pos #0B8B4B ≈ 4.3:1 on the tj-paper
                 card surface) clears WCAG AA in light theme. At 20px/500
                 (text-xl) it failed AA normal-text (4.5:1); at 24px/500 it
                 qualifies as WCAG "large text" (≥24px regular) which only
@@ -211,8 +211,7 @@ export function Wrapped() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-                className={`group relative liquid-glass depth-2 rounded-card overflow-hidden border border-transparent transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)] ${span}`}
+                className={`group relative tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.35)] ${span}`}
               >
                 <div className="relative p-6 md:p-7 flex flex-col h-full justify-between gap-4 cq-wrap min-w-0">
                   {/* R24-1c: editorial index (01 — 06) before the eyebrow so

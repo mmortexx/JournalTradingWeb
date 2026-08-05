@@ -162,7 +162,7 @@ export function ContactForm() {
             {/* T3c — swap `liquid-glass` por `.tj-paper`: el formulario
                 se lee como una tarjeta de papel cálido translúcida.
                 `depth-2`, padding, rounded-card y min-h-[360px] intactos. */}
-            <div className="tj-paper depth-2 rounded-card p-6 relative overflow-hidden mt-8">
+            <div className="tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-6 relative overflow-hidden mt-8">
               {/* min-height keeps layout stable when the form swaps to the
                   success state, so the card doesn't collapse on submit. */}
               <div className="min-h-[360px] flex flex-col justify-center">

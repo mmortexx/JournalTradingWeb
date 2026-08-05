@@ -24,13 +24,13 @@ import {
  *  - Centered institutional header above the accordion (eyebrow + headline
  *    + lead + 3 reassurance pills) — mirrors the Pricing header rhythm so
  *    the two sections read as one continuous conversion story.
- *  - Single `.liquid-glass depth-2 rounded-card` container holds the
+ *  - Single `.tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)]` container holds the
  *    accordion; each item tints with `rgb(var(--divider)/0.04)` when open
  *    and picks up a subtle accent border + glow so the active item reads as
  *    "lit".
  *
  * Institutional polish (R2-b):
- *  - `.liquid-glass rounded-card` container with `depth-2` elevation +
+ *  - `.tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)]` container with `` elevation +
  *    `p-2 md:p-3` padding so each accordion item has breathing room.
  *  - Accordion headers `text-sm font-medium text-primary` + the shadcn
  *    chevron (rotates 180° on open via `[&[data-state=open]>svg]:rotate-180`).
@@ -161,11 +161,11 @@ export function PricingFAQ() {
           </div>
         </Reveal>
 
-        {/* Accordion — single liquid-glass container holds all 5 items.
+        {/* Accordion — single tj-paper container holds all 5 items.
             `max-w-3xl` keeps the line-length comfortable for reading
             the answers; `mx-auto` centers it under the header. */}
         <Reveal delay={0.1} y={28}>
-          <div className="mt-10 max-w-3xl mx-auto liquid-glass depth-2 rounded-card p-2 md:p-3">
+          <div className="mt-10 max-w-3xl mx-auto tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-2 md:p-3">
             <Accordion
               type="single"
               collapsible

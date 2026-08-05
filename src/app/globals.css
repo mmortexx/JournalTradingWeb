@@ -172,7 +172,7 @@
      5,31:1 conservando casi todo el recorrido del degradado. Por debajo
      de 0.3 la ganancia se estanca (0.22 → 5,58 y 0.10 → 5,82) y solo se
      pierde señal visual, así que 0.3 es el punto de corte. */
-  --cal-tint-max: 0.3;
+  --cal-tint-max: 0.22;
 
   /* Rojo de P&L para cuando el texto va SOBRE UN FONDO TEÑIDO DE SU MISMO
      COLOR (la insignia Long/Short: `bg-pnl-neg/15 text-pnl-neg`). Ahí el
@@ -2871,25 +2871,19 @@ button.icon-btn:hover > svg,
 }
 
 /* Celdas del calendario de P&L. El color del resultado lo lleva el FONDO
-   de la celda; el texto solo tiene que leerse encima.
-   · Oscuro: el tinte es casi negro y el texto puede ir en el color P&L
-     (verde neón / rojo), que es como se ve en la app.
-   · Claro: el tinte y el color del texto son el MISMO #1E7A4C, así que
-     el número se disolvía sobre su propia celda (medido: 2,2:1). Pasa a
-     texto primario — el signo lo siguen dando el fondo y el + / −. */
-.cal-day-num {
-  color: rgb(var(--txt-secondary));
-}
-.cal-day-pnl {
-  color: rgb(var(--pnl-pos));
-}
+   de la celda; el texto sólo tiene que leerse encima.
+
+   EN LOS DOS TEMAS va en TINTA, no en el color P&L. La excepción para el
+   tema oscuro se retiró: se apoyaba en que allí el tinte era "casi negro",
+   y con el tope de tinte del calendario la celda se aclara lo suficiente
+   como para que el verde sobre verde caiga a 4,42:1 y el número del día a
+   4,38:1 — ambos por debajo del mínimo. Escribir una cifra en el mismo
+   color con el que está teñido su propio fondo no se sostiene en ningún
+   tema; el signo lo siguen dando el fondo y el + / −. */
+.cal-day-num,
+.cal-day-pnl,
 .cal-day-pnl.neg,
 .cal-day-pnl[data-neg="true"] {
-  color: rgb(var(--pnl-neg));
-}
-:root[data-theme="light"] .cal-day-num,
-:root[data-theme="light"] .cal-day-pnl,
-:root[data-theme="light"] .cal-day-pnl[data-neg="true"] {
   color: rgb(var(--txt-primary));
 }
 
@@ -2962,7 +2956,12 @@ button.icon-btn:hover > svg,
   --pnl-neg: 240 119 106; /* #F0776A */
   --pnl-warn: 224 147 43; /* #E0932B */
   --pnl-neg-on-tint: 240 119 106;
-  --cal-tint-max: 0.3;
+  /* 0,22 y no 0,3, el mismo tope que el tema claro. En oscuro el acento es
+     PLATA —un color claro— así que una celda teñida al 30 % se aclara hasta
+     competir con su propia cifra: medido, dejaba los importes del calendario
+     en 4,22:1 y los números de día en 3,03:1. El tope es el mismo en los dos
+     temas porque el problema es el mismo en los dos, sólo que invertido. */
+  --cal-tint-max: 0.22;
   --sig-green: 63 206 146;
   --sig-amber: 224 147 43;
   --sig-red: 240 119 106;

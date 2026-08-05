@@ -20,7 +20,7 @@ import { Reveal } from "@/components/tj/Reveal";
  *    highlighting the current one.
  *
  * The component is fully theme-aware (uses --divider, --surface, text-primary/
- * secondary/tertiary tokens) and matches the site's liquid-glass material
+ * secondary/tertiary tokens) and matches the site's tj-paper material
  * language.
  */
 
@@ -121,7 +121,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             onClick={handleShare}
             // T2h: bumped h-10 → min-h-[44px] (h-11 = 44px) so the
             // share control meets the ≥44px touch-target spec on mobile.
-            className="liquid-glass inline-flex items-center gap-2 min-h-[44px] px-5 rounded-[2px] text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-[background-color,transform] duration-200"
+            className="inline-flex items-center gap-2 min-h-[44px] bg-[rgb(var(--divider)/0.04)] px-5 rounded-[2px] text-sm font-medium text-primary border border-[rgb(var(--divider)/0.15)] hover:bg-[rgb(var(--divider)/0.06)] hover:-translate-y-0.5 transition-[background-color,transform] duration-200"
             aria-label={es ? "Compartir esta página" : "Share this page"}
           >
             {copied ? (
@@ -149,7 +149,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                 // the ≥44px touch target on mobile regardless of label
                 // height. Icon container bumped w-10 h-10 → w-11 h-11 (44px)
                 // so the circular tap zone is comfortably tappable too.
-                className="group liquid-glass depth-1 rounded-card p-5 min-h-[44px] flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-5 min-h-[44px] flex items-center gap-4 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:border-[rgb(var(--accent-base)/0.30)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {/* R24-1c: arrow icon container shifts on hover from neutral
                     divider bg + tertiary text to accent-tinted bg + accent
@@ -180,7 +180,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
             <Reveal delay={0.06}>
               <Link
                 href={AXES[next].href}
-                className="group liquid-glass depth-1 rounded-card p-5 min-h-[44px] flex items-center gap-4 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 border border-[rgb(var(--divider)/0.1)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                className="group tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-5 min-h-[44px] flex items-center gap-4 transition-[background-color,border-color,box-shadow,transform] duration-300 hover:border-[rgb(var(--accent-base)/0.30)] md:flex-row-reverse md:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
               >
                 {/* R24-1c: mirror of the prev card’s icon-container polish. */}
                 <span className="grid place-items-center w-11 h-11 rounded-full bg-[rgb(var(--divider)/0.06)] text-tertiary group-hover:text-[rgb(var(--accent-base))] group-hover:bg-[rgb(var(--accent-base)/0.12)] transition-[background-color,color] duration-300 flex-none">
@@ -240,7 +240,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
           />
           <div
             className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 overflow-x-auto md:overflow-visible
-                       snap-x snap-mandatory md:snap-none px-[clamp(1.25rem,4vw,2.25rem)] md:px-0 pb-2 md:pb-0
+ snap-x snap-mandatory md:snap-none px-[clamp(1.25rem,4vw,2.25rem)] md:px-0 pb-2 md:pb-0
                        [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent-base)/0.4)_transparent]"
             style={{ scrollbarWidth: "thin" }}
           >
@@ -252,18 +252,19 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                 <Link
                   href={a.href}
                   aria-current={isActive ? "page" : undefined}
-                  // R20-3b: hover lift refined — inactive cards now lift
-                  //   -translate-y-0.5 → -translate-y-1 + gain an accent
-                  //   inner ring (ring-accent/30) on hover so the “tappable
-                  //   cross-nav card” affordance is unmistakable. Active card
-                  //   stays put (no hover lift — it IS the current page).
-                  // T2h: min-h-[44px] on the link itself so the whole card
-                  //   meets the ≥44px touch-target floor even if content is
-                  //   short.
-                  className={`group relative liquid-glass rounded-card p-5 block min-h-[44px] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
+                  // Ninguna de las dos se levanta al pasar el ratón. La
+                  // inactiva subía 4 px y la activa se quedaba quieta, y ese
+                  // desnivel hacía que la tarjeta de la página actual pareciera
+                  // deshabilitada en vez de actual. Ahora las dos se quedan en
+                  // el plano y la diferencia la lleva el filete: la activa lo
+                  // tiene marcado en acento de forma permanente, la inactiva lo
+                  // marca al apuntarla.
+                  // T2h: `min-h-[44px]` en el propio enlace para que toda la
+                  //   tarjeta llegue al mínimo táctil aunque el texto sea corto.
+                  className={`group relative tj-paper rounded-[2px] border p-5 block min-h-[44px] transition-[background-color,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
                     isActive
-                      ? "border-[rgb(var(--accent-base)/0.4)] depth-2"
-                      : "border-[rgb(var(--divider)/0.1)] depth-1 hover:depth-2 hover:-translate-y-1 hover:border-[rgb(var(--accent-base)/0.28)]"
+                      ? "border-[rgb(var(--accent-base)/0.4)]"
+                      : "border-[rgb(var(--divider)/0.13)] hover:border-[rgb(var(--accent-base)/0.28)]"
                   }`
                   }
                 >
@@ -274,7 +275,7 @@ export function FeaturePageNav({ current }: FeaturePageNavProps) {
                   {!isActive && (
                     <span
                       aria-hidden
-                      className="pointer-events-none absolute inset-0 rounded-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      className="pointer-events-none absolute inset-0 rounded-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{ boxShadow: "inset 0 0 0 1px rgb(var(--accent-base) / 0.30)" }}
                     />
                   )}

@@ -88,7 +88,7 @@ export function SkeletonCard({
   showChart = true,
 }: SkeletonCardProps) {
   return (
-    <div className={`liquid-glass rounded-card p-5 ${className}`} aria-hidden="true">
+    <div className={`tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-5 ${className}`} aria-hidden="true">
       {children ?? (
         <>
           {showTitle && <Skeleton shimmer className="h-4 w-1/3 mb-4" />}

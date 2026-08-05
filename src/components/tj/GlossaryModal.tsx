@@ -404,7 +404,7 @@ export function GlossaryModal({
                     data-glossary-index={i}
                     data-glossary-term={g.term}
                     className={[
-                      "liquid-glass rounded-card p-4 transition-[border-color,box-shadow,background-color] cursor-pointer",
+                      "tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] p-4 transition-[border-color,box-shadow,background-color] cursor-pointer",
                       isActive
                         ? "border-[rgb(var(--divider)/0.30)] ring-1 ring-[rgb(var(--divider)/0.20)] bg-[rgb(var(--divider)/0.06)] shadow-[0_0_28px_-8px_rgb(var(--divider)/0.18)]"
                         : "hover:border-[rgb(var(--divider)/0.25)]",

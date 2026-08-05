@@ -89,7 +89,7 @@ export function Milestones() {
         <Reveal delay={0.18} y={36}>
           <div
             className="relative mt-14 overflow-x-auto pb-6 -mx-5 px-5 md:mx-0 md:px-0
-                       [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent-base)/0.4)_transparent]
+ [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent-base)/0.4)_transparent]
                        snap-x snap-mandatory"
             style={{ scrollbarWidth: "thin" }}
           >
@@ -150,7 +150,7 @@ export function Milestones() {
                         a spring y-shift. The shadow + border tokens stay
                         accent-tinted so a past milestone reads as "shipped
                         with energy" and the upcoming one stays muted. */}
-                    <div className="mt-3 liquid-glass depth-1 rounded-card border border-transparent p-4 transition-[box-shadow,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-[rgb(var(--accent-base)/0.30)]">
+                    <div className="mt-3 tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-4 transition-[box-shadow,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-[rgb(var(--accent-base)/0.30)]">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary tnum">
                           {m.date}

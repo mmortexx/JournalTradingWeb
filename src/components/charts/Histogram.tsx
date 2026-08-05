@@ -30,7 +30,7 @@ export const Histogram = memo(function Histogram({
 
   return (
     <motion.div
-      className={`relative liquid-glass depth-1 hover:depth-2 transition-shadow duration-300 rounded-card ${className}`}
+      className={`relative tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] ${className}`}
       ref={containerRef}
       role="img"
       aria-label={lang === "es"
@@ -90,7 +90,7 @@ export const Histogram = memo(function Histogram({
       {/* Floating liquid-glass tooltip — bucket range + count */}
       {hovered && data[hovered.i] && (
         <div
-          className="absolute pointer-events-none liquid-glass glass-thin rounded-md px-3 py-2 text-xs whitespace-nowrap z-10"
+          className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"
           style={{
             left: `clamp(72px, ${hovered.x}px, calc(100% - 72px))`,
             top: hovered.y - 6,

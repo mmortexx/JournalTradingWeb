@@ -143,7 +143,7 @@ export function DemoShortcutsHint({ open, onClose }: DemoShortcutsHintProps) {
             onClick={onClose}
             aria-hidden="true"
           />
-          <div className="liquid-glass depth-3 rounded-card p-4 shadow-2xl">
+          <div className="tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] p-4 shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-2 min-w-0">

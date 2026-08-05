@@ -190,8 +190,16 @@ export function FeaturesBento({ num = "03" }: { num?: string }) {
                   : { padding: "4px" };
                 return (
                   <div key={i} style={cellStyle}>
-                    <span className="tnum" style={{ fontSize: 8, opacity: 0.75 }}>{c.day}</span>
-                    <span className="tnum" style={{ fontSize: 8.5, fontWeight: 600, lineHeight: 1 }}>{c.val}</span>
+                    {/* Tinta explícita en vez de opacidad. El número del día
+                        iba al 75 % de opacidad y eso lo dejaba en 4,19:1
+                        sobre la celda teñida.
+                        Va en la MISMA tinta que el importe, no en una más
+                        apagada: sobre una celda ya teñida, atenuar el día lo
+                        empujaba por debajo del mínimo en tema oscuro. La
+                        jerarquía entre día e importe la llevan el cuerpo y el
+                        peso, que es donde no cuesta contraste. */}
+                    <span className="tnum" style={{ fontSize: 8, color: "var(--ink)" }}>{c.day}</span>
+                    <span className="tnum" style={{ fontSize: 8.5, fontWeight: 600, lineHeight: 1, color: "var(--ink)" }}>{c.val}</span>
                   </div>
                 );
               })}

@@ -41,7 +41,7 @@ export default function Loading() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-card border border-[rgb(var(--divider)/0.10)] p-5 flex flex-col gap-3"
+                className="rounded-[2px] border border-[rgb(var(--divider)/0.10)] p-5 flex flex-col gap-3"
               >
                 <Skeleton className="w-9 h-9 rounded-md" />
                 <Skeleton className="h-4 w-[80%]" />
@@ -112,7 +112,7 @@ export default function Loading() {
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
-                      className="rounded-card border border-[rgb(var(--divider)/0.1)] p-4 space-y-2"
+                      className="rounded-[2px] border border-[rgb(var(--divider)/0.1)] p-4 space-y-2"
                     >
                       <Skeleton className="h-2.5 w-16" />
                       <Skeleton className="h-6 w-24" />
@@ -120,7 +120,7 @@ export default function Loading() {
                     </div>
                   ))}
                 </div>
-                <div className="rounded-card border border-[rgb(var(--divider)/0.1)] p-4 h-[180px] md:h-[220px] flex items-end gap-2">
+                <div className="rounded-[2px] border border-[rgb(var(--divider)/0.1)] p-4 h-[180px] md:h-[220px] flex items-end gap-2">
                   {Array.from({ length: 12 }).map((_, i) => (
                     <Skeleton
                       key={i}
@@ -129,7 +129,7 @@ export default function Loading() {
                     />
                   ))}
                 </div>
-                <div className="rounded-card border border-[rgb(var(--divider)/0.1)] p-4 space-y-2">
+                <div className="rounded-[2px] border border-[rgb(var(--divider)/0.1)] p-4 space-y-2">
                   <div className="flex gap-4 pb-2 border-b border-[rgb(var(--divider)/0.05)]">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Skeleton key={i} className="h-2.5 flex-1 max-w-[80px]" />

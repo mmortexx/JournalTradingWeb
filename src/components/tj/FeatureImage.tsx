@@ -85,7 +85,7 @@ export function FeatureImage({
       whileInView={whileInView}
       viewport={{ once: true, margin: "-40px" }}
       transition={reduce ? { duration: 0 } : { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`overflow-hidden rounded-card ${className}`}
+      className={`overflow-hidden rounded-[2px] ${className}`}
       style={
         isContain
           ? {

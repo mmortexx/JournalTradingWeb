@@ -133,7 +133,7 @@ export function NotFoundClient() {
         </motion.p>
 
         {/* Inline search suggestion — pre-fills the FAQ search on submit.
-            The border-white/10 border brightens to the accent on hover/focus,
+            The border-[rgb(var(--divider)/0.13)] border brightens to the accent on hover/focus,
             matching the keyboard-first pattern the rest of the site uses
             (the command palette opens on `/`). */}
         <motion.form
@@ -168,7 +168,7 @@ export function NotFoundClient() {
             >
               <button
                 type="submit"
-                className="h-8 px-3 rounded-[5px] bg-white text-black text-xs font-semibold hover:bg-gray-100 transition-colors"
+                className="h-8 px-3 rounded-[5px] bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] text-xs font-semibold hover:bg-[rgb(var(--accent-hover))] transition-colors"
               >
                 {es ? "Buscar" : "Search"}
               </button>
@@ -177,7 +177,7 @@ export function NotFoundClient() {
         </motion.form>
 
         {/* Quick-link tiles — Features, Demo, Pricing.
-            Each tile uses the liquid-glass utility so it sits cohesively with
+            Each tile uses the tj-paper utility so it sits cohesively with
             the rest of the site's surfaces. */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
@@ -194,7 +194,7 @@ export function NotFoundClient() {
             >
               <Link
                 href={tile.href}
-                className="group liquid-glass rounded-card p-4 text-left transition-colors hover:border-[rgb(var(--divider)/0.25)] block h-full"
+                className="group tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-4 text-left transition-colors hover:border-[rgb(var(--divider)/0.25)] block h-full"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-primary">
@@ -235,7 +235,7 @@ export function NotFoundClient() {
           >
             <Link
               href="/"
-              className="bg-white text-black px-6 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-[background-color,box-shadow] hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
+              className="bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] px-6 py-2 rounded-[2px] text-sm font-semibold hover:bg-[rgb(var(--accent-hover))] transition-[background-color,box-shadow] hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
             >
               {es ? "Volver al inicio" : "Back to home"}
               <svg

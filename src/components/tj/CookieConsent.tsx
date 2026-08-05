@@ -46,14 +46,14 @@ import { useLang } from "@/lib/i18n";
  * px (3 stacked button rows). The 2-col grid keeps the action region to a
  * single 44 px row.
  *
- * POSITION OVERRIDE — `style={{ position: "fixed" }}`. The `.liquid-glass`
+ * POSITION OVERRIDE — `style={{ position: "fixed" }}`. The `.tj-paper`
  * material class sets `position: relative` (so its `::before` rim and
  * `::after` inset highlights can absolute-position against the host). That
  * rule has the same specificity as Tailwind's `.fixed` utility but is
  * defined later in `globals.css`, so it wins — the banner was rendering
  * in normal document flow at the bottom of the page, not pinned to the
  * viewport. Inline `position: fixed` has higher specificity than any class
- * selector and reliably overrides the `.liquid-glass` rule. (We can't edit
+ * selector and reliably overrides the `.tj-paper` rule. (We can't edit
  * globals.css from this subagent — see T2a ownership.)
  *
  * State strategy follows the project rule: no setState inside effect bodies.
@@ -146,7 +146,7 @@ export function CookieConsent() {
             // corto para que el sheet no tape más de ~16% de la pantalla.
             //
             // En desktop (≥768px): tarjeta compacta bottom-left
-            // (w-[22rem], bottom-4 left-4, rounded-card) — la versión
+            // (w-[22rem], bottom-4 left-4, rounded-[2px]) — la versión
             // original, menos intrusiva en pantalla grande.
             //
             // z-50 sobre BackToTop (z-40). safe-bottom para el home
@@ -155,7 +155,7 @@ export function CookieConsent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="tj-paper tj-paper-dense z-50 safe-bottom left-0 bottom-0 w-full rounded-t-[12px] border-t border-[rgb(var(--divider)/0.14)] p-4 shadow-2xl md:left-4 md:bottom-4 md:w-[22rem] md:rounded-card md:border md:border-[rgb(var(--divider)/0.13)] md:p-5"
+            className="tj-paper tj-paper-dense z-50 safe-bottom left-0 bottom-0 w-full rounded-t-[12px] border-t border-[rgb(var(--divider)/0.14)] p-4 shadow-2xl md:left-4 md:bottom-4 md:w-[22rem] md:rounded-[2px] md:border md:border-[rgb(var(--divider)/0.13)] md:p-5"
           >
             <div className="flex items-start gap-2.5 md:gap-3">
               <CookieIcon />

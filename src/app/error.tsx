@@ -53,7 +53,7 @@ export default function Error({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-pill liquid-glass text-[12px] text-gray-300 mb-7"
+          className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-[2px] tj-paper tj-paper-dense border border-[rgb(var(--divider)/0.16)] text-[12px] text-secondary mb-7"
         >
           <span className="relative flex w-1.5 h-1.5">
             <span className="absolute inline-flex w-full h-full rounded-full bg-pnl-neg opacity-60 animate-ping" />
@@ -67,7 +67,7 @@ export default function Error({
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-3xl md:text-4xl font-semibold tracking-tight text-white text-balance"
+          className="text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance"
         >
           {es ? "Algo salió mal" : "Something went wrong"}
         </motion.h1>
@@ -76,7 +76,7 @@ export default function Error({
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-4 text-base md:text-lg text-gray-300 leading-relaxed"
+          className="mt-4 text-base md:text-lg text-secondary leading-relaxed"
         >
           {es
             ? "Se produjo un error inesperado. Puedes intentar de nuevo o volver al inicio."
@@ -89,7 +89,7 @@ export default function Error({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-3 text-[11px] uppercase tracking-[0.15em] text-gray-400 tnum"
+            className="mt-3 text-[11px] uppercase tracking-[0.15em] text-tertiary tnum"
           >
             {es ? "Referencia" : "Reference"}: {error.digest}
           </motion.p>
@@ -108,7 +108,7 @@ export default function Error({
             <button
               type="button"
               onClick={reset}
-              className="bg-white text-black px-6 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-[background-color,box-shadow] hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
+              className="bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] px-6 py-2 rounded-[2px] text-sm font-semibold hover:bg-[rgb(var(--accent-hover))] transition-[background-color,box-shadow] hover:shadow-[0_12px_32px_-8px_rgb(var(--accent-base)/0.7)]"
             >
               <svg
                 className="mr-2 transition-transform group-hover:-rotate-45"
@@ -135,7 +135,7 @@ export default function Error({
           >
             <Link
               href="/"
-              className="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-black transition-[background-color,color,transform] hover:-translate-y-0.5"
+              className="tj-paper tj-paper-dense border border-[rgb(var(--divider)/0.20)] text-primary px-8 py-3 rounded-[2px] font-medium hover:bg-[rgb(var(--accent-base))] hover:text-[rgb(var(--accent-ink))] transition-[background-color,color,transform] hover:-translate-y-0.5"
             >
               {es ? "Volver al inicio" : "Back to home"}
             </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { ComponentType } from "react";
 import { Mail, BookOpen, MessagesSquare, ArrowRight } from "lucide-react";
 
@@ -13,12 +13,14 @@ import { Reveal } from "@/components/tj/Reveal";
  * ContactSupport — three contact-option cards shown right under the FAQ.
  *
  * Design:
- *  - `liquid-glass rounded-card p-6` cards in `grid md:grid-cols-3 gap-4`.
- *  - Each card: accent icon chip, title, description, optional meta tag,
- *    and a CTA row with an arrow that nudges on hover.
- *  - Hover lift: `whileHover={{ y: -4 }}` with a soft spring.
- *  - Accent sweep line fades in along the top edge on hover.
- *  - Accent-only palette — no indigo/blue.
+ *  - Tres láminas de papel (`tj-paper` + filete) en `grid md:grid-cols-3`.
+ *  - Cada una: chip de icono, título, descripción, meta opcional y una fila
+ *    de llamada con la flecha que avanza al pasar el ratón.
+ *  - SIN levantamiento al pasar por encima. Lo llevaba (`y: -4`) y se retiró:
+ *    en este sistema la respuesta al puntero es que el filete se marque, no
+ *    que el objeto se despegue de la página.
+ *  - Un trazo de acento aparece en el canto superior al pasar el ratón.
+ *  - Sólo acento acromático — el color queda reservado al resultado.
  */
 
 type Card = {
@@ -82,7 +84,6 @@ const CARDS: Card[] = [
 export function ContactSupport() {
   const { lang } = useLang();
   const es = lang === "es";
-  const reduce = useReducedMotion();
 
   return (
     <section
@@ -95,7 +96,7 @@ export function ContactSupport() {
       // heading + subtitle + the 3 support card titles. `bg-veil`
       // (82 % bg in light / 74 % in dark) occludes the eye while
       // the grain overlay still paints on top. The cards themselves
-      // (`liquid-glass depth-2`) have their own opaque surface and
+      // (`tj-paper border border-[rgb(var(--divider)/0.13)]`) have their own opaque surface and
       // are unaffected.
       className="section-tight relative overflow-hidden bg-veil scroll-mt-24"
     >
@@ -146,10 +147,9 @@ export function ContactSupport() {
               <Reveal key={c.titleEn} delay={0.12 + i * 0.06} y={20}>
                 <motion.a
                   href={c.href}
-                  whileHover={reduce ? undefined : { y: -4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                   aria-label={`${title} — ${cta}`}
-                  className="group relative flex flex-col liquid-glass depth-2 rounded-card p-5 sm:p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
+                  className="group relative flex flex-col tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-5 sm:p-6 h-full overflow-hidden transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[rgb(var(--accent-base)/0.30)]"
                 >
                   {/* Hover accent sweep */}
                   <span

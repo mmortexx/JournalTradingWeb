@@ -46,7 +46,7 @@ interface Command {
  * `[cmdk-root]` — skip their keys) and sets `body[data-demo-palette-open]`
  * so the AppDemo `?` interceptor skips too.
  *
- * Refined styling: `.liquid-glass depth-4 rounded-card` modal with a
+ * Refined styling: `.tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)]` modal with a
  * search input (magnifier icon + Esc kbd) + a list of commands. Each row
  * has an icon + label + optional kbd hint. Active row highlighted with
  * `bg-[rgb(var(--divider)/0.1)]` + an accent-color left border (`inset 2px 0 0 ...`).
@@ -283,7 +283,7 @@ export function DemoCommandPalette({ open, onClose }: DemoCommandPaletteProps) {
           {/* Panel — liquid-glass depth-4, springy fade + scale + lift. */}
           <motion.div
             ref={rootRef}
-            className="relative w-full max-w-lg liquid-glass depth-4 rounded-card shadow-2xl overflow-hidden"
+            className="relative w-full max-w-lg tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] shadow-2xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.97, y: -8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: -4 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { useLang } from "@/lib/i18n";
 import { SUPPORT_EMAIL } from "@/lib/forms";
@@ -13,7 +13,7 @@ import { withLocale } from "@/lib/locale";
  * accordion and the ContactSupport section.
  *
  * Design:
- *  - `liquid-glass rounded-card p-6` centered banner with a single line of copy.
+ *  - `tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-6` centered banner with a single line of copy.
  *  - Accent on the second clause to draw the eye and signal "help is here".
  *  - Inline CTA row under the headline — two tappable links (mailto support +
  *    /faq) so the banner reads as an action, not a statement. Each ≥44 px.
@@ -26,7 +26,6 @@ import { withLocale } from "@/lib/locale";
 export function StillHaveQuestions() {
   const { lang } = useLang();
   const es = lang === "es";
-  const reduce = useReducedMotion();
 
   return (
     <section
@@ -36,8 +35,7 @@ export function StillHaveQuestions() {
       <div className="tj-container">
         <Reveal y={18}>
           <motion.div
-            whileHover={reduce ? undefined : { y: -4, transition: { type: "spring", stiffness: 300, damping: 24 } }}
-            className="relative liquid-glass depth-2 rounded-card p-6 md:p-7 overflow-hidden text-center"
+            className="relative tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-6 md:p-7 overflow-hidden text-center"
           >
             <p className="relative text-lg md:text-xl font-medium text-primary text-balance">
               {es ? (

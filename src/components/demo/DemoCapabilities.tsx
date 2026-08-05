@@ -194,7 +194,7 @@ export function DemoCapabilities() {
                 // cálido en las 6 tarjetas de capacidades. depth-1 → depth-2
                 // hover, accent top-edge bar, icon chip y hover bg/shadow se
                 // conservan.
-                className="group tj-paper depth-1 hover:depth-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-card p-5 h-full flex flex-col gap-3 border border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--accent-base)/0.32)] hover:bg-[rgb(var(--accent-base)/0.04)] hover:shadow-[0_8px_24px_-8px_rgb(var(--accent-base)/0.25)] relative overflow-hidden min-w-0"
+                className="group tj-paper transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-[2px] p-5 h-full flex flex-col gap-3 border border-[rgb(var(--divider)/0.10)] hover:border-[rgb(var(--accent-base)/0.32)] hover:bg-[rgb(var(--accent-base)/0.04)] hover:shadow-[0_8px_24px_-8px_rgb(var(--accent-base)/0.25)] relative overflow-hidden min-w-0"
               >
                 {/* Accent top-edge bar — mirrors the ExperimentsPage /
                     FiscalPage KPI card pattern, tying each feature card

@@ -235,12 +235,25 @@ export function SessionClock({ num = "02" }: { num?: string }) {
                 style={{
                   left: `${hourPct(s.startUtc)}%`,
                   width: `${hourPct(s.endUtc - s.startUtc)}%`,
-                  background: `color-mix(in oklab, ${s.color} ${states?.find((x) => x.id === s.id)?.open ? "38%" : "14%"}, transparent)`,
-                  border: `1px solid color-mix(in oklab, ${s.color} ${states?.find((x) => x.id === s.id)?.open ? "50%" : "20%"}, transparent)`,
+                  // La banda abierta baja del 38 % al 22 %. No es un ajuste
+                  // de gusto: a 38 % el tinte competía con su propio rótulo y
+                  // lo dejaba en 3,23:1 en el peor caso —Londres, sobre el
+                  // acento—, por debajo del mínimo. A 22 % la banda sigue
+                  // leyéndose como abierta y el peor caso sube a 5,2:1. El
+                  // filete acompaña, que es donde vive de verdad la señal.
+                  background: `color-mix(in oklab, ${s.color} ${states?.find((x) => x.id === s.id)?.open ? "22%" : "14%"}, transparent)`,
+                  border: `1px solid color-mix(in oklab, ${s.color} ${states?.find((x) => x.id === s.id)?.open ? "58%" : "20%"}, transparent)`,
                 }}
                 aria-label={`${es ? s.nameEs : s.nameEn} ${fmtHour(s.startUtc)}-${fmtHour(s.endUtc)} UTC`}
               >
-                <span className="absolute inset-0 flex items-center justify-center text-[9px] font-semibold uppercase tracking-[0.08em]" style={{ color: states?.find((x) => x.id === s.id)?.open ? s.color : "var(--ink-3)" }}>
+                {/* La sesión abierta rotula en TINTA, no en su propio color.
+                    Lo llevaba en el color de la sesión, y como la banda ya se
+                    tiñe con ese mismo color al 38 %, el rótulo quedaba en
+                    3,54:1 sobre su propio fondo — color sobre su tinte, que es
+                    la peor combinación posible. Que la sesión está abierta ya
+                    lo dicen el relleno y el filete; el nombre sólo tiene que
+                    leerse. */}
+                <span className="absolute inset-0 flex items-center justify-center text-[9px] font-semibold uppercase tracking-[0.08em]" style={{ color: states?.find((x) => x.id === s.id)?.open ? "var(--ink)" : "var(--ink-2)" }}>
                   {es ? s.nameEs : s.nameEn}
                 </span>
               </div>

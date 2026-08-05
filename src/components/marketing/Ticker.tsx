@@ -166,6 +166,14 @@ export function Ticker() {
          engordarla. Resto sin cambios: `border-y`, `liquid-glass`,
          `glass-band` (solo la luz superior), `overflow-hidden`,
          `select-none`. */
+      /* SE QUEDA EN `liquid-glass`, y no es un descuido. Esta cinta es una
+         BANDA a ancho completo, no una tarjeta: el papel lleva grano y
+         sombra proyectada, y una hoja que cruza la pantalla de lado a lado
+         no se sostiene sobre nada — se leería como un error, no como
+         material. Además `glass-band` cuelga del selector
+         `.liquid-glass.glass-band`, así que cambiar la clase apagaría de
+         paso la luz del canto superior, que es lo que separa la banda del
+         contenido. Mismo caso que el pie. */
       className="relative border-y border-[rgb(var(--divider)/0.14)] py-4 liquid-glass glass-band overflow-hidden select-none"
     >
       {/* Left edge gradient fade — R27-1b: switched from hardcoded

@@ -271,7 +271,7 @@ export function ComparisonSlider() {
         <Reveal delay={0.1} y={28}>
           <div
             ref={containerRef}
-            className="tj-paper rounded-card overflow-hidden h-[320px] sm:h-[300px] relative select-none mt-10 max-w-3xl mx-auto border border-[rgb(var(--divider)/0.16)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            className="tj-paper rounded-[2px] overflow-hidden h-[320px] sm:h-[300px] relative select-none mt-10 max-w-3xl mx-auto border border-[rgb(var(--divider)/0.16)] transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
             style={{ touchAction: "none" }}
           >
             {/* ─────────── BEFORE (base layer, full width) ─────────── */}

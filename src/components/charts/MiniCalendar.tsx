@@ -55,7 +55,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
 
   return (
     <motion.div
-      className={`relative liquid-glass depth-2 hover:depth-3 transition-shadow duration-300 rounded-card p-4 md:p-5 ${className}`}
+      className={`relative tj-paper rounded-[2px] border border-[rgb(var(--divider)/0.13)] p-4 md:p-5 ${className}`}
       ref={containerRef}
       whileHover={reduce ? undefined : { scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300, damping: 26 }}
@@ -149,7 +149,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
       {/* Floating liquid-glass tooltip above the day cell */}
       {hovered && (
         <div
-          className="absolute pointer-events-none liquid-glass glass-thin rounded-md px-3 py-2 text-xs whitespace-nowrap z-10"
+          className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"
           style={{
             left: `clamp(80px, ${hovered.x}px, calc(100% - 80px))`,
             top: hovered.y - 6,

@@ -168,7 +168,14 @@ function buildCal() {
     // Intensity scaled to a $200 typical 1R win at the demo's risk
     // profile (0.5–1.5 % of $10–15 k balance ≈ $75–225 per R).
     const intensity = Math.min(1, Math.abs(pnl) / 200);
-    const opacity = 0.18 + intensity * 0.42;
+    // El tinte se expresa como FRACCIÓN de `--cal-tint-max`, no como un
+    // número suelto. Antes iba de 0,18 a 0,60 por su cuenta, y al 0,60 la
+    // celda quedaba tan teñida que su texto —8 px, en tinta oscura— caía a
+    // 2,72:1 sobre ella: muy por debajo del mínimo. El tope existe justo
+    // para esto y estaba escrito en la paleta (0,22 en claro, 0,30 en
+    // oscuro) sin que nadie lo usara; atarse a él mantiene la escala de
+    // intensidad y deja el peor caso en 7:1.
+    const factor = (0.3 + intensity * 0.7).toFixed(2);
     // Un día del mes sin operaciones es un dato, no un agujero. Antes se
     // pintaba con opacidad 0: dieciocho de los treinta días de julio
     // desaparecían y las dos últimas filas del calendario quedaban en
@@ -179,9 +186,11 @@ function buildCal() {
       pnl === 0
         ? "rgb(var(--divider) / 0.07)"
         : isPos
-          ? `rgb(var(--accent-base) / ${opacity.toFixed(2)})`
-          : `rgb(var(--pnl-neg) / ${opacity.toFixed(2)})`;
-    const style = `background:${bg};border-radius:5px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px`;
+          ? `rgb(var(--accent-base) / calc(var(--cal-tint-max) * ${factor}))`
+          : `rgb(var(--pnl-neg) / calc(var(--cal-tint-max) * ${factor}))`;
+    // 2 px, el canto del sistema: los 5 px de antes eran el único radio de
+    // ese tamaño que quedaba en la página.
+    const style = `background:${bg};border-radius:2px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px`;
     return {
       day: String(dayNum),
       val: pnl === 0 ? "·" : `${pnl >= 0 ? "+" : "−"}${fmtNum(Math.abs(pnl), "es", 0)}`,
