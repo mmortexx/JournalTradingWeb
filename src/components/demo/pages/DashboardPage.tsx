@@ -1068,7 +1068,12 @@ export function DashboardPage() {
                     }}
                     className="group w-full flex items-center gap-3 py-2.5 hover:bg-[rgb(var(--divider)/0.05)] -mx-2 px-2 rounded-md transition-colors text-left"
                   >
-                    <div className="flex items-center gap-2 min-w-0 w-[80px] sm:w-[110px] shrink-0">
+                    {/* 80px se quedaba corto: "BTC/USDT" mide 79px de texto
+                        él solo, y a eso hay que sumarle el icono + el hueco
+                        antes de la letra — se cortaba en "EURU…" y "XAU/U…"
+                        en el ancho de un teléfono. 100px es lo que pide el
+                        símbolo más largo del catálogo, con margen. */}
+                    <div className="flex items-center gap-2 min-w-0 w-[100px] sm:w-[110px] shrink-0">
                       <AssetMark assetClass={trInst?.assetClass} />
                       <span className="font-medium text-primary truncate min-w-0">
                         {tr.instrument}
