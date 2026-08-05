@@ -81,7 +81,7 @@ export const EquityCurve = memo(function EquityCurve({
   }, [equityCurve, drawdownCeiling, padL, padR, padT, padB, H]);
 
   if (!equityCurve.length) {
-    return <div className={`text-gray-400 text-sm ${className}`} style={{ height }}>Sin datos</div>;
+    return <div className={`text-tertiary text-sm ${className}`} style={{ height }}>Sin datos</div>;
   }
 
   /** Shared pointer→hover resolver used by both mousemove and touch handlers.
@@ -284,7 +284,7 @@ export const EquityCurve = memo(function EquityCurve({
         )}
       </svg>
 
-      {/* Rich hover tooltip — date, balance, P&L since start, drawdown from peak */}
+      {/* Tooltip de detalle sobre papel denso — date, balance, P&L since start, drawdown from peak */}
       {hoverPoint && tooltipLeft !== null && (
         <div
           className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"
@@ -294,21 +294,21 @@ export const EquityCurve = memo(function EquityCurve({
             transform: tooltipTransform,
           }}
         >
-          <div className="text-gray-400 text-[10px]">
+          <div className="text-tertiary text-[10px]">
             {hoverPoint.date.toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" })}
           </div>
-          <div className="font-semibold tnum text-white text-[13px] mt-0.5">
+          <div className="font-semibold tnum text-primary text-[13px] mt-0.5">
             ${hoverPoint.balance.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
           </div>
           <div className="flex items-center justify-between gap-3 mt-1 text-[11px]">
-            <span className="text-gray-400">{lang === "es" ? "Desde inicio" : "Since start"}</span>
+            <span className="text-tertiary">{lang === "es" ? "Desde inicio" : "Since start"}</span>
             <span className={`tnum font-medium ${hoverPoint.perf >= 0 ? "text-pnl-pos" : "text-pnl-neg"}`}>
               {hoverPoint.perf >= 0 ? "+" : "−"}${Math.abs(hoverPoint.perf).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </span>
           </div>
           <div className="flex items-center justify-between gap-3 text-[11px]">
-            <span className="text-gray-400">{lang === "es" ? "Desde pico" : "From peak"}</span>
-            <span className={`tnum font-medium ${drawdown > 0 ? "text-pnl-neg" : "text-gray-400"}`}>
+            <span className="text-tertiary">{lang === "es" ? "Desde pico" : "From peak"}</span>
+            <span className={`tnum font-medium ${drawdown > 0 ? "text-pnl-neg" : "text-tertiary"}`}>
               {drawdown > 0
                 ? `−${drawdown.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
                 : "0"}

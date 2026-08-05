@@ -58,7 +58,7 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
         {/* Day labels */}
         <div className="flex flex-col gap-1 justify-around pr-1">
           {WEEKDAYS_SHORT.map((d) => (
-            <div key={d} className="text-[10px] text-gray-400 font-medium h-8 flex items-center">{d}</div>
+            <div key={d} className="text-[10px] text-tertiary font-medium h-8 flex items-center">{d}</div>
           ))}
         </div>
         {/* Grid */}
@@ -68,11 +68,16 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
               {row.map((v, c) => {
                 const intensity = Math.abs(v) / maxAbs;
                 const pos = v >= 0;
+                // Tope a 0,30 de pico (antes 0,72). La cifra de la celda es
+                // texto de 9px — pide 4,5:1, no 3:1 — y en el peor de los
+                // cuatro casos (tinta sobre positivo, tema oscuro) el tinte
+                // deja de bastar a partir de 0,33. Medido con el fondo real
+                // de la tarjeta, en los dos temas y las dos direcciones.
                 const bg = v === 0
                   ? "rgb(var(--divider) / 0.04)"
                   : pos
-                  ? `rgb(var(--pnl-pos) / ${0.12 + intensity * 0.6})`
-                  : `rgb(var(--pnl-neg) / ${0.12 + intensity * 0.6})`;
+                  ? `rgb(var(--pnl-pos) / ${0.12 + intensity * 0.18})`
+                  : `rgb(var(--pnl-neg) / ${0.12 + intensity * 0.18})`;
                 return (
                   <motion.div
                     key={c}
@@ -97,7 +102,15 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
                     onMouseLeave={() => setHovered(null)}
                   >
                     {intensity > 0.4 && (
-                      <span className={`relative z-10 ${pos ? "text-pnl-pos" : "text-pnl-neg"}`} style={{ filter: "brightness(1.6)" }}>
+                      // Tinta del sistema, no el color de ganancia/pérdida: la
+                      // celda ya está teñida con ese mismo color, así que
+                      // escribir en él es tinta sobre su propio tinte. El
+                      // filtro `brightness` que había antes lo intentaba
+                      // arreglar sin tocar el color y se quedaba corto en
+                      // celdas intensas (hasta 1,87:1). El resultado ya lo
+                      // dicen el tinte y la posición de la celda; la cifra
+                      // sólo tiene que leerse.
+                      <span className="relative z-10 text-primary">
                         {v >= 0 ? "+" : "−"}{Math.abs(v) >= 1000 ? `${(Math.abs(v) / 1000).toFixed(1)}k` : Math.round(Math.abs(v))}
                       </span>
                     )}
@@ -111,11 +124,11 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
       {/* Hour labels */}
       <div className="flex gap-1 mt-1 ml-7">
         {HOUR_LABELS.map((h) => (
-          <div key={h} className="flex-1 text-[9px] text-gray-400 text-center">{h}</div>
+          <div key={h} className="flex-1 text-[9px] text-tertiary text-center">{h}</div>
         ))}
       </div>
 
-      {/* Floating liquid-glass tooltip — day · hour, P&L, trade count */}
+      {/* Tooltip flotante sobre papel denso — day · hour, P&L, trade count */}
       {hovered && (
         <div
           className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"
@@ -125,7 +138,7 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
             transform: "translate(-50%, -100%)",
           }}
         >
-          <div className="text-gray-400 text-[10px]">
+          <div className="text-tertiary text-[10px]">
             {WEEKDAYS_SHORT[hovered.r]} · {HOUR_LABELS[hovered.c]}
           </div>
           <div
@@ -136,7 +149,7 @@ export const Heatmap = memo(function Heatmap({ trades, className = "" }: Heatmap
             {fmtMoney(grid[hovered.r][hovered.c], lang, { sign: true, decimals: 0 })}
           </div>
           {countGrid[hovered.r][hovered.c] > 0 && (
-            <div className="text-gray-400 text-[10px] mt-0.5 tnum">
+            <div className="text-tertiary text-[10px] mt-0.5 tnum">
               {countGrid[hovered.r][hovered.c]} {lang === "es" ? "ops" : "trades"}
             </div>
           )}

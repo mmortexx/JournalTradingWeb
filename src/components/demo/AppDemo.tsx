@@ -268,9 +268,9 @@ function AppDemoInner({ hideHeader = false }: { hideHeader?: boolean }) {
       {!hideHeader && (
         <div className="text-center max-w-2xl mx-auto mb-10">
           <div className="eyebrow inline-flex items-center gap-2 justify-center mb-3">
-            <span className="w-6 h-px bg-white opacity-60" />
+            <span className="w-6 h-px bg-[rgb(var(--divider)/0.45)]" />
             {t("demoTitle")}
-            <span className="w-6 h-px bg-white opacity-60" />
+            <span className="w-6 h-px bg-[rgb(var(--divider)/0.45)]" />
           </div>
           <h2 className="font-medium tracking-[-0.03em] leading-tight" style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)" }}>
             {lang === "es" ? (

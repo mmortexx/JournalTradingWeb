@@ -178,7 +178,7 @@ export function TableOfContents() {
                       background: active ? "rgb(var(--accent-base))" : "transparent",
                       border: active
                         ? "none"
-                        : "1px solid rgb(var(--divider) / 0.4)",
+                        : "1px solid rgb(var(--divider) / 0.55)",
                     }}
                   />
                   <span

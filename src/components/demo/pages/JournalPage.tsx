@@ -221,11 +221,10 @@ function DayScoreDots({
             className="relative w-5 h-5"
           >
             <span
-              className="absolute inset-0 rounded-full"
-              style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
+              className="absolute inset-0 rounded-full bg-[rgb(var(--divider)/0.10)]"
             />
             <motion.span
-              className="absolute inset-0 rounded-full bg-white"
+              className="absolute inset-0 rounded-full bg-[rgb(var(--accent-base))]"
               animate={{
                 opacity: active ? 1 : 0,
                 scale: active ? 1 : 0.7,
@@ -235,7 +234,7 @@ function DayScoreDots({
             {isSelected && (
               <motion.span
                 layoutId={`${idPrefix}-day-score-ring`}
-                className="absolute -inset-1 rounded-full border border-[rgb(var(--divider)/0.3)]"
+                className="absolute -inset-1 rounded-full border border-[rgb(var(--accent-base)/0.55)]"
                 transition={{ type: "spring", stiffness: 320, damping: 26 }}
               />
             )}
@@ -283,7 +282,7 @@ function RitualColumn({
         <div className="flex items-center gap-2">
           <span
             className={`w-2 h-2 rounded-full ${
-              accent ? "bg-white" : "bg-pnl-pos"
+              accent ? "bg-[rgb(var(--accent-base))]" : "bg-pnl-pos"
             }`}
           />
           <h3 className="font-medium text-primary">{title}</h3>
@@ -379,7 +378,7 @@ function ComplianceRing({ pct, label }: { pct: number; label: string }) {
           cy="60"
           r={R}
           fill="none"
-          stroke="rgba(255,255,255,0.08)"
+          stroke="rgb(var(--divider) / 0.14)"
           strokeWidth={8}
         />
         <motion.circle
@@ -458,7 +457,11 @@ function TrafficLight({ level }: { level: "green" | "amber" | "red" }) {
       role="status"
       aria-label={label}
     >
-      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 border border-[rgb(var(--divider)/0.1)] shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]">
+      {/* El alojamiento del semáforo es un HUECO: un rebaje en el material,
+          no una pieza negra pegada encima. Atado al tinte del sistema y a
+          la sombra tonal, se lee como rebaje en los dos temas; en negro
+          fijo era una mancha sobre el papel claro. */}
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[rgb(var(--divider)/0.10)] border border-[rgb(var(--divider)/0.1)] shadow-[inset_0_1px_2px_rgb(var(--sombra)/0.28)]">
         {lights.map((l) => {
           const active = l.key === level;
           return (
@@ -694,16 +697,16 @@ function SegmentedMeter({
               style={{
                 backgroundColor: active
                   ? "rgb(var(--accent-base) / 0.55)"
-                  : "rgba(255,255,255,0.05)",
+                  : "rgb(var(--divider) / 0.06)",
                 borderColor: active
                   ? "rgb(var(--accent-base) / 0.75)"
-                  : "rgba(255,255,255,0.08)",
+                  : "rgb(var(--divider) / 0.16)",
               }}
             >
               {isSelected && (
                 <motion.span
                   layoutId={`segmented-ring-${label}`}
-                  className="absolute -inset-px rounded-md border border-[rgb(var(--divider)/0.3)] pointer-events-none"
+                  className="absolute -inset-px rounded-md border border-[rgb(var(--accent-base)/0.55)] pointer-events-none"
                   transition={{ type: "spring", stiffness: 320, damping: 26 }}
                 />
               )}
@@ -823,7 +826,14 @@ function PlanToggle({
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className={`absolute top-0.5 ${
               on ? "left-[1.375rem]" : "left-0.5"
-            } w-5 h-5 rounded-full bg-white shadow-md`}
+            } w-5 h-5 rounded-full shadow-md ${
+              // La manecilla se define por CONTRASTE con su propia pista, no
+              // por un blanco fijo: sobre el acento va la tinta que el
+              // sistema reserva para escribir encima del acento, y sobre la
+              // pista de aviso va la tinta normal. Así se ve en los dos
+              // temas — el blanco fijo desaparecía en el claro.
+              on ? "bg-[rgb(var(--accent-ink))]" : "bg-[rgb(var(--txt-primary))]"
+            }`}
           />
         </span>
         <span
@@ -1167,14 +1177,18 @@ export function JournalPage() {
                 <div className="flex items-center gap-2">
                   {/* Current streak — accent-tinted pill so the count reads
                       as the strip's focal point. */}
+                  {/* Etiquetas en `text-secondary`, no `text-tertiary`: la
+                      terciaria se calibra para el fondo plano de la página,
+                      y aquí se apoya en el tinte del acento — un paso más
+                      de tinta es lo que le devuelve el margen. */}
                   <span className="inline-flex items-center gap-1.5 px-2.5 h-7 rounded-full bg-[rgb(var(--accent-base)/0.12)] border border-[rgb(var(--accent-base)/0.3)]">
-                    <span className="text-[10px] uppercase tracking-[0.12em] text-tertiary">
+                    <span className="text-[10px] uppercase tracking-[0.12em] text-secondary">
                       {L("Actual", "Current")}
                     </span>
                     <span className="text-sm font-bold tnum text-primary leading-none">
                       {currentStreak}
                     </span>
-                    <span className="text-[10px] text-tertiary">
+                    <span className="text-[10px] text-secondary">
                       {L("días", "days")}
                     </span>
                   </span>
@@ -1219,7 +1233,7 @@ export function JournalPage() {
         <div className="demo-card p-5 md:p-6">
           <div className="flex items-center justify-between gap-3 mb-5">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="w-1 h-5 bg-white rounded-full shrink-0" />
+              <span className="w-1 h-5 bg-[rgb(var(--accent-base))] rounded-full shrink-0" />
               <h2 className="font-medium text-primary text-base md:text-lg truncate">
                 {t("ritualTitle")}
               </h2>
@@ -1250,7 +1264,7 @@ export function JournalPage() {
               className="md:hidden col-span-full -my-1"
               aria-hidden="true"
             >
-              <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+              <div className="h-px bg-gradient-to-r from-transparent via-[rgb(var(--divider)/0.18)] to-transparent" />
             </div>
 
             <RitualColumn
@@ -1273,7 +1287,7 @@ export function JournalPage() {
               className="hidden md:block absolute left-1/2 top-0 bottom-0 -translate-x-1/2 pointer-events-none"
               aria-hidden="true"
             >
-              <div className="h-full w-px bg-gradient-to-b from-transparent via-white/15 to-transparent" />
+              <div className="h-full w-px bg-gradient-to-b from-transparent via-[rgb(var(--divider)/0.18)] to-transparent" />
             </div>
           </div>
         </div>
@@ -1357,8 +1371,11 @@ export function JournalPage() {
               {/* Expectancy in-plan vs out-of-plan */}
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
+                  {/* `text-secondary`, no `text-tertiary`: aquí la etiqueta
+                      va sobre el tinte de ganancia/pérdida, no sobre la
+                      página, y la terciaria se queda corta en ese fondo. */}
                   <div className="rounded-md p-3 bg-pnl-pos/10 border border-pnl-pos/20">
-                    <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
+                    <div className="text-[10px] uppercase tracking-[0.15em] text-secondary">
                       {t("expInPlan")}
                     </div>
                     <div className="text-pnl-pos font-bold text-lg tnum mt-1">
@@ -1366,7 +1383,7 @@ export function JournalPage() {
                     </div>
                   </div>
                   <div className="rounded-md p-3 bg-pnl-neg/10 border border-pnl-neg/20">
-                    <div className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
+                    <div className="text-[10px] uppercase tracking-[0.15em] text-secondary">
                       {t("expOutPlan")}
                     </div>
                     <div className="text-pnl-neg font-bold text-lg tnum mt-1">
@@ -1497,7 +1514,7 @@ export function JournalPage() {
                 labeled progress-bar per month. */}
             <div className="pt-5 border-t border-[rgb(var(--divider)/0.1)]">
               <div className="flex items-center gap-2 mb-4">
-                <span className="w-1 h-4 bg-white rounded-full shrink-0" />
+                <span className="w-1 h-4 bg-[rgb(var(--accent-base))] rounded-full shrink-0" />
                 <h3 className="text-[13px] font-medium text-primary tracking-[-0.01em]">
                   {L("Cumplimiento mensual", "Monthly compliance")}
                 </h3>
@@ -1548,7 +1565,7 @@ export function JournalPage() {
         <div className="demo-card p-5 md:p-6">
           <div className="flex items-center justify-between gap-3 flex-wrap mb-5">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="w-1 h-5 bg-white rounded-full shrink-0" />
+              <span className="w-1 h-5 bg-[rgb(var(--accent-base))] rounded-full shrink-0" />
               <h2 className="font-medium text-primary text-base md:text-lg truncate">
                 {t("review2")}
               </h2>
@@ -1630,7 +1647,7 @@ export function JournalPage() {
       <Reveal delay={0.2}>
         <div className="demo-card p-5 md:p-6">
           <div className="flex items-center gap-2 mb-5">
-            <span className="w-1 h-5 bg-white rounded-full shrink-0" />
+            <span className="w-1 h-5 bg-[rgb(var(--accent-base))] rounded-full shrink-0" />
             <h2 className="font-medium text-primary text-base md:text-lg">
               {t("history")}
             </h2>

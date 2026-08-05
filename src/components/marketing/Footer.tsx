@@ -52,7 +52,7 @@ const SOCIAL_LINKS: SocialLink[] = [
  *
  * Trust strip — a row of 4 small inline pills ("Pago único · Sin
  * suscripción", "Datos 100 % locales", "ES + EN", "Garantía 30 días")
- * with a hairline `border-white/10` + faint `bg-white/[0.02]` tint.
+ * with un filete y un tinte muy leves, ambos atados a `--divider`.
  * Reads as a quiet institutional credentials row — the PositioningStrip
  * on the home page carries the visual version of these; the footer's is
  * the closing reminder.
@@ -61,7 +61,7 @@ const SOCIAL_LINKS: SocialLink[] = [
  * version + locale on the right. The status indicator is a pulsing
  * emerald dot + "All systems operational" label (Stripe / Vercel pattern).
  * The top edge is the `.liquid-glass::before` machined rim PLUS a
- * `border-t border-white/10` hairline so the footer reads as a precision
+ * filete `border-t` atado a `--divider` para que el pie se lea como panel
  * closing panel rather than a soft fade.
  *
  * Material — `liquid-glass` (rgba(0,0,0,0.4) + 4px blur + machined inset
@@ -105,7 +105,7 @@ export function Footer() {
         { label: es ? "Características" : "Features", href: "/features" },
         { label: es ? "Demo" : "Demo", href: "/demo" },
         { label: es ? "Precios" : "Pricing", href: "/pricing" },
-        { label: "Changelog", href: "/about" },
+        { label: "Changelog", href: "/about#changelog" },
       ],
     },
     {
@@ -131,7 +131,7 @@ export function Footer() {
         /* «Contacto» llevaba a /about, donde NO hay ningún formulario: el
            único del sitio vive en /faq. Quien pulsaba aquí aterrizaba en la
            historia del producto y tenía que buscarse la vida. */
-        { label: es ? "Contacto" : "Contact", href: "/faq" },
+        { label: es ? "Contacto" : "Contact", href: "/faq#contacto" },
       ],
     },
     {
@@ -210,7 +210,7 @@ export function Footer() {
             {/* Local-first badge — small inline pill (lock glyph + label).
                 Signals the "your data never leaves your machine" promise
                 inline in the brand column. Same hairline language as the
-                rest of the design system (`border-white/10`). */}
+                rest of the design system (filete sobre `--divider`). */}
             <div className="mt-4 inline-flex items-center gap-1.5 rounded-[2px] border border-[rgb(var(--divider)/0.1)] bg-[rgb(var(--divider)/0.04)] px-2.5 py-1 text-[11px] font-medium text-secondary">
               <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path
@@ -322,7 +322,7 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Structural separator — 1px neutral border-white/10 gradient at
+        {/* Structural separator — filete de 1px sobre `--divider`, en degradado
             12% opacity. Floats rather than terminating in a hard edge.
             Sits BETWEEN the link grid above and the trust-pills + bottom-bar
             cluster below — the link grid is the footer's primary content

@@ -73,6 +73,12 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  /* Faltaba el par de tinta. `text-destructive-foreground` existía en el
+     componente de aviso desde el primer día, pero apuntaba a una variable
+     que nadie había declarado: la utilidad se generaba con un valor vacío,
+     el aviso de error no fijaba color de letra y heredaba la del tema —
+     tinta oscura sobre el rojo oscuro del sistema, 1,79:1. */
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -238,6 +244,7 @@
   --accent: oklch(0.72 0.02 250);
   --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: rgb(var(--accent-base));
@@ -344,6 +351,7 @@
   --accent: oklch(0.5 0.02 250);
   --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.55 0.24 27);
+  --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0 0 0 / 10%);
   --input: oklch(0 0 0 / 12%);
   --ring: rgb(var(--accent-base));
@@ -3013,6 +3021,7 @@ button.icon-btn:hover > svg,
      distintos a diez píxeles de distancia. Ya está medido (5,16:1 en el
      peor fondo). */
   --destructive: #f0776a;
+  --destructive-foreground: rgb(var(--accent-ink));
   --border: rgba(205, 217, 228, 0.13);
   --input: rgba(205, 217, 228, 0.17);
   --ring: rgb(var(--accent-base));
@@ -3101,6 +3110,7 @@ button.icon-btn:hover > svg,
   --accent: rgb(var(--accent-base));
   --accent-foreground: rgb(var(--accent-ink));
   --destructive: #931315;
+  --destructive-foreground: rgb(var(--accent-ink));
   --border: rgba(19, 29, 38, 0.17);
   --input: rgba(19, 29, 38, 0.21);
   --ring: rgb(var(--accent-base));

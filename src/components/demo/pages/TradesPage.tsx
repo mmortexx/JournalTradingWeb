@@ -26,23 +26,17 @@ import { Chip } from "@/components/tj/Chip";
 import { Money } from "@/components/tj/Money";
 import { CountUp } from "@/components/tj/CountUp";
 import { Reveal } from "@/components/tj/Reveal";
+import { AssetMark } from "@/components/demo/AssetMark";
 import { useDemo } from "@/components/demo/DemoContext";
 
 /* ============================================================
- * Static lookups — mirrors TradesPage.xaml's AssetDotBrush /
- * TradeListItem session/entry-exit rendering.
+ * Tablas estáticas — la clase de activo ya no se codifica por color (ver
+ * AssetMark), sólo queda su etiqueta y la de plaza y decimales.
  * ============================================================ */
 
 const DECIMALS: Record<string, number> = Object.fromEntries(
   INSTRUMENTS.map((i) => [i.symbol, i.decimals])
 );
-
-const ASSET_DOT: Record<string, string> = {
-  crypto: "bg-amber-400",
-  forex: "bg-emerald-400",
-  stock: "bg-rose-400",
-  futures: "bg-teal-400",
-};
 
 const ASSET_LABEL: Record<string, { es: string; en: string }> = {
   crypto: { es: "Cripto", en: "Crypto" },
@@ -190,8 +184,6 @@ const TradeRow = memo(function TradeRow({
   const { t, lang } = useLang();
   const decimals = DECIMALS[trade.instrument] ?? 2;
   const inst = INSTRUMENTS.find((x) => x.symbol === trade.instrument);
-  const dotClass =
-    ASSET_DOT[inst?.assetClass ?? "stock"] ?? "bg-white";
   const assetLabel =
     ASSET_LABEL[inst?.assetClass ?? "stock"]?.[lang] ?? "";
   const isConfirming = confirmingId === trade.id;
@@ -237,14 +229,10 @@ const TradeRow = memo(function TradeRow({
         </div>
       </td>
 
-      {/* Col 1 — asset dot + symbol (mono) + custom badge. */}
+      {/* Col 1 — marca de clase de activo + símbolo (mono) + distintivo. */}
       <td className="px-3 py-2.5 whitespace-nowrap">
         <div className="flex items-center gap-2">
-          <span
-            className={`inline-block w-1.5 h-1.5 rounded-full ${dotClass}`}
-            aria-hidden="true"
-            title={assetLabel}
-          />
+          <AssetMark assetClass={inst?.assetClass} title={assetLabel} />
           <span className="font-medium text-primary text-sm tnum">
             {trade.instrument}
           </span>
@@ -1307,12 +1295,12 @@ export function TradesPage() {
               beyond the card's right edge. No left fade: the sticky first
               column (checkbox + direction chip) already signals "this is
               pinned, scroll right for more". */}
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-transparent to-black/20" aria-hidden />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-transparent to-[rgb(var(--sombra)/0.18)]" aria-hidden />
           {/* Subtle shadow on the right edge of the sticky first column —
               only visible while the table is scrolled horizontally, gives
               the pinned column a visual separation from the scrolling
               cells underneath. */}
-          <div className="pointer-events-none absolute left-[88px] top-0 bottom-0 w-4 bg-gradient-to-r from-black/15 to-transparent md:hidden" aria-hidden />
+          <div className="pointer-events-none absolute left-[88px] top-0 bottom-0 w-4 bg-gradient-to-r from-[rgb(var(--sombra)/0.14)] to-transparent md:hidden" aria-hidden />
         </div>
 
         {/* Bulk action bar — only when rows are selected. Spring in

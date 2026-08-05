@@ -158,7 +158,7 @@ function KpiStripCell({
       </div>
       {showHairline && (
         <div
-          className="self-stretch w-px shrink-0 my-1 bg-gradient-to-b from-transparent via-white/15 to-transparent"
+          className="self-stretch w-px shrink-0 my-1 bg-gradient-to-b from-transparent via-[rgb(var(--divider)/0.18)] to-transparent"
           aria-hidden="true"
         />
       )}
@@ -611,9 +611,11 @@ function HeatmapLegend({ trades }: { trades: Trade[] }) {
     const t = i / 8;
     const intensity = Math.abs(t - 0.5) * 2;
     const pos = t >= 0.5;
+    // Misma escala que Heatmap.tsx — la leyenda tiene que enseñar el
+    // tinte que las celdas usan de verdad, no uno más intenso.
     return pos
-      ? `rgb(var(--pnl-pos) / ${0.12 + intensity * 0.6})`
-      : `rgb(var(--pnl-neg) / ${0.12 + intensity * 0.6})`;
+      ? `rgb(var(--pnl-pos) / ${0.12 + intensity * 0.18})`
+      : `rgb(var(--pnl-neg) / ${0.12 + intensity * 0.18})`;
   });
 
   return (
@@ -1557,7 +1559,7 @@ export function AnalyticsPage() {
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
-                    className={`relative inline-block w-4 h-4 rounded-full ${verdictLedClass} ring-2 ring-white/10`}
+                    className={`relative inline-block w-4 h-4 rounded-full ${verdictLedClass} ring-2 ring-[rgb(var(--divider)/0.12)]`}
                     aria-hidden="true"
                   />
                 </span>

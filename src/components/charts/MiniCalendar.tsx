@@ -146,7 +146,7 @@ export const MiniCalendar = memo(function MiniCalendar({ trades, className = "" 
         })}
       </div>
 
-      {/* Floating liquid-glass tooltip above the day cell */}
+      {/* Tooltip flotante sobre papel denso above the day cell */}
       {hovered && (
         <div
           className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"

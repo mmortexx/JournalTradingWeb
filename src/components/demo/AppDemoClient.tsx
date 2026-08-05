@@ -192,11 +192,11 @@ function DemoSkeleton() {
             skeleton never accidentally intercepts the cursor. */}
         <div
           aria-hidden="true"
-          className="absolute top-0 left-0 right-0 h-px bg-gradient-to-b from-white/15 to-transparent pointer-events-none z-10"
+          className="absolute top-0 left-0 right-0 h-px bg-gradient-to-b from-[rgb(var(--divider)/0.18)] to-transparent pointer-events-none z-10"
         />
         <div
           aria-hidden="true"
-          className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-t from-white/[0.06] to-transparent pointer-events-none z-10"
+          className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-t from-[rgb(var(--divider)/0.07)] to-transparent pointer-events-none z-10"
         />
       </div>
     </div>

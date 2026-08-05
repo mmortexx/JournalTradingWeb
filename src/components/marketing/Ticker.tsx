@@ -18,7 +18,7 @@ import {
  * Honors `prefers-reduced-motion` (static fallback — no scroll).
  *
  * Institutional polish (R2-c):
- *  - Liquid-glass chrome band with `border-y border-white/10` hairline
+ *  - Banda de cristal con filete `border-y` atado a `--divider` arriba
  *    top + bottom edges — reads as a precision-machined ticker tape
  *    floating over the dark page background.
  *  - Slow, dignified base speed: full track (two rows) in 50 s — about

@@ -278,7 +278,7 @@ export function Changelog() {
                     {isPast ? (
                       <span className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))]" />
                     ) : (
-                      <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.55)] bg-background" />
+                      <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.85)] bg-background" />
                     )}
                   </motion.div>
 

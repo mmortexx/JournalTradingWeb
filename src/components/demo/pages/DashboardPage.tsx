@@ -22,6 +22,7 @@ import { Money } from "@/components/tj/Money";
 import { CountUp } from "@/components/tj/CountUp";
 import { EquityCurve } from "@/components/charts/EquityCurve";
 import { MiniCalendar } from "@/components/charts/MiniCalendar";
+import { AssetMark } from "@/components/demo/AssetMark";
 import { useDemo } from "@/components/demo/DemoContext";
 
 // ES futures contract multiplier ($50 per point per contract) — kept for
@@ -339,7 +340,7 @@ export function DashboardPage() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       aria-hidden="true"
-                      className="group-hover:scale-110 transition-transform text-white/40"
+                      className="group-hover:scale-110 transition-transform"
                     >
                       <rect x="3" y="3" width="18" height="18" rx="2" />
                       <circle cx="9" cy="9" r="2" />
@@ -376,7 +377,7 @@ export function DashboardPage() {
                       </div>
                       {/* Vertical hairline — full height with subtle gradient */}
                       <div
-                        className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent"
+                        className="self-stretch w-px bg-gradient-to-b from-transparent via-[rgb(var(--divider)/0.18)] to-transparent"
                         aria-hidden="true"
                       />
                       {/* R:R planned */}
@@ -398,7 +399,7 @@ export function DashboardPage() {
                       </div>
                       {/* Vertical hairline */}
                       <div
-                        className="self-stretch w-px bg-gradient-to-b from-transparent via-white/15 to-transparent"
+                        className="self-stretch w-px bg-gradient-to-b from-transparent via-[rgb(var(--divider)/0.18)] to-transparent"
                         aria-hidden="true"
                       />
                       {/* % of account */}
@@ -767,7 +768,7 @@ export function DashboardPage() {
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 400, damping: 25 } }}
                     title={es ? "Ctrl+Enter" : "Ctrl+Enter"}
-                    className="group h-11 min-w-[200px] px-4 rounded-md bg-white text-black font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors shadow-[0_2px_8px_rgb(255_255_255_/_0.18)]"
+                    className="group h-11 min-w-[200px] px-4 rounded-md bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[rgb(var(--accent-hover))] transition-colors shadow-[0_2px_8px_rgb(var(--sombra)/0.18)]"
                   >
                     <svg
                       width="14"
@@ -786,7 +787,7 @@ export function DashboardPage() {
                     {/* Keyboard hint — visible ⌘↵ chip on hover, mirrors the
                         real app's accelerator-key badge on primary CTAs. */}
                     <kbd
-                      className="hidden sm:inline-flex items-center gap-0.5 h-5 px-1.5 rounded-[2px] bg-black/10 text-[10px] font-semibold text-black/70 tabular-nums group-hover:bg-black/15 transition-colors"
+                      className="hidden sm:inline-flex items-center gap-0.5 h-5 px-1.5 rounded-[2px] bg-[rgb(var(--accent-ink)/0.12)] text-[10px] font-semibold text-[rgb(var(--accent-ink)/0.75)] tabular-nums group-hover:bg-[rgb(var(--accent-ink)/0.18)] transition-colors"
                       aria-hidden="true"
                     >
                       <span>⌘</span>
@@ -1050,10 +1051,9 @@ export function DashboardPage() {
                 </svg>
               </button>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-[rgb(var(--divider)/0.07)]">
               {recentTrades.map((tr, i) => {
                 const trInst = INSTRUMENTS.find((x) => x.symbol === tr.instrument);
-                const dotClass = ASSET_DOT[trInst?.assetClass ?? "stock"] ?? "bg-white";
                 return (
                   <motion.button
                     key={tr.id}
@@ -1069,10 +1069,7 @@ export function DashboardPage() {
                     className="group w-full flex items-center gap-3 py-2.5 hover:bg-[rgb(var(--divider)/0.05)] -mx-2 px-2 rounded-md transition-colors text-left"
                   >
                     <div className="flex items-center gap-2 min-w-0 w-[80px] sm:w-[110px] shrink-0">
-                      <span
-                        className={`inline-block w-1.5 h-1.5 rounded-full ${dotClass}`}
-                        aria-hidden="true"
-                      />
+                      <AssetMark assetClass={trInst?.assetClass} />
                       <span className="font-medium text-primary truncate min-w-0">
                         {tr.instrument}
                       </span>
@@ -1335,7 +1332,7 @@ function KpiDivider() {
       // leaves exactly 7 grid children (one per KpiCell) so the strip
       // stays a single row; the `gap-x-4` provides the optical separation
       // the dividers were painting on mobile.
-      className="self-stretch w-px shrink-0 justify-self-center bg-gradient-to-b from-transparent via-white/15 to-transparent md:hidden"
+      className="self-stretch w-px shrink-0 justify-self-center bg-gradient-to-b from-transparent via-[rgb(var(--divider)/0.18)] to-transparent md:hidden"
       aria-hidden="true"
     />
   );
@@ -1374,14 +1371,6 @@ function DirectionChip({
     </span>
   );
 }
-
-// Asset-class color dots — shared with TradesPage for visual consistency.
-const ASSET_DOT: Record<string, string> = {
-  crypto: "bg-amber-400",
-  forex: "bg-emerald-400",
-  stock: "bg-rose-400",
-  futures: "bg-teal-400",
-};
 
 /** Native-select chevron overlay (since appearance-none strips it). */
 function ChevronDown() {

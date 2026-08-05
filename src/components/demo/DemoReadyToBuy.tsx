@@ -34,11 +34,11 @@ export function DemoReadyToBuy() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 w-[420px] h-[420px] rounded-full blur-[120px] opacity-[0.10] bg-white"
+        className="pointer-events-none absolute -top-24 -left-24 w-[420px] h-[420px] rounded-full blur-[120px] opacity-[0.10] bg-[rgb(var(--divider))]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-24 -right-24 w-[460px] h-[460px] rounded-full blur-[120px] opacity-[0.08] bg-white"
+        className="pointer-events-none absolute -bottom-24 -right-24 w-[460px] h-[460px] rounded-full blur-[120px] opacity-[0.08] bg-[rgb(var(--divider))]"
       />
 
       <div className="relative max-w-page mx-auto px-5 md:px-8">

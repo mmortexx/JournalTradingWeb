@@ -79,7 +79,7 @@ export const Histogram = memo(function Histogram({
                   opacity: hovered && hovered.i === i ? 1 : 0.9,
                 }}
               />
-              <div className="text-[9px] text-gray-400 mt-1 tnum truncate w-full text-center">
+              <div className="text-[9px] text-tertiary mt-1 tnum truncate w-full text-center">
                 {formatX(d.x)}
               </div>
             </div>
@@ -87,7 +87,7 @@ export const Histogram = memo(function Histogram({
         })}
       </div>
 
-      {/* Floating liquid-glass tooltip — bucket range + count */}
+      {/* Tooltip flotante sobre papel denso — bucket range + count */}
       {hovered && data[hovered.i] && (
         <div
           className="absolute pointer-events-none tj-paper tj-paper-dense rounded-[2px] border border-[rgb(var(--divider)/0.16)] px-3 py-2 text-xs whitespace-nowrap z-10"
@@ -97,10 +97,10 @@ export const Histogram = memo(function Histogram({
             transform: "translate(-50%, -100%)",
           }}
         >
-          <div className="text-gray-400 text-[10px]">
+          <div className="text-tertiary text-[10px]">
             {formatX(data[hovered.i].x)}
           </div>
-          <div className="font-semibold tnum mt-0.5 text-white">
+          <div className="font-semibold tnum mt-0.5 text-primary">
             {data[hovered.i].count} {lang === "es" ? "ops" : "trades"}
           </div>
         </div>

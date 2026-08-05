@@ -8,18 +8,24 @@ const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
+      // Las variantes venían de la plantilla base con `text-white` fijo y con
+      // un `text-gray-300-foreground` que ni siquiera es una clase real —
+      // resto de un buscar-y-reemplazar que dejó la variante `secondary` sin
+      // color de letra. Al fijar blanco, cualquier botón sin sobrescribir
+      // salía en blanco sobre fondo claro. Ahora la letra sale del par
+      // acento/tinta-sobre-acento del sistema, que se invierte con el tema.
       variant: {
         default:
-          "bg-primary text-white shadow-xs hover:bg-primary/90",
+          "bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] shadow-xs hover:bg-[rgb(var(--accent-hover))]",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20",
         outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          "border border-[rgb(var(--divider)/0.18)] bg-transparent shadow-xs text-primary hover:bg-[rgb(var(--divider)/0.06)] hover:border-[rgb(var(--divider)/0.3)]",
         secondary:
-          "bg-secondary text-gray-300-foreground shadow-xs hover:bg-secondary/80",
+          "bg-[rgb(var(--divider)/0.08)] text-primary shadow-xs hover:bg-[rgb(var(--divider)/0.14)]",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-white underline-offset-4 hover:underline",
+          "text-primary hover:bg-[rgb(var(--divider)/0.06)]",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

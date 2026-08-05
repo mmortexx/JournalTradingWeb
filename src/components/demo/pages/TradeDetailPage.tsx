@@ -262,7 +262,7 @@ function HeroStat({
     <div
       className={`relative px-5 first:pl-0 ${
         divider
-          ? "before:absolute before:left-0 before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-transparent before:via-white/15 before:to-transparent"
+          ? "before:absolute before:left-0 before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-transparent before:via-[rgb(var(--divider)/0.18)] before:to-transparent"
           : ""
       }`}
     >
@@ -773,7 +773,7 @@ export function TradeDetailPage() {
                 <div className="text-right">{lang === "es" ? "Com." : "Fee"}</div>
                 <div className="text-right">{lang === "es" ? "Acum." : "Cum."}</div>
               </div>
-              <ul className="divide-y divide-white/5">
+              <ul className="divide-y divide-[rgb(var(--divider)/0.07)]">
                 {fills.map((f, i) => {
                   const isEntry = f.dir === "ENTRY";
                   return (
@@ -1182,7 +1182,7 @@ export function TradeDetailPage() {
               <MagneticButton
                 type="button"
                 strength={0.25}
-                className="w-full h-11 rounded-md bg-white text-black font-medium text-sm transition-colors hover:bg-gray-100 inline-flex items-center justify-center"
+                className="w-full h-11 rounded-md bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] font-medium text-sm transition-colors hover:bg-[rgb(var(--accent-hover))] inline-flex items-center justify-center"
               >
                 {t("saveChanges")}
               </MagneticButton>
