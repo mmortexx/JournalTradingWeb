@@ -1,4 +1,6 @@
 import type { Lang } from "@/lib/i18n";
+import { TERMINOS } from "@/lib/glosario";
+import { HERRAMIENTAS } from "@/lib/herramientas";
 
 /**
  * Las rutas que existen en inglés, y la única lista de la que dependen
@@ -13,12 +15,15 @@ import type { Lang } from "@/lib/i18n";
  * `/es/...` + `/en/...` que tiene más sentido cuando ningún idioma es
  * "el de siempre".
  *
- * ── Por qué esta lista NO cubre el glosario ni las herramientas ───────
- * Sus 51 + 6 páginas ya tienen texto en inglés en los datos —igual que el
- * resto del sitio—, pero traducir sus 57 direcciones queda fuera de esta
- * tanda a propósito: sumarlas habría significado no terminar de
- * verificar nada a fondo. Se deja como el siguiente paso natural, con la
- * misma infraestructura ya lista para reutilizar.
+ * ── El glosario y las herramientas se añaden solos ─────────────────────
+ * Sus 51 + 6 páginas ya tenían texto en inglés en los datos —igual que el
+ * resto del sitio—; lo único que faltaba era la dirección `/en/...` de
+ * cada una (`app/en/glosario/[termino]`, `app/en/herramientas/
+ * [herramienta]`). Con esas rutas ya creadas, esta lista las deriva de
+ * `TERMINOS`/`HERRAMIENTAS` en vez de copiarlas a mano: si mañana se
+ * añade un término o una herramienta, el selector de idioma, el mapa del
+ * sitio y `app/en/**` crecen con él sin que nadie tenga que acordarse de
+ * tocar tres sitios a la vez.
  *
  * Mientras tanto, un enlace hacia una ruta que NO está en esta lista se
  * queda en español aunque se pulse desde una página en inglés — es la
@@ -36,6 +41,17 @@ export const LOCALIZED_PATHS: readonly string[] = [
   "/test",
   "/about",
   "/faq",
+  "/beta",
+  "/traders/manual",
+  "/traders/prop-firms",
+  "/privacidad",
+  "/cookies",
+  "/terminos",
+  "/aviso-legal",
+  "/glosario",
+  ...TERMINOS.map((t) => `/glosario/${t.slug}`),
+  "/herramientas",
+  ...HERRAMIENTAS.map((h) => `/herramientas/${h.slug}`),
 ];
 
 const LOCALIZED_SET = new Set(LOCALIZED_PATHS);

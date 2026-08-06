@@ -7,7 +7,7 @@ import { Reveal } from "@/components/tj/Reveal";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 
 /**
- * Values — the four product principles. Local always · One-time payment ·
+ * Values — the four product principles. Local always · Interactive demo ·
  * Discipline > metrics · Made by traders. A 2×2 grid of liquid-glass cards with a
  * number, title, and description; subtle accent edge + lift on hover.
  *
@@ -31,19 +31,19 @@ const VALUES: Value[] = [
     titleEs: "Local siempre",
     titleEn: "Local always",
     descEs:
-      "Tus datos son tuyos. Punto. Sin nube, sin servidores, sin tracking.",
+      "Tus operaciones son tuyas. Punto. No salen de tu equipo; la analítica de esta web sólo se activa con tu consentimiento.",
     descEn:
-      "Your data is yours. Period. No cloud, no servers, no tracking.",
+      "Your trading data is yours. Period. It stays on your machine; this site's analytics only activates with your consent.",
     icon: <LockIcon />,
   },
   {
     num: "02",
-    titleEs: "Pago único, no suscripción",
-    titleEn: "One-time, not subscription",
+    titleEs: "Demo honesta, sin atajos",
+    titleEn: "An honest demo, no shortcuts",
     descEs:
-      "Compras una vez. Es tuyo para siempre. No te retenemos con pagos mensuales.",
+      "Datos de muestra, sin tarjeta ni instalación. El piloto privado valida el producto con usuarios reales antes de abrir la venta.",
     descEn:
-      "Buy once. It's yours forever. We don't hold you with monthly payments.",
+      "Sample data, no card and no installation. The private pilot validates the product with real users before opening sales.",
     icon: <CoinIcon />,
   },
   {

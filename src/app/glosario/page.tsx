@@ -4,7 +4,7 @@ import { GlosarioIndice } from "@/components/glosario/GlosarioIndice";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { TERMINOS } from "@/lib/glosario";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /glosario — los 51 términos, cada uno con su dirección.
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   title: "Glosario de trading",
   description:
     "51 términos de trading explicados sin rodeos: riesgo, métricas, ejecución y psicología. Qué significa cada uno y por qué importa al medir tu operativa.",
-  alternates: { canonical: `${SITE_URL}/glosario/` },
+  alternates: { canonical: `${SITE_URL}/glosario/`, languages: hreflangDe("/glosario") },
   openGraph: {
     title: "Glosario de trading — CountPips",
     description:
@@ -69,7 +69,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function GlosarioPage() {
+/** Exportado con nombre para que `app/en/glosario/page.tsx` lo reutilice.
+ *  Sin los `<script>` de datos estructurados: cada idioma lleva los suyos. */
+export function GlosarioBody() {
   return (
     <>
       <PageHeader
@@ -84,6 +86,16 @@ export default function GlosarioPage() {
         breadcrumbEs="Glosario"
         breadcrumbEn="Glossary"
       />
+      <GlosarioIndice />
+      <PlateInterlude index={0} />
+      <FinalCTANew />
+    </>
+  );
+}
+
+export default function GlosarioPage() {
+  return (
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -92,9 +104,7 @@ export default function GlosarioPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(glosarioSchema) }}
       />
-      <GlosarioIndice />
-      <PlateInterlude index={0} />
-      <FinalCTANew />
+      <GlosarioBody />
     </>
   );
 }

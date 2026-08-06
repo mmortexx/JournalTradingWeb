@@ -29,7 +29,7 @@ const PAGES: PageMeta[] = [
   { path: "/features/disciplina", priority: 0.85, changeFrequency: "weekly" },
   { path: "/features/seguridad", priority: 0.85, changeFrequency: "weekly" },
   { path: "/pricing", priority: 0.9, changeFrequency: "monthly" },
-  { path: "/demo", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/demo", priority: 1.0, changeFrequency: "monthly" },
   /* El diagnóstico. Prioridad alta pese a no vender nada directamente:
      es la página que más gente comparte y por la que más se entra, porque
      se sale de ella con una cifra propia. */
@@ -37,6 +37,9 @@ const PAGES: PageMeta[] = [
   // Lower-velocity editorial / trust pages.
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/beta", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/traders/manual", priority: 0.85, changeFrequency: "monthly" },
+  { path: "/traders/prop-firms", priority: 0.85, changeFrequency: "monthly" },
   /* Páginas legales. Prioridad baja porque nadie las busca, pero van en el
      mapa igualmente: que existan y sean localizables es una señal de
      confianza, y las pasarelas de pago las exigen accesibles antes de
@@ -94,8 +97,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   /* Las direcciones `/en/...`: la MISMA lista de páginas base, con su
      propia prioridad —una idea, dos idiomas, la misma importancia
      relativa entre ellas— y las mismas etiquetas recíprocas, vistas
-     desde el otro lado. El glosario y las herramientas no aparecen aquí
-     porque no tienen versión inglesa todavía; ver `LOCALIZED_PATHS`. */
+     desde el otro lado. El glosario y las herramientas SÍ aparecen aquí:
+     `LOCALIZED_PATHS` deriva sus 51 + 6 rutas de `TERMINOS`/
+     `HERRAMIENTAS`, así que este filtro las incluye solo con que exista
+     su página en `app/en/glosario/[termino]` / `app/en/herramientas/
+     [herramienta]` — no hace falta tocar este fichero para eso. */
   const paginasEn = PAGES.filter((p) => LOCALIZED_PATHS.includes(p.path)).map(
     ({ path, priority, changeFrequency }) => ({
       url: path === "/" ? `${SITE_URL}/en/` : `${SITE_URL}/en${path}/`,

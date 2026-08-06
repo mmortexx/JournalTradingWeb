@@ -59,8 +59,8 @@ export function NotFoundClient() {
       href: "/pricing",
       label: es ? "Precios" : "Pricing",
       desc: es
-        ? "Pago único. Sin suscripción."
-        : "One-time. No subscription.",
+        ? "Core $29 · Pro $49 como precios de lanzamiento previstos."
+        : "Core $29 · Pro $49 as planned launch prices.",
     },
   ];
 

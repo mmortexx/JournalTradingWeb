@@ -1,7 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
 import { Skeleton } from "@/components/tj/Skeleton";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * Client-side entry point for the demo. We can't call
@@ -204,5 +206,8 @@ function DemoSkeleton() {
 }
 
 export function AppDemoClient({ hideHeader = false }: { hideHeader?: boolean } = {}) {
+  useEffect(() => {
+    trackEvent("demo_viewed");
+  }, []);
   return <AppDemo hideHeader={hideHeader} />;
 }

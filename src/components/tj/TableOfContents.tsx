@@ -42,10 +42,9 @@ export function TableOfContents() {
     // inside <section> tags, but EXCLUDE the last section (FinalCTA) and
     // the FeaturePageNav section (they're not content the reader wants
     // to jump to). For each h2, we find the closest element with an id
-    // (the section wrapper, e.g. #guardian, #metrics); if none exists
-    // or it's the generic #main-content, we generate a stable slug from
-    // the heading text and assign it to the h2 itself so it becomes an
-    // anchor target.
+    // (the section wrapper, e.g. #guardian, #metrics). Anchors are
+    // authored by their owning section; mutating a server-rendered
+    // heading here would create a hydration mismatch in React.
     const allSections = Array.from(document.querySelectorAll("section"));
     // Drop the last 2 sections: FinalCTANew + the FeaturePageNav section.
     // (FeaturePageNav has class bg-veil and contains "Sigue explorando" /
@@ -53,7 +52,7 @@ export function TableOfContents() {
     const contentSections = allSections.filter((sec) => {
       const txt = sec.textContent || "";
       if (txt.includes("Sigue explorando") || txt.includes("Keep exploring")) return false;
-      // FinalCTA contains "Empieza hoy" / "Start today"
+      // Legacy CTAs can still appear in archived sections.
       if (txt.includes("Empieza hoy") || txt.includes("Start today")) return false;
       return true;
     });
@@ -63,15 +62,6 @@ export function TableOfContents() {
       const h2s = sec.querySelectorAll("h2");
       h2s.forEach((h) => headings.push(h as HTMLHeadingElement));
     });
-
-    const slugify = (s: string) =>
-      s
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        .slice(0, 40);
 
     const found: TocItem[] = [];
     const seenIds = new Set<string>();
@@ -88,23 +78,10 @@ export function TableOfContents() {
          nadie. Aquí se veía en el índice de `/about`, con la misma lámina
          dos veces, una con su slug y otra con el id de React.
 
-         Si el id no vale como ancla, se trata igual que si no hubiera: se
-         genera el slug a partir del texto. Y como ese slug coincide con el
-         de la entrada buena, el duplicado se descarta solo unas líneas más
-         abajo. */
+         Si el id no vale como ancla, se descarta. El componente no debe
+         parchear el DOM después de SSR para inventar destinos. */
       if (id && !/^[A-Za-z][\w-]*$/.test(id)) id = undefined;
-      if (!id || id === "main-content") {
-        // Generate a slug and assign to the h2 itself.
-        id = slugify(h.textContent || "");
-        if (!id) return;
-        // Ensure uniqueness.
-        let unique = id;
-        let n = 2;
-        while (seenIds.has(unique)) unique = `${id}-${n++}`;
-        id = unique;
-        h.id = id;
-        target = h;
-      }
+      if (!id || id === "main-content") return;
       if (seenIds.has(id)) return;
       seenIds.add(id);
       const text = (h.textContent || "").trim().replace(/\s+/g, " ").slice(0, 60);

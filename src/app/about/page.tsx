@@ -7,9 +7,9 @@ import { TableOfContents } from "@/components/tj/TableOfContents";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL, hreflangDe } from "@/lib/site";
+import { BetaStatus } from "@/components/beta/BetaStatus";
 
-// Estimated reading time (story + values + social proof + testimonials +
-// changelog + milestones + lista de espera). ~700 words at 220 wpm = ~4 min.
+// Estimated reading time (story + values + changelog + beta status).
 const READING_TIME_MIN = 4;
 
 // PNG (not SVG) — Twitter/X, Facebook, LinkedIn, Slack and Discord all
@@ -76,10 +76,6 @@ const Changelog = dynamic(
   () => import("@/components/marketing/Changelog").then((m) => m.Changelog),
   { loading: () => sectionFallback }
 );
-const Waitlist = dynamic(
-  () => import("@/components/marketing/Waitlist").then((m) => m.Waitlist),
-  { loading: () => sectionFallback }
-);
 const SessionClock = dynamic(
   () => import("@/components/marketing/SessionClock").then((m) => m.SessionClock),
   { loading: () => sectionFallback }
@@ -116,7 +112,7 @@ export function AboutBody() {
           (v1.0, Playbook, Monte Carlo, Guardián, Importador). Dos líneas
           de tiempo distintas para los mismos datos restan credibilidad
           en vez de sumarla. El componente sigue en el repositorio. */}
-      <Waitlist />
+      <BetaStatus />
       <FinalCTANew />
       <TableOfContents />
     </>

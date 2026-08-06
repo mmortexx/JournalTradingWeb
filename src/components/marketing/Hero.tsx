@@ -55,7 +55,7 @@ export function Hero() {
   const specs: { k: string; v: string }[] = [
     { k: es ? "PLATAFORMA" : "PLATFORM", v: "Windows 10 · 11" },
     { k: es ? "DATOS" : "DATA", v: es ? "100 % locales" : "100 % local" },
-    { k: es ? "LICENCIA" : "LICENSE", v: es ? "Pago único" : "One-time" },
+    { k: es ? "RECORRIDO" : "PATH", v: es ? "Demo interactiva" : "Interactive demo" },
     { k: es ? "IDIOMAS" : "LANGUAGES", v: "ES · EN" },
     /* Aquí había una quinta fila, «VERSIÓN: 1.4.2», del mismo historial
        de versiones inventado que ya se retiró del pie: un número de
@@ -198,8 +198,8 @@ export function Hero() {
               }}
             >
               {es
-                ? "40+ métricas institucionales, un guardián que te frena antes del error y tus datos 100 % en tu máquina. Nativo de Windows, pago único desde 29 $."
-                : "40+ institutional metrics, a guardian that brakes before the error, and your data 100 % on your machine. Windows-native, one-time payment from $29."}
+                ? "40+ métricas institucionales, un guardián que te frena antes del error y tus datos 100 % en tu máquina. Explora el flujo completo antes de decidir."
+                : "40+ institutional metrics, a guardian that brakes before the error, and your data 100 % on your machine. Explore the full workflow before deciding."}
             </p>
           </div>
 
@@ -225,20 +225,20 @@ export function Hero() {
               de 2 px entre las dos llamadas a la acción principales. */}
           <div data-seq className="flex flex-col items-center gap-3.5 sm:flex-row sm:items-center sm:justify-center lg:flex-col lg:items-end lg:self-end lg:justify-start">
             <Link
-              href="/pricing"
+              href="/demo"
               className="inline-flex h-[52px] min-w-[180px] w-fit items-center justify-center gap-2.5 rounded-[2px] px-7 text-[15px] font-semibold outline-none transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
               style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
             >
-              {es ? "Comprar — desde 29 $" : "Buy — from $29"}
+              {es ? "Ver la demo interactiva" : "See the interactive demo"}
               <ArrowRight size={16} aria-hidden />
             </Link>
             <Link
-              href="/demo"
+              href="/pricing"
               className="inline-flex h-[52px] min-w-[180px] w-fit items-center justify-center gap-2.5 rounded-[2px] border px-7 text-[15px] font-semibold text-[var(--ink)] outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
               style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
             >
               <Play size={14} fill="currentColor" aria-hidden />
-              {es ? "Ver la demo" : "See the demo"}
+              {es ? "Ver precios" : "See pricing"}
             </Link>
           </div>
         </div>

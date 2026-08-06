@@ -243,11 +243,11 @@ export function OverviewApp() {
                 color, declarado igual para ratón y teclado. */}
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link
-                href="/pricing"
+                href="/beta"
                 className="inline-flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[2px] px-7 text-[15px] font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:w-auto"
                 style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
               >
-                {es ? "Comprar — desde 29 $" : "Buy — from $29"}
+                {es ? "Solicitar acceso anticipado" : "Request early access"}
                 <ArrowRight size={16} aria-hidden />
               </Link>
               <Link
@@ -262,9 +262,9 @@ export function OverviewApp() {
             <div className="mt-7 flex flex-wrap items-center gap-x-3.5 gap-y-2">
               {[
                 "100% LOCAL",
-                es ? "PAGO ÚNICO" : "ONE-TIME",
+                es ? "DEMO PÚBLICA" : "PUBLIC DEMO",
                 "ES · EN",
-                es ? "SIN SUSCRIPCIÓN" : "NO SUBSCRIPTION",
+                es ? "SIN TARJETA" : "NO CARD",
               ].map((label, i) => (
                 <span key={label} className="flex items-center gap-3.5">
                   {i > 0 && (

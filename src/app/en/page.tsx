@@ -14,7 +14,7 @@ import { SITE_URL, hreflangDe } from "@/lib/site";
  * compartido ven ANTES de que se ejecute una sola línea de React.
  */
 const PAGE_DESCRIPTION =
-  "Windows-native trading journal. Institutional metrics, discipline that stops the mistake, and 100% local data. One-time payment from $29. No subscriptions.";
+  "Windows-native trading journal. Explore an interactive demo with institutional metrics, discipline and 100% local data.";
 
 export const metadata: Metadata = {
   title: { absolute: "CountPips — Trade like an institutional desk." },
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CountPips — Trade like an institutional desk.",
     description:
-      "Professional trading journal, native to Windows. Institutional metrics, discipline, and 100% local data. One-time payment from $29.",
+      "Professional trading journal, native to Windows. Explore the product before installing it: institutional metrics, discipline and local data.",
   },
 };
 

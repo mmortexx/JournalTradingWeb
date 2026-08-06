@@ -1,12 +1,11 @@
 /**
  * ============================================================
- *  LISTA DE ESPERA — script para Google Sheets
+ *  ADMISIÓN DE BETA — endpoint temporal para Google Sheets
  * ============================================================
  *
  * Este archivo NO forma parte de la web. Es el trozo que vive en tu
- * cuenta de Google y hace dos cosas: guardar cada inscripción como una
- * fila de una hoja de cálculo tuya, y decirle a la web cuánta gente hay
- * apuntada para poder enseñar el contador en vivo.
+ * cuenta de Google y guarda cada solicitud cualificada en una hoja. La
+ * selección se hace por perfil y cohorte; no se muestran puestos en cola.
  *
  * ------------------------------------------------------------
  *  CÓMO INSTALARLO (una sola vez, ~5 minutos)
@@ -41,15 +40,15 @@
  *
  *       · En tu ordenador, para probar en local: pégala en el archivo
  *         `.env.local` de la web, en la línea
- *         NEXT_PUBLIC_WAITLIST_URL=
+ *         NEXT_PUBLIC_BETA_API_URL=
  *
  *       · Para la web publicada: GitHub → el repositorio →
  *         Settings → Secrets and variables → Actions →
- *         "New repository secret" → Name: WAITLIST_URL,
+ *         "New repository secret" → Name: BETA_API_URL,
  *         Secret: la URL. El siguiente despliegue ya la usa.
  *
  *  7. COMPROBACIÓN: abre la URL en el navegador tal cual. Debe
- *     responder algo como {"ok":true,"count":0}. Si responde eso, está
+ *     responder algo como {"ok":true,"duplicate":false}. Si responde eso, está
  *     bien puesto.
  *
  *  Si algún día cambias este script, hay que volver a "Implementar" →
@@ -61,24 +60,17 @@
  *  QUÉ HACE
  * ------------------------------------------------------------
  *
- *  ALTAS (POST)
- *  · Añade una fila por inscripción: fecha, email, idioma y de qué
- *    página venía.
- *  · Si el email YA estaba, no lo duplica: devuelve el puesto que ya
- *    tenía.
- *  · Devuelve el puesto en la cola y el total, para poder enseñarlos.
+ *  SOLICITUDES (POST)
+ *  · Añade una fila por aplicación: perfil, experiencia, mercados, método
+ *    de journal, objetivo, nota opcional, idioma y trazabilidad UTM.
+ *  · Si el email YA estaba, no lo duplica ni devuelve una posición.
  *  · Descarta lo que llegue con el campo trampa relleno (bots).
  *  · Usa un candado (LockService): dos altas simultáneas ya no pueden
  *    pisarse la fila ni repartir el mismo puesto a dos personas.
  *
- *  CONTADOR (GET)
- *  · Devuelve {"ok":true,"count":N} — el número real de inscritos.
- *  · La respuesta se guarda 30 segundos en caché, así el contador de
- *    la web puede refrescarse a menudo sin agotar la cuota diaria de
- *    Apps Script ni ralentizar la hoja.
- *  · Acepta `?callback=nombre` (JSONP) porque algunos navegadores y
- *    extensiones bloquean la lectura directa entre dominios. La web
- *    intenta primero la vía limpia y sólo recurre a esta si falla.
+ *  SEGURIDAD
+ *  · Honeypot, deduplicación, bloqueo transaccional, origen permitido y
+ *    límite por email. Turnstile se valida si configuras su secreto.
  *
  *  Sobre CORS, que es lo que suele romper esto: la web envía el cuerpo
  *  como `text/plain` a propósito. Con `application/json` el navegador
@@ -93,13 +85,27 @@
 var HOJA = "Inscripciones";
 
 /** Cabeceras de la tabla. Se escriben solas la primera vez. */
-var CABECERAS = ["Fecha", "Email", "Idioma", "Origen"];
+var CABECERAS = [
+  "Fecha", "Email", "Perfil", "Experiencia", "Mercados", "Journal actual",
+  "Objetivo", "Notas", "Idioma", "Comunicaciones", "Origen", "UTM source",
+  "UTM medium", "UTM campaign"
+];
 
 /** Segundos que se guarda el total en caché antes de volver a contar. */
 var CACHE_SEGUNDOS = 30;
 
 /** Clave con la que se guarda el total en la caché del script. */
 var CACHE_CLAVE = "waitlist_total";
+
+/** Configura TURNSTILE_SECRET en las propiedades del proyecto para activarlo. */
+var TURNSTILE_SECRET = PropertiesService.getScriptProperties().getProperty("TURNSTILE_SECRET") || "";
+var RATE_LIMIT_SECONDS = 60;
+var ORIGENES_PERMITIDOS = [
+  "https://mmortexx.github.io",
+  "https://countpips.com",
+  "https://www.countpips.com",
+  "http://localhost:3000",
+];
 
 /* ============================================================
    ALTAS
@@ -114,13 +120,28 @@ function doPost(e) {
     // Si llega con contenido, respondemos "ok" sin guardar nada — así
     // el bot no aprende que ha sido detectado.
     if (datos.botcheck) {
-      return responder(e, { ok: true, position: null });
+      return responder(e, { ok: true, duplicate: false });
+    }
+
+    if (datos.origin && ORIGENES_PERMITIDOS.indexOf(String(datos.origin)) === -1) {
+      return responder(e, { ok: false, error: "origen_no_autorizado" });
+    }
+
+    if (TURNSTILE_SECRET && !verificarTurnstile(String(datos.turnstileToken || ""))) {
+      return responder(e, { ok: false, error: "anti_bot" });
     }
 
     var email = String(datos.email || "").trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return responder(e, { ok: false, error: "email_invalido" });
     }
+
+    var cache = CacheService.getScriptCache();
+    var rateKey = "beta_rate_" + Utilities.base64EncodeWebSafe(email).slice(0, 80);
+    if (cache.get(rateKey)) {
+      return responder(e, { ok: false, error: "demasiadas_petitions" });
+    }
+    cache.put(rateKey, "1", RATE_LIMIT_SECONDS);
 
     // Sin candado, dos altas a la vez leen el mismo `getLastRow()` y
     // una sobrescribe a la otra. 20 s es de sobra para una escritura;
@@ -140,9 +161,7 @@ function doPost(e) {
         if (String(columnaEmail[i][0]).trim().toLowerCase() === email) {
           return responder(e, {
             ok: true,
-            position: i + 1,
             duplicate: true,
-            count: totalPrevio,
           });
         }
       }
@@ -151,14 +170,24 @@ function doPost(e) {
     hoja.appendRow([
       new Date(),
       email,
+      String(datos.profile || "").slice(0, 20),
+      String(datos.experience || "").slice(0, 20),
+      String(datos.markets || "").slice(0, 120),
+      String(datos.workflow || "").slice(0, 30),
+      String(datos.goal || "").slice(0, 30),
+      String(datos.notes || "").slice(0, 800),
       String(datos.lang || "").slice(0, 8),
+      datos.marketingConsent === true ? "sí" : "no",
       String(datos.source || "").slice(0, 200),
+      String(datos.utmSource || "").slice(0, 100),
+      String(datos.utmMedium || "").slice(0, 100),
+      String(datos.utmCampaign || "").slice(0, 100),
     ]);
 
     var total = hoja.getLastRow() - 1; // Fila 1 son las cabeceras.
     guardarEnCache(total);
 
-    return responder(e, { ok: true, position: total, count: total });
+    return responder(e, { ok: true, duplicate: false });
   } catch (err) {
     return responder(e, { ok: false, error: String(err) });
   } finally {
@@ -206,6 +235,22 @@ function guardarEnCache(total) {
     );
   } catch (err) {
     // La caché es un lujo, no un requisito: si falla, se cuenta a mano.
+  }
+}
+
+/** Valida el token de Turnstile en servidor cuando se ha configurado el secreto. */
+function verificarTurnstile(token) {
+  if (!token) return false;
+  try {
+    var respuesta = UrlFetchApp.fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "post",
+      payload: { secret: TURNSTILE_SECRET, response: token },
+      muteHttpExceptions: true,
+    });
+    var datos = JSON.parse(respuesta.getContentText() || "{}");
+    return datos.success === true;
+  } catch (err) {
+    return false;
   }
 }
 

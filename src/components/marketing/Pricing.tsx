@@ -78,10 +78,10 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
       name: t("core"),
       price: 29,
       tagline: es
-        ? "Todo lo esencial para medir y mejorar tu operativa."
-        : "Everything you need to measure and improve your trading.",
+        ? "El núcleo del journal para construir una operativa medible."
+        : "The journal core for building a measurable trading process.",
       features: coreFeatures,
-      cta: es ? "Comprar Core" : "Buy Core",
+      cta: es ? "Solicitar acceso anticipado" : "Request early access",
     },
     {
       id: "pro",
@@ -89,10 +89,10 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
       price: 49,
       popular: true,
       tagline: es
-        ? "Para el trader serio con ambición prop firm."
-        : "For the serious trader with prop firm ambition.",
+        ? "Controles avanzados para exigencia prop y multi-cuenta."
+        : "Advanced controls for prop-firm and multi-account work.",
       features: proFeatures,
-      cta: es ? "Comprar Pro" : "Buy Pro",
+      cta: es ? "Solicitar acceso anticipado" : "Request early access",
     },
   ];
 
@@ -125,13 +125,13 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
           >
             {es ? (
               <>
-                Lo compras una vez. Es tuyo para{" "}
-                <span className="text-gradient">siempre.</span>
+                Dos niveles. Una decisión{" "}
+                <span className="text-gradient">informada.</span>
               </>
             ) : (
               <>
-                You buy it once. It's yours{" "}
-                <span className="text-gradient">forever.</span>
+                Two tiers. One informed{" "}
+                <span className="text-gradient">decision.</span>
               </>
             )}
           </h2>
@@ -142,27 +142,20 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
           )}
         </Reveal>
 
-        {/* Barra de condiciones — sustituye al antiguo conmutador
-            "Pago único / Suscripción". Aquel conmutador dibujaba una
-            opción de suscripción tachada y deshabilitada: introducía en
-            pantalla justo el concepto que el producto niega, fingía un
-            control interactivo que no lo era (role="radiogroup" sin
-            estado) y obligaba al visitante a descartar una alternativa
-            inexistente. Aquí las tres condiciones comerciales se
-            afirman de una vez, sin negaciones ni controles falsos:
-            estructura de datos, no de interfaz. */}
+        {/* La demo es pública; la compra se habilita cuando la entrega
+            comercial esté lista. El acceso anticipado sigue siendo privado. */}
         <Reveal delay={0.08} y={20}>
-          <ul className="terms-bar mt-10" aria-label={es ? "Condiciones de compra" : "Purchase terms"}>
+          <ul className="terms-bar mt-10" aria-label={es ? "Condiciones de acceso" : "Access terms"}>
             {(es
               ? [
-                  { k: "Licencia", v: "Pago único" },
-                  { k: "Vigencia", v: "Sin caducidad" },
-                  { k: "Actualizaciones", v: "1.x incluidas" },
+                  { k: "Ahora", v: "Demo sin registro" },
+                  { k: "Acceso", v: "Piloto privado" },
+                  { k: "Lanzamiento", v: "Core $29 · Pro $49" },
                 ]
               : [
-                  { k: "License", v: "One-time payment" },
-                  { k: "Term", v: "Never expires" },
-                  { k: "Updates", v: "1.x included" },
+                  { k: "Now", v: "No-sign-up demo" },
+                  { k: "Access", v: "Private pilot" },
+                  { k: "Launch", v: "Core $29 · Pro $49" },
                 ]
             ).map((item) => (
               <li key={item.k} className="terms-bar__item">
@@ -196,12 +189,12 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="font-medium text-secondary">
-                {es ? "Pago único" : "One-time payment"}
+                {es ? "Demo pública" : "Public demo"}
               </span>
               <span className="text-tertiary" aria-hidden="true">
                 ·
               </span>
-              <span>{es ? "Tus datos nunca salen de tu equipo" : "Your data never leaves your machine"}</span>
+              <span>{es ? "Compra habilitada con la entrega comercial" : "Purchase opens with commercial delivery"}</span>
             </span>
           </div>
         </Reveal>
@@ -217,15 +210,13 @@ export function Pricing({ standalone = false }: { standalone?: boolean } = {}) {
             venta, que hoy es la respuesta verdadera. */}
         <Reveal delay={0.2}>
           <p className="mt-4 text-center text-[13px] text-tertiary">
-            {es ? "El producto aún no está a la venta. " : "The product is not on sale yet. "}
+            {es ? "Son precios de lanzamiento previstos. " : "These are planned launch prices. "}
             <Link
-              href="/terminos#availability"
+              href="/beta"
               className="link-underline-host -my-2 inline-flex py-2 text-secondary transition-colors hover:text-primary"
             >
               <span className="link-underline">
-                {es
-                  ? "Condiciones de compra y devolución"
-                  : "Purchase and refund conditions"}
+                {es ? "Solicitar acceso anticipado" : "Request early access"}
               </span>
             </Link>
           </p>
@@ -351,7 +342,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
               : "bg-[rgb(var(--divider)/0.05)] text-tertiary border-[rgb(var(--divider)/0.10)]"
           }`}
         >
-          {es ? "Para siempre" : "Forever"}
+          {es ? "Lanzamiento" : "Launch"}
         </span>
       </div>
 
@@ -381,7 +372,7 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
           className="text-5xl md:text-6xl font-bold text-primary tnum leading-[0.95]"
         />
         <span className="ml-2 text-sm text-tertiary whitespace-nowrap">
-          / {es ? "pago único" : "one-time"}
+          / {es ? "precio previsto" : "planned price"}
         </span>
       </div>
 
@@ -457,12 +448,9 @@ function PlanCard({ plan, es }: { plan: Plan; es: boolean }) {
             están en `html`, así que baja suave y sin quedar tapado por la
             barra.
 
-            Cuando entre el cobro, esto pasa a ser la URL del carrito.
-
-            Pendiente de decisión del fundador: el rótulo sigue diciendo
-            «Comprar Core» / «Comprar Pro». Es su territorio, no el mío. */}
+            Cuando entre el cobro, esto pasa a ser la URL del carrito. */}
         <MagneticButton
-          href="#waitlist"
+          href="/beta"
           strength={0.18}
           className={
             // Pro: gold accent fill + accent-ink text + accent-tinted hover

@@ -28,7 +28,7 @@ export function StatsBandNew() {
     // La cuarta estadística era "30 días de garantía". Retirada: ya no se
     // ofrecen reembolsos. No se sustituye por otra cifra inventada — la
     // banda pasa a 3 columnas (ver grid-cols de abajo), que es lo honesto.
-    { v: "29 $", l: es ? "pago único · Core 29 $ · Pro 49 $" : "one-time payment · Core $29 · Pro $49" },
+    { v: "↗", l: es ? "demo interactiva · sin registro" : "interactive demo · no sign-up" },
   ];
   return (
     <section

@@ -15,9 +15,9 @@ const ROWS: Row[] = [
     cells: [/* TJ */ "Local · tu equipo", /* cloud */ "Servidor ajeno", /* excel */ "Local · tu equipo"],
   },
   {
-    labelEs: "Pago",
-    labelEn: "Payment",
-    cells: ["Único · desde $29", "Suscripción mensual", "Gratis"],
+    labelEs: "Precio",
+    labelEn: "Pricing",
+    cells: ["Core $29 · Pro $49", "Suscripción mensual", "Gratis"],
   },
   {
     labelEs: "Métricas",

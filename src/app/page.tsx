@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import { Ticker } from "@/components/marketing/Ticker";
 import { Hero } from "@/components/marketing/Hero";
+import { ProfileSelector } from "@/components/marketing/ProfileSelector";
 import { SideRail } from "@/components/tj/SideRail";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL, hreflangDe } from "@/lib/site";
@@ -11,7 +12,7 @@ import { SITE_URL, hreflangDe } from "@/lib/site";
 // metadataBase + basePath double-resolution issue (also see layout.tsx).
 
 const PAGE_DESCRIPTION =
-  "Diario de trading nativo de Windows. Métricas institucionales, disciplina que frena el error y datos 100% locales. Pago único desde 29 $. Sin suscripciones.";
+  "Diario de trading nativo de Windows. Explora una demo interactiva con métricas institucionales, disciplina y datos 100% locales.";
 
 export const metadata: Metadata = {
   title: { absolute: "CountPips — Opera como una mesa institucional." },
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CountPips — Opera como una mesa institucional.",
     description:
-      "Diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único desde 29 $.",
+      "Diario de trading profesional, nativo de Windows. Explora el producto antes de instalarlo: métricas institucionales, disciplina y datos locales.",
   },
 };
 
@@ -159,6 +160,7 @@ export function HomeBody() {
       {/* Raíl lateral 01–02 — índice local de la home (solo ≥1100px) */}
       <SideRail />
       <Hero />
+      <ProfileSelector />
       <StatsBandNew />
 
       <PlateInterlude index={0} />

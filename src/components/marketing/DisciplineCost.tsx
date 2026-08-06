@@ -83,7 +83,15 @@ export function DisciplineCost({ num = "05·b" }: { num?: string }) {
             className="rounded-[2px] overflow-hidden"
             style={{
               border: "1px solid rgb(var(--divider) / 0.13)",
-              background: "color-mix(in oklab, var(--surface) 50%, transparent)",
+              // R27-1e dejó pendiente el valor verde "+29,73 $" de esta
+              // tabla, marginal en AA (~4,0:1): al 50% de opacidad, lo que
+              // hay detrás del cristal (aurora del fondo) se cuela lo
+              // bastante como para aclarar el fondo efectivo. Subido al
+              // 70%, el mismo valor que ya usa la factura de al lado
+              // (línea de abajo) sin queja previa, para que --surface pese
+              // más que lo que asome detrás. Pendiente de remedir con el
+              // navegador cuando esté disponible.
+              background: "color-mix(in oklab, var(--surface) 70%, transparent)",
               backdropFilter: "blur(14px)",
               WebkitBackdropFilter: "blur(14px)",
             }}

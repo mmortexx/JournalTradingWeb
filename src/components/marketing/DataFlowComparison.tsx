@@ -140,8 +140,8 @@ export function DataFlowComparison({ num = "02" }: { num?: string }) {
         {/* Footer note */}
         <p className="mt-6 text-[12px] leading-[1.55] max-w-2xl" style={{ color: "var(--ink-3)" }}>
           {es
-            ? "Cada punto es una operación. En CountPips nunca sale de tu equipo: no hay servidor que hackear, no hay suscripción que caduque, no hay proveedor que cierre. Tu historial es tuyo."
-            : "Each dot is a trade. In CountPips it never leaves your machine: no server to hack, no subscription to lapse, no vendor to shut down. Your history is yours."}
+            ? "Cada punto es una operación. En CountPips nunca sale de tu equipo: el flujo local no depende de exponer tu historial a un servidor. Tu historial es tuyo."
+            : "Each dot is a trade. In CountPips it stays on your machine: the local-first workflow does not depend on exposing your history to a server. Your history is yours."}
         </p>
       </div>
     </section>

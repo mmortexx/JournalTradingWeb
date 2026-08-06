@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { HerramientaVista } from "@/components/herramientas/HerramientaVista";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { HERRAMIENTAS, herramientaPorSlug } from "@/lib/herramientas";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /** Una página por herramienta, todas generadas en la compilación. */
 export function generateStaticParams() {
@@ -23,7 +23,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: { absolute: `${h.tituloEs} — CountPips` },
     description: h.descripcionEs,
-    alternates: { canonical: `${SITE_URL}/herramientas/${h.slug}/` },
+    alternates: {
+      canonical: `${SITE_URL}/herramientas/${h.slug}/`,
+      languages: hreflangDe(`/herramientas/${h.slug}`),
+    },
     openGraph: {
       title: `${h.tituloEs} — CountPips`,
       description: h.descripcionEs,

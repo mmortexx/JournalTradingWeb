@@ -8,23 +8,21 @@ import { TITULAR, LEGAL_ACTUALIZADO } from "@/lib/legal/titular";
  * de verdad y que se ha comprobado en el código:
  *
  *  · El formulario de contacto envía a Web3Forms (`src/lib/forms.ts:19`).
- *  · La lista de espera envía a un script de Google Apps Script
- *    (`src/lib/forms.ts:46`, `docs/waitlist-apps-script.js`).
- *  · No hay analítica, ni píxeles, ni publicidad: no existe ninguna otra
- *    llamada a un tercero en todo el proyecto.
+ *  · La solicitud de acceso anticipado se envía al endpoint de admisión configurado
+ *    (`src/lib/forms.ts`, `docs/waitlist-apps-script.js`).
+ *  · La analítica PostHog sólo se carga después del consentimiento explícito
+ *    y en su región europea; la web no envía respuestas ni datos financieros.
  *  · Las tipografías se sirven desde el propio dominio (`next/font`), así
  *    que ni siquiera hay una petición a Google Fonts que registre una IP.
  *  · Lo único que queda en el navegador son siete claves de almacenamiento
  *    local, listadas una a una más abajo. NINGUNA es una cookie.
  *
- * Una plantilla genérica habría hablado de cookies analíticas y de
- * publicidad comportamental que aquí no existen. Habría sido más largo y
- * menos cierto, y además habría desperdiciado el mejor argumento de este
- * producto, que es justamente que no recoge nada.
+ * La política distingue las preferencias técnicas de la medición opcional,
+ * para que el visitante pueda aceptar, rechazar o retirar ese consentimiento.
  *
  * ── LO QUE ESTO NO ES ─────────────────────────────────────────────────
  * Un borrador redactado por quien construye el sitio, no por un abogado.
- * Sirve para publicar una web informativa con lista de espera. Antes de
+ * Sirve para publicar una web informativa con demo pública y acceso anticipado privado. Antes de
  * cobrar un solo euro hay que pasarlo por un profesional, sobre todo los
  * términos de venta y la licencia del programa.
  */
@@ -73,13 +71,13 @@ const privacidad: DocumentoLegal = {
   tituloEs: "Política de privacidad",
   tituloEn: "Privacy policy",
   entradaEs:
-    "Esta web recoge dos cosas, y solo si tú las escribes: tu correo si te apuntas a la lista de espera, y lo que pongas en el formulario de contacto. No hay analítica, ni cookies de terceros, ni publicidad.",
+    "Esta web recoge una solicitud de acceso anticipado cuando la envías y, sólo con permiso, medición agregada de uso mediante PostHog en la UE. No pedimos credenciales, capital, extractos ni datos financieros.",
   entradaEn:
-    "This site collects two things, and only if you type them: your email if you join the waiting list, and whatever you write in the contact form. There is no analytics, no third-party cookies and no advertising.",
+    "This site collects an early-access application when you submit it and, only with permission, aggregated usage measurement through EU-hosted PostHog. We do not ask for credentials, capital, statements or financial data.",
   descripcionEs:
-    "Qué datos recoge la web de CountPips, quién los trata y cómo pedir que se borren. Sin analítica ni rastreo.",
+    "Qué datos recoge la web de CountPips, quién los trata, cómo funciona PostHog opcional y cómo pedir que se borren.",
   descripcionEn:
-    "What data the CountPips site collects, who processes it and how to have it deleted. No analytics, no tracking.",
+    "What the CountPips site collects, who processes it, how optional PostHog works and how to have it deleted.",
   secciones: [
     {
       id: "responsable",
@@ -100,8 +98,8 @@ const privacidad: DocumentoLegal = {
       bloques: [
         {
           tipo: "parrafo",
-          es: "En toda la web hay exactamente dos formularios. Fuera de ellos, no se recoge ningún dato personal.",
-          en: "There are exactly two forms on this site. Outside them, no personal data is collected at all.",
+          es: "La solicitud de acceso anticipado pide sólo el contexto necesario para seleccionar un piloto: email, perfil, experiencia, mercados, método actual de journal, objetivo y comentario opcional. El formulario de contacto pide nombre, email y mensaje.",
+          en: "The early-access application asks only for the context needed to select a pilot: email, profile, experience, markets, current journaling method, goal and optional note. The contact form asks for name, email and message.",
         },
         {
           tipo: "tabla",
@@ -110,14 +108,14 @@ const privacidad: DocumentoLegal = {
           filas: [
             {
               es: [
-                "Lista de espera",
-                "Tu correo, el idioma en que navegas y desde qué página te apuntaste",
-                "Una hoja de cálculo de Google, a través de un script propio",
+                "Solicitud de acceso anticipado",
+                "Email, perfil, experiencia, mercados, método de journal, objetivo, comentario opcional, idioma y origen/UTM",
+                "El endpoint de admisión, con acceso restringido",
               ],
               en: [
-                "Waiting list",
-                "Your email, the language you are browsing in and which page you signed up from",
-                "A Google spreadsheet, through our own script",
+                "Early-access application",
+                "Email, profile, experience, markets, journaling method, goal, optional note, language and source/UTM",
+                "The admission endpoint, with restricted access",
               ],
             },
             {
@@ -154,18 +152,18 @@ const privacidad: DocumentoLegal = {
         {
           tipo: "lista",
           es: [
-            "No hay analítica. Ni Google Analytics, ni ninguna otra: no se sabe cuánta gente entra, ni desde dónde, ni qué mira.",
-            "No hay píxeles de seguimiento ni publicidad, de nadie.",
+            "No se carga PostHog ni ninguna otra analítica si no aceptas la categoría opcional.",
+            "PostHog funciona en región europea y recibe eventos de embudo sin email, respuestas de formulario, valores de calculadora ni datos financieros.",
             "No se elabora ningún perfil tuyo, ni se toman decisiones automatizadas sobre ti.",
             "No se comparte, vende ni cede tu correo a terceros con fines comerciales.",
-            "Las tipografías se sirven desde este mismo dominio, así que ni siquiera se produce una petición a un servidor de fuentes que pudiera registrar tu dirección IP.",
+            "Las tipografías se sirven desde este mismo dominio; no usamos píxeles publicitarios ni vendemos perfiles.",
           ],
           en: [
-            "There is no analytics. Not Google Analytics, not any other: we do not know how many people visit, from where, or what they look at.",
-            "There are no tracking pixels and no advertising, from anyone.",
+            "PostHog and all other analytics remain disabled unless you accept the optional category.",
+            "PostHog runs in the European region and receives funnel events without emails, form answers, calculator values or financial data.",
             "No profile of you is built, and no automated decisions are made about you.",
             "Your email is never shared, sold or transferred to third parties for commercial purposes.",
-            "Fonts are served from this same domain, so not even a request to a font server that could log your IP address takes place.",
+            "Fonts are served from this same domain; we use no advertising pixels and do not sell profiles.",
           ],
         },
       ],
@@ -178,18 +176,18 @@ const privacidad: DocumentoLegal = {
         {
           tipo: "lista",
           es: [
-            "Lista de espera: avisarte cuando el programa esté disponible. La base es tu consentimiento, que das al escribir tu correo y enviarlo.",
-            "Contacto: responder a lo que preguntas. La base es tu consentimiento y el interés en atender tu solicitud.",
+            "Acceso anticipado: evaluar tu solicitud, asignar un piloto y contactar contigo si encaja. La base es tu consentimiento al enviarla.",
+            "Analítica opcional: medir el recorrido de la web y detectar fricciones. La base es tu consentimiento granular, revocable en cualquier momento.",
           ],
           en: [
-            "Waiting list: to tell you when the software is available. The basis is your consent, given when you type your email and submit it.",
-            "Contact: to answer what you ask. The basis is your consent and the interest in handling your request.",
+            "Early access: evaluate your application, assign a pilot and contact you if it fits. The basis is your consent when you submit it.",
+            "Optional analytics: measure the website journey and identify friction. The basis is granular consent, revocable at any time.",
           ],
         },
         {
           tipo: "parrafo",
-          es: "Tu correo no se usa para enviarte publicidad de otros productos ni boletines que no hayas pedido.",
-          en: "Your email is not used to send you advertising for other products, nor newsletters you did not ask for.",
+          es: "Las comunicaciones futuras son opcionales y separadas: sólo se enviarán si marcas esa casilla. Tu email no se usa para publicidad de terceros.",
+          en: "Future communications are optional and separate: they are sent only if you tick that box. Your email is not used for third-party advertising.",
         },
       ],
     },
@@ -200,18 +198,22 @@ const privacidad: DocumentoLegal = {
       bloques: [
         {
           tipo: "parrafo",
-          es: "Dos proveedores tratan datos por encargo, porque la web es estática y no tiene servidor propio donde recibirlos:",
-          en: "Two providers process data on our behalf, because the site is static and has no server of its own to receive it:",
+          es: "Los proveedores que pueden intervenir son el endpoint de admisión, Turnstile para el control anti-bot, PostHog en la UE si aceptas analítica, Web3Forms para contacto y el alojamiento estático:",
+          en: "Providers that may be involved are the admission endpoint, Turnstile for anti-bot protection, EU-hosted PostHog if you accept analytics, Web3Forms for contact and static hosting:",
         },
         {
           tipo: "lista",
           es: [
+            "Endpoint de admisión — recibe y deduplica solicitudes para el equipo de selección.",
+            "Cloudflare Turnstile — valida que la solicitud procede de una persona cuando el control está activado.",
+            "PostHog EU — recibe eventos técnicos sólo tras consentimiento analítico.",
             "Web3Forms — recibe el formulario de contacto y lo reenvía al buzón de soporte.",
-            "Google — aloja la hoja de cálculo de la lista de espera y ejecuta el script que la escribe.",
           ],
           en: [
+            "Admission endpoint — receives and deduplicates applications for the selection team.",
+            "Cloudflare Turnstile — checks that an application comes from a person when enabled.",
+            "EU PostHog — receives technical events only after analytics consent.",
             "Web3Forms — receives the contact form and forwards it to the support mailbox.",
-            "Google — hosts the waiting-list spreadsheet and runs the script that writes to it.",
           ],
         },
         {
@@ -229,11 +231,11 @@ const privacidad: DocumentoLegal = {
         {
           tipo: "lista",
           es: [
-            "Lista de espera: hasta el lanzamiento del programa o hasta que pidas la baja, lo que ocurra antes.",
+            "Solicitud de acceso anticipado: durante la selección y el piloto, y después sólo el tiempo necesario para atender obligaciones o tu baja.",
             "Contacto: el tiempo necesario para resolver tu consulta y el plazo en que pudieran derivarse responsabilidades.",
           ],
           en: [
-            "Waiting list: until the software launches or until you ask to be removed, whichever comes first.",
+            "Early-access application: during selection and the pilot, then only as long as needed for obligations or your deletion request.",
             "Contact: as long as needed to resolve your query, plus any period in which liability could arise.",
           ],
         },
@@ -293,28 +295,28 @@ const cookies: DocumentoLegal = {
   tituloEs: "Política de cookies",
   tituloEn: "Cookie policy",
   entradaEs:
-    "Esta web no usa cookies. Lo que hace es recordar algunas preferencias tuyas en el propio navegador, y aquí está la lista completa de lo que guarda.",
+    "Las preferencias técnicas se guardan localmente. La analítica opcional sólo se activa si la aceptas y puede usar almacenamiento de PostHog para recordar tu consentimiento.",
   entradaEn:
-    "This site does not use cookies. What it does is remember a few of your preferences in the browser itself, and here is the full list of what it stores.",
+    "Technical preferences are stored locally. Optional analytics only starts if you accept it and may use PostHog storage to remember your consent.",
   descripcionEs:
-    "La web de CountPips no usa cookies. Lista completa de lo que guarda en tu navegador y cómo borrarlo.",
+    "Preferencias locales y analítica opcional de CountPips: qué guarda tu navegador y cómo retirar el consentimiento.",
   descripcionEn:
-    "The CountPips site uses no cookies. Full list of what it stores in your browser and how to delete it.",
+    "CountPips local preferences and optional analytics: what your browser stores and how to withdraw consent.",
   secciones: [
     {
       id: "no-cookies",
-      tituloEs: "No hay cookies",
-      tituloEn: "There are no cookies",
+      tituloEs: "Preferencias necesarias y analítica opcional",
+      tituloEn: "Necessary preferences and optional analytics",
       bloques: [
         {
           tipo: "parrafo",
-          es: "Una cookie es un dato que tu navegador envía de vuelta al servidor en cada petición, y por eso sirve para seguirte. Esta web no crea ninguna. Lo que usa es almacenamiento local: información que se queda en tu navegador y que NUNCA sale de él, porque nadie la pide.",
-          en: "A cookie is a piece of data your browser sends back to the server on every request, which is what makes it useful for following you around. This site creates none. What it uses is local storage: information that stays in your browser and NEVER leaves it, because nobody asks for it.",
+          es: "Las preferencias de idioma, tema y consentimiento se guardan localmente. Si aceptas analítica, PostHog puede guardar identificadores técnicos para medir el uso agregado; puedes retirar ese permiso desde el aviso de cookies o borrando el almacenamiento del sitio.",
+          en: "Language, theme and consent preferences are stored locally. If you accept analytics, PostHog may store technical identifiers for aggregate measurement; you can withdraw permission from the cookie notice or by clearing this site's storage.",
         },
         {
           tipo: "parrafo",
-          es: "La diferencia importa: nada de lo que hay en esa lista viaja por la red, así que no puede usarse para reconocerte en otra web ni para construir un perfil.",
-          en: "The difference matters: nothing on that list travels over the network, so it cannot be used to recognise you on another site or to build a profile.",
+          es: "La analítica es opcional y no se carga hasta que la aceptas. No se envían emails, respuestas del formulario, valores de calculadoras ni datos financieros.",
+          en: "Analytics is optional and does not load until you accept it. Emails, form answers, calculator values and financial data are not sent.",
         },
       ],
     },
@@ -329,8 +331,8 @@ const cookies: DocumentoLegal = {
           cabecerasEn: ["What it stores", "What for", "How long"],
           filas: [
             {
-              es: ["Tu elección en este aviso", "No volver a preguntarte", "Hasta que borres los datos del navegador"],
-              en: ["Your choice in this notice", "So we do not ask you again", "Until you clear your browser data"],
+              es: ["Tu elección en este aviso", "Recordar consentimiento", "Hasta que borres los datos del navegador"],
+              en: ["Your choice in this notice", "Remember consent", "Until you clear your browser data"],
             },
             {
               es: ["Tema claro u oscuro", "Abrir la web como la dejaste", "Hasta que borres los datos del navegador"],
@@ -360,8 +362,8 @@ const cookies: DocumentoLegal = {
         },
         {
           tipo: "parrafo",
-          es: "Ninguna de las siete sirve para rastrear, medir audiencias ni mostrar publicidad. Todas son preferencias tuyas o comodidades de uso.",
-          en: "None of the seven is used for tracking, audience measurement or advertising. All of them are your own preferences or usability conveniences.",
+          es: "Las preferencias técnicas no se usan para medir audiencias. La medición PostHog es una categoría separada, opcional y revocable.",
+          en: "Technical preferences are not used for audience measurement. PostHog measurement is a separate, optional and revocable category.",
         },
       ],
     },
@@ -372,8 +374,8 @@ const cookies: DocumentoLegal = {
       bloques: [
         {
           tipo: "parrafo",
-          es: "Porque preferimos preguntar aunque no haga falta. Si rechazas, la web funciona exactamente igual: no hay nada que desactivar, porque no se cargaba nada. Lo único que cambia es que recordamos tu respuesta para no volver a interrumpirte.",
-          en: "Because we would rather ask even when it is not required. If you decline, the site works exactly the same: there is nothing to switch off, because nothing was loaded. The only change is that we remember your answer so we do not interrupt you again.",
+          es: "Porque la analítica opcional requiere tu permiso. Si rechazas, la web funciona igual y PostHog no se carga. Para retirar un permiso concedido, borra la preferencia de consentimiento del sitio y vuelve a elegir «Solo necesarias».",
+          en: "Because optional analytics requires your permission. If you decline, the site works the same and PostHog is not loaded. To withdraw a previous choice, clear this site's consent preference and choose “Necessary only”.",
         },
       ],
     },
@@ -384,8 +386,8 @@ const cookies: DocumentoLegal = {
       bloques: [
         {
           tipo: "parrafo",
-          es: "Desde los ajustes de tu navegador, borrando los datos de sitios web. También basta con navegar en una ventana privada: al cerrarla no queda nada.",
-          en: "From your browser settings, by clearing site data. Browsing in a private window also works: nothing is left when you close it.",
+          es: "Desde los ajustes de tu navegador, borrando los datos de sitios web y volviendo a elegir «Solo necesarias» en el aviso. También puedes escribirnos para solicitar la supresión de una solicitud de acceso anticipado.",
+          en: "From your browser settings, clear this site's data and choose “Necessary only” in the notice again. You can also write to us to request deletion of an early-access application.",
         },
       ],
     },
@@ -460,8 +462,8 @@ const terminos: DocumentoLegal = {
       bloques: [
         {
           tipo: "parrafo",
-          es: "Los precios y las características que se muestran son informativos y describen lo previsto para el lanzamiento. Pueden cambiar antes de que se abra la venta. Apuntarte a la lista de espera no es una compra, no genera ningún cargo y no te obliga a nada.",
-          en: "The prices and features shown are informational and describe what is planned for launch. They may change before sales open. Joining the waiting list is not a purchase, creates no charge and commits you to nothing.",
+          es: "La demo es pública y funciona con datos de muestra. El acceso anticipado se asigna por perfil y no es una compra ni una preventa. Los precios Core $29 y Pro $49 son referencias de lanzamiento y pueden cambiar antes de abrir la venta.",
+          en: "The demo is public and uses sample data. Early access is assigned by profile and is not a purchase or pre-order. Core $29 and Pro $49 are planned launch references and may change before sales open.",
         },
         {
           tipo: "parrafo",
@@ -586,8 +588,8 @@ const avisoLegal: DocumentoLegal = {
       bloques: [
         {
           tipo: "parrafo",
-          es: "El acceso es libre y gratuito. Algunas funciones —la lista de espera y el formulario de contacto— requieren que facilites datos, y en ese caso se aplica la política de privacidad.",
-          en: "Access is free and open. Some features — the waiting list and the contact form — require you to provide data, in which case the privacy policy applies.",
+          es: "El acceso público a la web y a la demo es libre y gratuito. La solicitud de acceso anticipado y el formulario de contacto requieren datos, y en ese caso se aplica la política de privacidad.",
+          en: "Public access to the site and demo is free and open. The early-access application and contact form require data, in which case the privacy policy applies.",
         },
       ],
     },

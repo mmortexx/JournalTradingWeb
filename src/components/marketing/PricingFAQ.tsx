@@ -18,8 +18,8 @@ import {
  * Pricing page between Comparison and TrustStrip.
  *
  * Distinct from the main marketing FAQ.tsx:
- *  - Narrower scope: only questions a buyer has at the pricing-decision moment
- *    (trial, payment methods, multi-computer, lost license).
+ *  - Narrower scope: only questions a trader has before requesting beta access
+ *    (what happens now, data, future pricing and invitation).
  *  - No search bar (the set is small enough that a search would feel heavy).
  *  - Centered institutional header above the accordion (eyebrow + headline
  *    + lead + 3 reassurance pills) — mirrors the Pricing header rhythm so
@@ -56,48 +56,46 @@ export function PricingFAQ() {
   const items: QA[] = es
     ? [
         {
-          q: "¿Puedo probar antes de comprar?",
-          a: "Sí. Tienes la demo en vivo de esta misma web — sin registro, sin descargar nada, con datos deterministas.",
+          q: "¿Qué recibo al solicitar acceso anticipado?",
+          a: "Revisamos cada solicitud por perfil y fase del producto. Si encaja con el piloto privado, recibirás una invitación con los siguientes pasos. No mostramos una posición en cola.",
         },
         {
-          q: "¿Qué métodos de pago aceptáis?",
-          a: "Tarjeta de crédito/débito y PayPal. Emitimos factura con IVA si procede.",
+          q: "¿La demo tiene algún coste?",
+          a: "No. La demo es pública, funciona con datos de muestra y no pide tarjeta, registro ni instalación.",
         },
         {
-          q: "¿Puedo usarlo en varios ordenadores?",
-          a: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Activaciones adicionales se gestionan escribiendo a soporte.",
+          q: "¿Qué incluyen los precios de lanzamiento?",
+          a: "Core está previsto en $29 y Pro en $49. Son referencias de lanzamiento hasta que la entrega comercial, la licencia y el soporte estén abiertos.",
         },
         {
-          q: "¿Qué pasa si pierdo mi licencia?",
-          a: "Nada. Tu licencia se asocia a tu correo electrónico: escríbenos y te la reenviamos las veces que haga falta. Y aunque pierdas el acceso al correo, tu historial sigue intacto porque vive en tu equipo, no en el nuestro.",
+          q: "¿Qué datos no se solicitan?",
+          a: "Nunca pedimos credenciales, capital, extractos ni datos financieros. Sólo preguntamos lo necesario para seleccionar el piloto y entender tu contexto de journal.",
         },
       ]
     : [
         {
-          q: "Can I try before buying?",
-          a: "Yes. You have the live demo on this very site — no signup, nothing to download, with deterministic data.",
+          q: "What do I receive when I request early access?",
+          a: "We review every request by profile and product phase. If it fits the private pilot, you receive an invitation with next steps. We do not show a queue position.",
         },
         {
-          q: "What payment methods do you accept?",
-          a: "Credit/debit card and PayPal. We issue VAT invoices where applicable.",
+          q: "Does the demo cost anything?",
+          a: "No. The demo is public, uses sample data, and requires no card, sign-up or installation.",
         },
         {
-          q: "Can I use it on multiple computers?",
-          a: "Yes. A single license lets you install CountPips on your personal computers (your trading desktop and your laptop, for example). Extra activations can be arranged by emailing support.",
+          q: "What do the launch prices include?",
+          a: "Core is planned at $29 and Pro at $49. They are launch references until commercial delivery, licensing and support are open.",
         },
         {
-          q: "What if I lose my license?",
-          a: "Nothing happens. Your license is tied to your email address: write to us and we'll resend it as many times as you need. And even if you lose access to that email, your history stays intact because it lives on your machine, not ours.",
+          q: "What data do you not request?",
+          a: "We never ask for credentials, capital, statements or financial data. We only ask what is needed to select the pilot and understand your journaling context.",
         },
       ];
 
-  /* La píldora de garantía se retiró (no se ofrecen reembolsos). Se
-     mantiene el trío que pide la maqueta con "Sin suscripción", que es
-     una promesa que el producto sí sostiene. */
+  /* Reassurance signals describe the current commercial path honestly. */
   const pills = [
-    es ? "Datos 100 % locales" : "100 % local data",
-    es ? "Pago único" : "One-time payment",
-    es ? "Sin suscripción" : "No subscription",
+    es ? "Demo sin registro" : "No-sign-up demo",
+    es ? "Datos de muestra" : "Sample data",
+    es ? "Acceso anticipado privado" : "Private early access",
   ];
 
   return (
@@ -117,23 +115,23 @@ export function PricingFAQ() {
             two sections read as one continuous conversion story. */}
         <Reveal className="text-center max-w-2xl mx-auto">
           <Eyebrow className="justify-center">
-            {es ? "Antes de comprar" : "Before you buy"}
+            {es ? "Antes de decidir" : "Before you decide"}
           </Eyebrow>
           <h2 className="mt-5 text-3xl md:text-4xl font-semibold tracking-tight text-primary text-balance">
             {es ? (
               <>
-                Lo que casi todos <span className="text-gradient">preguntan.</span>
+                Lo que casi todos <span className="text-gradient">quieren saber.</span>
               </>
             ) : (
               <>
-                What almost everyone <span className="text-gradient">asks.</span>
+                What almost everyone <span className="text-gradient">wants to know.</span>
               </>
             )}
           </h2>
           <p className="mt-4 text-base md:text-lg text-secondary leading-relaxed">
             {es
-              ? "Cuatro respuestas rápidas sobre prueba, pago y licencia. Si te queda alguna duda, escríbenos: respondemos en menos de 24 h."
-              : "Four quick answers about trial, payment and license. If anything is still unclear, email us: we reply within 24 h."}
+              ? "Cuatro respuestas rápidas sobre la demo, el alcance y el acceso anticipado. Si te queda alguna duda, escríbenos."
+              : "Four quick answers about the demo, scope and early access. If anything is still unclear, email us."}
           </p>
 
           {/* Compact reassurance row — three pills summarizing the

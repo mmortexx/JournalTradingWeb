@@ -60,6 +60,14 @@ Las que sí hay que añadir, en *Settings → Environment variables*:
 
 - `NEXT_PUBLIC_WEB3FORMS_KEY` — destino de los formularios de contacto.
 - `NEXT_PUBLIC_WAITLIST_URL` — script que recoge las altas de la lista.
+- `NEXT_PUBLIC_BETA_API_URL` — URL de `POST /v1/applications` del Worker
+  `services/beta-api`. Sin ella, el formulario de `/beta` cae al mismo
+  Apps Script que la lista de espera (mismo contrato, sin panel interno
+  ni deduplicación por base de datos).
+- `NEXT_PUBLIC_POSTHOG_KEY` — clave de proyecto de PostHog (host EU). Sin
+  ella no se carga analítica; el sitio funciona igual.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` — site key pública de Turnstile. Sin
+  ella no se renderiza el widget anti-bot en `/beta`.
 - `NEXT_PUBLIC_SITE_URL` — **solo cuando el dominio esté comprado y
   apuntando**. Antes de eso, déjala sin definir: el sitio usará la dirección
   donde está publicado y todo seguirá siendo coherente.
@@ -77,8 +85,11 @@ Cloudflare solo, no hay que hacer nada.
 
 ## Cabeceras
 
-`public/_headers` lleva las cabeceras de seguridad y de caché. Lo lee
+`public/_headers` lleva las cabeceras de seguridad y de caché, incluida la
+`Content-Security-Policy` (restringe scripts/conexiones a los dominios que el
+sitio usa de verdad: Turnstile, PostHog, Web3Forms, Apps Script). Lo lee
 Cloudflare; GitHub Pages lo ignora porque no permite configurarlas — así que
+la copia de GitHub Pages **no lleva CSP ni el resto de estas cabeceras**, y
 ese fichero no puede romper la publicación antigua. Es una de las cosas que se
 ganan con este cambio.
 

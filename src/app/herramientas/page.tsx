@@ -4,7 +4,7 @@ import { HerramientasIndice } from "@/components/herramientas/HerramientasIndice
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { HERRAMIENTAS } from "@/lib/herramientas";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /herramientas — las calculadoras, cada una con su dirección.
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   title: "Herramientas de trading",
   description:
     "Calculadora de tamaño de posición, Monte Carlo, significancia de tu edge, proyector de capital y reloj de sesiones. Gratis, sin registro y sin enviar datos.",
-  alternates: { canonical: `${SITE_URL}/herramientas/` },
+  alternates: { canonical: `${SITE_URL}/herramientas/`, languages: hreflangDe("/herramientas") },
   openGraph: {
     title: "Herramientas de trading — CountPips",
     description:
@@ -74,7 +74,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HerramientasPage() {
+/** Exportado con nombre para que `app/en/herramientas/page.tsx` lo
+ *  reutilice. Sin los `<script>` de datos estructurados: cada idioma
+ *  lleva los suyos. */
+export function HerramientasBody() {
   return (
     <>
       <PageHeader
@@ -89,6 +92,16 @@ export default function HerramientasPage() {
         breadcrumbEs="Herramientas"
         breadcrumbEn="Tools"
       />
+      <HerramientasIndice />
+      <PlateInterlude index={0} />
+      <FinalCTANew />
+    </>
+  );
+}
+
+export default function HerramientasPage() {
+  return (
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -97,9 +110,7 @@ export default function HerramientasPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(listaSchema) }}
       />
-      <HerramientasIndice />
-      <PlateInterlude index={0} />
-      <FinalCTANew />
+      <HerramientasBody />
     </>
   );
 }

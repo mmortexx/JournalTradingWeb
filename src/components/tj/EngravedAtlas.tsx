@@ -1704,18 +1704,9 @@ function plateStreak(ctx: Ctx, w: number, h: number, t: number) {
 }
 
 /**
- * `tenure` — lo que cuesta alquilar frente a lo que cuesta comprar.
- *
- * La página de precios tenía prestadas sus dos láminas: el libro mayor,
- * que es de seguridad, y la curva de capital, que es de la portada. Ambas
- * quedan bien, pero ninguna dice lo que esa página defiende. Esta sí: dos
- * trazos sobre el mismo eje de años, la escalera de una suscripción que
- * no para de subir y la horizontal de un pago que se hace una vez.
- *
- * Lo que argumenta no es ninguna de las dos líneas, sino el hueco que se
- * abre entre ellas: crece solo con el tiempo, sin que nadie añada nada.
- * Por eso el área tramada es la última fase del grabado — se lee después
- * de las líneas, que es el orden en que se entiende.
+ * `tenure` — la adopción por evidencia, representada como una secuencia de
+ * validación. La lámina conserva el lenguaje de instrumento y el eje
+ * temporal, pero no presenta una compra que todavía no existe.
  */
 function plateTenure(ctx: Ctx, w: number, h: number, t: number) {
   plateChrome(ctx, w, h, t);
@@ -1733,19 +1724,18 @@ function plateTenure(ctx: Ctx, w: number, h: number, t: number) {
   engraveLine(ctx, [[x0, yBase], [x0 + gw, yBase]], ap, 1, 0.44, 1201);
   engraveLine(ctx, [[x0, yBase], [x0, yBase - gh]], ap, 0.85, 0.36, 1203);
 
-  /* Las marcas de año. El eje es el tiempo: es la variable de la que
-     depende todo el argumento. */
+  /* Las marcas de cohorte. El eje es el tiempo de validación, no un
+     calendario comercial. */
   for (let i = 0; i <= YEARS; i++) {
     const p = phase(t, 0.08 + i * 0.02, 0.2);
     if (p <= 0.01) continue;
     const X = x0 + i * stepX;
     engraveLine(ctx, [[X, yBase], [X, yBase + 6]], p, 0.6, 0.32, i + 1211);
-    label(ctx, i === 0 ? "HOY" : `AÑO ${i}`, X, yBase + 19, 8.5, 0.42, p, "center");
+    label(ctx, i === 0 ? "HOY" : `COHORTE ${i}`, X, yBase + 19, 8.5, 0.42, p, "center");
   }
 
-  /* LA ESCALERA — la suscripción. Sube un tramo por año y no baja nunca:
-     el escalón horizontal es el año que se paga, el vertical el cargo que
-     vuelve. Se dibuja como escalera y no como recta porque así se cobra. */
+  /* LA ESCALERA — la validación. Cada cohorte añade evidencia, no un
+     cobro recurrente. */
   const yTop = yBase - gh * 0.9;
   const subPts: Pt[] = [[x0, yBase]];
   for (let i = 1; i <= YEARS; i++) {
@@ -1755,15 +1745,15 @@ function plateTenure(ctx: Ctx, w: number, h: number, t: number) {
   }
   const sp = phase(t, 0.2, 0.34);
   engraveLine(ctx, subPts, sp, 1.35, 0.5, 1221);
-  label(ctx, "SUSCRIPCIÓN", x0 + gw - 6, yTop - 10, 9.5, 0.5, sp, "right");
+  label(ctx, "VALIDACIÓN", x0 + gw - 6, yTop - 10, 9.5, 0.5, sp, "right");
 
-  /* LA HORIZONTAL — el pago único. Un peldaño al principio y ni uno más;
-     el resto del trazo es plano porque no vuelve a pasar nada. */
+  /* LA HORIZONTAL — el acceso anticipado privado: una condición estable
+     durante esta fase, sin convertirla en una oferta comercial. */
   const yOnce = yBase - gh * 0.16;
   const oncePts: Pt[] = [[x0, yBase], [x0, yOnce], [x0 + gw, yOnce]];
   const op = phase(t, 0.42, 0.3);
   engraveLine(ctx, oncePts, op, 1.35, 0.52, 1231);
-  label(ctx, "PAGO ÚNICO", x0 + 8, yOnce - 11, 9.5, 0.52, op, "left");
+  label(ctx, "ACCESO PRIVADO", x0 + 8, yOnce - 11, 9.5, 0.52, op, "left");
 
   /* EL HUECO — lo que separa una cosa de la otra, que es de lo que va la
      página. Se trama por franjas anuales siguiendo la escalera, no como
@@ -1781,7 +1771,7 @@ function plateTenure(ctx: Ctx, w: number, h: number, t: number) {
       hatch(ctx, bx, yNow, stepX, yOnce - yNow, Math.PI / 4, 5.4, 0.38, 0.2, gp, i + 1241);
       ctx.restore();
     }
-    label(ctx, "LO QUE NO PAGAS", x0 + gw * 0.5, yTop + gh * 0.3, 9, 0.44, gp, "center");
+    label(ctx, "EVIDENCIA ACUMULADA", x0 + gw * 0.5, yTop + gh * 0.3, 9, 0.44, gp, "center");
   }
 }
 

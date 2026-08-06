@@ -104,6 +104,9 @@ export function Footer() {
       links: [
         { label: es ? "Características" : "Features", href: "/features" },
         { label: es ? "Demo" : "Demo", href: "/demo" },
+        { label: es ? "Operativa manual" : "Manual trading", href: "/traders/manual" },
+        { label: es ? "Prop firms" : "Prop firms", href: "/traders/prop-firms" },
+        { label: es ? "Acceso anticipado" : "Early access", href: "/beta" },
         { label: es ? "Precios" : "Pricing", href: "/pricing" },
         { label: "Changelog", href: "/about#changelog" },
       ],
@@ -156,10 +159,10 @@ export function Footer() {
   // PositioningStrip on the home page carries the visual version of these;
   // the footer's is the closing reminder.
   const trust: string[] = [
-    es ? "Pago único · Sin suscripción" : "One-time payment · No subscription",
+    es ? "Demo interactiva · Sin registro" : "Interactive demo · No sign-up",
     es ? "Datos 100 % locales" : "100 % local data",
     "ES + EN",
-    es ? "Actualizaciones 1.x gratuitas" : "Free 1.x updates",
+    es ? "Acceso anticipado privado" : "Private early access",
   ];
 
   // SE QUEDA EN `liquid-glass` a propósito: el pie es una banda a ancho

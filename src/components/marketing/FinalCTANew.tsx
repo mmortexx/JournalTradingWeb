@@ -65,12 +65,12 @@ export function FinalCTANew() {
           {es ? (
             <>
               Deja de operar a ciegas.<br />
-              <span style={{ color: "rgb(var(--accent-base))" }}>Empieza a medir.</span>
+              <span style={{ color: "rgb(var(--accent-base))" }}>Mira cómo se mide.</span>
             </>
           ) : (
             <>
               Stop trading blind.<br />
-              <span style={{ color: "rgb(var(--accent-base))" }}>Start measuring.</span>
+              <span style={{ color: "rgb(var(--accent-base))" }}>See how it is measured.</span>
             </>
           )}
         </motion.h2>
@@ -88,8 +88,8 @@ export function FinalCTANew() {
           }}
         >
           {es
-            ? "40+ métricas, guardián de disciplina y tus datos en tu máquina. Pago único desde 29 $, sin suscripciones."
-            : "40+ metrics, a discipline guardian, and your data on your machine. One-time payment from $29, no subscriptions."}
+            ? "40+ métricas, guardián de disciplina y tus datos en tu máquina. Explora la demo con datos de muestra y decide con criterio."
+            : "40+ metrics, a discipline guardian, and your data on your machine. Explore the sample-data demo and decide with clarity."}
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -103,9 +103,9 @@ export function FinalCTANew() {
           className="mt-9 flex flex-wrap items-center justify-center gap-3.5"
         >
           <Link
-            href="/pricing"
+            href="/demo"
             // T2d — `px-6 sm:px-8` en ambos CTAs (era `px-8` fijo):
-            // en 320px el botón primario “Empieza hoy — 29 $” + icono
+            // en 320px el botón primario de la demo + icono
             // medía ~281px y desbordaba los 280px de contenido útil
             // (320 − 2×20 de px-5 del contenedor). Bajar a 24px de
             // padding en móvil lo deja en ~265px y cabe con holgura;
@@ -119,11 +119,11 @@ export function FinalCTANew() {
             className="inline-flex h-[52px] items-center gap-2.5 rounded-[2px] px-6 sm:px-8 text-base font-semibold outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[rgb(var(--accent-hover))] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
             style={{ background: "rgb(var(--accent-base))", color: "rgb(var(--accent-ink))" }}
           >
-            {es ? "Empieza hoy — 29 $" : "Start today — $29"}
+            {es ? "Ver la demo" : "See the demo"}
             <ArrowRight size={17} aria-hidden />
           </Link>
           <Link
-            href="/demo"
+            href="/pricing"
             className="inline-flex h-[52px] items-center gap-2.5 rounded-[2px] border px-6 sm:px-8 text-base font-semibold text-[var(--ink)] outline-none transition-[background-color,border-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[color-mix(in_srgb,var(--ink)_6%,transparent)] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] active:translate-y-0"
             style={{ borderColor: "rgb(var(--divider) / 0.20)" }}
           >
@@ -132,7 +132,7 @@ export function FinalCTANew() {
                 across the site (primary = ArrowRight suffix, secondary =
                 Play prefix). */}
             <Play size={15} fill="currentColor" aria-hidden />
-            {es ? "Ver la demo" : "See the demo"}
+            {es ? "Ver precios" : "See pricing"}
           </Link>
         </motion.div>
         <motion.div
@@ -147,10 +147,10 @@ export function FinalCTANew() {
           className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5"
         >
           {[
-            es ? "Actualizaciones 1.x gratuitas" : "Free 1.x updates",
-            es ? "Pago único · sin suscripción" : "One-time payment · no subscription",
+            es ? "Datos de muestra" : "Sample data",
+            es ? "Sin registro para explorar" : "No sign-up to explore",
+            es ? "Acceso anticipado privado" : "Private early access",
             "100 % local",
-            es ? "Soporte directo" : "Direct support",
           ].map((g) => (
             <span
               key={g}

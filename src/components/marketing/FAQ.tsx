@@ -60,8 +60,8 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
   const items: QA[] = es
     ? [
         {
-          q: "¿Es realmente de pago único?",
-          a: "Sí. Pagas una vez y la app es tuya para siempre, sin recurrencias ni cargos ocultos. Incluye todas las actualizaciones de la versión principal que compres y descuentos generosos en futuras versiones mayores.",
+          q: "¿Cuál es el estado de compra?",
+          a: "La demo es pública y no pide registro ni tarjeta. Core $29 y Pro $49 son precios de lanzamiento previstos hasta que la entrega comercial esté abierta.",
         },
         {
           q: "¿Mis datos están seguros?",
@@ -73,49 +73,49 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "¿Funciona en Mac o Linux?",
-          a: "CountPips es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
+          a: "CountPips es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres entrar en el acceso anticipado, escríbenos.",
         },
         {
           q: "¿Puedo importar de otro journal?",
           a: "Sí. Aceptamos importación desde CSV (formato flexible con mapeo de columnas) y un importador dedicado para journals populares. Si tu journal actual exporta a CSV, lo tienes en tu CountPips en menos de 5 minutos.",
         },
         {
-          q: "¿Qué pasa si pierdo mi licencia?",
-          a: "Tu licencia se asocia a tu correo electrónico. Puedes recuperarla cuantas veces necesites escribiendo al soporte. Y aunque pierdas el acceso a tu correo, tu historial sigue intacto porque vive en tu equipo, no en el nuestro.",
+          q: "¿Cómo se selecciona el acceso anticipado?",
+          a: "Revisamos las solicitudes por perfil y fase del producto, no por orden de llegada. Si encaja con el piloto privado, escribiremos con los pasos de invitación.",
         },
         {
-          q: "¿Hay actualizaciones?",
-          a: "Sí, y son gratuitas dentro de la misma versión mayor (1.x → 1.x). Las versiones mayores (2.0, 3.0…) serán de pago, pero con descuento preferente para quienes ya tengan una licencia.",
+          q: "¿Qué está listo y qué se está validando?",
+          a: "La demo, el journal, las métricas y los recorridos de riesgo están listos para explorar. El piloto privado valida la instalación y el flujo con usuarios reales; la página de estado explica lo que todavía no prometemos.",
         },
         {
           q: "¿Qué métodos de pago aceptáis?",
-          a: "Tarjeta de crédito/débito y PayPal. Emitimos factura con IVA si procede.",
+          a: "La demo no tiene coste. La compra se abrirá cuando la entrega comercial, la licencia y el soporte estén listos; el acceso anticipado no es una preventa.",
         },
         {
-          q: "¿Puedo probar antes de comprar?",
-          a: "Sí. Puedes explorar la demo en vivo de esta misma web con datos deterministas, sin registro y sin descargar nada. Es la app recreada al completo: puedes recorrer las pantallas y ver exactamente qué te llevas antes de pagar.",
+          q: "¿Puedo ver el producto antes de solicitar acceso?",
+          a: "Sí. Puedes explorar la demo en vivo con datos deterministas, sin registro y sin descargar nada. La aplicación instalada se entrega sólo a participantes del piloto privado invitados.",
         },
         {
           q: "¿Cuál es la diferencia entre Core y Pro?",
           a: "Core incluye el journal completo, 40+ métricas, 2 cuentas de trading, gestión de riesgo, disciplina e informes PDF básicos. Pro desbloquea además: cuentas ilimitadas, modo prop firm, simulador Monte Carlo, informe de track record, risk of ruin, informes PDF avanzados y el importador de rivales que migra tu journal anterior en 5 minutos.",
         },
         {
-          q: "¿Funciona sin internet?",
-          a: "Sí, 100 % local. Una vez descargada e instalada, la app no necesita conexión a internet para nada: ni para abrir tu journal, ni para registrar operaciones, ni para generar informes. Tus datos nunca salen de tu equipo. Solo necesitas internet para descargar la app, recibir actualizaciones (opcional) o activar tu licencia la primera vez.",
+          q: "¿Cómo funcionará la privacidad de mis datos?",
+          a: "La aplicación está diseñada local-first: las operaciones viven en tu equipo y la web no pide credenciales, capital, extractos ni datos financieros. El piloto privado valida el flujo sin exponer esos datos.",
         },
         {
-          q: "¿Puedo usarlo en varios ordenadores?",
-          a: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Tu archivo .sqlite es portable: cópialo a una carpeta compartida o llévalo en un pendrive y trabajarás desde cualquiera de los equipos como si fuera el mismo. Las activaciones adicionales se gestionan escribiendo a soporte.",
+          q: "¿Podré usarlo en varios ordenadores?",
+          a: "La política de dispositivos se concretará antes de la venta. Durante el piloto privado recibirás instrucciones de instalación sólo si eres invitado.",
         },
         {
-          q: "¿Qué pasa si cambio de ordenador?",
-          a: "Nada. Tu historial vive en un único archivo .sqlite portable. Cópialo al nuevo equipo (pendrive, disco externo, carpeta compartida) y seguirás trabajando como si no hubiera pasado nada. Tu licencia se asocia a tu correo, no a la máquina: reinstala la app en el equipo nuevo, activa con tu correo y listo.",
+          q: "¿Qué ocurre si cambio de ordenador durante el piloto?",
+          a: "El equipo de CountPips te indicará el procedimiento para mover tu entorno. No pediremos credenciales ni datos financieros para hacerlo.",
         },
       ]
     : [
         {
-          q: "Is it really a one-time payment?",
-          a: "Yes. You pay once and the app is yours forever, with no recurring fees or hidden charges. All updates within the major version you buy are included, and you get generous discounts on future major versions.",
+          q: "What is the purchase status?",
+          a: "The demo is public and requires no sign-up or card. Core is planned at $29 and Pro at $49 until commercial delivery opens.",
         },
         {
           q: "Are my data safe?",
@@ -127,43 +127,43 @@ export function FAQ({ standalone = false }: { standalone?: boolean } = {}) {
         },
         {
           q: "Does it work on Mac or Linux?",
-          a: "CountPips is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like to be a beta tester when it lands, drop us a line.",
+          a: "CountPips is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like early access, drop us a line.",
         },
         {
           q: "Can I import from another journal?",
           a: "Yes. We support CSV import (flexible format with column mapping) and a dedicated importer for popular journals. If your current journal exports to CSV, you'll have it in your CountPips in less than 5 minutes.",
         },
         {
-          q: "What if I lose my license?",
-          a: "Your license is tied to your email address. You can recover it as many times as you need by writing to support. And even if you lose access to your email, your history stays intact because it lives on your machine, not ours.",
+          q: "How is early access selected?",
+          a: "We review applications by profile and product phase, not by order of arrival. If it fits the private pilot, we will write with invitation steps.",
         },
         {
-          q: "Are there updates?",
-          a: "Yes, and they're free within the same major version (1.x → 1.x). Major versions (2.0, 3.0…) will be paid, but with a preferential discount for existing license holders.",
+          q: "What is ready and what is being validated?",
+          a: "The demo, journal, metrics and risk journeys are ready to explore. The private pilot validates installation and workflow with real users; the product status page explains what is not promised yet.",
         },
         {
           q: "What payment methods do you accept?",
-          a: "Credit/debit card and PayPal. We issue VAT invoices where applicable.",
+          a: "The demo is free. Purchase opens when commercial delivery, licensing and support are ready; early access is not a pre-order.",
         },
         {
-          q: "Can I try before buying?",
-          a: "Yes. You can explore the live demo on this very site with deterministic data, no signup and nothing to download. It's the full app recreated: you can walk through the screens and see exactly what you're getting before you pay.",
+          q: "Can I see the product before requesting access?",
+          a: "Yes. Explore the live demo with deterministic data, no signup and nothing to download. The desktop installer is delivered only to invited private-pilot participants.",
         },
         {
           q: "What's the difference between Core and Pro?",
           a: "Core includes the full journal, 40+ metrics, 2 trading accounts, risk management, discipline, and basic PDF reports. Pro additionally unlocks unlimited accounts, prop firm mode, the Monte Carlo simulator, track record report, risk of ruin, advanced PDF reports, and the rival importer that migrates your old journal in 5 minutes.",
         },
         {
-          q: "Does it work without internet?",
-          a: "Yes, 100% local. Once downloaded and installed, the app needs no internet connection at all: not to open your journal, not to log trades, not to generate reports. Your data never leaves your machine. You only need internet to download the app, receive updates (optional), or activate your license the first time.",
+          q: "How will my data stay private?",
+          a: "The app is designed local-first: trades live on your machine and the website never asks for credentials, capital, statements or financial data. The private pilot validates the workflow without exposing those data.",
         },
         {
-          q: "Can I use it on multiple computers?",
-          a: "Yes. A single license lets you install CountPips on your personal computers (your trading desktop and your laptop, for example). Your .sqlite file is portable: copy it to a shared folder or carry it on a USB stick and you'll work from any of your machines as if it were the same one. Extra activations can be arranged by emailing support.",
+          q: "Will I be able to use it on multiple computers?",
+          a: "The device policy will be defined before sales open. During the private pilot, invited participants receive installation instructions.",
         },
         {
-          q: "What if I change computers?",
-          a: "Nothing happens. Your history lives in a single portable .sqlite file. Copy it to the new machine (USB stick, external drive, shared folder) and keep working as if nothing happened. Your license is tied to your email, not the machine: reinstall the app on the new computer, activate with your email and you're done.",
+          q: "What if I change computers during the pilot?",
+          a: "The CountPips team will provide the procedure to move your environment. We will not ask for credentials or financial data to do it.",
         },
       ];
 

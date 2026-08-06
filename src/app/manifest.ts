@@ -17,7 +17,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "CountPips",
     short_name: "CountPips",
     description:
-      "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
+      "El diario de trading profesional, nativo de Windows. Demo interactiva, métricas institucionales, disciplina y datos 100 % locales.",
     start_url: `${BASE}/`,
     display: "standalone",
     // Los dos colores son `--bg` del tema oscuro del estilo vivo

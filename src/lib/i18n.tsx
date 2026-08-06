@@ -23,7 +23,7 @@ export const STR = {
   },
   ctaPrimary: { es: "Probar la demo", en: "Try the demo" },
   ctaSecondary: { es: "Ver precios", en: "See pricing" },
-  buyNow: { es: "Comprar Pro", en: "Buy Pro" },
+  buyNow: { es: "Solicitar acceso anticipado", en: "Request early access" },
 
   // ---- Nav ----
   navProduct: { es: "Producto", en: "Product" },
@@ -39,14 +39,14 @@ export const STR = {
   // ---- Positioning strip ----
   posNative: { es: "Nativa de Windows", en: "Native to Windows" },
   posLocal: { es: "100 % local", en: "100 % local" },
-  posOnce: { es: "Pago único", en: "One-time payment" },
+  posOnce: { es: "Demo interactiva", en: "Interactive demo" },
   posBilingual: { es: "ES + EN nativo", en: "Native ES + EN" },
 
   // ---- Demo ----
   demoTitle: { es: "Demo en vivo", en: "Live demo" },
   demoSubtitle: {
-    es: "Esto no es un vídeo: es la app, recreada. Haz clic en las pestañas, explora las páginas. Los datos son de muestra, como en la app real.",
-    en: "This isn't a video: it's the app, recreated. Click the tabs, explore the pages. Data is sample data, just like the real app.",
+    es: "No es un vídeo ni una galería: es el recorrido esencial de CountPips, recreado para que puedas juzgarlo antes de instalar nada.",
+    en: "Not a video or a gallery: it is CountPips' essential workflow, recreated so you can judge it before installing anything.",
   },
   demoOpenFull: { es: "Abrir en pantalla completa", en: "Open full screen" },
   demoCloseFull: { es: "Cerrar", en: "Close" },
@@ -334,14 +334,14 @@ export const STR = {
   },
 
   // ---- Pricing ----
-  pricingEyebrow: { es: "Precios", en: "Pricing" },
+  pricingEyebrow: { es: "Precios de lanzamiento", en: "Launch pricing" },
   pricingTitle: {
-    es: "Lo compras una vez. Es tuyo para siempre.",
-    en: "You buy it once. It's yours forever.",
+    es: "Compra cuando estés listo.",
+    en: "Buy when you are ready.",
   },
   pricingLead: {
-    es: "Sin suscripciones. Sin nube. Sin perder acceso a tu historial si dejas de pagar.",
-    en: "No subscriptions. No cloud. No losing access to your history if you stop paying.",
+    es: "Dos niveles claros para dos formas de operar. Prueba la demo, compara el alcance y solicita acceso anticipado si quieres entrar antes de la apertura comercial.",
+    en: "Two clear tiers for two ways of trading. Try the demo, compare the scope and request early access if you want in before commercial launch.",
   },
   core: { es: "Core", en: "Core" },
   pro: { es: "Pro", en: "Pro" },

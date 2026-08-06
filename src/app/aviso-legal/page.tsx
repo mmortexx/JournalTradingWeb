@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LegalDoc } from "@/components/legal/LegalDoc";
 import { documentoPorSlug } from "@/lib/legal/documentos";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /aviso-legal — quién está detrás del sitio.
@@ -28,7 +28,10 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: doc.tituloEs,
   description: doc.descripcionEs,
-  alternates: { canonical: `${SITE_URL}/aviso-legal/` },
+  alternates: {
+    canonical: `${SITE_URL}/aviso-legal/`,
+    languages: hreflangDe("/aviso-legal"),
+  },
   openGraph: {
     title: `${doc.tituloEs} — CountPips`,
     description: doc.descripcionEs,
@@ -45,7 +48,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AvisoLegalPage() {
+/** Exportado con nombre para que `app/en/aviso-legal/page.tsx` lo reutilice.
+ *  Sin el `<script>` de datos estructurados: cada idioma lleva el suyo. */
+export function AvisoLegalBody() {
   return (
     <>
       <PageHeader
@@ -60,11 +65,19 @@ export default function AvisoLegalPage() {
         breadcrumbEs="Aviso legal"
         breadcrumbEn="Legal notice"
       />
+      <LegalDoc doc={doc} />
+    </>
+  );
+}
+
+export default function AvisoLegalPage() {
+  return (
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <LegalDoc doc={doc} />
+      <AvisoLegalBody />
     </>
   );
 }

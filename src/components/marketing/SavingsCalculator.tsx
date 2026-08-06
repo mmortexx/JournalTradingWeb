@@ -5,18 +5,17 @@ import { useLang } from "@/lib/i18n";
 import { Reveal } from "@/components/tj/Reveal";
 
 /**
- * SavingsCalculator — "pago único vs suscripción".
+ * SavingsCalculator — illustrative post-beta cost scenario.
  *
- * Refuerza el value prop central de CountPips: pago único desde 29 $,
- * sin suscripciones. Cuantifica cuánto ahorra un trader frente a las
- * herramientas de journal SaaS típicas (que cobran 15-30 $/mes).
+ * Uses the planned Core/Pro reference prices only as an illustrative
+ * scenario; it does not represent a live offer or purchase flow.
  *
  * El trader ajusta:
- *   · plan CountPips (Core 29 $ / Pro 49 $)
+ *   · planned reference tier (Core $29 / Pro $49)
  *   · precio mensual de la alternativa por suscripción
  *   · años de uso
  *
- * Y ve: pago CountPips (una vez), pago suscripción (acumulado), ahorro
+ * Y ve: reference cost, subscription cost (cumulative), illustrative saving
  * total $ y %, y una mini-curva que muestra cómo el ahorro crece con
  * el tiempo mientras la suscripción sigue cobrando cada mes.
  *
@@ -121,7 +120,7 @@ export function SavingsCalculator() {
             </span>
             <span aria-hidden style={{ width: 22, height: 1, background: "rgb(var(--divider) / 0.13)" }} />
             <span className="tnum" style={{ fontSize: 11, letterSpacing: "0.2em", color: "var(--ink-3)" }}>
-              {es ? "AHORRO" : "SAVINGS"}
+              {es ? "ESCENARIO" : "SCENARIO"}
             </span>
           </div>
           <h2
@@ -137,11 +136,11 @@ export function SavingsCalculator() {
           >
             {es ? (
               <>
-                Pago único. <span style={{ color: "rgb(var(--accent-base))" }}>Sin recurrencias.</span>
+                Un escenario de coste. <span style={{ color: "rgb(var(--accent-base))" }}>No es una oferta.</span>
               </>
             ) : (
               <>
-                Pay once. <span style={{ color: "rgb(var(--accent-base))" }}>No subscriptions.</span>
+                A cost scenario. <span style={{ color: "rgb(var(--accent-base))" }}>Not an offer.</span>
               </>
             )}
           </h2>
@@ -150,14 +149,14 @@ export function SavingsCalculator() {
             style={{ fontSize: "clamp(1rem, 1.3vw, 1.1rem)", lineHeight: 1.62, color: "var(--ink-2)", maxWidth: "34em" }}
           >
             {es
-              ? "Las herramientas de journal por suscripción te cobran cada mes, para siempre. CountPips se compra una vez. Calcula cuánto ahorras."
-              : "Subscription journal tools charge you every month, forever. CountPips is a one-time purchase. Calculate how much you save."}
+              ? "Core $29 y Pro $49 son referencias previstas de lanzamiento. Compara un escenario de coste mensual sin interpretar el resultado como una promesa comercial."
+              : "Core $29 and Pro $49 are planned launch references. Compare a monthly cost scenario without treating the result as a commercial promise."}
           </p>
 
           {/* Plan CountPips */}
           <div className="mb-5">
             <div className="tnum mb-2" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
-              {es ? "Tu plan CountPips" : "Your CountPips plan"}
+              {es ? "Referencia prevista" : "Planned reference"}
             </div>
             <div className="flex flex-wrap gap-2">
               {COUNTPIPS_PLANS.map((p) => (
@@ -290,7 +289,7 @@ export function SavingsCalculator() {
           {/* Headline savings */}
           <div className="mb-5">
             <div className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
-              {es ? "Ahorras" : "You save"}
+              {es ? "Diferencia ilustrativa" : "Illustrative difference"}
             </div>
             <div className="flex items-baseline gap-3 mt-1">
               <span className="tnum" style={{ fontSize: 34, fontWeight: 700, color: "rgb(var(--pnl-pos))" }}>
@@ -306,7 +305,7 @@ export function SavingsCalculator() {
           <div className="mb-5">
             <div className="flex items-center justify-between mb-2">
               <span className="tnum" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-3)" }}>
-                {es ? "Pago acumulado" : "Cumulative cost"} · {years} {es ? "años" : "yrs"}
+                {es ? "Coste acumulado de referencia" : "Cumulative reference cost"} · {years} {es ? "años" : "yrs"}
               </span>
             </div>
             <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full" style={{ height: "auto", display: "block" }} aria-label={es ? "Comparación de pago acumulado" : "Cumulative cost comparison"} role="img">
@@ -335,20 +334,20 @@ export function SavingsCalculator() {
             <div className="flex items-center gap-4 mt-2 tnum" style={{ fontSize: 10, color: "var(--ink-3)" }}>
               <span className="inline-flex items-center gap-1.5">
                 <span aria-hidden className="inline-block w-2.5 h-[2px]" style={{ background: "rgb(var(--pnl-neg))" }} />
-                {es ? "Suscripción" : "Subscription"}: {fmtUsd(c.altTotal)}
+                {es ? "Alternativa mensual" : "Monthly alternative"}: {fmtUsd(c.altTotal)}
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span aria-hidden className="inline-block w-2.5 border-t-2 border-dashed" style={{ borderColor: "rgb(var(--accent-base))" }} />
-                CountPips: {fmtUsd(c.cpPrice)}
+                {es ? "Referencia CountPips" : "CountPips reference"}: {fmtUsd(c.cpPrice)}
               </span>
             </div>
           </div>
 
           {/* Result tiles */}
           <div className="grid grid-cols-2 gap-3.5 mb-4">
-            <Result label={es ? "Pago CountPips" : "CountPips (once)"} value={fmtUsd(c.cpPrice)} color="rgb(var(--accent-base))" />
-            <Result label={es ? "Suscripción" : "Subscription"} value={fmtUsd(c.altTotal)} color="rgb(var(--pnl-neg))" />
-            <Result label={es ? "Ahorro total" : "Total saved"} value={fmtUsd(c.savings)} color="rgb(var(--pnl-pos))" />
+            <Result label={es ? "Referencia CountPips" : "CountPips reference"} value={fmtUsd(c.cpPrice)} color="rgb(var(--accent-base))" />
+            <Result label={es ? "Alternativa mensual" : "Monthly alternative"} value={fmtUsd(c.altTotal)} color="rgb(var(--pnl-neg))" />
+            <Result label={es ? "Diferencia ilustrativa" : "Illustrative difference"} value={fmtUsd(c.savings)} color="rgb(var(--pnl-pos))" />
             <Result label={es ? "Break-even" : "Break-even"} value={`${c.breakEvenMonths} ${es ? "meses" : "mo"}`} color="var(--ink)" />
           </div>
 
@@ -359,8 +358,8 @@ export function SavingsCalculator() {
           >
             <p className="tnum m-0 text-[12px] leading-[1.55]" style={{ color: "var(--ink-2)" }}>
               {es
-                ? `En ${c.breakEvenMonths} ${c.breakEvenMonths === 1 ? "mes" : "meses"} la suscripción ya supera lo que cuesta CountPips. A partir de ahí, cada mes que sigas usándolo es ahorro neto.`
-                : `In ${c.breakEvenMonths} ${c.breakEvenMonths === 1 ? "month" : "months"} the subscription already exceeds CountPips' price. After that, every month you keep using it is net savings.`}
+                ? `En ${c.breakEvenMonths} ${c.breakEvenMonths === 1 ? "mes" : "meses"} la alternativa mensual supera esta referencia de precio.`
+                : `In ${c.breakEvenMonths} ${c.breakEvenMonths === 1 ? "month" : "months"} the monthly alternative exceeds this price reference.`}
             </p>
           </div>
         </div>

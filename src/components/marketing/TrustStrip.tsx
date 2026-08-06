@@ -33,7 +33,7 @@ export function TrustStrip() {
     },
     {
       icon: <InfinityIcon />,
-      label: es ? "Sin suscripción" : "No subscription",
+      label: es ? "Demo sin registro" : "No-sign-up demo",
     },
     {
       icon: <LockIcon />,
@@ -45,7 +45,7 @@ export function TrustStrip() {
     },
     {
       icon: <SparkIcon />,
-      label: es ? "Actualizaciones gratuitas" : "Free updates",
+      label: es ? "Sin tarjeta" : "No card",
     },
   ];
 

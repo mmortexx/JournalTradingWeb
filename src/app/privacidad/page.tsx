@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LegalDoc } from "@/components/legal/LegalDoc";
 import { documentoPorSlug } from "@/lib/legal/documentos";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /privacidad — qué datos recoge la web.
@@ -31,7 +31,10 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: doc.tituloEs,
   description: doc.descripcionEs,
-  alternates: { canonical: `${SITE_URL}/privacidad/` },
+  alternates: {
+    canonical: `${SITE_URL}/privacidad/`,
+    languages: hreflangDe("/privacidad"),
+  },
   openGraph: {
     title: `${doc.tituloEs} — CountPips`,
     description: doc.descripcionEs,
@@ -48,7 +51,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PrivacidadPage() {
+/** Exportado con nombre para que `app/en/privacidad/page.tsx` lo reutilice.
+ *  Sin el `<script>` de datos estructurados: cada idioma lleva el suyo. */
+export function PrivacidadBody() {
   return (
     <>
       <PageHeader
@@ -58,16 +63,24 @@ export default function PrivacidadPage() {
         titleEn="Privacy policy."
         titleHighlightEs="privacidad."
         titleHighlightEn="policy."
-        subtitleEs="Dos formularios, ninguna analítica y ningún rastreo. Aquí está exactamente qué se recoge, quién lo trata y cómo pedir que se borre."
-        subtitleEn="Two forms, no analytics and no tracking. Here is exactly what is collected, who processes it and how to have it deleted."
+        subtitleEs="Una solicitud de acceso anticipado, un consentimiento separado para comunicaciones y analítica opcional sólo tras aceptarla. Aquí está qué se recoge y cómo pedir que se borre."
+        subtitleEn="An early-access application, separate consent for communications, and optional analytics only after acceptance. Here is what is collected and how to have it deleted."
         breadcrumbEs="Privacidad"
         breadcrumbEn="Privacy"
       />
+      <LegalDoc doc={doc} />
+    </>
+  );
+}
+
+export default function PrivacidadPage() {
+  return (
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <LegalDoc doc={doc} />
+      <PrivacidadBody />
     </>
   );
 }

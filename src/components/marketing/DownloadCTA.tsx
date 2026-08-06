@@ -2,21 +2,21 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n";
+import { asset } from "@/lib/asset";
+import { withLocale } from "@/lib/locale";
 import { Eyebrow } from "@/components/tj/Eyebrow";
 
 /**
- * DownloadCTA — Windows-app download call-to-action. Sits between the
- * Newsletter and the FinalCTA on the Pricing page, giving a concrete
- * "next action" before the soft close.
+ * DownloadCTA — legacy-compatible beta admission block. If reintroduced on a
+ * route, it explains that installers go only to invited participants.
  *
  * Premium motion layer:
  *  - Card scales in on view (0.96 → 1).
  *  - Download button: lift on hover, press-down on tap.
  *  - prefers-reduced-motion disables the hover lift.
  *
- * The download href is "#" — purely visual, the Windows build is not yet
- * shipped. System-requirements line uses `tnum` for the version numbers
- * and the size figure.
+ * There is deliberately no public download link while the installer is
+ * invitation-only.
  *
  * No indigo/blue: accent-only palette.
  */
@@ -28,7 +28,7 @@ export function DownloadCTA() {
 
   return (
     <section
-      aria-label={es ? "Descarga" : "Download"}
+      aria-label={es ? "Acceso anticipado" : "Early access"}
       // R27-1b — `bg-veil` added: the aurora-bg + grain overlays are
       // transparent in hue, and the tj-paper download card (while
       // opaque itself) is `max-w-3xl mx-auto` — so the area around the
@@ -72,31 +72,31 @@ export function DownloadCTA() {
             {/* Left: copy block */}
             <div className="flex-1 min-w-0 text-center md:text-left">
               <div className="flex justify-center md:justify-start">
-                <Eyebrow>{es ? "Descarga" : "Download"}</Eyebrow>
+                <Eyebrow>{es ? "Acceso anticipado" : "Early access"}</Eyebrow>
               </div>
               <h2
                 className="mt-5 t-h2 text-primary"
               >
                 {es ? (
                   <>
-                    Empieza en <span className="text-gradient">2 minutos.</span>
+                    Empieza por <span className="text-gradient">tu contexto.</span>
                   </>
                 ) : (
                   <>
-                    Start in <span className="text-gradient">2 minutes.</span>
+                    Start with <span className="text-gradient">your context.</span>
                   </>
                 )}
               </h2>
               <p className="mt-4 text-secondary leading-relaxed max-w-md mx-auto md:mx-0">
                 {es ? (
                   <>
-                    Descarga la app para Windows. Sin registro, sin nube. Pago
-                    único desde <span className="tnum text-primary font-medium">$29</span>.
+                    El piloto es privado y por invitación. El instalador se entrega
+                    sólo a participantes seleccionados, sin tarjeta ni preventa.
                   </>
                 ) : (
                   <>
-                    Download the app for Windows. No registration, no cloud.
-                    One-time payment from <span className="tnum text-primary font-medium">$29</span>.
+                    The pilot is private and invite-only. The installer is delivered
+                    only to selected participants, with no card or pre-order.
                   </>
                 )}
               </p>
@@ -125,7 +125,7 @@ export function DownloadCTA() {
               </div>
             </div>
 
-            {/* Right: download button + meta */}
+              {/* Right: early-access button + meta */}
             <div className="shrink-0 flex flex-col items-center md:items-end gap-3">
               {/* Mismo caso que el botón de compra de los planes: apuntaba a
                   `href="#"` porque el instalador de Windows todavía no
@@ -143,7 +143,7 @@ export function DownloadCTA() {
                   los colores primarios del tema con realce al pasar por
                   encima (R20-3c). */}
               <motion.a
-                href="#waitlist"
+                href={asset(withLocale("/beta", lang))}
                 whileHover={
                   reduce
                     ? undefined
@@ -165,8 +165,8 @@ export function DownloadCTA() {
                     on sm+. Both render inside the same span so the icon↔text
                     gap stays consistent. */}
                 <span className="whitespace-nowrap">
-                  <span className="sm:hidden">{es ? "Descargar" : "Download"}</span>
-                  <span className="hidden sm:inline">{es ? "Descargar para Windows" : "Download for Windows"}</span>
+                  <span className="sm:hidden">{es ? "Solicitar" : "Request"}</span>
+                  <span className="hidden sm:inline">{es ? "Solicitar acceso anticipado" : "Request early access"}</span>
                 </span>
               </motion.a>
               {/* R24-1d — promotes the offline-installer subtext from bare
@@ -177,7 +177,7 @@ export function DownloadCTA() {
                   the icon + text aligned on the caption baseline. */}
               <span className="inline-flex items-center justify-center md:justify-end gap-1.5 text-xs text-tertiary tnum text-center md:text-right break-words">
                 <LockIconMini />
-                <span>{es ? "Instalador offline · sin conexión tras instalar" : "Offline installer · no connection after install"}</span>
+                <span>{es ? "Instalador sólo para participantes invitados" : "Installer for invited participants only"}</span>
               </span>
             </div>
           </div>

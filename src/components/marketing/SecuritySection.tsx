@@ -21,7 +21,7 @@ export function SecuritySection({ num = "06" }: { num?: string }) {
   ];
   const compare = [
     { l: es ? "Dónde viven los datos" : "Where data lives", tj: es ? "Tu disco" : "Your disk", cloud: es ? "Servidores del proveedor" : "Vendor servers" },
-    { l: es ? "Modelo de pago" : "Payment model", tj: es ? "Pago único" : "One-time payment", cloud: es ? "Suscripción mensual" : "Monthly subscription" },
+    { l: es ? "Modelo actual" : "Current model", tj: es ? "Demo + piloto privado" : "Demo + private pilot", cloud: es ? "Suscripción mensual" : "Monthly subscription" },
     { l: es ? "Funciona sin internet" : "Works offline", tj: true, cloud: false },
     { l: es ? "Cifrado en reposo" : "Encrypted at rest", tj: true, cloud: false },
     { l: es ? "Bloqueo por proveedor" : "Vendor lock-in", tj: false, cloud: true },

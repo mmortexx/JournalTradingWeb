@@ -4,12 +4,16 @@ import type { ReactNode } from "react";
 import { MotionConfig } from "framer-motion";
 import { ThemeProvider } from "@/lib/theme";
 import { LanguageProvider } from "@/lib/i18n";
+import { PostHog } from "@/components/analytics/PostHog";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <MotionConfig reducedMotion="user" transition={{ ease: [0.22, 1, 0.36, 1] }}>
       <ThemeProvider>
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          {children}
+          <PostHog />
+        </LanguageProvider>
       </ThemeProvider>
     </MotionConfig>
   );

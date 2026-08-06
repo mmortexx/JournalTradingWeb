@@ -389,15 +389,19 @@ export function CommandPalette({
                 <CommandGroup heading={es ? "Acción" : "Action"}>
                   <CommandItem
                     className={itemClass}
-                    value={es ? "comprar pro plan precios" : "buy pro plan pricing"}
-                    onSelect={() => navigate("/pricing")}
+                    value={
+                      es
+                        ? "solicitar acceso anticipado countpips"
+                        : "request countpips early access"
+                    }
+                    onSelect={() => navigate("/beta")}
                   >
-                    <CartIcon />
+                    <NavIcon />
                     <span className="text-primary">
-                      {es ? "Comprar Pro" : "Buy Pro"}
+                      {es ? "Solicitar acceso anticipado" : "Request early access"}
                     </span>
                     <CommandShortcut className="tnum text-tertiary">
-                      /pricing
+                      /beta
                     </CommandShortcut>
                   </CommandItem>
                 </CommandGroup>
@@ -490,29 +494,6 @@ function LangIcon() {
         strokeWidth="1.3"
         strokeLinecap="round"
       />
-    </svg>
-  );
-}
-
-function CartIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      className="text-tertiary shrink-0"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 3h1.4l1.2 7.6a1 1 0 0 0 1 .85h6.1a1 1 0 0 0 1-.78L13.6 5H4.2"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="6" cy="13" r="1" fill="currentColor" />
-      <circle cx="11" cy="13" r="1" fill="currentColor" />
     </svg>
   );
 }

@@ -346,8 +346,8 @@ export function Navbar() {
     },
   ];
 
-  // Enlaces del drawer móvil — mantiene Acerca de y FAQ (en desktop
-  // viven en el footer; la barra sigue al HTML: Producto/Demo/Precios).
+  // Enlaces del drawer móvil. La demo, los precios y el acceso anticipado quedan
+  // visibles sin obligar a descubrirlos dentro del megamenú.
   // Cada entrada lleva un icono de línea de 14 px: el drawer se abre
   // para escanear, y el icono acelera el reconocimiento frente a una
   // lista en plano de solo texto. El estilo es el mismo que usa el
@@ -381,6 +381,24 @@ export function Navbar() {
           <path d="M6.5 6.5v3l2.8-1.5-2.8-1.5Z" fill="currentColor" />
         </svg>
       ),
+    },
+    {
+      href: "/traders/manual",
+      labelEs: "Operativa manual",
+      labelEn: "Manual trading",
+      icon: <span aria-hidden className="text-[13px]">M</span>,
+    },
+    {
+      href: "/traders/prop-firms",
+      labelEs: "Prop firms",
+      labelEn: "Prop firms",
+      icon: <span aria-hidden className="text-[13px]">P</span>,
+    },
+    {
+      href: "/beta",
+      labelEs: "Acceso anticipado",
+      labelEn: "Early access",
+      icon: <span aria-hidden className="text-[13px]">β</span>,
     },
     {
       href: "/pricing",
@@ -571,6 +589,7 @@ export function Navbar() {
       `}</style>
       <header data-navbar-root className="fixed inset-x-0 top-0 z-50">
       <nav
+        aria-label={es ? "Principal" : "Main"}
         // T3b — papel cálido translúcido. `tj-paper` aporta el material
         // (backdrop-blur 10px + saturate 140%, grano de papel SVG,
         // catch-light inset); `tj-paper-dense` sube la opacidad de 72%
@@ -849,13 +868,10 @@ export function Navbar() {
             </div>
 
             {navLink("/demo", "Demo")}
-            {/* El test, con enlace DIRECTO y no sólo dentro del megamenú.
-                Estar en el desplegable de Producto lo deja a un clic de
-                distancia y sin verse: hay que abrir algo para saber que
-                existe. Aquí se lee de entrada, que es lo que se pedía al
-                llevarlo al menú principal. */}
-            {navLink("/test", es ? "Test" : "Quiz")}
-            {navLink("/pricing", es ? "Precios" : "Pricing")}
+            {navLink("/traders/manual", es ? "Manual" : "Manual")}
+            {navLink("/traders/prop-firms", "Prop firms")}
+            {navLink("/beta", es ? "Acceso" : "Access")}
+            {navLink("/faq", es ? "Recursos" : "Resources")}
           </div>
 
           {/* ZONA 3 — Utilidades: reloj UTC · tema · idioma · CTA · hamburguesa.
@@ -939,7 +955,7 @@ export function Navbar() {
                 El único realce es un cambio de tono, declarado igual
                 para ratón y teclado. */}
             <Link
-              href="/pricing"
+              href="/demo"
               className="hidden flex-none items-center gap-[7px] whitespace-nowrap rounded-[2px] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] sm:inline-flex"
               style={{
                 height: 38,
@@ -948,7 +964,7 @@ export function Navbar() {
                 color: "rgb(var(--accent-ink))",
               }}
             >
-              {es ? "Comprar" : "Buy"}
+              {es ? "Ver la demo" : "See the demo"}
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
                 <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -1190,24 +1206,24 @@ export function Navbar() {
                  (scrollable) de la conversión (fija al fondo). */}
               <div className="safe-bottom shrink-0 border-t border-[rgb(var(--divider)/0.06)] px-4 pt-4">
                 <div className="flex flex-col gap-2">
-                  {/* CTA secundario — la demo es la conversión suave:
-                      "míralo antes de pagar". Ghost, sin relleno de
-                      acento, para no competir con el primario. */}
+                  {/* CTA secundario — lleva a precios después de la demo.
+                      Ghost, sin relleno de acento, para no competir con el
+                      recorrido principal. */}
                   <Link
-                    href="/demo"
+                    href="/pricing"
                     onClick={() => setMobileOpen(false)}
                     className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[2px] border border-[rgb(var(--divider)/0.18)] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--ink)_5%,transparent)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
                     style={{ color: "var(--ink)" }}
                   >
-                    {es ? "Ver demo" : "View demo"}
+                    {es ? "Ver precios" : "See pricing"}
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M5 3l5 5-5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </Link>
-                  {/* CTA primario — mismo tratamiento que el de escritorio:
+                  {/* CTA primario — la demo es el primer paso del recorrido:
                       rectángulo de 4 px, sin sheen ni sombra de acento. */}
                   <Link
-                    href="/pricing"
+                    href="/demo"
                     onClick={() => setMobileOpen(false)}
                     className="flex h-12 w-full items-center justify-center gap-1.5 rounded-[2px] text-sm font-semibold outline-none transition-colors duration-150 hover:bg-[rgb(var(--accent-hover))] focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.55)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
                     style={{
@@ -1215,7 +1231,7 @@ export function Navbar() {
                       color: "rgb(var(--accent-ink))",
                     }}
                   >
-                    {t("buyNow")}
+                    {lang === "es" ? "Ver la demo" : "See the demo"}
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M3 8h9M8 4l4 4-4 4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>

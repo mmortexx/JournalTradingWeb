@@ -24,7 +24,7 @@ export function DemoReadyToBuy() {
 
   return (
     <section
-      aria-label={es ? "¿Listo para comprar?" : "Ready to buy?"}
+      aria-label={es ? "¿Listo para solicitar acceso?" : "Ready to request access?"}
       className="section-tight relative overflow-hidden"
     >
       {/* Subtle aurora wash + two soft accent orbs */}
@@ -55,18 +55,18 @@ export function DemoReadyToBuy() {
             >
               {es ? (
                 <>
-                  ¿Te gusta <span className="text-gradient">lo que ves?</span>
+                  ¿Te encaja <span className="text-gradient">lo que ves?</span>
                 </>
               ) : (
                 <>
-                  Like <span className="text-gradient">what you see?</span>
+                  Does it fit <span className="text-gradient">your workflow?</span>
                 </>
               )}
             </h2>
             <p className="mt-4 text-base md:text-lg text-secondary leading-relaxed max-w-xl mx-auto">
               {es
-                ? "Llévatelo a tu máquina. Pago único, sin suscripción y con tus datos siempre en tu equipo."
-                : "Take it to your machine. One-time payment, no subscription, and your data always on your machine."}
+                ? "Solicita acceso anticipado al piloto privado. La demo es pública, y no necesitas tarjeta."
+                : "Request private early access. The demo is public, and no card is required."}
             </p>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <motion.div
@@ -75,11 +75,11 @@ export function DemoReadyToBuy() {
                 className="inline-block"
               >
                 <MagneticButton
-                  href={asset(withLocale("/pricing", lang))}
+                  href={asset(withLocale("/beta", lang))}
                   strength={0.25}
                   className="group inline-flex items-center gap-2 rounded-lg bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] px-8 py-3 font-medium hover:-translate-y-0.5 transition-[transform,filter,box-shadow] duration-200 shadow-[0_18px_46px_-15px_rgb(var(--accent-base)/0.7)] ring-1 ring-inset ring-[rgb(var(--accent-base)/0.40)] hover:brightness-[1.08] hover:shadow-[0_22px_54px_-15px_rgb(var(--accent-base)/0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-base)/0.6)] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                 >
-                  {es ? "Ver precios" : "See pricing"}
+                  {es ? "Solicitar acceso anticipado" : "Request early access"}
                   <svg
                     className="transition-transform group-hover:translate-x-0.5"
                     width="16"
@@ -134,10 +134,7 @@ export function DemoReadyToBuy() {
               </motion.div>
             </div>
             <p className="mt-5 text-xs text-tertiary">
-              {es ? "desde " : "from "}
-              <span className="tnum text-secondary font-medium">$29</span>
-              {" · "}
-              {es ? "pago único · sin suscripción" : "one-time · no subscription"}
+              {es ? "Demo sin registro · datos de muestra · acceso anticipado privado" : "No-sign-up demo · sample data · private early access"}
             </p>
           </div>
         </Reveal>

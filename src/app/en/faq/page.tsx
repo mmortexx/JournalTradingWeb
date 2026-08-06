@@ -11,7 +11,7 @@ const breadcrumbSchema = {
   ],
 };
 
-/* Debe coincidir palabra por palabra con las 13 preguntas EN visibles en
+/* Debe coincidir palabra por palabra con las preguntas EN visibles en
    `FAQ.tsx` — copiadas de ahí, no traducidas de nuevo. */
 const faqSchema = {
   "@context": "https://schema.org",
@@ -19,10 +19,10 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "Is it really a one-time payment?",
+      name: "What is the purchase status?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. You pay once and the app is yours forever, with no recurring fees or hidden charges. All updates within the major version you buy are included, and you get generous discounts on future major versions.",
+        text: "The demo is public and requires no sign-up or card. Core is planned at $29 and Pro at $49 until commercial delivery opens.",
       },
     },
     {
@@ -46,7 +46,7 @@ const faqSchema = {
       name: "Does it work on Mac or Linux?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "CountPips is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like to be a beta tester when it lands, drop us a line.",
+        text: "CountPips is a native Windows app (WinUI 3). On Mac or Linux you can run it through a Windows virtual machine or Parallels. We're actively exploring a local-first version for Mac and Linux — if you'd like early access, drop us a line.",
       },
     },
     {
@@ -59,18 +59,18 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "What if I lose my license?",
+      name: "How is early access selected?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Your license is tied to your email address. You can recover it as many times as you need by writing to support. And even if you lose access to your email, your history stays intact because it lives on your machine, not ours.",
+        text: "We review applications by profile and product phase, not by order of arrival. If it fits the private pilot, we will write with invitation steps.",
       },
     },
     {
       "@type": "Question",
-      name: "Are there updates?",
+      name: "What is ready and what is being validated?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes, and they're free within the same major version (1.x → 1.x). Major versions (2.0, 3.0…) will be paid, but with a preferential discount for existing license holders.",
+        text: "The demo, journal, metrics and risk journeys are ready to explore. The private pilot validates installation and workflow with real users; the product status page explains what is not promised yet.",
       },
     },
     {
@@ -83,10 +83,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Can I try before buying?",
+      name: "Can I see the product before requesting access?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. You can explore the live demo on this very site with deterministic data, no signup and nothing to download. It's the full app recreated: you can walk through the screens and see exactly what you're getting before you pay.",
+        text: "Yes. Explore the live demo with deterministic data, no signup and nothing to download. The desktop installer is delivered only to invited private-pilot participants.",
       },
     },
     {
@@ -99,26 +99,26 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Does it work without internet?",
+      name: "How will my data stay private?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes, 100% local. Once downloaded and installed, the app needs no internet connection at all: not to open your journal, not to log trades, not to generate reports. Your data never leaves your machine. You only need internet to download the app, receive updates (optional), or activate your license the first time.",
+        text: "The app is designed local-first: trades live on your machine and the website never asks for credentials, capital, statements or financial data. The private pilot validates the workflow without exposing those data.",
       },
     },
     {
       "@type": "Question",
-      name: "Can I use it on multiple computers?",
+      name: "Will I be able to use it on multiple computers?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. A single license lets you install CountPips on your personal computers (your trading desktop and your laptop, for example). Your .sqlite file is portable: copy it to a shared folder or carry it on a USB stick and you'll work from any of your machines as if it were the same one. Extra activations can be arranged by emailing support.",
+        text: "The device policy will be defined before sales open. During the private pilot, invited participants receive installation instructions.",
       },
     },
     {
       "@type": "Question",
-      name: "What if I change computers?",
+      name: "What if I change computers during the pilot?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Nothing happens. Your history lives in a single portable .sqlite file. Copy it to the new machine (USB stick, external drive, shared folder) and keep working as if nothing happened. Your license is tied to your email, not the machine: reinstall the app on the new computer, activate with your email and you're done.",
+        text: "The CountPips team will provide the procedure to move your environment. We will not ask for credentials or financial data to do it.",
       },
     },
   ],

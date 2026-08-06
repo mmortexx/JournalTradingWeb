@@ -3,10 +3,11 @@ import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DemoCapabilities } from "@/components/demo/DemoCapabilities";
 import { AppDemoClient } from "@/components/demo/AppDemoClient";
+import { DemoConversionPanel } from "@/components/demo/DemoConversionPanel";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL, hreflangDe } from "@/lib/site";
 
-// Estimated reading time (capabilities + demo + gallery + stats + ready-to-buy).
+// Estimated reading time (capabilities + demo + decision bridge + stats).
 // ~400 words at 220 wpm = ~2 min.
 const READING_TIME_MIN = 2;
 
@@ -40,14 +41,14 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: "Demo en vivo",
   description:
-    "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra realistas. No es un vídeo: es la app.",
+    "Explora el recorrido esencial de CountPips en tu navegador con datos de muestra, sin registro ni instalación.",
   alternates: {
     canonical: `${SITE_URL}/demo/`,
     languages: hreflangDe("/demo"),
   },
   openGraph: {
     title: "Demo en vivo — CountPips",
-    description: "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra.",
+    description: "Explora el recorrido esencial de CountPips con datos de muestra, sin registro ni instalación.",
     url: `${SITE_URL}/demo/`,
     type: "website",
     siteName: "CountPips",
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Demo en vivo — CountPips",
     description:
-      "La app recreada en tu navegador. 4 secciones clickeables con datos de muestra realistas. No es un vídeo: es la app.",
+      "Explora el recorrido esencial de CountPips con datos de muestra, sin registro ni instalación.",
   },
 };
 
@@ -89,8 +90,8 @@ export function DemoBody() {
         titleEn="The app, in your browser."
         titleHighlightEs="en tu navegador."
         titleHighlightEn="in your browser."
-        subtitleEs="Esto no es un vídeo: es la app, recreada. Haz clic en las pestañas, explora las páginas. Los datos son de muestra, como en la app real."
-        subtitleEn="This isn't a video: it's the app, recreated. Click the tabs, explore the pages. Data is sample data, just like the real app."
+        subtitleEs="No es un vídeo ni una galería: explora el recorrido esencial de CountPips con datos de muestra, sin registro ni instalación."
+        subtitleEn="Not a video or a gallery: explore CountPips' essential workflow with sample data, no sign-up and no installation."
         breadcrumbEs="Demo"
         breadcrumbEn="Demo"
         readingTimeMin={READING_TIME_MIN}
@@ -103,6 +104,7 @@ export function DemoBody() {
             bandera el visitante leía el titular dos veces seguidas. */}
         <AppDemoClient hideHeader />
       </section>
+      <DemoConversionPanel />
       <PlateInterlude index={0} />
       <StatsBandNew />
       {/* Ready-to-buy CTA — catches visitors who just played with the demo */}

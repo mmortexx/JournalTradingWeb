@@ -51,10 +51,10 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "¿Es realmente de pago único?",
+      name: "¿Cuál es el estado de compra?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Pagas una vez y la app es tuya para siempre, sin recurrencias ni cargos ocultos. Incluye todas las actualizaciones de la versión principal que compres y descuentos generosos en futuras versiones mayores.",
+        text: "La demo es pública y no pide registro ni tarjeta. Core $29 y Pro $49 son precios de lanzamiento previstos hasta que la entrega comercial esté abierta.",
       },
     },
     {
@@ -78,7 +78,7 @@ const faqSchema = {
       name: "¿Funciona en Mac o Linux?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "CountPips es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres ser beta tester cuando salga, escríbenos.",
+        text: "CountPips es una app nativa de Windows (WinUI 3). En Mac o Linux puedes ejecutarla a través de una máquina virtual con Windows o Parallels. Estamos explorando activamente una versión local-first para Mac y Linux: si quieres entrar en el acceso anticipado, escríbenos.",
       },
     },
     {
@@ -91,18 +91,18 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "¿Qué pasa si pierdo mi licencia?",
+      name: "¿Cómo se selecciona el acceso anticipado?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Tu licencia se asocia a tu correo electrónico. Puedes recuperarla cuantas veces necesites escribiendo al soporte. Y aunque pierdas el acceso a tu correo, tu historial sigue intacto porque vive en tu equipo, no en el nuestro.",
+        text: "Revisamos las solicitudes por perfil y fase del producto, no por orden de llegada. Si encaja con el piloto privado, escribiremos con los pasos de invitación.",
       },
     },
     {
       "@type": "Question",
-      name: "¿Hay actualizaciones?",
+      name: "¿Qué está listo y qué se está validando?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí, y son gratuitas dentro de la misma versión mayor (1.x → 1.x). Las versiones mayores (2.0, 3.0…) serán de pago, pero con descuento preferente para quienes ya tengan una licencia.",
+        text: "La demo, el journal, las métricas y los recorridos de riesgo están listos para explorar. El piloto privado valida la instalación y el flujo con usuarios reales; la página de estado explica lo que todavía no prometemos.",
       },
     },
     {
@@ -115,10 +115,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "¿Puedo probar antes de comprar?",
+      name: "¿Puedo ver el producto antes de solicitar acceso?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Puedes explorar la demo en vivo de esta misma web con datos deterministas, sin registro y sin descargar nada. Es la app recreada al completo: puedes recorrer las pantallas y ver exactamente qué te llevas antes de pagar.",
+        text: "Sí. Puedes explorar la demo en vivo con datos deterministas, sin registro y sin descargar nada. La aplicación instalada se entrega sólo a participantes del piloto privado invitados.",
       },
     },
     {
@@ -131,26 +131,26 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "¿Funciona sin internet?",
+      name: "¿Cómo funcionará la privacidad de mis datos?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí, 100 % local. Una vez descargada e instalada, la app no necesita conexión a internet para nada: ni para abrir tu journal, ni para registrar operaciones, ni para generar informes. Tus datos nunca salen de tu equipo. Solo necesitas internet para descargar la app, recibir actualizaciones (opcional) o activar tu licencia la primera vez.",
+        text: "La aplicación está diseñada local-first: las operaciones viven en tu equipo y la web no pide credenciales, capital, extractos ni datos financieros. El piloto privado valida el flujo sin exponer esos datos.",
       },
     },
     {
       "@type": "Question",
-      name: "¿Puedo usarlo en varios ordenadores?",
+      name: "¿Podré usarlo en varios ordenadores?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Tu archivo .sqlite es portable: cópialo a una carpeta compartida o llévalo en un pendrive y trabajarás desde cualquiera de los equipos como si fuera el mismo. Las activaciones adicionales se gestionan escribiendo a soporte.",
+        text: "La política de dispositivos se concretará antes de la venta. Durante el piloto privado recibirás instrucciones de instalación sólo si eres invitado.",
       },
     },
     {
       "@type": "Question",
-      name: "¿Qué pasa si cambio de ordenador?",
+      name: "¿Qué ocurre si cambio de ordenador durante el piloto?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Nada. Tu historial vive en un único archivo .sqlite portable. Cópialo al nuevo equipo (pendrive, disco externo, carpeta compartida) y seguirás trabajando como si no hubiera pasado nada. Tu licencia se asocia a tu correo, no a la máquina: reinstala la app en el equipo nuevo, activa con tu correo y listo.",
+        text: "El equipo de CountPips te indicará el procedimiento para mover tu entorno. No pediremos credenciales ni datos financieros para hacerlo.",
       },
     },
   ],
@@ -218,8 +218,8 @@ export function FaqBody() {
         titleEn="Frequently asked questions."
         titleHighlightEs="frecuentes."
         titleHighlightEn="questions."
-        subtitleEs="Todo lo que necesitas saber antes de comprar. ¿No encuentras tu respuesta? Consulta el glosario o escríbenos."
-        subtitleEn="Everything you need to know before buying. Can't find your answer? Browse the glossary or write to us."
+        subtitleEs="Todo lo que necesitas saber antes de probar CountPips o solicitar acceso anticipado. ¿No encuentras tu respuesta? Consulta el glosario o escríbenos."
+        subtitleEn="Everything you need to know before trying CountPips or requesting early access. Can't find your answer? Browse the glossary or write to us."
         breadcrumbEs="FAQ"
         breadcrumbEn="FAQ"
         readingTimeMin={READING_TIME_MIN}

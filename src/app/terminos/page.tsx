@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LegalDoc } from "@/components/legal/LegalDoc";
 import { documentoPorSlug } from "@/lib/legal/documentos";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /terminos — condiciones de uso de la web y de sus herramientas.
@@ -29,7 +29,10 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: doc.tituloEs,
   description: doc.descripcionEs,
-  alternates: { canonical: `${SITE_URL}/terminos/` },
+  alternates: {
+    canonical: `${SITE_URL}/terminos/`,
+    languages: hreflangDe("/terminos"),
+  },
   openGraph: {
     title: `${doc.tituloEs} — CountPips`,
     description: doc.descripcionEs,
@@ -46,7 +49,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TerminosPage() {
+/** Exportado con nombre para que `app/en/terminos/page.tsx` lo reutilice.
+ *  Sin el `<script>` de datos estructurados: cada idioma lleva el suyo. */
+export function TerminosBody() {
   return (
     <>
       <PageHeader
@@ -61,11 +66,19 @@ export default function TerminosPage() {
         breadcrumbEs="Términos"
         breadcrumbEn="Terms"
       />
+      <LegalDoc doc={doc} />
+    </>
+  );
+}
+
+export default function TerminosPage() {
+  return (
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <LegalDoc doc={doc} />
+      <TerminosBody />
     </>
   );
 }

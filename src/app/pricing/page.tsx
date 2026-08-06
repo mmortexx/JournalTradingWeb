@@ -5,10 +5,10 @@ import { Pricing } from "@/components/marketing/Pricing";
 import { TableOfContents } from "@/components/tj/TableOfContents";
 import { PlateInterlude } from "@/components/tj/PlateInterlude";
 import { SITE_URL, hreflangDe } from "@/lib/site";
-import { PRECIO_VALIDO_HASTA } from "@/lib/fechas";
+import { BetaStatus } from "@/components/beta/BetaStatus";
 
 // Estimated reading time (pricing cards + comparison + pricing FAQ +
-// trust strip + stats + lista de espera + download CTA).
+// trust strip + beta status).
 // ~850 words at 220 wpm = ~4 min.
 const READING_TIME_MIN = 4;
 
@@ -58,108 +58,64 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "¿Puedo probar antes de comprar?",
+      name: "¿Qué recibo al solicitar acceso anticipado?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Tienes la demo en vivo de esta misma web — sin registro, sin descargar nada, con datos deterministas.",
+        text: "Revisamos cada solicitud por perfil y fase del producto. Si encaja con el piloto privado, recibirás una invitación con los siguientes pasos. No mostramos una posición en cola.",
       },
     },
     {
       "@type": "Question",
-      name: "¿Qué métodos de pago aceptáis?",
+      name: "¿La demo tiene algún coste?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Tarjeta de crédito/débito y PayPal. Emitimos factura con IVA si procede.",
+        text: "No. La demo es pública, funciona con datos de muestra y no pide tarjeta, registro ni instalación.",
       },
     },
     {
       "@type": "Question",
-      name: "¿Puedo usarlo en varios ordenadores?",
+      name: "¿Qué incluyen los precios de lanzamiento?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sí. Una misma licencia te permite instalar CountPips en tus ordenadores personales (tu sobremesa de trading y tu portátil, por ejemplo). Activaciones adicionales se gestionan escribiendo a soporte.",
+        text: "Core está previsto en $29 y Pro en $49. Son referencias de lanzamiento hasta que la entrega comercial, la licencia y el soporte estén abiertos.",
       },
     },
     {
       "@type": "Question",
-      name: "¿Qué pasa si pierdo mi licencia?",
+      name: "¿Qué datos no se solicitan?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Nada. Tu licencia se asocia a tu correo electrónico: escríbenos y te la reenviamos las veces que haga falta. Y aunque pierdas el acceso al correo, tu historial sigue intacto porque vive en tu equipo, no en el nuestro.",
+        text: "Nunca pedimos credenciales, capital, extractos ni datos financieros. Sólo preguntamos lo necesario para seleccionar el piloto y entender tu contexto de journal.",
       },
     },
   ],
 };
 
 /**
- * Product + Offer structured data — tells search engines this page sells
- * two software products (Core $29, Pro $49) with one-time pricing. Enables
- * price rich-results on the SERP (the price snippet under the listing).
- * Mirrors the actual prices shown in the Pricing component (Core $29 ·
- * Pro $49, one-time payment, USD). Prices are the brand-fixed values —
- * NEVER 149/249 (per the owner's decision).
+ * Product structured data describes the product without an Offer. The prices
+ * are future references during the private pilot, not a purchasable offer.
  */
 const productSchema = {
   "@context": "https://schema.org",
   "@type": "Product",
   name: "CountPips",
   description:
-    "Diario de trading nativo de Windows. Métricas institucionales, disciplina que actúa, datos 100% locales. Pago único, sin suscripciones.",
+    "Diario de trading nativo de Windows. Demo interactiva, métricas institucionales, disciplina que actúa y datos locales.",
   brand: { "@type": "Brand", name: "CountPips" },
   category: "Software",
-  // Sin `aggregateRating` a propósito: no hay reseñas reales todavía.
-  // Ver la nota equivalente en src/app/layout.tsx.
-  /* Dos correcciones en las ofertas, y la segunda no es menor:
-
-     · `priceValidUntil` estaba escrito a mano como `2026-12-31`, a menos
-       de cinco meses vista. Pasada esa fecha el buscador da la oferta por
-       caducada y deja de mostrar el precio, sin avisar. Ahora se calcula.
-
-     · `availability` declaraba `InStock` — «disponible, en existencias»—
-       de un producto QUE NO SE PUEDE COMPRAR. Contradice al resto del
-       sitio, donde los botones de compra llevan a una lista de espera y
-       los términos dicen que las condiciones se publicarán al abrir la
-       venta. Declarar disponible lo que no lo está es justo lo que hace
-       que un buscador deje de fiarse de tus datos estructurados.
-       `PreOrder` es lo que corresponde: anunciado, todavía no a la venta.
-       El día que se abra el cobro, esto pasa a `InStock`. */
-  offers: [
-    {
-      "@type": "Offer",
-      name: "CountPips — Core",
-      price: "29",
-      priceCurrency: "USD",
-      priceValidUntil: PRECIO_VALIDO_HASTA,
-      availability: "https://schema.org/PreOrder",
-      url: `${SITE_URL}/pricing/`,
-      description:
-        "Journal completo, 40+ métricas, 2 cuentas, gestión de riesgo, disciplina, informes PDF básicos.",
-    },
-    {
-      "@type": "Offer",
-      name: "CountPips — Pro",
-      price: "49",
-      priceCurrency: "USD",
-      priceValidUntil: PRECIO_VALIDO_HASTA,
-      availability: "https://schema.org/PreOrder",
-      url: `${SITE_URL}/pricing/`,
-      description:
-        "Todo lo de Core + cuentas ilimitadas, modo prop firm, Monte Carlo, track record, risk of ruin, PDF avanzado, importador de rivales.",
-    },
-  ],
 };
 
 export const metadata: Metadata = {
   title: "Precios",
   description:
-    "Pago único. Sin suscripciones. Core $29 · Pro $49. Tus datos 100% locales para siempre.",
+    "Demo interactiva sin registro. Precios de lanzamiento previstos: Core $29 · Pro $49.",
   alternates: {
     canonical: `${SITE_URL}/pricing/`,
     languages: hreflangDe("/pricing"),
   },
   openGraph: {
     title: "Precios — CountPips",
-    description: "Pago único. Sin suscripciones. Core $29 · Pro $49.",
+    description: "Demo interactiva sin registro. Precios de lanzamiento previstos: Core $29 · Pro $49.",
     url: `${SITE_URL}/pricing/`,
     type: "website",
     siteName: "CountPips",
@@ -169,8 +125,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Precios — CountPips",
-    description:
-      "Pago único, sin suscripciones. Core $29 · Pro $49. Tus datos 100% locales para siempre.",
+    description: "Demo interactiva sin registro. Core $29 · Pro $49 como precios de lanzamiento previstos.",
   },
 };
 
@@ -182,10 +137,6 @@ const sectionFallback = (
 );
 const Comparison = dynamic(
   () => import("@/components/marketing/Comparison").then((m) => m.Comparison),
-  { loading: () => sectionFallback }
-);
-const SavingsCalculator = dynamic(
-  () => import("@/components/marketing/SavingsCalculator").then((m) => m.SavingsCalculator),
   { loading: () => sectionFallback }
 );
 const PricingFAQ = dynamic(
@@ -202,14 +153,6 @@ const StatsBandNew = dynamic(
   () => import("@/components/marketing/StatsBandNew").then((m) => m.StatsBandNew),
   { loading: () => sectionFallback }
 );
-const Waitlist = dynamic(
-  () => import("@/components/marketing/Waitlist").then((m) => m.Waitlist),
-  { loading: () => sectionFallback }
-);
-const DownloadCTA = dynamic(
-  () => import("@/components/marketing/DownloadCTA").then((m) => m.DownloadCTA),
-  { loading: () => sectionFallback }
-);
 const FinalCTANew = dynamic(
   () => import("@/components/marketing/FinalCTANew").then((m) => m.FinalCTANew),
   { loading: () => sectionFallback }
@@ -223,33 +166,28 @@ export function PricingBody() {
       <PageHeader
         eyebrowEs="Precios"
         eyebrowEn="Pricing"
-        titleEs="Lo compras una vez. Tuyo para siempre."
-        titleEn="You buy it once. Yours forever."
-        titleHighlightEs="Tuyo para siempre."
-        titleHighlightEn="Yours forever."
-        subtitleEs="Sin suscripciones. Sin nube. Sin perder acceso a tu historial si dejas de pagar."
-        subtitleEn="No subscriptions. No cloud. No losing access to your history if you stop paying."
+        titleEs="Compara antes de comprar."
+        titleEn="Compare before you buy."
+        titleHighlightEs="antes de comprar."
+        titleHighlightEn="before you buy."
+        subtitleEs="Core $29 y Pro $49 son precios de lanzamiento previstos. Prueba primero la demo; el acceso anticipado privado no es una preventa."
+        subtitleEn="Core $29 and Pro $49 are planned launch prices. Try the demo first; private early access is not a pre-order."
         breadcrumbEs="Precios"
         breadcrumbEn="Pricing"
         readingTimeMin={READING_TIME_MIN}
       />
       <Pricing standalone />
-      <SavingsCalculator />
       <Comparison />
       {/* Pricing-specific FAQ — 4 bilingual Q&A focused on trial, payment,
           multi-computer and lost license. */}
       <PricingFAQ />
+      <BetaStatus />
 
       <PlateInterlude index={0} />
       <TrustStrip />
       <StatsBandNew />
 
       <PlateInterlude index={1} />
-      <Waitlist />
-      {/* Download CTA — Windows-app installer button. Sits between the
-          la lista de espera y el cierre suave, para que el visitante se vaya con una
-          next action (download the desktop app). */}
-      <DownloadCTA />
       <FinalCTANew />
       <TableOfContents />
     </>

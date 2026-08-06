@@ -152,7 +152,7 @@ export default async function Image() {
             {[
               { v: "40+", l: "Métricas" },
               { v: "100%", l: "Local" },
-              { v: "1×", l: "Pago único" },
+              { v: "↗", l: "Demo interactiva" },
             ].map((k) => (
               <div key={k.l} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <div style={{ fontSize: 38, fontWeight: 700, color: "#CDD9E4", lineHeight: 1 }}>{k.v}</div>
@@ -173,7 +173,7 @@ export default async function Image() {
               fontWeight: 700,
             }}
           >
-            Comprar — desde 29 $
+            Ver la demo interactiva
           </div>
         </div>
 

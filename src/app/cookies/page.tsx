@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LegalDoc } from "@/components/legal/LegalDoc";
 import { documentoPorSlug } from "@/lib/legal/documentos";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /cookies — la lista de todo lo que la web deja en tu navegador.
@@ -30,7 +30,10 @@ const breadcrumbSchema = {
 export const metadata: Metadata = {
   title: doc.tituloEs,
   description: doc.descripcionEs,
-  alternates: { canonical: `${SITE_URL}/cookies/` },
+  alternates: {
+    canonical: `${SITE_URL}/cookies/`,
+    languages: hreflangDe("/cookies"),
+  },
   openGraph: {
     title: `${doc.tituloEs} — CountPips`,
     description: doc.descripcionEs,
@@ -47,26 +50,36 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CookiesPage() {
+/** Exportado con nombre para que `app/en/cookies/page.tsx` lo reutilice.
+ *  Sin el `<script>` de datos estructurados: cada idioma lleva el suyo. */
+export function CookiesBody() {
   return (
     <>
       <PageHeader
         eyebrowEs="Legal"
         eyebrowEn="Legal"
-        titleEs="Esta web no usa cookies."
-        titleEn="This site uses no cookies."
-        titleHighlightEs="no usa cookies."
-        titleHighlightEn="no cookies."
-        subtitleEs="Recuerda siete preferencias tuyas en el propio navegador, y ninguna sale de él. Aquí está la lista completa, sin excepciones, y cómo borrarla."
-        subtitleEn="It remembers seven of your preferences in the browser itself, and none of them leaves it. Here is the full list, with no exceptions, and how to delete it."
+        titleEs="Preferencias claras. Analítica opcional."
+        titleEn="Clear preferences. Optional analytics."
+        titleHighlightEs="Analítica opcional."
+        titleHighlightEn="Optional analytics."
+        subtitleEs="Las preferencias técnicas se quedan en tu navegador. PostHog sólo se carga si aceptas la medición y puedes retirarla cuando quieras."
+        subtitleEn="Technical preferences stay in your browser. PostHog only loads if you accept measurement, and you can withdraw it at any time."
         breadcrumbEs="Cookies"
         breadcrumbEn="Cookies"
       />
+      <LegalDoc doc={doc} />
+    </>
+  );
+}
+
+export default function CookiesPage() {
+  return (
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <LegalDoc doc={doc} />
+      <CookiesBody />
     </>
   );
 }

@@ -122,6 +122,7 @@ export function CookieConsent() {
     setDismissed(true);
     try {
       window.localStorage.setItem(STORAGE_KEY, choice);
+      window.dispatchEvent(new CustomEvent("tj-consent-change", { detail: choice }));
     } catch {
       /* localStorage unavailable — keep in-memory dismissal only. */
     }
@@ -172,8 +173,8 @@ export function CookieConsent() {
                   precisamente la diferencia. */}
               <p className="text-[12.5px] leading-[1.5] text-secondary flex-1 md:text-[13px] md:leading-relaxed">
                 {es
-                  ? "Esta web no usa cookies: solo recuerda tus preferencias en tu navegador. Sin rastreo ni publicidad. "
-                  : "This site uses no cookies: it just remembers your preferences in your browser. No tracking, no ads. "}
+                  ? "Usamos almacenamiento local para preferencias. La analítica opcional sólo se activa si la aceptas. "
+                  : "We use local storage for preferences. Optional analytics only starts if you accept it. "}
                 <Link
                   href="/cookies"
                   className="link-underline-host whitespace-nowrap text-primary transition-colors hover:text-[rgb(var(--accent-base))]"
@@ -194,14 +195,14 @@ export function CookieConsent() {
                 onClick={() => choose("declined")}
                 className="min-h-[44px] w-full px-3 py-2 rounded-lg text-[13px] font-medium text-secondary border border-[rgb(var(--divider)/0.22)] hover:bg-[rgb(var(--divider)/0.06)] hover:text-primary active:scale-[0.98] transition-[background,color,transform] duration-150"
               >
-                {es ? "Rechazar" : "Decline"}
+                {es ? "Solo necesarias" : "Necessary only"}
               </button>
               <button
                 type="button"
                 onClick={() => choose("accepted")}
                 className="min-h-[44px] w-full px-3 py-2 rounded-lg text-[13px] font-medium bg-[rgb(var(--accent-base))] text-[rgb(var(--accent-ink))] hover:brightness-110 active:scale-[0.98] transition-[filter,transform] duration-150"
               >
-                {es ? "Aceptar" : "Accept"}
+                {es ? "Aceptar analítica" : "Accept analytics"}
               </button>
             </div>
           </motion.div>

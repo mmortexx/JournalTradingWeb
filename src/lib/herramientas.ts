@@ -148,22 +148,22 @@ export const HERRAMIENTAS: Herramienta[] = [
   {
     slug: "ahorro-vs-suscripcion",
     componente: "SavingsCalculator",
-    tituloEs: "Pago único frente a suscripción",
-    tituloEn: "One-time payment vs subscription",
-    h1Es: "Lo que cuesta alquilar.",
-    h1En: "What renting costs.",
-    resaltaEs: "alquilar.",
-    resaltaEn: "renting.",
+    tituloEs: "Escenario de coste de lanzamiento",
+    tituloEn: "Launch cost scenario",
+    h1Es: "Una referencia, no una oferta.",
+    h1En: "A reference, not an offer.",
+    resaltaEs: "no una oferta.",
+    resaltaEn: "not an offer.",
     subtituloEs:
-      "Una suscripción de journal cuesta poco al mes y mucho a los cinco años. Pon la cuota que pagas o que te plantean y compárala con pagar una vez.",
+      "Core $29 y Pro $49 son precios previstos de lanzamiento. Introduce una alternativa mensual para comparar escenarios, sin que el resultado sea una oferta de compra.",
     subtituloEn:
-      "A journal subscription costs little per month and a lot over five years. Enter the fee you pay, or the one you are being offered, and compare it with paying once.",
-    resumenEs: "Cuánto suma una cuota mensual frente a pagar una sola vez.",
-    resumenEn: "What a monthly fee adds up to versus paying once.",
+      "Core $29 and Pro $49 are planned launch prices. Enter a monthly alternative to compare scenarios; the result is not a purchase offer.",
+    resumenEs: "Cómo cambia un escenario mensual frente a una referencia futura.",
+    resumenEn: "How a monthly scenario compares with a future reference.",
     descripcionEs:
-      "Compara el coste total de un diario de trading por suscripción frente a uno de pago único, en el plazo que elijas.",
+      "Compara un coste mensual con las referencias de lanzamiento de CountPips, sin convertir el resultado en una promesa de compra.",
     descripcionEn:
-      "Compare the total cost of a subscription trading journal against a one-time purchase, over the period you choose.",
+      "Compare a monthly cost with CountPips launch references; the result is not a purchase offer.",
   },
 ];
 

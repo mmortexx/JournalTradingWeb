@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { TerminoVista } from "@/components/glosario/TerminoVista";
 import { FinalCTANew } from "@/components/marketing/FinalCTANew";
 import { CATEGORIAS, TERMINOS, terminoPorSlug } from "@/lib/glosario";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, hreflangDe } from "@/lib/site";
 
 /**
  * /glosario/[termino] — una página por cada uno de los 51 términos.
@@ -42,7 +42,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: `${titulo} — CountPips` },
     description: desc,
     keywords: undefined,
-    alternates: { canonical: `${SITE_URL}/glosario/${t.slug}/` },
+    alternates: {
+      canonical: `${SITE_URL}/glosario/${t.slug}/`,
+      languages: hreflangDe(`/glosario/${t.slug}`),
+    },
     openGraph: {
       title: `${t.term} — ${familia} | CountPips`,
       description: desc,

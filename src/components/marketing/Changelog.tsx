@@ -24,94 +24,77 @@ type Entry = {
   title: string;
   description: string;
   date: string;
-  kind: "past" | "next";
+  stage: "delivered" | "pilot" | "future";
 };
 
 export function Changelog() {
   const { lang } = useLang();
   const es = lang === "es";
 
-  /* ── Por qué aquí ya no hay historial ────────────────────────────────
-     Esta lista presentaba v1.0, v1.2, v1.3 y v1.4 como versiones YA
-     publicadas, con fechas de enero a julio de 2026 —o sea, en el
-     pasado— de un producto que todavía no se puede comprar. El pie
-     remataba con «v1.4.2» y un punto verde de «sistemas operativos».
-
-     Era el último resto de una tanda de contenido inventado que ya se
-     había limpiado en el resto del sitio: se retiraron testimonios de
-     personas que no existen y una valoración de 4,8 sobre 47 reseñas que
-     tampoco. Esto se quedó, y desentonaba con todo lo demás.
-
-     Hay además una incoherencia de fondo que NO me corresponde resolver
-     y que dejo señalada: tres de estas entradas describen funciones que
-     la página de precios vende como incluidas desde el primer día —el
-     playbook con estadísticas y el Monte Carlo en los planes, el modo
-     prop firm y el importador en Pro—. O son del lanzamiento, o son
-     futuras, pero no las dos cosas. Al fundir lo publicado en una única
-     entrada de lanzamiento, la contradicción se reduce a las dos últimas
-     líneas del plan, que son decisión de producto. */
   const entries: Entry[] = es
     ? [
         {
-          version: "v1.0",
-          title: "Lanzamiento inicial",
+          version: "01",
+          title: "Demo pública",
           description:
-            "El journal completo: métricas, calendario, curva de capital, playbook con estadísticas, el guardián de disciplina e importación por CSV.",
+            "Recorrido interactivo con datos deterministas para entender el producto sin registro ni instalación.",
+          date: "Entregado",
+          stage: "delivered",
+        },
+        {
+          version: "02",
+          title: "Acceso anticipado privado",
+          description:
+            "Pilotos invitados para validar operativa manual y prop firms con usuarios que quieran llevar sus propios datos.",
           date: "En preparación",
-          kind: "next",
+          stage: "pilot",
         },
         {
-          version: "v1.5",
-          title: "Importador de rivales",
-          description: "Importa tu historial de otro journal en 5 minutos",
-          date: "Después del lanzamiento",
-          kind: "next",
-        },
-        {
-          version: "v1.6",
-          title: "Backtesting visual",
-          description: "Replay del mercado con tus reglas de setup",
+          version: "02",
+          title: "Importación ampliada",
+          description: "Más formatos de bróker y migración desde otros journals.",
           date: "Más adelante",
-          kind: "next",
+          stage: "future",
         },
         {
-          version: "v2.0",
+          version: "03",
           title: "Modo prop firm avanzado",
           description:
-            "Reglas de pérdida diaria, drawdown máximo y reset",
+            "Reglas de pérdida diaria, drawdown máximo y reset por cuenta.",
           date: "Más adelante",
-          kind: "next",
+          stage: "future",
         },
       ]
     : [
         {
-          version: "v1.0",
-          title: "Initial launch",
+          version: "01",
+          title: "Public demo",
           description:
-            "The full journal: metrics, calendar, equity curve, playbook with live stats, the discipline guardian and CSV import.",
-          date: "In preparation",
-          kind: "next",
+            "An interactive, deterministic walkthrough to understand the product with no signup or install.",
+          date: "Delivered",
+          stage: "delivered",
         },
         {
-          version: "v1.5",
-          title: "Rival importer",
-          description: "Import your history from another journal in 5 minutes",
-          date: "After launch",
-          kind: "next",
+          version: "02",
+          title: "Private early access",
+          description:
+            "Invited pilots validating manual trading and prop-firm workflows with users ready to bring their own data.",
+          date: "Preparing",
+          stage: "pilot",
         },
         {
-          version: "v1.6",
-          title: "Visual backtesting",
-          description: "Market replay with your setup rules",
+          version: "02",
+          title: "Expanded imports",
+          description: "More broker formats and migration from other journals.",
           date: "Later",
-          kind: "next",
+          stage: "future",
         },
         {
-          version: "v2.0",
+          version: "03",
           title: "Advanced prop firm mode",
-          description: "Daily loss rules, max drawdown and reset",
+          description: "Daily loss rules, max drawdown and account reset.",
           date: "Later",
-          kind: "next",
+          stage: "future",
         },
       ];
 
@@ -125,9 +108,7 @@ export function Changelog() {
         <div className="relative max-w-3xl mx-auto text-center">
           <Reveal>
             <div className="relative flex justify-center">
-              {/* «Changelog» prometía un historial de versiones publicadas
-                  que no existe. Esto es un plan, y se llama plan. */}
-              <Eyebrow>{es ? "Hoja de ruta" : "Roadmap"}</Eyebrow>
+              <Eyebrow>{es ? "Estado del producto" : "Product status"}</Eyebrow>
             </div>
           </Reveal>
           <Reveal delay={0.06}>
@@ -136,24 +117,20 @@ export function Changelog() {
             >
               {es ? (
                 <>
-                  Lo que viene, <span className="text-gradient">y en qué orden.</span>
+                  Qué está listo, <span className="text-gradient">qué validamos y qué sigue.</span>
                 </>
               ) : (
                 <>
-                  What's coming, <span className="text-gradient">and in what order.</span>
+                  What is ready, <span className="text-gradient">what we validate and what follows.</span>
                 </>
               )}
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
             <p className="relative mt-4 text-lg text-secondary max-w-xl mx-auto leading-[1.6]">
-              {/* Decía «cada versión se construye sobre el feedback de
-                  traders reales» y «lo que ya está en tu mano». Ninguna
-                  de las dos cosas puede ser cierta todavía: no hay
-                  versiones publicadas ni, por tanto, usuarios. */}
               {es
-                ? "Sin fechas cerradas: se publican cuando estén, no cuando toque. Apúntate a la lista y te avisamos en cada una."
-                : "No fixed dates: they ship when they are ready, not when a calendar says so. Join the list and we'll tell you at each one."}
+                ? "Separado entre entregado, acceso anticipado y futuro. Sin testimonios ni fechas inventadas: actualizamos esta página cuando haya evidencia."
+                : "Separated into delivered, early access and future. No invented testimonials or dates: we update this page when there is evidence."}
             </p>
           </Reveal>
         </div>
@@ -168,7 +145,8 @@ export function Changelog() {
 
           <div className="space-y-8 md:space-y-10">
             {entries.map((entry, i) => {
-              const isPast = entry.kind === "past";
+              const isPast = entry.stage === "delivered";
+              const isPilot = entry.stage === "pilot";
               const isLeft = i % 2 === 0; // even → left side on desktop
               // Slide-in direction: left card slides from left, right card from right
               const slideX = isLeft ? -48 : 48;
@@ -210,7 +188,7 @@ export function Changelog() {
                             }`}
                           >
                             <Chip
-                              variant={isPast ? "accent" : "neutral"}
+                              variant={isPast ? "accent" : isPilot ? "accent" : "neutral"}
                               className={
                                 isPast
                                   ? ""
@@ -221,7 +199,7 @@ export function Changelog() {
                             </Chip>
                             {!isPast && (
                               <Chip variant="warn">
-                                {es ? "Próximo" : "Next"}
+                                {isPilot ? (es ? "Acceso anticipado" : "Early access") : es ? "Futuro" : "Future"}
                               </Chip>
                             )}
                           </div>
@@ -238,7 +216,7 @@ export function Changelog() {
                           </h3>
                           <p
                             className={`mt-1.5 text-sm leading-[1.6] ${
-                              isPast ? "text-secondary" : "text-tertiary"
+                              isPast || isPilot ? "text-secondary" : "text-tertiary"
                             }`}
                           >
                             {entry.description}
@@ -249,9 +227,9 @@ export function Changelog() {
                               isLeft ? "md:justify-end" : "md:justify-start"
                             }`}
                           >
-                            <span
-                              className={`inline-block w-1.5 h-1.5 rounded-full ${
-                                isPast ? "bg-[rgb(var(--divider)/0.70)]" : "bg-pnl-warn/70"
+                              <span
+                                className={`inline-block w-1.5 h-1.5 rounded-full ${
+                                isPast ? "bg-[rgb(var(--accent-base)/0.85)]" : isPilot ? "bg-pnl-pos/80" : "bg-pnl-warn/70"
                               }`}
                               aria-hidden
                             />
@@ -275,7 +253,7 @@ export function Changelog() {
                     className="absolute left-4 md:left-1/2 top-6 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 z-10"
                     aria-hidden
                   >
-                    {isPast ? (
+                    {isPast || isPilot ? (
                       <span className="block w-3.5 h-3.5 rounded-full bg-[rgb(var(--accent-base))]" />
                     ) : (
                       <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[rgb(var(--pnl-warn)/0.85)] bg-background" />
@@ -297,8 +275,8 @@ export function Changelog() {
             <p className="text-sm text-secondary">
               <span className="text-[rgb(var(--pnl-pos))] font-medium">✓</span>{" "}
               {es
-                ? "Tu licencia incluye las actualizaciones de tu versión mayor. Las próximas, con descuento."
-                : "Your license includes updates within your major version. Future majors at a discount."}
+                ? "El acceso anticipado se abre con usuarios reales. Publicamos cambios cuando están validados."
+                : "Early access opens with real users. We publish changes once they are validated."}
             </p>
           </div>
         </Reveal>

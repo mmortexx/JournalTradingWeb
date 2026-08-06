@@ -113,9 +113,8 @@ const softwareApplicationSchema = {
   operatingSystem: "Windows",
   url: SITE_URL,
   description:
-    "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
+    "El diario de trading profesional, nativo de Windows. Explora una demo interactiva con métricas institucionales, disciplina y datos 100 % locales.",
   inLanguage: ["es", "en"],
-  softwareVersion: "1.0",
   /* Capturas reales de la aplicación. Estaban en `public/img/` sin que
      ningún dato estructurado las mencionara: Google las admite en
      `SoftwareApplication` y son gratis, ya existen. */
@@ -124,24 +123,6 @@ const softwareApplicationSchema = {
     `${SITE_URL}/img/app-curva.webp`,
     `${SITE_URL}/img/app-operaciones.webp`,
   ],
-  /* Este bloque se emite en TODAS las páginas, así que sus ofertas
-     convivían con las del `Product` de /pricing: dos entidades distintas
-     declarando Core a 29 y Pro a 49 sobre la misma dirección. No es
-     penalizable, pero es ambiguo, y ante la duda un buscador se queda con
-     lo que menos se compromete.
-     El precio se declara UNA vez, donde se vende, que es /pricing.
-     Aquí queda el enlace a esa página, que es la relación real. */
-  offers: {
-    "@type": "AggregateOffer",
-    lowPrice: "29",
-    highPrice: "49",
-    priceCurrency: "USD",
-    offerCount: 2,
-    /* `PreOrder` y no `InStock`, por lo mismo que en /pricing: el
-       producto todavía no se puede comprar. */
-    availability: "https://schema.org/PreOrder",
-    url: `${SITE_URL}/pricing/`,
-  },
   featureList: [
     "Métricas institucionales (Sharpe, Profit Factor, Expectancy, R-multiple)",
     "Curva de equity y drawdown en tiempo real",
@@ -186,7 +167,7 @@ const organizationSchema = {
     height: 512,
   },
   description:
-    "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único, sin suscripciones.",
+    "El diario de trading profesional, nativo de Windows. Explora el producto antes de instalarlo: métricas institucionales, disciplina y datos locales.",
   foundingDate: "2024",
   /* Sólo el repositorio, que es el único perfil que existe de verdad. Los
      iconos de X, YouTube y Discord se retiraron del pie por apuntar a
@@ -237,7 +218,7 @@ export const metadata: Metadata = {
     template: "%s · CountPips",
   },
   description:
-    "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina que te frena antes de la tontería y tus datos 100 % en tu máquina. Pago único. Sin suscripciones.",
+    "El diario de trading profesional, nativo de Windows. Explora la demo con métricas institucionales, disciplina y tus datos siempre en tu máquina.",
   /* Aquí iban 28 palabras clave. Se retiran: Google dejó de usar
      `meta keywords` en 2009 y lo anunció públicamente, Bing lo trata como
      señal de spam, y lo único que hacían era viajar en cada una de las
@@ -252,7 +233,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CountPips — Tu operativa, medida.",
     description:
-      "El diario de trading profesional, nativo de Windows. Métricas institucionales, disciplina y datos 100 % locales. Pago único.",
+      "El diario de trading profesional, nativo de Windows. Demo interactiva, métricas institucionales, disciplina y datos 100 % locales.",
     url: SITE_URL,
     siteName: "CountPips",
     type: "website",
@@ -305,6 +286,13 @@ export default function RootLayout({
       <head>
         <script
           // Prevent FOUC: apply saved theme/palette before paint
+          // suppressHydrationWarning: este script sólo existe para leer
+          // localStorage antes del primer paint — el servidor nunca puede
+          // reproducir su __html tal cual lo ve React al reconciliar, igual
+          // que ya pasa con el <html> de arriba. Sin esto, React marcaba un
+          // "mismatch" en cada primera visita (consola sucia en cada carga,
+          // no sólo la primera de la sesión de un visitante).
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             // El estilo es único ("clasico") y se fija aquí sin consultar
             // el localStorage: así un valor antiguo guardado en el
@@ -319,6 +307,9 @@ export default function RootLayout({
           // Intro del HTML de referencia: en la primera visita de la
           // sesión, oculta los [data-seq] del hero ANTES del primer
           // paint (IntroSequence los revela tras el loader).
+          // suppressHydrationWarning: lee sessionStorage, sólo existe en el
+          // navegador — mismo motivo que el script de arriba.
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `(function(){try{if(!sessionStorage.getItem('tj_intro'))document.documentElement.classList.add('tj-preload')}catch(e){}})();`,
           }}
@@ -333,6 +324,9 @@ export default function RootLayout({
           // interpola en la compilación con el mismo valor que usa
           // `asset()`, y en Cloudflare —donde no hay prefijo— la cadena
           // sale vacía y la resta no hace nada.
+          // suppressHydrationWarning: lee location.pathname del navegador —
+          // mismo motivo que los dos scripts de arriba.
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var p=location.pathname;var b='${BASE_PATH}';if(b&&p.indexOf(b)===0)p=p.slice(b.length)||'/';document.documentElement.lang=(p==='/en'||p.indexOf('/en/')===0)?'en':'es';}catch(e){}})();`,
           }}

@@ -123,12 +123,12 @@ export const PLATE_META: Record<PlateId, PlateMeta> = {
       "The ledger, open, with its columns and its ruled lines. No statistic exists until someone writes the trade down: that is where this product's name and its mark come from.",
   },
   tenure: {
-    titleEs: "Lo que separa alquilar de comprar",
-    titleEn: "What separates renting from owning",
+    titleEs: "El producto se abre por evidencia",
+    titleEn: "The product opens on evidence",
     noteEs:
-      "Dos trazos sobre el mismo eje de años: la escalera de una suscripción, que sube un peldaño cada vez que vence, y la horizontal de un pago que se hace una sola vez. Lo que argumenta no es ninguna de las dos líneas, sino el hueco tramado entre ellas — crece solo, sin que nadie añada nada.",
+      "Dos trazos sobre el mismo eje de adopción: la validación acumula evidencia y el acceso anticipado permanece privado durante esta fase. El área tramada recuerda que cada invitación debe aportar aprendizaje, no una promesa comercial.",
     noteEn:
-      "Two strokes on the same axis of years: the staircase of a subscription, climbing a step each time it renews, and the flat line of a payment made once. Neither line is the argument — the hatched gap between them is, and it widens on its own, with nobody adding anything.",
+      "Two strokes on the same adoption axis: validation accumulates evidence while early access remains private during this phase. The hatched area is a reminder that every invitation should add learning, not a commercial promise.",
   },
   sessions: {
     titleEs: "El día partido en husos",
