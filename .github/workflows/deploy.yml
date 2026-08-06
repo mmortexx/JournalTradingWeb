@@ -100,6 +100,22 @@ jobs:
           # del fallo en vez de fingir que ha registrado a nadie.
           #   Settings → Secrets and variables → Actions → WAITLIST_URL
           NEXT_PUBLIC_WAITLIST_URL: ${{ secrets.WAITLIST_URL }}
+          # URL de POST /v1/applications del Worker services/beta-api. Sin
+          # ella, joinBetaApplication cae al mismo Apps Script que la lista
+          # de espera (ver src/lib/forms.ts) — el sitio se publica igual,
+          # solo sin panel de operaciones ni deduplicación por D1.
+          #   Settings → Secrets and variables → Actions → BETA_API_URL
+          NEXT_PUBLIC_BETA_API_URL: ${{ secrets.BETA_API_URL }}
+          # Clave pública de proyecto de PostHog (host EU). Sin ella,
+          # PostHog.tsx no inyecta el script y el sitio se publica igual,
+          # sin analítica.
+          #   Settings → Secrets and variables → Actions → POSTHOG_KEY
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+          # Site key pública de Turnstile. Sin ella, BetaApplication.tsx no
+          # renderiza el widget anti-bot; el Worker igualmente rechaza la
+          # solicitud si exige Turnstile y no llega turnstileToken.
+          #   Settings → Secrets and variables → Actions → TURNSTILE_SITE_KEY
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
 
       - name: Disable Jekyll + add nojekyll
         # GitHub Pages procesa el contenido con Jekyll por defecto.

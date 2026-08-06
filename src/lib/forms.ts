@@ -45,8 +45,13 @@ export const formsConfigured = ACCESS_KEY.length > 0;
  */
 const WAITLIST_URL = (process.env.NEXT_PUBLIC_WAITLIST_URL ?? "").trim();
 
+/** Endpoint opcional para la aplicación cualificada de beta. Si no se
+ * configura, reutiliza el Apps Script de la lista con el mismo contrato. */
+const BETA_API_URL = (process.env.NEXT_PUBLIC_BETA_API_URL ?? WAITLIST_URL).trim();
+
 /** `false` mientras no se haya configurado la URL de la lista. */
 export const waitlistConfigured = WAITLIST_URL.length > 0;
+export const betaConfigured = BETA_API_URL.length > 0;
 
 /**
  * Buzón de soporte. ÚNICO sitio del proyecto donde se escribe.
@@ -168,6 +173,57 @@ export async function submitForm(fields: FormFields): Promise<SubmitResult> {
 export type WaitlistResult =
   | { ok: true; priority: number | null; duplicate: boolean; count: number | null }
   | { ok: false; reason: SubmitFailure };
+
+export type BetaApplicationData = {
+  email: string;
+  profile: "manual" | "prop";
+  experience: string;
+  markets: string;
+  workflow: string;
+  goal: string;
+  privacyConsent: boolean;
+  notes?: string;
+  marketingConsent?: boolean;
+  botcheck?: string;
+  turnstileToken?: string;
+  lang?: string;
+};
+
+export type BetaApplicationResult =
+  | { ok: true; duplicate: boolean }
+  | { ok: false; reason: SubmitFailure };
+
+/** Envía una solicitud cualificada sin enviar datos financieros ni valores
+ * de calculadoras. El endpoint definitivo puede ser un Worker; el fallback
+ * al Apps Script permite probar el flujo antes de migrar la infraestructura. */
+export async function joinBetaApplication(
+  application: BetaApplicationData,
+): Promise<BetaApplicationResult> {
+  if (!betaConfigured) return { ok: false, reason: "unconfigured" };
+
+  const { botcheck = "", ...rest } = application;
+  const params = typeof window === "undefined" ? new URLSearchParams() : new URLSearchParams(window.location.search);
+  const res = await postJson(
+    BETA_API_URL,
+    {
+      ...rest,
+      email: application.email.trim(),
+      botcheck,
+      source: typeof window === "undefined" ? "" : window.location.pathname,
+      utmSource: params.get("utm_source") ?? "",
+      utmMedium: params.get("utm_medium") ?? "",
+      utmCampaign: params.get("utm_campaign") ?? "",
+      origin: typeof window === "undefined" ? "" : window.location.origin,
+    },
+    "text/plain;charset=utf-8",
+  );
+
+  if (!res) return { ok: false, reason: "network" };
+  if (!res.ok) return { ok: false, reason: "rejected" };
+  const data = res.data as { ok?: boolean; duplicate?: boolean } | null;
+  if (!data?.ok) return { ok: false, reason: "rejected" };
+  return { ok: true, duplicate: data.duplicate === true };
+}
 
 /**
  * Da de alta un email en la lista de espera y devuelve su puesto en la cola.

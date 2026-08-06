@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/wrangler.json",
+  "name": "countpips-beta-api",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-08-05",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "vars": {
+    "ENVIRONMENT": "production",
+    "RATE_LIMIT_SECONDS": "60",
+    "ALLOWED_ORIGINS": "https://mmortexx.github.io,https://countpips.com,https://www.countpips.com,http://localhost:3000"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "countpips-beta",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID"
+    }
+  ]
+}

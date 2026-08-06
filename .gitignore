@@ -34,6 +34,13 @@ yarn-error.log*
 .env*
 # ...salvo la plantilla, que documenta qué variables hacen falta.
 !.env.example
+# secretos locales de `wrangler dev` (services/beta-api) — no coinciden
+# con el patrón .env* de arriba.
+.dev.vars
+.dev.vars.*
+# estado local de D1/KV simulado por `wrangler dev` (services/beta-api) —
+# incluye datos de prueba en SQLite, no es código ni configuración.
+.wrangler/
 
 # vercel
 .vercel
